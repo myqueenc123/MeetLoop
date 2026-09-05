@@ -1,8 +1,13 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
+
     <title>MeetLoop - Random Video Chat</title>
 
     <style>
@@ -467,7 +472,11 @@
 
             <div class="video-box">
 
-                <video id="remoteVideo" autoplay playsinline></video>
+                <video
+                    id="remoteVideo"
+                    autoplay
+                    playsinline
+                ></video>
 
                 <div class="video-label" id="strangerLabel">
                     👤 Stranger
@@ -477,9 +486,13 @@
                     Waiting...
                 </div>
 
-                <div class="search-overlay" id="searchOverlay">
+                <div
+                    class="search-overlay"
+                    id="searchOverlay"
+                >
                     <div class="search-box">
                         <div class="spinner"></div>
+
                         <div id="searchText">
                             Finding someone...
                         </div>
@@ -490,7 +503,12 @@
 
             <div class="video-box">
 
-                <video id="localVideo" autoplay muted playsinline></video>
+                <video
+                    id="localVideo"
+                    autoplay
+                    muted
+                    playsinline
+                ></video>
 
                 <div class="video-label">
                     🙂 You
@@ -505,7 +523,8 @@
             <button
                 class="btn btn-loop"
                 id="loopBtn"
-                onclick="toggleLoop()">
+                onclick="toggleLoop()"
+            >
                 🔄 Start Loop
             </button>
 
@@ -513,28 +532,32 @@
                 class="btn btn-stop"
                 id="stopBtn"
                 onclick="stopSession()"
-                disabled>
+                disabled
+            >
                 ⏹️ Stop
             </button>
 
             <button
                 class="btn btn-toggle"
                 id="micBtn"
-                onclick="toggleMic()">
+                onclick="toggleMic()"
+            >
                 🎙️ Mic On
             </button>
 
             <button
                 class="btn btn-toggle"
                 id="camBtn"
-                onclick="toggleCam()">
+                onclick="toggleCam()"
+            >
                 📷 Cam On
             </button>
 
             <button
                 class="btn btn-flip"
                 id="flipBtn"
-                onclick="flipCamera()">
+                onclick="flipCamera()"
+            >
                 🔄 Flip
             </button>
 
@@ -548,9 +571,12 @@
             💬 Live Chat
         </div>
 
-        <div class="chat-messages" id="chatMessages">
-
+        <div
+            class="chat-messages"
+            id="chatMessages"
+        >
             <div class="message">
+
                 <div class="message-name">
                     System
                 </div>
@@ -558,8 +584,8 @@
                 <div class="message-text">
                     Welcome to MeetLoop!
                 </div>
-            </div>
 
+            </div>
         </div>
 
         <div class="chat-input-area">
@@ -568,11 +594,13 @@
                 type="text"
                 id="chatInput"
                 placeholder="Type a message..."
-                maxlength="300">
+                maxlength="300"
+            >
 
             <button
                 id="sendBtn"
-                onclick="sendMessage()">
+                onclick="sendMessage()"
+            >
                 Send
             </button>
 
@@ -598,21 +626,30 @@
 
     const searchOverlay = document.getElementById("searchOverlay");
     const searchText = document.getElementById("searchText");
+
     const remoteStatus = document.getElementById("remoteStatus");
     const onlineCount = document.getElementById("onlineCount");
 
     const chatInput = document.getElementById("chatInput");
     const chatMessages = document.getElementById("chatMessages");
 
+    /*
+        STUN servers help discover the network path.
+
+        TURN is intentionally not hardcoded here because public
+        TURN servers should not be embedded with private credentials.
+    */
     const rtcConfig = {
         iceServers: [
             {
-                urls: "stun:stun.l.google.com:19302"
-            },
-            {
-                urls: "stun:stun1.l.google.com:19302"
+                urls: [
+                    "stun:stun.l.google.com:19302",
+                    "stun:stun1.l.google.com:19302"
+                ]
             }
-        ]
+        ],
+        bundlePolicy: "max-bundle",
+        rtcpMuxPolicy: "require"
     };
 
     let localStream = null;
@@ -625,6 +662,11 @@
     let currentFacingMode = "user";
     let pendingIceCandidates = [];
 
+    let makingOffer = false;
+    let ignoreOffer = false;
+
+    let remoteDescriptionSet = false;
+
 
     async function startMedia() {
 
@@ -632,17 +674,46 @@
             return true;
         }
 
+        if (
+            !navigator.mediaDevices ||
+            !navigator.mediaDevices.getUserMedia
+        ) {
+            alert(
+                "Your browser does not support camera access."
+            );
+
+            return false;
+        }
+
         try {
 
             localStream =
                 await navigator.mediaDevices.getUserMedia({
                     video: {
-                        facingMode: "user"
+                        facingMode: {
+                            ideal: "user"
+                        },
+                        width: {
+                            ideal: 1280
+                        },
+                        height: {
+                            ideal: 720
+                        },
+                        frameRate: {
+                            ideal: 30,
+                            max: 30
+                        }
                     },
-                    audio: true
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
                 });
 
             localVideo.srcObject = localStream;
+
+            await localVideo.play().catch(() => {});
 
             currentFacingMode = "user";
 
@@ -658,7 +729,8 @@
             );
 
             alert(
-                "Please allow camera and microphone permission to use MeetLoop."
+                "Hindi ma-access ang camera/microphone. " +
+                "I-check ang Chrome permission."
             );
 
             return false;
@@ -736,7 +808,11 @@
 
     async function flipCamera() {
 
-        if (!window.matchMedia("(max-width: 850px)").matches) {
+        if (
+            !window.matchMedia(
+                "(max-width: 850px)"
+            ).matches
+        ) {
             return;
         }
 
@@ -756,12 +832,16 @@
                 ? "environment"
                 : "user";
 
+        let newStream = null;
+
         try {
 
-            const newStream =
+            newStream =
                 await navigator.mediaDevices.getUserMedia({
                     video: {
-                        facingMode: newFacingMode
+                        facingMode: {
+                            exact: newFacingMode
+                        }
                     },
                     audio: false
                 });
@@ -770,7 +850,9 @@
                 newStream.getVideoTracks()[0];
 
             if (!newVideoTrack) {
-                return;
+                throw new Error(
+                    "No replacement camera track."
+                );
             }
 
             newVideoTrack.enabled =
@@ -783,9 +865,9 @@
                     peerConnection
                         .getSenders()
                         .find(
-                            s =>
-                                s.track &&
-                                s.track.kind === "video"
+                            sender =>
+                                sender.track &&
+                                sender.track.kind === "video"
                         );
 
                 if (sender) {
@@ -810,6 +892,8 @@
             localVideo.srcObject =
                 localStream;
 
+            await localVideo.play().catch(() => {});
+
             currentFacingMode =
                 newFacingMode;
 
@@ -821,6 +905,12 @@
                 "Flip camera error:",
                 error
             );
+
+            if (newStream) {
+                newStream
+                    .getTracks()
+                    .forEach(track => track.stop());
+            }
 
             alert(
                 "Hindi available ang camera na ito sa device mo."
@@ -838,10 +928,10 @@
             remoteVideo.srcObject = null;
 
             connected = false;
-
             searching = true;
 
-            searchOverlay.style.display = "flex";
+            searchOverlay.style.display =
+                "flex";
 
             searchText.textContent =
                 "Finding someone...";
@@ -913,6 +1003,7 @@
         closePeerConnection();
 
         pendingIceCandidates = [];
+        remoteDescriptionSet = false;
 
         peerConnection =
             new RTCPeerConnection(
@@ -937,6 +1028,11 @@
         peerConnection.ontrack =
             event => {
 
+                console.log(
+                    "Remote track received:",
+                    event.track.kind
+                );
+
                 if (
                     event.streams &&
                     event.streams[0]
@@ -945,8 +1041,17 @@
                     remoteVideo.srcObject =
                         event.streams[0];
 
+                    remoteVideo
+                        .play()
+                        .catch(error => {
+                            console.warn(
+                                "Remote video autoplay:",
+                                error
+                            );
+                        });
+
                     remoteStatus.textContent =
-                        "Connected";
+                        "Video connected";
                 }
             };
 
@@ -967,6 +1072,21 @@
             };
 
 
+        peerConnection.oniceconnectionstatechange =
+            () => {
+
+                if (!peerConnection) {
+                    return;
+                }
+
+                console.log(
+                    "ICE state:",
+                    peerConnection
+                        .iceConnectionState
+                );
+            };
+
+
         peerConnection.onconnectionstatechange =
             () => {
 
@@ -975,7 +1095,8 @@
                 }
 
                 const state =
-                    peerConnection.connectionState;
+                    peerConnection
+                        .connectionState;
 
                 console.log(
                     "Connection state:",
@@ -1001,41 +1122,56 @@
                 }
 
 
-                if (
-                    state === "failed" ||
-                    state === "disconnected"
-                ) {
+                if (state === "failed") {
 
                     connected = false;
 
                     remoteStatus.textContent =
-                        "Disconnected";
+                        "Connection failed";
 
                     loopBtn.disabled = false;
 
                     loopBtn.textContent =
                         "🔄 Start Loop";
                 }
+
+
+                if (state === "disconnected") {
+
+                    remoteStatus.textContent =
+                        "Disconnected";
+                }
             };
 
 
-        if (initiator) {
+        peerConnection.onicegatheringstatechange =
+            () => {
 
-            dataChannel =
-                peerConnection.createDataChannel(
-                    "chat"
+                console.log(
+                    "ICE gathering:",
+                    peerConnection
+                        .iceGatheringState
                 );
+            };
 
-            setupDataChannel(
-                dataChannel
-            );
 
-            createOffer();
-        }
+        peerConnection.onsignalingstatechange =
+            () => {
+
+                console.log(
+                    "Signaling state:",
+                    peerConnection
+                        .signalingState
+                );
+            };
 
 
         peerConnection.ondatachannel =
             event => {
+
+                console.log(
+                    "Data channel received"
+                );
 
                 dataChannel =
                     event.channel;
@@ -1044,6 +1180,24 @@
                     dataChannel
                 );
             };
+
+
+        if (initiator) {
+
+            dataChannel =
+                peerConnection.createDataChannel(
+                    "chat",
+                    {
+                        ordered: true
+                    }
+                );
+
+            setupDataChannel(
+                dataChannel
+            );
+
+            createOffer();
+        }
     }
 
 
@@ -1054,6 +1208,8 @@
         }
 
         try {
+
+            makingOffer = true;
 
             const offer =
                 await peerConnection.createOffer();
@@ -1066,7 +1222,9 @@
                 "signal",
                 {
                     type: "offer",
-                    offer: offer
+                    offer:
+                        peerConnection
+                            .localDescription
                 }
             );
 
@@ -1076,6 +1234,10 @@
                 "Offer error:",
                 error
             );
+
+        } finally {
+
+            makingOffer = false;
         }
     }
 
@@ -1086,28 +1248,53 @@
             createPeer(false);
         }
 
+        if (!peerConnection) {
+            return;
+        }
+
         try {
 
-            await peerConnection.setRemoteDescription(
-                new RTCSessionDescription(
-                    offer
-                )
-            );
+            const polite =
+                !peerConnection ||
+                !makingOffer;
+
+            ignoreOffer =
+                !polite &&
+                peerConnection
+                    .signalingState !==
+                    "stable";
+
+            if (ignoreOffer) {
+                return;
+            }
+
+            await peerConnection
+                .setRemoteDescription(
+                    new RTCSessionDescription(
+                        offer
+                    )
+                );
+
+            remoteDescriptionSet = true;
 
             await flushIceCandidates();
 
             const answer =
-                await peerConnection.createAnswer();
+                await peerConnection
+                    .createAnswer();
 
-            await peerConnection.setLocalDescription(
-                answer
-            );
+            await peerConnection
+                .setLocalDescription(
+                    answer
+                );
 
             socket.emit(
                 "signal",
                 {
                     type: "answer",
-                    answer: answer
+                    answer:
+                        peerConnection
+                            .localDescription
                 }
             );
 
@@ -1129,11 +1316,14 @@
 
         try {
 
-            await peerConnection.setRemoteDescription(
-                new RTCSessionDescription(
-                    answer
-                )
-            );
+            await peerConnection
+                .setRemoteDescription(
+                    new RTCSessionDescription(
+                        answer
+                    )
+                );
+
+            remoteDescriptionSet = true;
 
             await flushIceCandidates();
 
@@ -1156,15 +1346,16 @@
         try {
 
             if (
-                peerConnection.remoteDescription &&
-                peerConnection.remoteDescription.type
+                remoteDescriptionSet &&
+                peerConnection.remoteDescription
             ) {
 
-                await peerConnection.addIceCandidate(
-                    new RTCIceCandidate(
-                        candidate
-                    )
-                );
+                await peerConnection
+                    .addIceCandidate(
+                        new RTCIceCandidate(
+                            candidate
+                        )
+                    );
 
             } else {
 
@@ -1201,11 +1392,12 @@
 
             try {
 
-                await peerConnection.addIceCandidate(
-                    new RTCIceCandidate(
-                        candidate
-                    )
-                );
+                await peerConnection
+                    .addIceCandidate(
+                        new RTCIceCandidate(
+                            candidate
+                        )
+                    );
 
             } catch (error) {
 
@@ -1221,6 +1413,7 @@
     function closePeerConnection() {
 
         pendingIceCandidates = [];
+        remoteDescriptionSet = false;
 
         if (dataChannel) {
 
@@ -1235,12 +1428,38 @@
         if (peerConnection) {
 
             try {
+                peerConnection.ontrack = null;
+                peerConnection.onicecandidate = null;
                 peerConnection.close();
             } catch (error) {}
         }
 
         peerConnection = null;
     }
+
+
+    socket.on(
+        "connect",
+        () => {
+
+            console.log(
+                "Socket connected:",
+                socket.id
+            );
+        }
+    );
+
+
+    socket.on(
+        "connect_error",
+        error => {
+
+            console.error(
+                "Socket connection error:",
+                error
+            );
+        }
+    );
 
 
     socket.on(
@@ -1297,26 +1516,36 @@
         "signal",
         async data => {
 
-            if (data.type === "offer") {
+            try {
 
-                await handleOffer(
-                    data.offer
-                );
+                if (data.type === "offer") {
 
-            } else if (
-                data.type === "answer"
-            ) {
+                    await handleOffer(
+                        data.offer
+                    );
 
-                await handleAnswer(
-                    data.answer
-                );
+                } else if (
+                    data.type === "answer"
+                ) {
 
-            } else if (
-                data.type === "candidate"
-            ) {
+                    await handleAnswer(
+                        data.answer
+                    );
 
-                await handleCandidate(
-                    data.candidate
+                } else if (
+                    data.type === "candidate"
+                ) {
+
+                    await handleCandidate(
+                        data.candidate
+                    );
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Signal handling error:",
+                    error
                 );
             }
         }
@@ -1360,6 +1589,25 @@
             };
 
 
+        channel.onclose =
+            () => {
+
+                console.log(
+                    "Chat disconnected"
+                );
+            };
+
+
+        channel.onerror =
+            error => {
+
+                console.error(
+                    "Chat error:",
+                    error
+                );
+            };
+
+
         channel.onmessage =
             event => {
 
@@ -1393,14 +1641,29 @@
             return;
         }
 
-        dataChannel.send(text);
+        try {
 
-        addMessage(
-            "Me",
-            text
-        );
+            dataChannel.send(text);
 
-        chatInput.value = "";
+            addMessage(
+                "Me",
+                text
+            );
+
+            chatInput.value = "";
+
+        } catch (error) {
+
+            console.error(
+                "Send message error:",
+                error
+            );
+
+            addMessage(
+                "System",
+                "Message could not be sent."
+            );
+        }
     }
 
 
@@ -1412,6 +1675,7 @@
         message.className =
             "message";
 
+
         const nameDiv =
             document.createElement("div");
 
@@ -1420,6 +1684,7 @@
 
         nameDiv.textContent =
             name;
+
 
         const textDiv =
             document.createElement("div");
@@ -1430,10 +1695,20 @@
         textDiv.textContent =
             text;
 
-        message.appendChild(nameDiv);
-        message.appendChild(textDiv);
 
-        chatMessages.appendChild(message);
+        message.appendChild(
+            nameDiv
+        );
+
+        message.appendChild(
+            textDiv
+        );
+
+
+        chatMessages.appendChild(
+            message
+        );
+
 
         chatMessages.scrollTop =
             chatMessages.scrollHeight;
@@ -1471,35 +1746,22 @@
                 const lang =
                     event.target.value;
 
-                if (lang === "tl") {
+                loopBtn.textContent =
+                    connected
+                        ? "⏭️ Next"
+                        : "🔄 Start Loop";
 
-                    loopBtn.textContent =
-                        connected
-                            ? "⏭️ Next"
-                            : "🔄 Start Loop";
+                stopBtn.textContent =
+                    "⏹️ Stop";
 
-                    stopBtn.textContent =
-                        "⏹️ Stop";
-
-                    chatInput.placeholder =
-                        "Mag-type ng message...";
-
-                } else {
-
-                    loopBtn.textContent =
-                        connected
-                            ? "⏭️ Next"
-                            : "🔄 Start Loop";
-
-                    stopBtn.textContent =
-                        "⏹️ Stop";
-
-                    chatInput.placeholder =
-                        "Type a message...";
-                }
+                chatInput.placeholder =
+                    lang === "tl"
+                        ? "Mag-type ng message..."
+                        : "Type a message...";
             }
         );
 </script>
 
 </body>
 </html>
+```
