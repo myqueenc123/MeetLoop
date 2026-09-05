@@ -270,16 +270,7 @@
             z-index: 2;
         }
 
-        .blur-video {
-            filter: blur(12px);
-        }
-
-        /* =========================
-           MOBILE
-        ========================= */
-
         @media (max-width: 850px) {
-
             body {
                 height: auto;
                 min-height: 100dvh;
@@ -328,11 +319,6 @@
                 gap: 8px;
             }
 
-            /*
-              Mobile video area:
-              Stranger = large
-              Your camera = small overlay
-            */
             .videos-grid {
                 position: relative;
                 display: block;
@@ -360,7 +346,7 @@
                 bottom: 10px;
                 z-index: 3;
                 border: 2px solid white;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             }
 
             .video-label {
@@ -393,19 +379,12 @@
                 border-radius: 9px;
             }
 
-            .btn-loop {
-                flex: none;
-            }
-
-            .btn-stop {
-                flex: none;
-            }
-
+            .btn-loop,
+            .btn-stop,
             .btn-toggle {
                 flex: none;
             }
 
-            /* Flip appears ONLY on mobile */
             .btn-flip {
                 display: flex;
             }
@@ -487,8 +466,13 @@
         <div class="videos-grid">
 
             <div class="video-box">
+
                 <video id="remoteVideo" autoplay playsinline></video>
-                <div class="video-label" id="strangerLabel">👤 Stranger</div>
+
+                <div class="video-label" id="strangerLabel">
+                    👤 Stranger
+                </div>
+
                 <div class="status" id="remoteStatus">
                     Waiting...
                 </div>
@@ -496,14 +480,22 @@
                 <div class="search-overlay" id="searchOverlay">
                     <div class="search-box">
                         <div class="spinner"></div>
-                        <div id="searchText">Finding someone...</div>
+                        <div id="searchText">
+                            Finding someone...
+                        </div>
                     </div>
                 </div>
+
             </div>
 
             <div class="video-box">
+
                 <video id="localVideo" autoplay muted playsinline></video>
-                <div class="video-label">🙂 You</div>
+
+                <div class="video-label">
+                    🙂 You
+                </div>
+
             </div>
 
         </div>
@@ -539,7 +531,6 @@
                 📷 Cam On
             </button>
 
-            <!-- PHONE ONLY -->
             <button
                 class="btn btn-flip"
                 id="flipBtn"
@@ -548,6 +539,7 @@
             </button>
 
         </div>
+
     </div>
 
     <div class="chat-wrapper">
@@ -557,25 +549,33 @@
         </div>
 
         <div class="chat-messages" id="chatMessages">
+
             <div class="message">
-                <div class="message-name">System</div>
+                <div class="message-name">
+                    System
+                </div>
+
                 <div class="message-text">
                     Welcome to MeetLoop!
                 </div>
             </div>
+
         </div>
 
         <div class="chat-input-area">
+
             <input
                 type="text"
                 id="chatInput"
                 placeholder="Type a message..."
-                maxlength="300"
-            >
+                maxlength="300">
 
-            <button id="sendBtn" onclick="sendMessage()">
+            <button
+                id="sendBtn"
+                onclick="sendMessage()">
                 Send
             </button>
+
         </div>
 
     </div>
@@ -585,7 +585,6 @@
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
-
     const socket = io();
 
     const localVideo = document.getElementById("localVideo");
@@ -593,9 +592,9 @@
 
     const loopBtn = document.getElementById("loopBtn");
     const stopBtn = document.getElementById("stopBtn");
+
     const micBtn = document.getElementById("micBtn");
     const camBtn = document.getElementById("camBtn");
-    const flipBtn = document.getElementById("flipBtn");
 
     const searchOverlay = document.getElementById("searchOverlay");
     const searchText = document.getElementById("searchText");
@@ -605,9 +604,6 @@
     const chatInput = document.getElementById("chatInput");
     const chatMessages = document.getElementById("chatMessages");
 
-    /* IMPORTANT:
-       rtcConfig is declared BEFORE createPeer() can be called.
-    */
     const rtcConfig = {
         iceServers: [
             {
@@ -627,25 +623,24 @@
     let connected = false;
 
     let currentFacingMode = "user";
-
     let pendingIceCandidates = [];
 
-    /* =========================
-       CAMERA / MICROPHONE
-    ========================= */
 
     async function startMedia() {
 
-        if (localStream) return true;
+        if (localStream) {
+            return true;
+        }
 
         try {
 
-            localStream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: "user"
-                },
-                audio: true
-            });
+            localStream =
+                await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: "user"
+                    },
+                    audio: true
+                });
 
             localVideo.srcObject = localStream;
 
@@ -657,7 +652,10 @@
 
         } catch (error) {
 
-            console.error("Camera/Microphone error:", error);
+            console.error(
+                "Camera/Microphone error:",
+                error
+            );
 
             alert(
                 "Please allow camera and microphone permission to use MeetLoop."
@@ -667,14 +665,21 @@
         }
     }
 
+
     function updateMediaButtons() {
 
-        if (!localStream) return;
+        if (!localStream) {
+            return;
+        }
 
-        const audioTrack = localStream.getAudioTracks()[0];
-        const videoTrack = localStream.getVideoTracks()[0];
+        const audioTrack =
+            localStream.getAudioTracks()[0];
+
+        const videoTrack =
+            localStream.getVideoTracks()[0];
 
         if (audioTrack) {
+
             micBtn.textContent =
                 audioTrack.enabled
                     ? "🎙️ Mic On"
@@ -682,6 +687,7 @@
         }
 
         if (videoTrack) {
+
             camBtn.textContent =
                 videoTrack.enabled
                     ? "📷 Cam On"
@@ -689,39 +695,47 @@
         }
     }
 
+
     function toggleMic() {
 
-        if (!localStream) return;
+        if (!localStream) {
+            return;
+        }
 
-        const track = localStream.getAudioTracks()[0];
+        const track =
+            localStream.getAudioTracks()[0];
 
-        if (!track) return;
+        if (!track) {
+            return;
+        }
 
         track.enabled = !track.enabled;
 
         updateMediaButtons();
     }
+
 
     function toggleCam() {
 
-        if (!localStream) return;
+        if (!localStream) {
+            return;
+        }
 
-        const track = localStream.getVideoTracks()[0];
+        const track =
+            localStream.getVideoTracks()[0];
 
-        if (!track) return;
+        if (!track) {
+            return;
+        }
 
         track.enabled = !track.enabled;
 
         updateMediaButtons();
     }
 
-    /* =========================
-       MOBILE FLIP CAMERA
-       ========================= */
 
     async function flipCamera() {
 
-        /* Only allow this on mobile */
         if (!window.matchMedia("(max-width: 850px)").matches) {
             return;
         }
@@ -730,7 +744,8 @@
             return;
         }
 
-        const oldVideoTrack = localStream.getVideoTracks()[0];
+        const oldVideoTrack =
+            localStream.getVideoTracks()[0];
 
         if (!oldVideoTrack) {
             return;
@@ -758,11 +773,10 @@
                 return;
             }
 
-            /* Keep Cam On/Off state */
             newVideoTrack.enabled =
                 oldVideoTrack.enabled;
 
-            /* Replace camera being sent to stranger */
+
             if (peerConnection) {
 
                 const sender =
@@ -775,13 +789,14 @@
                         );
 
                 if (sender) {
+
                     await sender.replaceTrack(
                         newVideoTrack
                     );
                 }
             }
 
-            /* Replace local camera track */
+
             localStream.removeTrack(
                 oldVideoTrack
             );
@@ -813,13 +828,33 @@
         }
     }
 
-    /* =========================
-       MATCHMAKING
-       ========================= */
 
     async function toggleLoop() {
 
-        if (searching || connected) {
+        if (connected) {
+
+            closePeerConnection();
+
+            remoteVideo.srcObject = null;
+
+            connected = false;
+
+            searching = true;
+
+            searchOverlay.style.display = "flex";
+
+            searchText.textContent =
+                "Finding someone...";
+
+            remoteStatus.textContent =
+                "Searching...";
+
+            socket.emit("skip");
+
+            return;
+        }
+
+        if (searching) {
             return;
         }
 
@@ -847,6 +882,7 @@
         socket.emit("skip");
     }
 
+
     function stopSession() {
 
         searching = false;
@@ -871,9 +907,6 @@
             "🔄 Start Loop";
     }
 
-    /* =========================
-       PEER CONNECTION
-       ========================= */
 
     function createPeer(initiator) {
 
@@ -886,6 +919,7 @@
                 rtcConfig
             );
 
+
         if (localStream) {
 
             localStream
@@ -896,9 +930,9 @@
                         track,
                         localStream
                     );
-
                 });
         }
+
 
         peerConnection.ontrack =
             event => {
@@ -916,6 +950,7 @@
                 }
             };
 
+
         peerConnection.onicecandidate =
             event => {
 
@@ -925,28 +960,30 @@
                         "signal",
                         {
                             type: "candidate",
-                            candidate:
-                                event.candidate
+                            candidate: event.candidate
                         }
                     );
                 }
             };
 
+
         peerConnection.onconnectionstatechange =
             () => {
 
+                if (!peerConnection) {
+                    return;
+                }
+
                 const state =
-                    peerConnection
-                        .connectionState;
+                    peerConnection.connectionState;
 
                 console.log(
                     "Connection state:",
                     state
                 );
 
-                if (
-                    state === "connected"
-                ) {
+
+                if (state === "connected") {
 
                     connected = true;
                     searching = false;
@@ -957,25 +994,30 @@
                     remoteStatus.textContent =
                         "Connected";
 
-                    loopBtn.disabled =
-                        false;
+                    loopBtn.disabled = false;
 
                     loopBtn.textContent =
                         "⏭️ Next";
                 }
 
+
                 if (
                     state === "failed" ||
-                    state === "disconnected" ||
-                    state === "closed"
+                    state === "disconnected"
                 ) {
 
                     connected = false;
 
                     remoteStatus.textContent =
                         "Disconnected";
+
+                    loopBtn.disabled = false;
+
+                    loopBtn.textContent =
+                        "🔄 Start Loop";
                 }
             };
+
 
         if (initiator) {
 
@@ -991,6 +1033,7 @@
             createOffer();
         }
 
+
         peerConnection.ondatachannel =
             event => {
 
@@ -1003,9 +1046,12 @@
             };
     }
 
+
     async function createOffer() {
 
-        if (!peerConnection) return;
+        if (!peerConnection) {
+            return;
+        }
 
         try {
 
@@ -1033,12 +1079,10 @@
         }
     }
 
-    async function handleOffer(
-        offer
-    ) {
+
+    async function handleOffer(offer) {
 
         if (!peerConnection) {
-
             createPeer(false);
         }
 
@@ -1076,11 +1120,12 @@
         }
     }
 
-    async function handleAnswer(
-        answer
-    ) {
 
-        if (!peerConnection) return;
+    async function handleAnswer(answer) {
+
+        if (!peerConnection) {
+            return;
+        }
 
         try {
 
@@ -1101,9 +1146,8 @@
         }
     }
 
-    async function handleCandidate(
-        candidate
-    ) {
+
+    async function handleCandidate(candidate) {
 
         if (!peerConnection) {
             return;
@@ -1137,6 +1181,7 @@
             );
         }
     }
+
 
     async function flushIceCandidates() {
 
@@ -1172,6 +1217,7 @@
         }
     }
 
+
     function closePeerConnection() {
 
         pendingIceCandidates = [];
@@ -1180,24 +1226,22 @@
 
             try {
                 dataChannel.close();
-            } catch {}
+            } catch (error) {}
         }
 
         dataChannel = null;
+
 
         if (peerConnection) {
 
             try {
                 peerConnection.close();
-            } catch {}
+            } catch (error) {}
         }
 
         peerConnection = null;
     }
 
-    /* =========================
-       SOCKET EVENTS
-       ========================= */
 
     socket.on(
         "online-count",
@@ -1207,6 +1251,7 @@
                 count;
         }
     );
+
 
     socket.on(
         "waiting",
@@ -1225,6 +1270,7 @@
         }
     );
 
+
     socket.on(
         "match",
         data => {
@@ -1238,11 +1284,14 @@
             remoteStatus.textContent =
                 "Connecting...";
 
+            stopBtn.disabled = false;
+
             createPeer(
                 data.initiator
             );
         }
     );
+
 
     socket.on(
         "signal",
@@ -1273,6 +1322,7 @@
         }
     );
 
+
     socket.on(
         "partner-disconnected",
         () => {
@@ -1282,8 +1332,7 @@
 
             closePeerConnection();
 
-            remoteVideo.srcObject =
-                null;
+            remoteVideo.srcObject = null;
 
             remoteStatus.textContent =
                 "Stranger left";
@@ -1292,19 +1341,15 @@
                 "none";
 
             loopBtn.disabled = false;
+            stopBtn.disabled = true;
 
             loopBtn.textContent =
                 "🔄 Start Loop";
         }
     );
 
-    /* =========================
-       CHAT
-       ========================= */
 
-    function setupDataChannel(
-        channel
-    ) {
+    function setupDataChannel(channel) {
 
         channel.onopen =
             () => {
@@ -1313,6 +1358,7 @@
                     "Chat connected"
                 );
             };
+
 
         channel.onmessage =
             event => {
@@ -1323,6 +1369,7 @@
                 );
             };
     }
+
 
     function sendMessage() {
 
@@ -1335,8 +1382,7 @@
 
         if (
             !dataChannel ||
-            dataChannel.readyState !==
-                "open"
+            dataChannel.readyState !== "open"
         ) {
 
             addMessage(
@@ -1357,90 +1403,67 @@
         chatInput.value = "";
     }
 
-    function addMessage(
-        name,
-        text
-    ) {
+
+    function addMessage(name, text) {
 
         const message =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
 
         message.className =
             "message";
 
-        message.innerHTML = `
-            <div class="message-name">
-                ${escapeHtml(name)}
-            </div>
+        const nameDiv =
+            document.createElement("div");
 
-            <div class="message-text">
-                ${escapeHtml(text)}
-            </div>
-        `;
+        nameDiv.className =
+            "message-name";
 
-        chatMessages.appendChild(
-            message
-        );
+        nameDiv.textContent =
+            name;
+
+        const textDiv =
+            document.createElement("div");
+
+        textDiv.className =
+            "message-text";
+
+        textDiv.textContent =
+            text;
+
+        message.appendChild(nameDiv);
+        message.appendChild(textDiv);
+
+        chatMessages.appendChild(message);
 
         chatMessages.scrollTop =
             chatMessages.scrollHeight;
     }
 
-    function escapeHtml(
-        text
-    ) {
-
-        const div =
-            document.createElement(
-                "div"
-            );
-
-        div.textContent =
-            text;
-
-        return div.innerHTML;
-    }
 
     chatInput.addEventListener(
         "keydown",
         event => {
 
-            if (
-                event.key === "Enter"
-            ) {
-
+            if (event.key === "Enter") {
                 sendMessage();
             }
         }
     );
 
-    /* =========================
-       KEYBOARD SHORTCUTS
-       ========================= */
 
     document.addEventListener(
         "keydown",
         event => {
 
-            if (
-                event.key === "Escape"
-            ) {
-
+            if (event.key === "Escape") {
                 stopSession();
             }
         }
     );
 
-    /* =========================
-       LANGUAGE
-       ========================= */
 
     document
-        .getElementById(
-            "languageSelect"
-        )
+        .getElementById("languageSelect")
         .addEventListener(
             "change",
             event => {
@@ -1451,7 +1474,9 @@
                 if (lang === "tl") {
 
                     loopBtn.textContent =
-                        "🔄 Start Loop";
+                        connected
+                            ? "⏭️ Next"
+                            : "🔄 Start Loop";
 
                     stopBtn.textContent =
                         "⏹️ Stop";
@@ -1474,7 +1499,6 @@
                 }
             }
         );
-
 </script>
 
 </body>
