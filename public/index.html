@@ -26,7 +26,6 @@ select{min-height:34px;padding:7px 10px;color:#fff;background:rgba(255,255,255,.
 @media (max-width:850px){
  body{height:100dvh;overflow-y:auto;overflow-x:hidden}header{min-height:60px;height:auto;padding:8px 10px;gap:8px}.brand{font-size:17px}.brand-icon{width:30px;height:30px;border-radius:9px}.header-right{gap:4px;flex-wrap:wrap}.badge{min-height:30px;padding:5px 8px;font-size:10px}.timer-label{display:none}.timer-time{min-width:49px;font-size:10px}.timer-dot{width:6px;height:6px}select{min-height:30px;padding:5px 7px;font-size:10px}.main-container{height:auto;min-height:calc(100dvh - 60px);display:flex;flex-direction:column;gap:9px;padding:8px}.video-wrapper{width:100%;flex:none;gap:8px}.videos-grid{position:relative;width:100%;height:min(55dvh,560px);min-height:300px;display:block}.video-box{position:absolute;border-radius:13px}.video-box:first-child{inset:0;width:100%;height:100%}.video-box:last-child{right:10px;bottom:10px;width:31%;height:30%;z-index:6;border:2px solid rgba(255,255,255,.9);box-shadow:0 8px 20px rgba(0,0,0,.46)}.video-label{left:7px;top:7px;padding:5px 7px;font-size:10px}.status{left:7px;bottom:7px;padding:5px 7px;font-size:9px}.controls-bar{width:100%;display:grid;grid-template-columns:repeat(2,1fr);gap:7px;padding:0}.btn{width:100%;min-height:48px;padding:10px 6px;border-radius:9px;font-size:11px}.btn-loop,.btn-stop,.btn-toggle{flex:none}.btn-flip{display:flex}.chat-wrapper{width:100%;max-width:none;height:250px;min-height:250px;border-radius:13px}.chat-header{padding:10px;font-size:12px}.chat-messages{padding:9px}.chat-input-area{padding:8px}#chatInput{min-height:40px;padding:9px;font-size:12px}#sendBtn{min-width:62px;font-size:11px}
 }
-@media (max-width:400px){.brand{font-size:15px}.videos-grid{height:48dvh;min-height:270px}.video-box:last-child{width:34%;height:30%}.btn{min-height:46px;font-size:10.5px}.chat-wrapper{height:230px;min-height:230px}}
 </style>
 </head>
 
@@ -45,6 +44,7 @@ select{min-height:34px;padding:7px 10px;color:#fff;background:rgba(255,255,255,.
 <div class="video-wrapper">
 <div class="videos-grid">
 <div class="video-box">
+<!-- Muted default para hindi i-block ng mobile browser ang video -->
 <video id="remoteVideo" autoplay playsinline></video>
 <div class="video-label">👤 Stranger</div>
 <div class="status" id="remoteStatus">Waiting...</div>
@@ -105,11 +105,11 @@ const languageSelect = document.getElementById("languageSelect");
 const callTimer = document.getElementById("callTimer");
 const callTimerValue = document.getElementById("callTimerValue");
 
-// FREE STUN + RELIABLE OPEN TURN SERVER PARA SA MOBILE DATA / CGNAT
 const rtcConfig = {
     iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
         { urls: "stun:stun1.l.google.com:19302" },
+        { urls: "stun:stun2.l.google.com:19302" },
         {
             urls: "turn:openrelay.metered.ca:80",
             username: "openrelay",
@@ -119,14 +119,8 @@ const rtcConfig = {
             urls: "turn:openrelay.metered.ca:443",
             username: "openrelay",
             credential: "openrelay"
-        },
-        {
-            urls: "turn:openrelay.metered.ca:443?transport=tcp",
-            username: "openrelay",
-            credential: "openrelay"
         }
-    ],
-    iceCandidatePoolSize: 10
+    ]
 };
 
 let localStream = null;
@@ -147,7 +141,9 @@ function showSearch(text) {
     searchText.textContent = text;
     searchOverlay.style.display = "flex";
 }
-function hideSearch() { searchOverlay.style.display = "none"; }
+function hideSearch() { 
+    searchOverlay.style.display = "none"; 
+}
 
 function formatCallTime(s) {
     const m = Math.floor((s % 3600) / 60);
@@ -176,15 +172,12 @@ function stopCallTimer() {
     callTimerValue.textContent = "00:00:00";
 }
 
+// BUKAS AGAD ANG CAMERA SA SIMULA PALANG
 async function startMedia() {
     if (localStream) return true;
     try {
         localStream = await navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: currentFacingMode,
-                width: { ideal: 640 },
-                height: { ideal: 480 }
-            },
+            video: { facingMode: currentFacingMode },
             audio: true
         });
 
@@ -194,10 +187,13 @@ async function startMedia() {
         return true;
     } catch (error) {
         console.error("CAMERA ERROR:", error);
-        alert("Paki-allow ang Camera at Microphone.");
+        alert("Paki-allow ang Camera at Mic sa browser.");
         return false;
     }
 }
+
+// Auto load camera pagkabukas ng website
+startMedia();
 
 function updateMediaButtons() {
     if (!localStream) return;
@@ -233,7 +229,9 @@ async function flipCamera() {
 
 function stopAllRemoteMedia() {
     if (remoteVideo.srcObject) {
-        remoteVideo.srcObject.getTracks().forEach(t => t.stop());
+        try {
+            remoteVideo.srcObject.getTracks().forEach(t => t.stop());
+        } catch(e) {}
         remoteVideo.srcObject = null;
     }
 }
@@ -244,17 +242,31 @@ function setupDataChannel(channel) {
     channel.onmessage = (e) => addMessage("Stranger", e.data);
 }
 
+function handleConnected() {
+    if (connected) return;
+    connected = true;
+    searching = false;
+    hideSearch();
+    setStatus("Connected");
+    setRemoteStatus("Live");
+    loopBtn.disabled = false;
+    stopBtn.disabled = false;
+    loopBtn.textContent = "⏭️ Next";
+    startCallTimer();
+}
+
 function createPeer(initiator) {
     closePeerConnection();
 
     peerConnection = new RTCPeerConnection(rtcConfig);
     pendingIceCandidates = [];
 
-    localStream.getTracks().forEach(track => {
-        peerConnection.addTrack(track, localStream);
-    });
+    if (localStream) {
+        localStream.getTracks().forEach(track => {
+            peerConnection.addTrack(track, localStream);
+        });
+    }
 
-    // INAYOS: Real-time Trickle ICE (Agad na ipinapasa ang candidates)
     peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
             socket.emit("signal", {
@@ -264,37 +276,42 @@ function createPeer(initiator) {
         }
     };
 
-    // INAYOS: Mobile Unmute Fix (Naiiwasan ang Black Screen)
+    // FIXED: Multi-browser Mobile Track Handler (Lulutas sa Black Screen)
     peerConnection.ontrack = (event) => {
-        if (remoteVideo.srcObject !== event.streams[0]) {
-            remoteVideo.srcObject = event.streams[0];
-        }
-        
-        event.track.onunmute = () => {
-            remoteVideo.play().catch(e => console.log("Auto-play error:", e));
-        };
-
+        hideSearch();
         setRemoteStatus("Live");
-        remoteVideo.play().catch(e => console.log("Auto-play error:", e));
+
+        let stream = event.streams && event.streams[0];
+        if (!stream) {
+            if (!remoteVideo.srcObject) {
+                remoteVideo.srcObject = new MediaStream();
+            }
+            remoteVideo.srcObject.addTrack(event.track);
+        } else {
+            remoteVideo.srcObject = stream;
+        }
+
+        // SMART PLAY: Sinusubukang mag-play na may audio; kung harangin ng mobile, i-play nang muted para lumabas agad ang mukha
+        remoteVideo.play().catch(() => {
+            remoteVideo.muted = true;
+            remoteVideo.play().catch(e => console.error("Play error:", e));
+        });
     };
 
+    // Dual Listeners para sa Mobile Connection Status
     peerConnection.onconnectionstatechange = () => {
         const state = peerConnection?.connectionState;
-        console.log("Connection state:", state);
-
-        if (state === "connected") {
-            connected = true;
-            searching = false;
-            hideSearch();
-            setStatus("Connected");
-            setRemoteStatus("Connected");
-            loopBtn.disabled = false;
-            stopBtn.disabled = false;
-            loopBtn.textContent = "⏭️ Next";
-            startCallTimer();
-        } else if (state === "disconnected" || state === "failed") {
+        if (state === "connected") handleConnected();
+        else if (state === "failed" || state === "disconnected") {
             setRemoteStatus("Disconnected");
-            setStatus("Disconnected");
+        }
+    };
+
+    peerConnection.oniceconnectionstatechange = () => {
+        const state = peerConnection?.iceConnectionState;
+        if (state === "connected" || state === "completed") handleConnected();
+        else if (state === "failed") {
+            setRemoteStatus("Disconnected");
         }
     };
 
@@ -326,7 +343,6 @@ async function handleOffer(offer) {
     try {
         await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
         
-        // I-apply ang mga pending ICE candidates
         while (pendingIceCandidates.length > 0) {
             const c = pendingIceCandidates.shift();
             await peerConnection.addIceCandidate(c).catch(() => {});
@@ -366,11 +382,13 @@ async function handleCandidate(candidate) {
 }
 
 function closePeerConnection() {
-    if (dataChannel) { dataChannel.close(); dataChannel = null; }
+    if (dataChannel) { try { dataChannel.close(); } catch(e){} dataChannel = null; }
     if (peerConnection) {
-        peerConnection.ontrack = null;
-        peerConnection.onicecandidate = null;
-        peerConnection.close();
+        try {
+            peerConnection.ontrack = null;
+            peerConnection.onicecandidate = null;
+            peerConnection.close();
+        } catch(e) {}
         peerConnection = null;
     }
     pendingIceCandidates = [];
@@ -420,7 +438,6 @@ function stopSession() {
     setTimeout(() => { stopping = false; }, 200);
 }
 
-// SOCKET EVENTS
 socket.on("connect", () => setStatus("Ready"));
 socket.on("online-count", count => onlineCount.textContent = count);
 
@@ -433,7 +450,6 @@ socket.on("waiting", () => {
 
 socket.on("match", data => {
     searching = false;
-    hideSearch();
     setStatus("Connecting...");
     setRemoteStatus("Connecting...");
     createPeer(Boolean(data?.initiator));
@@ -490,9 +506,12 @@ chatInput.addEventListener("keydown", e => {
     }
 });
 
-// Safari / Mobile Touch Fix to trigger audio/video playback
+// Pindot kahit saan sa screen para mag-play ang sound ng Stranger sa phone
 document.addEventListener("pointerdown", () => {
-    if (remoteVideo.srcObject) remoteVideo.play().catch(() => {});
+    if (remoteVideo.srcObject && remoteVideo.muted) {
+        remoteVideo.muted = false;
+        remoteVideo.play().catch(() => {});
+    }
 }, { passive: true });
 </script>
 </body>
