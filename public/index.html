@@ -5,10 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0b1120">
+    <title>MeetLoop - Random Video Chat</title>
 
 ```
-<title>MeetLoop - Random Video Chat</title>
-
 <style>
     * {
         box-sizing: border-box;
@@ -20,13 +19,12 @@
         --bg: #0b1120;
         --panel: #111827;
         --panel-light: #1f2937;
-        --border: rgba(255,255,255,.09);
-        --border-strong: rgba(255,255,255,.15);
+        --border: rgba(255, 255, 255, 0.09);
+        --border-strong: rgba(255, 255, 255, 0.15);
         --blue: #2563eb;
         --blue2: #3b82f6;
         --red: #ef4444;
         --purple: #8b5cf6;
-        --green: #22c55e;
         --text: #f8fafc;
         --muted: #94a3b8;
     }
@@ -42,12 +40,12 @@
         background:
             radial-gradient(
                 circle at top left,
-                rgba(37,99,235,.14),
+                rgba(37, 99, 235, 0.14),
                 transparent 28%
             ),
             radial-gradient(
                 circle at bottom right,
-                rgba(139,92,246,.12),
+                rgba(139, 92, 246, 0.12),
                 transparent 25%
             ),
             var(--bg);
@@ -56,6 +54,7 @@
         overflow: hidden;
 
         -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
     }
 
     button,
@@ -69,10 +68,6 @@
         -webkit-tap-highlight-color: transparent;
     }
 
-    /* =========================
-       HEADER
-    ========================= */
-
     header {
         height: 68px;
 
@@ -83,7 +78,7 @@
         gap: 12px;
         padding: 0 20px;
 
-        background: rgba(17,24,39,.9);
+        background: rgba(17, 24, 39, 0.92);
         border-bottom: 1px solid var(--border);
 
         backdrop-filter: blur(14px);
@@ -122,7 +117,7 @@
             );
 
         box-shadow:
-            0 6px 20px rgba(37,99,235,.25);
+            0 6px 20px rgba(37, 99, 235, 0.25);
     }
 
     .header-right {
@@ -145,7 +140,7 @@
 
         border-radius: 999px;
 
-        background: rgba(255,255,255,.055);
+        background: rgba(255, 255, 255, 0.055);
         border: 1px solid var(--border);
 
         font-size: 12px;
@@ -168,26 +163,23 @@
         padding: 7px 10px;
 
         color: white;
-        background: rgba(255,255,255,.055);
+        background: rgba(255, 255, 255, 0.055);
 
         border: 1px solid var(--border);
         border-radius: 9px;
 
         outline: none;
+        cursor: pointer;
     }
-
-    /* =========================
-       CALL TIMER
-    ========================= */
 
     #callTimer {
         gap: 7px;
 
         transition:
-            color .25s ease,
-            background .25s ease,
-            border-color .25s ease,
-            box-shadow .25s ease;
+            color 0.25s ease,
+            background 0.25s ease,
+            border-color 0.25s ease,
+            box-shadow 0.25s ease;
     }
 
     .timer-dot {
@@ -206,7 +198,7 @@
         font-size: 9px;
         font-weight: 900;
 
-        letter-spacing: .8px;
+        letter-spacing: 0.8px;
     }
 
     .timer-time {
@@ -216,7 +208,7 @@
         font-weight: 900;
 
         font-variant-numeric: tabular-nums;
-        letter-spacing: .6px;
+        letter-spacing: 0.6px;
     }
 
     #callTimer.active {
@@ -225,15 +217,15 @@
         background:
             linear-gradient(
                 135deg,
-                rgba(239,68,68,.16),
-                rgba(239,68,68,.06)
+                rgba(239, 68, 68, 0.16),
+                rgba(239, 68, 68, 0.06)
             );
 
         border-color:
-            rgba(239,68,68,.25);
+            rgba(239, 68, 68, 0.25);
 
         box-shadow:
-            0 8px 25px rgba(239,68,68,.08);
+            0 8px 25px rgba(239, 68, 68, 0.08);
     }
 
     #callTimer.active .timer-dot {
@@ -247,25 +239,21 @@
         0% {
             box-shadow:
                 0 0 0 0
-                rgba(239,68,68,.55);
+                rgba(239, 68, 68, 0.55);
         }
 
         70% {
             box-shadow:
                 0 0 0 7px
-                rgba(239,68,68,0);
+                rgba(239, 68, 68, 0);
         }
 
         100% {
             box-shadow:
                 0 0 0 0
-                rgba(239,68,68,0);
+                rgba(239, 68, 68, 0);
         }
     }
-
-    /* =========================
-       MAIN
-    ========================= */
 
     .main-container {
         width: 100%;
@@ -307,13 +295,11 @@
 
         background: #000;
 
-        border:
-            1px solid var(--border);
-
+        border: 1px solid var(--border);
         border-radius: 16px;
 
         box-shadow:
-            0 10px 35px rgba(0,0,0,.25);
+            0 10px 35px rgba(0, 0, 0, 0.25);
     }
 
     video {
@@ -344,11 +330,11 @@
 
         padding: 6px 10px;
 
-        background: rgba(0,0,0,.56);
+        background: rgba(0, 0, 0, 0.56);
 
         border:
             1px solid
-            rgba(255,255,255,.08);
+            rgba(255, 255, 255, 0.08);
 
         border-radius: 9px;
 
@@ -368,11 +354,11 @@
 
         padding: 6px 10px;
 
-        background: rgba(0,0,0,.56);
+        background: rgba(0, 0, 0, 0.56);
 
         border:
             1px solid
-            rgba(255,255,255,.08);
+            rgba(255, 255, 255, 0.08);
 
         border-radius: 9px;
 
@@ -384,10 +370,6 @@
         pointer-events: none;
     }
 
-    /* =========================
-       SEARCH
-    ========================= */
-
     .search-overlay {
         position: absolute;
         inset: 0;
@@ -395,11 +377,12 @@
         z-index: 10;
 
         display: none;
+
         align-items: center;
         justify-content: center;
 
         background:
-            rgba(2,6,23,.72);
+            rgba(2, 6, 23, 0.72);
 
         backdrop-filter: blur(2px);
         -webkit-backdrop-filter: blur(2px);
@@ -413,11 +396,11 @@
         text-align: center;
 
         background:
-            rgba(15,23,42,.82);
+            rgba(15, 23, 42, 0.82);
 
         border:
             1px solid
-            rgba(255,255,255,.08);
+            rgba(255, 255, 255, 0.08);
 
         border-radius: 16px;
     }
@@ -430,21 +413,21 @@
             0 auto 12px;
 
         border: 4px solid
-            rgba(255,255,255,.12);
+            rgba(255, 255, 255, 0.12);
 
         border-top-color: white;
 
         border-radius: 50%;
 
         animation:
-            spin .8s linear infinite;
+            spin 0.8s linear infinite;
     }
 
     #searchText {
+        color: #e2e8f0;
+
         font-size: 13px;
         font-weight: 700;
-
-        color: #e2e8f0;
     }
 
     @keyframes spin {
@@ -452,10 +435,6 @@
             transform: rotate(360deg);
         }
     }
-
-    /* =========================
-       CONTROLS
-    ========================= */
 
     .controls-bar {
         display: flex;
@@ -469,12 +448,15 @@
 
         padding: 11px 15px;
 
-        border: 1px solid
-            rgba(255,255,255,.04);
+        border:
+            1px solid
+            rgba(255, 255, 255, 0.04);
 
         border-radius: 11px;
 
         color: white;
+
+        background: var(--panel);
 
         cursor: pointer;
 
@@ -490,9 +472,9 @@
         user-select: none;
 
         transition:
-            transform .12s ease,
-            filter .2s ease,
-            opacity .2s ease;
+            transform 0.12s ease,
+            filter 0.2s ease,
+            opacity 0.2s ease;
     }
 
     .btn:hover:not(:disabled) {
@@ -500,11 +482,11 @@
     }
 
     .btn:active:not(:disabled) {
-        transform: scale(.98);
+        transform: scale(0.98);
     }
 
     .btn:disabled {
-        opacity: .5;
+        opacity: 0.5;
         cursor: not-allowed;
     }
 
@@ -520,7 +502,7 @@
 
         box-shadow:
             0 7px 22px
-            rgba(37,99,235,.18);
+            rgba(37, 99, 235, 0.18);
     }
 
     .btn-stop {
@@ -536,11 +518,14 @@
 
     .btn-toggle {
         flex: 1;
-        background: rgba(255,255,255,.07);
+
+        background:
+            rgba(255, 255, 255, 0.07);
     }
 
     .btn-flip {
         display: none;
+
         flex: 1;
 
         background:
@@ -550,10 +535,6 @@
                 #8b5cf6
             );
     }
-
-    /* =========================
-       CHAT
-    ========================= */
 
     .chat-wrapper {
         width: 320px;
@@ -566,7 +547,7 @@
         overflow: hidden;
 
         background:
-            rgba(17,24,39,.9);
+            rgba(17, 24, 39, 0.9);
 
         border:
             1px solid var(--border);
@@ -623,7 +604,7 @@
         color: #f8fafc;
 
         background:
-            rgba(255,255,255,.075);
+            rgba(255, 255, 255, 0.075);
 
         border-radius: 10px;
 
@@ -650,7 +631,7 @@
         padding: 9px 10px;
 
         background:
-            rgba(2,6,23,.64);
+            rgba(2, 6, 23, 0.64);
 
         color: white;
 
@@ -664,7 +645,7 @@
 
     #chatInput:focus {
         border-color:
-            rgba(59,130,246,.55);
+            rgba(59, 130, 246, 0.55);
     }
 
     #sendBtn {
@@ -688,14 +669,11 @@
         font-weight: 800;
     }
 
-    /* =========================
-       MOBILE
-    ========================= */
-
     @media (max-width: 850px) {
 
         body {
             height: 100dvh;
+
             overflow-y: auto;
             overflow-x: hidden;
         }
@@ -810,11 +788,11 @@
 
             border:
                 2px solid
-                rgba(255,255,255,.9);
+                rgba(255, 255, 255, 0.9);
 
             box-shadow:
                 0 8px 20px
-                rgba(0,0,0,.46);
+                rgba(0, 0, 0, 0.46);
         }
 
         .video-label {
@@ -850,6 +828,7 @@
 
         .btn {
             width: 100%;
+
             min-height: 48px;
 
             padding: 10px 6px;
@@ -894,12 +873,15 @@
 
         #chatInput {
             min-height: 40px;
+
             padding: 9px;
+
             font-size: 12px;
         }
 
         #sendBtn {
             min-width: 62px;
+
             font-size: 11px;
         }
     }
@@ -1155,10 +1137,6 @@
 <script>
 "use strict";
 
-/* =========================================
-   SOCKET
-========================================= */
-
 const socket = io({
     transports: [
         "websocket",
@@ -1172,68 +1150,96 @@ const socket = io({
 });
 
 
-/* =========================================
-   DOM
-========================================= */
-
 const localVideo =
-    document.getElementById("localVideo");
+    document.getElementById(
+        "localVideo"
+    );
 
 const remoteVideo =
-    document.getElementById("remoteVideo");
+    document.getElementById(
+        "remoteVideo"
+    );
 
 const loopBtn =
-    document.getElementById("loopBtn");
+    document.getElementById(
+        "loopBtn"
+    );
 
 const stopBtn =
-    document.getElementById("stopBtn");
+    document.getElementById(
+        "stopBtn"
+    );
 
 const micBtn =
-    document.getElementById("micBtn");
+    document.getElementById(
+        "micBtn"
+    );
 
 const camBtn =
-    document.getElementById("camBtn");
+    document.getElementById(
+        "camBtn"
+    );
 
 const flipBtn =
-    document.getElementById("flipBtn");
+    document.getElementById(
+        "flipBtn"
+    );
 
 const searchOverlay =
-    document.getElementById("searchOverlay");
+    document.getElementById(
+        "searchOverlay"
+    );
 
 const searchText =
-    document.getElementById("searchText");
+    document.getElementById(
+        "searchText"
+    );
 
 const remoteStatus =
-    document.getElementById("remoteStatus");
+    document.getElementById(
+        "remoteStatus"
+    );
 
 const onlineCount =
-    document.getElementById("onlineCount");
+    document.getElementById(
+        "onlineCount"
+    );
 
 const statusBadge =
-    document.getElementById("statusBadge");
+    document.getElementById(
+        "statusBadge"
+    );
 
 const chatInput =
-    document.getElementById("chatInput");
+    document.getElementById(
+        "chatInput"
+    );
 
 const chatMessages =
-    document.getElementById("chatMessages");
+    document.getElementById(
+        "chatMessages"
+    );
 
 const sendBtn =
-    document.getElementById("sendBtn");
+    document.getElementById(
+        "sendBtn"
+    );
 
 const languageSelect =
-    document.getElementById("languageSelect");
+    document.getElementById(
+        "languageSelect"
+    );
 
 const callTimer =
-    document.getElementById("callTimer");
+    document.getElementById(
+        "callTimer"
+    );
 
 const callTimerValue =
-    document.getElementById("callTimerValue");
+    document.getElementById(
+        "callTimerValue"
+    );
 
-
-/* =========================================
-   WEBRTC
-========================================= */
 
 const rtcConfig = {
     iceServers: [
@@ -1243,6 +1249,7 @@ const rtcConfig = {
                 "stun:stun1.l.google.com:19302"
             ]
         },
+
         {
             urls:
                 "stun:stun.cloudflare.com:3478"
@@ -1261,10 +1268,6 @@ const rtcConfig = {
         "all"
 };
 
-
-/* =========================================
-   STATE
-========================================= */
 
 let localStream = null;
 
@@ -1297,35 +1300,39 @@ let iceRestartAttempted =
     false;
 
 
-/* =========================================
-   HELPERS
-========================================= */
-
 function setStatus(text) {
-    statusBadge.textContent = text;
+    statusBadge.textContent =
+        text;
 }
 
 
 function setRemoteStatus(text) {
-    remoteStatus.textContent = text;
+    remoteStatus.textContent =
+        text;
 }
 
 
 function showSearch(text) {
-    searchText.textContent = text;
-    searchOverlay.style.display = "flex";
+    searchText.textContent =
+        text;
+
+    searchOverlay.style.display =
+        "flex";
 }
 
 
 function hideSearch() {
-    searchOverlay.style.display = "none";
+    searchOverlay.style.display =
+        "none";
 }
 
 
 function isMobile() {
-    return window.matchMedia(
-        "(max-width: 850px)"
-    ).matches;
+    return window
+        .matchMedia(
+            "(max-width: 850px)"
+        )
+        .matches;
 }
 
 
@@ -1337,7 +1344,8 @@ function clearConnectionTimer() {
             connectionTimer
         );
 
-        connectionTimer = null;
+        connectionTimer =
+            null;
     }
 }
 
@@ -1345,6 +1353,7 @@ function clearConnectionTimer() {
 function startConnectionTimer() {
 
     clearConnectionTimer();
+
 
     connectionTimer =
         setTimeout(
@@ -1379,25 +1388,23 @@ function startConnectionTimer() {
 function queueSignal(callback) {
 
     signalQueue =
-        signalQueue.then(
-            callback
-        ).catch(
-            error => {
+        signalQueue
+            .then(
+                callback
+            )
+            .catch(
+                error => {
 
-                console.error(
-                    "Signal queue error:",
-                    error
-                );
-            }
-        );
+                    console.error(
+                        "Signal queue error:",
+                        error
+                    );
+                }
+            );
 
     return signalQueue;
 }
 
-
-/* =========================================
-   CALL TIMER
-========================================= */
 
 function formatCallTime(
     totalSeconds
@@ -1449,7 +1456,10 @@ function updateCallTimer() {
 
     callTimerValue.textContent =
         formatCallTime(
-            Math.max(0, elapsed)
+            Math.max(
+                0,
+                elapsed
+            )
         );
 }
 
@@ -1458,14 +1468,18 @@ function startCallTimer() {
 
     stopCallTimer();
 
+
     callStartTime =
         Date.now();
+
 
     callTimer.classList.add(
         "active"
     );
 
+
     updateCallTimer();
+
 
     callTimerInterval =
         setInterval(
@@ -1502,10 +1516,6 @@ function stopCallTimer() {
 }
 
 
-/* =========================================
-   LOCAL CAMERA + MIC
-========================================= */
-
 async function startMedia() {
 
     if (localStream) {
@@ -1534,6 +1544,7 @@ async function startMedia() {
                 .getUserMedia({
 
                     video: {
+
                         facingMode: {
                             ideal:
                                 "user"
@@ -1556,6 +1567,7 @@ async function startMedia() {
                     },
 
                     audio: {
+
                         echoCancellation: true,
                         noiseSuppression: true,
                         autoGainControl: true
@@ -1565,6 +1577,7 @@ async function startMedia() {
 
         localVideo.srcObject =
             localStream;
+
 
         localVideo.muted =
             true;
@@ -1576,8 +1589,11 @@ async function startMedia() {
             true;
 
 
-        await localVideo.play()
-            .catch(() => {});
+        await localVideo
+            .play()
+            .catch(
+                () => {}
+            );
 
 
         currentFacingMode =
@@ -1619,6 +1635,15 @@ async function startMedia() {
                 "No camera or microphone was found."
             );
 
+        } else if (
+            error.name ===
+            "NotReadableError"
+        ) {
+
+            alert(
+                "Camera or microphone is already being used by another app."
+            );
+
         } else {
 
             alert(
@@ -1642,6 +1667,7 @@ function updateMediaButtons() {
     const audioTrack =
         localStream
             .getAudioTracks()[0];
+
 
     const videoTrack =
         localStream
@@ -1717,10 +1743,6 @@ function toggleCam() {
 }
 
 
-/* =========================================
-   FLIP CAMERA
-========================================= */
-
 async function flipCamera() {
 
     if (!isMobile()) {
@@ -1750,7 +1772,8 @@ async function flipCamera() {
             : "user";
 
 
-    let newStream = null;
+    let newStream =
+        null;
 
 
     try {
@@ -1761,6 +1784,7 @@ async function flipCamera() {
                 .getUserMedia({
 
                     video: {
+
                         facingMode: {
                             ideal:
                                 newFacingMode
@@ -1778,7 +1802,7 @@ async function flipCamera() {
 
         if (!newTrack) {
             throw new Error(
-                "No new camera track"
+                "No replacement camera track"
             );
         }
 
@@ -1796,15 +1820,16 @@ async function flipCamera() {
                         item =>
                             item.track &&
                             item.track.kind ===
-                            "video"
+                                "video"
                     );
 
 
             if (sender) {
 
-                await sender.replaceTrack(
-                    newTrack
-                );
+                await sender
+                    .replaceTrack(
+                        newTrack
+                    );
             }
         }
 
@@ -1812,6 +1837,7 @@ async function flipCamera() {
         localStream.removeTrack(
             oldTrack
         );
+
 
         localStream.addTrack(
             newTrack
@@ -1825,8 +1851,11 @@ async function flipCamera() {
             localStream;
 
 
-        await localVideo.play()
-            .catch(() => {});
+        await localVideo
+            .play()
+            .catch(
+                () => {}
+            );
 
 
         currentFacingMode =
@@ -1860,10 +1889,6 @@ async function flipCamera() {
     }
 }
 
-
-/* =========================================
-   PEER CONNECTION
-========================================= */
 
 function createPeer(
     initiator
@@ -1958,12 +1983,13 @@ function createPeer(
                 true;
 
 
-            remoteVideo.play()
+            remoteVideo
+                .play()
                 .catch(
                     error => {
 
                         console.warn(
-                            "Remote playback blocked:",
+                            "Remote play blocked:",
                             error
                         );
                     }
@@ -1985,25 +2011,26 @@ function createPeer(
     peerConnection.onicecandidate =
         event => {
 
-            if (
-                event.candidate
-            ) {
-
-                socket.emit(
-                    "signal",
-                    {
-                        type:
-                            "candidate",
-
-                        candidate:
-                            event.candidate
-                    }
-                );
+            if (!event.candidate) {
+                return;
             }
+
+
+            socket.emit(
+                "signal",
+                {
+                    type:
+                        "candidate",
+
+                    candidate:
+                        event.candidate
+                }
+            );
         };
 
 
-    peerConnection.oniceconnectionstatechange =
+    peerConnection
+        .oniceconnectionstatechange =
         () => {
 
             if (!peerConnection) {
@@ -2023,7 +2050,8 @@ function createPeer(
 
 
             if (
-                state === "checking"
+                state ===
+                "checking"
             ) {
 
                 setStatus(
@@ -2074,7 +2102,8 @@ function createPeer(
         };
 
 
-    peerConnection.onconnectionstatechange =
+    peerConnection
+        .onconnectionstatechange =
         () => {
 
             if (!peerConnection) {
@@ -2094,8 +2123,7 @@ function createPeer(
 
 
             if (
-                state ===
-                "connecting"
+                state === "connecting"
             ) {
 
                 setStatus(
@@ -2109,8 +2137,7 @@ function createPeer(
 
 
             if (
-                state ===
-                "connected"
+                state === "connected"
             ) {
 
                 connected =
@@ -2146,9 +2173,7 @@ function createPeer(
                     "⏭️ Next";
 
 
-                if (
-                    !callStartTime
-                ) {
+                if (!callStartTime) {
 
                     startCallTimer();
                 }
@@ -2156,8 +2181,7 @@ function createPeer(
 
 
             if (
-                state ===
-                "failed"
+                state === "failed"
             ) {
 
                 connected =
@@ -2188,8 +2212,7 @@ function createPeer(
 
 
             if (
-                state ===
-                "disconnected"
+                state === "disconnected"
             ) {
 
                 setRemoteStatus(
@@ -2199,7 +2222,8 @@ function createPeer(
         };
 
 
-    peerConnection.onicegatheringstatechange =
+    peerConnection
+        .onicegatheringstatechange =
         () => {
 
             if (!peerConnection) {
@@ -2215,7 +2239,8 @@ function createPeer(
         };
 
 
-    peerConnection.onsignalingstatechange =
+    peerConnection
+        .onsignalingstatechange =
         () => {
 
             if (!peerConnection) {
@@ -2231,7 +2256,8 @@ function createPeer(
         };
 
 
-    peerConnection.ondatachannel =
+    peerConnection
+        .ondatachannel =
         event => {
 
             console.log(
@@ -2256,7 +2282,8 @@ function createPeer(
                 .createDataChannel(
                     "chat",
                     {
-                        ordered: true
+                        ordered:
+                            true
                     }
                 );
 
@@ -2276,10 +2303,6 @@ function createPeer(
 }
 
 
-/* =========================================
-   OFFER
-========================================= */
-
 async function createOffer(
     iceRestart = false
 ) {
@@ -2296,7 +2319,8 @@ async function createOffer(
                 .createOffer(
                     iceRestart
                         ? {
-                            iceRestart: true
+                            iceRestart:
+                                true
                         }
                         : undefined
                 );
@@ -2329,10 +2353,6 @@ async function createOffer(
     }
 }
 
-
-/* =========================================
-   OFFER HANDLER
-========================================= */
 
 async function handleOffer(
     offer
@@ -2411,10 +2431,6 @@ async function handleOffer(
 }
 
 
-/* =========================================
-   ANSWER HANDLER
-========================================= */
-
 async function handleAnswer(
     answer
 ) {
@@ -2454,10 +2470,6 @@ async function handleAnswer(
     );
 }
 
-
-/* =========================================
-   ICE CANDIDATES
-========================================= */
 
 async function handleCandidate(
     candidate
@@ -2546,10 +2558,6 @@ async function flushIceCandidates() {
 }
 
 
-/* =========================================
-   CLOSE CONNECTION
-========================================= */
-
 function closePeerConnection() {
 
     clearConnectionTimer();
@@ -2609,10 +2617,6 @@ function closePeerConnection() {
         null;
 }
 
-
-/* =========================================
-   START LOOP
-========================================= */
 
 async function startLoop() {
 
@@ -2715,10 +2719,6 @@ async function startLoop() {
 }
 
 
-/* =========================================
-   STOP
-========================================= */
-
 function stopSession() {
 
     stopping =
@@ -2780,10 +2780,6 @@ function stopSession() {
 }
 
 
-/* =========================================
-   SOCKET EVENTS
-========================================= */
-
 socket.on(
     "connect",
     () => {
@@ -2792,6 +2788,7 @@ socket.on(
             "SOCKET CONNECTED:",
             socket.id
         );
+
 
         setStatus(
             connected
@@ -2810,6 +2807,7 @@ socket.on(
             "SOCKET ERROR:",
             error
         );
+
 
         setStatus(
             "Server reconnecting..."
@@ -2998,10 +2996,6 @@ socket.on(
 );
 
 
-/* =========================================
-   CHAT
-========================================= */
-
 function setupDataChannel(
     channel
 ) {
@@ -3066,7 +3060,7 @@ function sendMessage() {
     if (
         !dataChannel ||
         dataChannel.readyState !==
-        "open"
+            "open"
     ) {
 
         addMessage(
@@ -3164,10 +3158,6 @@ function addMessage(
 }
 
 
-/* =========================================
-   BUTTONS
-========================================= */
-
 loopBtn.addEventListener(
     "click",
     startLoop
@@ -3221,10 +3211,6 @@ chatInput.addEventListener(
 );
 
 
-/* =========================================
-   LANGUAGE
-========================================= */
-
 languageSelect.addEventListener(
     "change",
     event => {
@@ -3247,9 +3233,20 @@ languageSelect.addEventListener(
 );
 
 
-/* =========================================
-   VISIBILITY
-========================================= */
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key ===
+            "Escape"
+        ) {
+
+            stopSession();
+        }
+    }
+);
+
 
 document.addEventListener(
     "visibilitychange",
@@ -3289,10 +3286,6 @@ document.addEventListener(
 );
 
 
-/* =========================================
-   CLEANUP
-========================================= */
-
 window.addEventListener(
     "beforeunload",
     () => {
@@ -3324,10 +3317,6 @@ window.addEventListener(
     }
 );
 
-
-/* =========================================
-   INITIAL STATE
-========================================= */
 
 stopCallTimer();
 
