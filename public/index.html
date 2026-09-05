@@ -44,7 +44,6 @@ select{min-height:34px;padding:7px 10px;color:#fff;background:rgba(255,255,255,.
 <div class="video-wrapper">
 <div class="videos-grid">
 <div class="video-box">
-<!-- Muted default para hindi i-block ng mobile browser ang video -->
 <video id="remoteVideo" autoplay playsinline></video>
 <div class="video-label">👤 Stranger</div>
 <div class="status" id="remoteStatus">Waiting...</div>
@@ -105,20 +104,29 @@ const languageSelect = document.getElementById("languageSelect");
 const callTimer = document.getElementById("callTimer");
 const callTimerValue = document.getElementById("callTimerValue");
 
+// NAKAKABIT NA ANG SARILI MONG METERED TURN SERVER CREDENTIALS
 const rtcConfig = {
     iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },
-        { urls: "stun:stun1.l.google.com:19302" },
-        { urls: "stun:stun2.l.google.com:19302" },
+        { urls: "stun:stun.relay.metered.ca:80" },
         {
-            urls: "turn:openrelay.metered.ca:80",
-            username: "openrelay",
-            credential: "openrelay"
+            urls: "turn:global.relay.metered.ca:80",
+            username: "ab517030afee9414b9e155c5",
+            credential: "MCHZdjwDZ2KjW9bv"
         },
         {
-            urls: "turn:openrelay.metered.ca:443",
-            username: "openrelay",
-            credential: "openrelay"
+            urls: "turn:global.relay.metered.ca:80?transport=tcp",
+            username: "ab517030afee9414b9e155c5",
+            credential: "MCHZdjwDZ2KjW9bv"
+        },
+        {
+            urls: "turn:global.relay.metered.ca:443",
+            username: "ab517030afee9414b9e155c5",
+            credential: "MCHZdjwDZ2KjW9bv"
+        },
+        {
+            urls: "turns:global.relay.metered.ca:443?transport=tcp",
+            username: "ab517030afee9414b9e155c5",
+            credential: "MCHZdjwDZ2KjW9bv"
         }
     ]
 };
@@ -172,7 +180,6 @@ function stopCallTimer() {
     callTimerValue.textContent = "00:00:00";
 }
 
-// BUKAS AGAD ANG CAMERA SA SIMULA PALANG
 async function startMedia() {
     if (localStream) return true;
     try {
@@ -187,12 +194,11 @@ async function startMedia() {
         return true;
     } catch (error) {
         console.error("CAMERA ERROR:", error);
-        alert("Paki-allow ang Camera at Mic sa browser.");
+        alert("Paki-allow ang Camera at Mic.");
         return false;
     }
 }
 
-// Auto load camera pagkabukas ng website
 startMedia();
 
 function updateMediaButtons() {
@@ -276,7 +282,6 @@ function createPeer(initiator) {
         }
     };
 
-    // FIXED: Multi-browser Mobile Track Handler (Lulutas sa Black Screen)
     peerConnection.ontrack = (event) => {
         hideSearch();
         setRemoteStatus("Live");
@@ -291,14 +296,12 @@ function createPeer(initiator) {
             remoteVideo.srcObject = stream;
         }
 
-        // SMART PLAY: Sinusubukang mag-play na may audio; kung harangin ng mobile, i-play nang muted para lumabas agad ang mukha
         remoteVideo.play().catch(() => {
             remoteVideo.muted = true;
             remoteVideo.play().catch(e => console.error("Play error:", e));
         });
     };
 
-    // Dual Listeners para sa Mobile Connection Status
     peerConnection.onconnectionstatechange = () => {
         const state = peerConnection?.connectionState;
         if (state === "connected") handleConnected();
@@ -506,7 +509,6 @@ chatInput.addEventListener("keydown", e => {
     }
 });
 
-// Pindot kahit saan sa screen para mag-play ang sound ng Stranger sa phone
 document.addEventListener("pointerdown", () => {
     if (remoteVideo.srcObject && remoteVideo.muted) {
         remoteVideo.muted = false;
