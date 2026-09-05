@@ -17,11 +17,12 @@ header{height:68px;display:flex;align-items:center;justify-content:space-between
 .header-right{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0}.badge{min-height:34px;display:inline-flex;align-items:center;justify-content:center;padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.055);border:1px solid var(--border);font-size:12px;font-weight:700;white-space:nowrap}.online{color:#86efac}#statusBadge{color:#cbd5e1}
 select{min-height:34px;padding:7px 10px;color:#fff;background:rgba(255,255,255,.055);border:1px solid var(--border);border-radius:9px;outline:none;cursor:pointer}
 #callTimer{gap:7px;transition:color .25s,background .25s,border-color .25s,box-shadow .25s}.timer-dot{width:7px;height:7px;border-radius:50%;background:#64748b;flex:0 0 auto}.timer-label{color:#94a3b8;font-size:9px;font-weight:900;letter-spacing:.8px}.timer-time{min-width:58px;font-size:12px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.6px}#callTimer.active{color:#fecaca;background:linear-gradient(135deg,rgba(239,68,68,.16),rgba(239,68,68,.06));border-color:rgba(239,68,68,.25);box-shadow:0 8px 25px rgba(239,68,68,.08)}#callTimer.active .timer-dot{background:var(--red);animation:timerPulse 1.5s infinite}@keyframes timerPulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}70%{box-shadow:0 0 0 7px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
-.main-container{width:100%;height:calc(100vh - 68px);display:flex;gap:12px;padding:12px}.video-wrapper{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px}.videos-grid{flex:1;min-height:0;display:flex;gap:10px}.video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#000;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 35px rgba(0,0,0,.25)}video{display:block;width:100%;height:100%;object-fit:cover;background:#000;border:0;outline:0}#localVideo{transform:none}
+.main-container{width:100%;height:calc(100vh - 68px);display:flex;gap:12px;padding:12px}.video-wrapper{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px}.videos-grid{flex:1;min-height:0;display:flex;gap:10px}.video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#000;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 35px rgba(0,0,0,.25)}video{display:block;width:100%;height:100%;object-fit:cover;background:#000;border:0;outline:0}#localVideo{transform:scaleX(-1)}
 .video-label{position:absolute;left:10px;top:10px;z-index:4;padding:6px 10px;background:rgba(0,0,0,.56);border:1px solid rgba(255,255,255,.08);border-radius:9px;font-size:12px;font-weight:700;pointer-events:none}.status{position:absolute;left:10px;bottom:10px;z-index:4;padding:6px 10px;background:rgba(0,0,0,.56);border:1px solid rgba(255,255,255,.08);border-radius:9px;color:#e2e8f0;font-size:11px;font-weight:600;pointer-events:none}
 .search-overlay{position:absolute;inset:0;z-index:10;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,.72);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}.search-box{min-width:220px;padding:20px;text-align:center;background:rgba(15,23,42,.82);border:1px solid rgba(255,255,255,.08);border-radius:16px}.spinner{width:42px;height:42px;margin:0 auto 12px;border:4px solid rgba(255,255,255,.12);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}#searchText{color:#e2e8f0;font-size:13px;font-weight:700}@keyframes spin{to{transform:rotate(360deg)}}
 .controls-bar{display:flex;gap:8px;padding:2px}.btn{min-height:46px;padding:11px 15px;border:1px solid rgba(255,255,255,.04);border-radius:11px;color:#fff;background:var(--panel);cursor:pointer;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;user-select:none;transition:transform .12s,filter .2s,opacity .2s}.btn:hover:not(:disabled){filter:brightness(1.08)}.btn:active:not(:disabled){transform:scale(.98)}.btn:disabled{opacity:.5;cursor:not-allowed}.btn-loop{flex:1.5;background:linear-gradient(135deg,var(--blue),var(--blue2));box-shadow:0 7px 22px rgba(37,99,235,.18)}.btn-stop{flex:1;background:linear-gradient(135deg,#dc2626,#ef4444)}.btn-toggle{flex:1;background:rgba(255,255,255,.07)}.btn-flip{display:none;flex:1;background:linear-gradient(135deg,#7c3aed,#8b5cf6)}
 .chat-wrapper{width:320px;max-width:320px;min-height:0;display:flex;flex-direction:column;overflow:hidden;background:rgba(17,24,39,.9);border:1px solid var(--border);border-radius:16px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}.chat-header{padding:14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:800}.chat-messages{flex:1;min-height:0;padding:12px;overflow-y:auto;overscroll-behavior:contain}.message{margin-bottom:10px;word-break:break-word}.message-name{margin-bottom:3px;color:var(--muted);font-size:10px;font-weight:700}.message-text{display:inline-block;max-width:90%;padding:8px 10px;color:#f8fafc;background:rgba(255,255,255,.075);border-radius:10px;font-size:12px;white-space:pre-wrap}.chat-input-area{display:flex;gap:6px;padding:9px;border-top:1px solid var(--border)}#chatInput{flex:1;min-width:0;min-height:40px;padding:9px 10px;background:rgba(2,6,23,.64);color:#fff;border:1px solid var(--border-strong);border-radius:9px;outline:none}#chatInput:focus{border-color:rgba(59,130,246,.55)}#sendBtn{min-width:60px;border:0;border-radius:9px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue2));cursor:pointer;font-size:12px;font-weight:800}
+
 @media (max-width:850px){
  body{height:100dvh;overflow-y:auto;overflow-x:hidden}header{min-height:60px;height:auto;padding:8px 10px;gap:8px}.brand{font-size:17px}.brand-icon{width:30px;height:30px;border-radius:9px}.header-right{gap:4px;flex-wrap:wrap}.badge{min-height:30px;padding:5px 8px;font-size:10px}.timer-label{display:none}.timer-time{min-width:49px;font-size:10px}.timer-dot{width:6px;height:6px}select{min-height:30px;padding:5px 7px;font-size:10px}.main-container{height:auto;min-height:calc(100dvh - 60px);display:flex;flex-direction:column;gap:9px;padding:8px}.video-wrapper{width:100%;flex:none;gap:8px}.videos-grid{position:relative;width:100%;height:min(55dvh,560px);min-height:300px;display:block}.video-box{position:absolute;border-radius:13px}.video-box:first-child{inset:0;width:100%;height:100%}.video-box:last-child{right:10px;bottom:10px;width:31%;height:30%;z-index:6;border:2px solid rgba(255,255,255,.9);box-shadow:0 8px 20px rgba(0,0,0,.46)}.video-label{left:7px;top:7px;padding:5px 7px;font-size:10px}.status{left:7px;bottom:7px;padding:5px 7px;font-size:9px}.controls-bar{width:100%;display:grid;grid-template-columns:repeat(2,1fr);gap:7px;padding:0}.btn{width:100%;min-height:48px;padding:10px 6px;border-radius:9px;font-size:11px}.btn-loop,.btn-stop,.btn-toggle{flex:none}.btn-flip{display:flex}.chat-wrapper{width:100%;max-width:none;height:250px;min-height:250px;border-radius:13px}.chat-header{padding:10px;font-size:12px}.chat-messages{padding:9px}.chat-input-area{padding:8px}#chatInput{min-height:40px;padding:9px;font-size:12px}#sendBtn{min-width:62px;font-size:11px}
 }
@@ -44,13 +45,13 @@ select{min-height:34px;padding:7px 10px;color:#fff;background:rgba(255,255,255,.
 <div class="video-wrapper">
 <div class="videos-grid">
 <div class="video-box">
-<video id="remoteVideo" autoplay playsinline preload="auto"></video>
+<video id="remoteVideo" autoplay playsinline></video>
 <div class="video-label">👤 Stranger</div>
 <div class="status" id="remoteStatus">Waiting...</div>
 <div class="search-overlay" id="searchOverlay"><div class="search-box"><div class="spinner"></div><div id="searchText">Finding someone...</div></div></div>
 </div>
 <div class="video-box">
-<video id="localVideo" autoplay muted playsinline preload="auto"></video>
+<video id="localVideo" autoplay muted playsinline></video>
 <div class="video-label">🙂 You</div>
 </div>
 </div>
@@ -82,10 +83,7 @@ select{min-height:34px;padding:7px 10px;color:#fff;background:rgba(255,255,255,.
 
 const socket = io({
     transports: ["websocket", "polling"],
-    reconnection: true,
-    reconnectionAttempts: Infinity,
-    reconnectionDelay: 1000,
-    reconnectionDelayMax: 5000
+    reconnection: true
 });
 
 const localVideo = document.getElementById("localVideo");
@@ -107,489 +105,157 @@ const languageSelect = document.getElementById("languageSelect");
 const callTimer = document.getElementById("callTimer");
 const callTimerValue = document.getElementById("callTimerValue");
 
-/*
- * FREE / STUN-ONLY.
- * This cannot bypass every NAT/firewall, but the signaling below
- * is more robust for mobile and avoids candidate/offer races.
- */
+// FREE STUN + RELIABLE OPEN TURN SERVER PARA SA MOBILE DATA / CGNAT
 const rtcConfig = {
     iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
         { urls: "stun:stun1.l.google.com:19302" },
-        { urls: "stun:stun2.l.google.com:19302" },
-        { urls: "stun:stun3.l.google.com:19302" },
-        { urls: "stun:stun.cloudflare.com:3478" }
+        {
+            urls: "turn:openrelay.metered.ca:80",
+            username: "openrelay",
+            credential: "openrelay"
+        },
+        {
+            urls: "turn:openrelay.metered.ca:443",
+            username: "openrelay",
+            credential: "openrelay"
+        },
+        {
+            urls: "turn:openrelay.metered.ca:443?transport=tcp",
+            username: "openrelay",
+            credential: "openrelay"
+        }
     ],
-    iceCandidatePoolSize: 0,
-    bundlePolicy: "max-bundle",
-    rtcpMuxPolicy: "require",
-    iceTransportPolicy: "all"
+    iceCandidatePoolSize: 10
 };
 
 let localStream = null;
 let peerConnection = null;
 let dataChannel = null;
-
 let pendingIceCandidates = [];
-let remoteDescriptionSet = false;
-
 let searching = false;
 let connected = false;
 let stopping = false;
-
 let currentFacingMode = "user";
-
-let connectionTimer = null;
 let callTimerInterval = null;
 let callStartTime = null;
 
-let peerGeneration = 0;
-let restartAttempted = false;
-let candidateGeneration = 0;
-
-function setStatus(text) {
-    statusBadge.textContent = text;
-}
-
-function setRemoteStatus(text) {
-    remoteStatus.textContent = text;
-}
+function setStatus(text) { statusBadge.textContent = text; }
+function setRemoteStatus(text) { remoteStatus.textContent = text; }
 
 function showSearch(text) {
     searchText.textContent = text;
     searchOverlay.style.display = "flex";
 }
+function hideSearch() { searchOverlay.style.display = "none"; }
 
-function hideSearch() {
-    searchOverlay.style.display = "none";
-}
-
-function isMobile() {
-    return window.matchMedia("(max-width: 850px)").matches;
-}
-
-function formatCallTime(totalSeconds) {
-    const h = Math.floor(totalSeconds / 3600);
-    const m = Math.floor((totalSeconds % 3600) / 60);
-    const s = totalSeconds % 60;
-
-    return (
-        String(h).padStart(2, "0") + ":" +
-        String(m).padStart(2, "0") + ":" +
-        String(s).padStart(2, "0")
-    );
+function formatCallTime(s) {
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    return String(m).padStart(2, "0") + ":" + String(sec).padStart(2, "0");
 }
 
 function updateCallTimer() {
-    if (!callStartTime) {
-        callTimerValue.textContent = "00:00:00";
-        return;
-    }
-
+    if (!callStartTime) return;
     const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
-    callTimerValue.textContent = formatCallTime(Math.max(0, elapsed));
+    callTimerValue.textContent = formatCallTime(elapsed);
 }
 
 function startCallTimer() {
     stopCallTimer();
-
     callStartTime = Date.now();
     callTimer.classList.add("active");
-
-    updateCallTimer();
     callTimerInterval = setInterval(updateCallTimer, 1000);
 }
 
 function stopCallTimer() {
-    if (callTimerInterval) {
-        clearInterval(callTimerInterval);
-        callTimerInterval = null;
-    }
-
+    if (callTimerInterval) clearInterval(callTimerInterval);
+    callTimerInterval = null;
     callStartTime = null;
     callTimer.classList.remove("active");
     callTimerValue.textContent = "00:00:00";
 }
 
-function clearConnectionTimer() {
-    if (connectionTimer) {
-        clearTimeout(connectionTimer);
-        connectionTimer = null;
-    }
-}
-
-function startConnectionTimer(generation) {
-    clearConnectionTimer();
-
-    connectionTimer = setTimeout(() => {
-        if (
-            peerConnection &&
-            generation === peerGeneration &&
-            !connected
-        ) {
-            setRemoteStatus("Connection failed");
-            setStatus("Connection failed");
-            loopBtn.disabled = false;
-            loopBtn.textContent = "🔄 Start Loop";
-        }
-    }, 20000);
-}
-
 async function startMedia() {
-    if (localStream) {
-        return true;
-    }
-
-    if (
-        !navigator.mediaDevices ||
-        !navigator.mediaDevices.getUserMedia
-    ) {
-        alert("Camera and microphone are not supported by this browser.");
-        return false;
-    }
-
+    if (localStream) return true;
     try {
         localStream = await navigator.mediaDevices.getUserMedia({
             video: {
-                facingMode: { ideal: "user" },
-                width: { ideal: 1280, max: 1920 },
-                height: { ideal: 720, max: 1080 },
-                frameRate: { ideal: 30, max: 30 }
+                facingMode: currentFacingMode,
+                width: { ideal: 640 },
+                height: { ideal: 480 }
             },
-            audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true
-            }
+            audio: true
         });
 
         localVideo.srcObject = localStream;
-        localVideo.muted = true;
-        localVideo.autoplay = true;
-        localVideo.playsInline = true;
-
         await localVideo.play().catch(() => {});
-
-        currentFacingMode = "user";
         updateMediaButtons();
-
         return true;
     } catch (error) {
-        console.error("GET USER MEDIA ERROR:", error);
-        localStream = null;
-
-        alert(
-            "Hindi ma-access ang camera/microphone. I-check ang Chrome permissions."
-        );
-
+        console.error("CAMERA ERROR:", error);
+        alert("Paki-allow ang Camera at Microphone.");
         return false;
     }
 }
 
 function updateMediaButtons() {
-    if (!localStream) {
-        return;
-    }
-
-    const audioTrack = localStream.getAudioTracks()[0];
-    const videoTrack = localStream.getVideoTracks()[0];
-
-    if (audioTrack) {
-        micBtn.textContent = audioTrack.enabled
-            ? "🎙️ Mic On"
-            : "🔇 Mic Off";
-    }
-
-    if (videoTrack) {
-        camBtn.textContent = videoTrack.enabled
-            ? "📷 Cam On"
-            : "🚫 Cam Off";
-    }
+    if (!localStream) return;
+    const a = localStream.getAudioTracks()[0];
+    const v = localStream.getVideoTracks()[0];
+    if (a) micBtn.textContent = a.enabled ? "🎙️ Mic On" : "🔇 Mic Off";
+    if (v) camBtn.textContent = v.enabled ? "📷 Cam On" : "🚫 Cam Off";
 }
 
 function toggleMic() {
-    const track = localStream?.getAudioTracks()[0];
-
-    if (!track) {
-        return;
-    }
-
-    track.enabled = !track.enabled;
-    updateMediaButtons();
+    const t = localStream?.getAudioTracks()[0];
+    if (t) { t.enabled = !t.enabled; updateMediaButtons(); }
 }
 
 function toggleCam() {
-    const track = localStream?.getVideoTracks()[0];
-
-    if (!track) {
-        return;
-    }
-
-    track.enabled = !track.enabled;
-    updateMediaButtons();
+    const t = localStream?.getVideoTracks()[0];
+    if (t) { t.enabled = !t.enabled; updateMediaButtons(); }
 }
 
 async function flipCamera() {
-    if (!isMobile() || !localStream) {
-        return;
-    }
-
-    const oldTrack = localStream.getVideoTracks()[0];
-
-    if (!oldTrack) {
-        return;
-    }
-
-    const nextFacingMode =
-        currentFacingMode === "user"
-            ? "environment"
-            : "user";
-
-    let replacementStream = null;
-
-    try {
-        replacementStream =
-            await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: {
-                        exact: nextFacingMode
-                    }
-                },
-                audio: false
-            });
-
-        const newTrack =
-            replacementStream.getVideoTracks()[0];
-
-        if (!newTrack) {
-            throw new Error("No replacement camera");
+    if (!localStream) return;
+    currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+    localStream.getTracks().forEach(t => t.stop());
+    localStream = null;
+    const ok = await startMedia();
+    if (ok && peerConnection) {
+        const videoSender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
+        if (videoSender) {
+            videoSender.replaceTrack(localStream.getVideoTracks()[0]);
         }
-
-        newTrack.enabled = oldTrack.enabled;
-
-        const sender = peerConnection
-            ?.getSenders()
-            .find(
-                item =>
-                    item.track &&
-                    item.track.kind === "video"
-            );
-
-        if (sender) {
-            await sender.replaceTrack(newTrack);
-        }
-
-        localStream.removeTrack(oldTrack);
-        localStream.addTrack(newTrack);
-
-        oldTrack.stop();
-
-        replacementStream
-            .getTracks()
-            .forEach(track => {
-                if (track !== newTrack) {
-                    track.stop();
-                }
-            });
-
-        localVideo.srcObject = localStream;
-        await localVideo.play().catch(() => {});
-
-        currentFacingMode = nextFacingMode;
-        updateMediaButtons();
-    } catch (error) {
-        console.error("FLIP CAMERA ERROR:", error);
-
-        if (replacementStream) {
-            replacementStream
-                .getTracks()
-                .forEach(track => track.stop());
-        }
-
-        alert("Hindi ma-switch ang camera.");
     }
 }
 
 function stopAllRemoteMedia() {
-    try {
-        remoteVideo.pause();
-    } catch (e) {}
-
-    remoteVideo.srcObject = null;
+    if (remoteVideo.srcObject) {
+        remoteVideo.srcObject.getTracks().forEach(t => t.stop());
+        remoteVideo.srcObject = null;
+    }
 }
 
 function setupDataChannel(channel) {
-    if (!channel) {
-        return;
-    }
-
     dataChannel = channel;
-
-    channel.onopen = () => {
-        console.log("CHAT CONNECTED");
-        addMessage("System", "Chat connected.");
-    };
-
-    channel.onclose = () => {
-        console.log("CHAT CLOSED");
-    };
-
-    channel.onerror = error => {
-        console.error("CHAT ERROR:", error);
-    };
-
-    channel.onmessage = event => {
-        addMessage("Stranger", String(event.data));
-    };
+    channel.onopen = () => addMessage("System", "Chat connected.");
+    channel.onmessage = (e) => addMessage("Stranger", e.data);
 }
 
-function attachRemoteTrack(event) {
-    console.log("REMOTE TRACK:", event.track.kind);
-
-    let stream = event.streams?.[0];
-
-    if (!stream) {
-        stream = remoteVideo.srcObject;
-
-        if (!(stream instanceof MediaStream)) {
-            stream = new MediaStream();
-        }
-
-        if (!stream.getTracks().includes(event.track)) {
-            stream.addTrack(event.track);
-        }
-    }
-
-    remoteVideo.srcObject = stream;
-    remoteVideo.autoplay = true;
-    remoteVideo.playsInline = true;
-    remoteVideo.controls = false;
-
-    /*
-     * Remote audio/video playback may require the user's original
-     * interaction on some mobile browsers. Since Start Loop is a
-     * user gesture, we explicitly attempt playback here and again
-     * on visibility/user interaction.
-     */
-    remoteVideo.play().catch(error => {
-        console.warn("REMOTE PLAY:", error);
-    });
-
-    if (event.track.kind === "video") {
-        setRemoteStatus("Video connected");
-    }
-
-    if (event.track.kind === "audio") {
-        console.log("REMOTE AUDIO RECEIVED");
-    }
-}
-
-function resetPeerState(clearCandidates = true) {
-    remoteDescriptionSet = false;
-    candidateGeneration++;
-
-    if (clearCandidates) {
-        pendingIceCandidates = [];
-    }
-
-    dataChannel = null;
-}
-
-function closePeerConnection(clearCandidates = true) {
-    clearConnectionTimer();
-
-    if (dataChannel) {
-        try {
-            dataChannel.close();
-        } catch (e) {}
-        dataChannel = null;
-    }
-
-    if (peerConnection) {
-        try {
-            peerConnection.ontrack = null;
-            peerConnection.onicecandidate = null;
-            peerConnection.onicecandidateerror = null;
-            peerConnection.onconnectionstatechange = null;
-            peerConnection.oniceconnectionstatechange = null;
-            peerConnection.ondatachannel = null;
-            peerConnection.onicegatheringstatechange = null;
-            peerConnection.close();
-        } catch (e) {}
-    }
-
-    peerConnection = null;
-    resetPeerState(clearCandidates);
-}
-
-function waitForIceGatheringComplete(pc, timeout = 12000) {
-    if (!pc || pc.iceGatheringState === "complete") {
-        return Promise.resolve();
-    }
-
-    return new Promise(resolve => {
-        let finished = false;
-
-        const finish = () => {
-            if (finished) {
-                return;
-            }
-
-            finished = true;
-            pc.removeEventListener(
-                "icegatheringstatechange",
-                check
-            );
-
-            clearTimeout(timer);
-            resolve();
-        };
-
-        const check = () => {
-            if (pc.iceGatheringState === "complete") {
-                finish();
-            }
-        };
-
-        const timer = setTimeout(finish, timeout);
-
-        pc.addEventListener(
-            "icegatheringstatechange",
-            check
-        );
-    });
-}
-
-/*
- * We only let the designated initiator create the initial offer.
- * This avoids mobile/desktop "offer collision" while keeping the
- * existing MeetLoop server protocol unchanged.
- */
 function createPeer(initiator) {
-    closePeerConnection(true);
+    closePeerConnection();
 
-    const generation = ++peerGeneration;
-    restartAttempted = false;
+    peerConnection = new RTCPeerConnection(rtcConfig);
+    pendingIceCandidates = [];
 
-    peerConnection =
-        new RTCPeerConnection(rtcConfig);
+    localStream.getTracks().forEach(track => {
+        peerConnection.addTrack(track, localStream);
+    });
 
-    peerConnection.__meetloopGeneration = generation;
-
-    if (localStream) {
-        localStream.getTracks().forEach(track => {
-            peerConnection.addTrack(track, localStream);
-        });
-    }
-
-    peerConnection.ontrack = attachRemoteTrack;
-
-    peerConnection.onicecandidate = event => {
-        /*
-         * We intentionally keep this handler for ICE restart.
-         * The initial offer/answer waits for ICE gathering to complete,
-         * so candidates are already inside SDP.
-         */
+    // INAYOS: Real-time Trickle ICE (Agad na ipinapasa ang candidates)
+    peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
             socket.emit("signal", {
                 type: "candidate",
@@ -598,387 +264,152 @@ function createPeer(initiator) {
         }
     };
 
-    peerConnection.onicecandidateerror = event => {
-        console.warn("ICE CANDIDATE ERROR:", {
-            code: event.errorCode,
-            url: event.url,
-            text: event.errorText
-        });
-    };
-
-    peerConnection.oniceconnectionstatechange = async () => {
-        if (
-            !peerConnection ||
-            generation !== peerGeneration
-        ) {
-            return;
+    // INAYOS: Mobile Unmute Fix (Naiiwasan ang Black Screen)
+    peerConnection.ontrack = (event) => {
+        if (remoteVideo.srcObject !== event.streams[0]) {
+            remoteVideo.srcObject = event.streams[0];
         }
+        
+        event.track.onunmute = () => {
+            remoteVideo.play().catch(e => console.log("Auto-play error:", e));
+        };
 
-        const state =
-            peerConnection.iceConnectionState;
-
-        console.log("ICE STATE:", state);
-
-        if (state === "checking") {
-            setStatus("Connecting...");
-            setRemoteStatus("Connecting...");
-        }
-
-        if (
-            state === "connected" ||
-            state === "completed"
-        ) {
-            clearConnectionTimer();
-            setStatus("Connected");
-        }
-
-        if (
-            state === "failed" &&
-            !restartAttempted
-        ) {
-            restartAttempted = true;
-
-            console.warn(
-                "ICE FAILED. Trying one ICE restart..."
-            );
-
-            try {
-                await peerConnection.restartIce();
-                await createOffer(true);
-            } catch (error) {
-                console.error(
-                    "ICE RESTART ERROR:",
-                    error
-                );
-            }
-        }
+        setRemoteStatus("Live");
+        remoteVideo.play().catch(e => console.log("Auto-play error:", e));
     };
 
     peerConnection.onconnectionstatechange = () => {
-        if (
-            !peerConnection ||
-            generation !== peerGeneration
-        ) {
-            return;
-        }
-
-        const state =
-            peerConnection.connectionState;
-
-        console.log("CONNECTION STATE:", state);
-
-        if (state === "connecting") {
-            setStatus("Connecting...");
-            setRemoteStatus("Connecting...");
-        }
+        const state = peerConnection?.connectionState;
+        console.log("Connection state:", state);
 
         if (state === "connected") {
             connected = true;
             searching = false;
-
-            clearConnectionTimer();
             hideSearch();
-
             setStatus("Connected");
             setRemoteStatus("Connected");
-
             loopBtn.disabled = false;
             stopBtn.disabled = false;
             loopBtn.textContent = "⏭️ Next";
-
-            if (!callStartTime) {
-                startCallTimer();
-            }
-
-            if (remoteVideo.srcObject) {
-                remoteVideo.play().catch(() => {});
-            }
-        }
-
-        if (state === "failed") {
-            connected = false;
-
-            setStatus("Connection failed");
-            setRemoteStatus("Connection failed");
-
-            loopBtn.disabled = false;
-            loopBtn.textContent = "🔄 Start Loop";
-        }
-
-        if (state === "disconnected") {
+            startCallTimer();
+        } else if (state === "disconnected" || state === "failed") {
             setRemoteStatus("Disconnected");
+            setStatus("Disconnected");
         }
-    };
-
-    peerConnection.onicegatheringstatechange = () => {
-        console.log(
-            "ICE GATHERING:",
-            peerConnection?.iceGatheringState
-        );
-    };
-
-    peerConnection.onsignalingstatechange = () => {
-        console.log(
-            "SIGNALING:",
-            peerConnection?.signalingState
-        );
-    };
-
-    peerConnection.ondatachannel = event => {
-        console.log("REMOTE DATA CHANNEL");
-        setupDataChannel(event.channel);
     };
 
     if (initiator) {
-        setupDataChannel(
-            peerConnection.createDataChannel(
-                "chat",
-                { ordered: true }
-            )
-        );
-
-        createOffer(false);
+        setupDataChannel(peerConnection.createDataChannel("chat"));
+        createOffer();
+    } else {
+        peerConnection.ondatachannel = (e) => setupDataChannel(e.channel);
     }
-
-    startConnectionTimer(generation);
 }
 
-async function createOffer(iceRestart = false) {
-    const pc = peerConnection;
-
-    if (!pc) {
-        return;
-    }
-
+async function createOffer() {
     try {
-        const offer = await pc.createOffer(
-            iceRestart
-                ? { iceRestart: true }
-                : undefined
-        );
-
-        await pc.setLocalDescription(offer);
-
-        /*
-         * Wait for ICE candidates to be gathered into the SDP.
-         * This is slower than trickle ICE, but it removes a common
-         * offer/candidate race and is useful for debugging mobile.
-         */
-        await waitForIceGatheringComplete(pc);
-
-        if (pc !== peerConnection) {
-            return;
-        }
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
 
         socket.emit("signal", {
             type: "offer",
-            offer: pc.localDescription
+            offer: peerConnection.localDescription
         });
-    } catch (error) {
-        console.error("CREATE OFFER ERROR:", error);
+    } catch (err) {
+        console.error("Offer error:", err);
     }
 }
 
 async function handleOffer(offer) {
-    if (!offer) {
-        return;
-    }
-
-    if (!peerConnection) {
-        createPeer(false);
-    }
-
-    if (!peerConnection) {
-        return;
-    }
+    if (!peerConnection) createPeer(false);
 
     try {
-        /*
-         * The server guarantees one initiator per match, so we don't
-         * manufacture a second offer on the answerer.
-         */
-        if (
-            peerConnection.signalingState !== "stable" &&
-            peerConnection.signalingState !== "have-remote-offer"
-        ) {
-            console.warn(
-                "Ignoring offer in state:",
-                peerConnection.signalingState
-            );
-            return;
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+        
+        // I-apply ang mga pending ICE candidates
+        while (pendingIceCandidates.length > 0) {
+            const c = pendingIceCandidates.shift();
+            await peerConnection.addIceCandidate(c).catch(() => {});
         }
 
-        await peerConnection.setRemoteDescription(
-            new RTCSessionDescription(offer)
-        );
-
-        remoteDescriptionSet = true;
-        await flushIceCandidates();
-
-        const answer =
-            await peerConnection.createAnswer();
-
-        await peerConnection.setLocalDescription(
-            answer
-        );
-
-        await waitForIceGatheringComplete(
-            peerConnection
-        );
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
 
         socket.emit("signal", {
             type: "answer",
             answer: peerConnection.localDescription
         });
-    } catch (error) {
-        console.error("HANDLE OFFER ERROR:", error);
+    } catch (err) {
+        console.error("Handle offer error:", err);
     }
 }
 
 async function handleAnswer(answer) {
-    if (!peerConnection || !answer) {
-        return;
-    }
-
     try {
-        if (
-            peerConnection.signalingState !==
-                "have-local-offer"
-        ) {
-            console.warn(
-                "Ignoring answer in state:",
-                peerConnection.signalingState
-            );
-            return;
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+        while (pendingIceCandidates.length > 0) {
+            const c = pendingIceCandidates.shift();
+            await peerConnection.addIceCandidate(c).catch(() => {});
         }
-
-        await peerConnection.setRemoteDescription(
-            new RTCSessionDescription(answer)
-        );
-
-        remoteDescriptionSet = true;
-
-        await flushIceCandidates();
-    } catch (error) {
-        console.error("HANDLE ANSWER ERROR:", error);
+    } catch (err) {
+        console.error("Handle answer error:", err);
     }
 }
 
 async function handleCandidate(candidate) {
-    /*
-     * Candidates may still arrive for ICE restart. Keep them until
-     * the appropriate remote description exists.
-     */
-    if (!peerConnection) {
-        pendingIceCandidates.push(candidate);
-        return;
-    }
-
-    try {
-        if (
-            remoteDescriptionSet &&
-            peerConnection.remoteDescription
-        ) {
-            await peerConnection.addIceCandidate(
-                new RTCIceCandidate(candidate)
-            );
-        } else {
-            pendingIceCandidates.push(candidate);
-        }
-    } catch (error) {
-        console.warn(
-            "ADD ICE ERROR:",
-            error
-        );
+    const ice = new RTCIceCandidate(candidate);
+    if (peerConnection && peerConnection.remoteDescription) {
+        await peerConnection.addIceCandidate(ice).catch(() => {});
+    } else {
+        pendingIceCandidates.push(ice);
     }
 }
 
-async function flushIceCandidates() {
-    if (
-        !peerConnection ||
-        !remoteDescriptionSet
-    ) {
-        return;
+function closePeerConnection() {
+    if (dataChannel) { dataChannel.close(); dataChannel = null; }
+    if (peerConnection) {
+        peerConnection.ontrack = null;
+        peerConnection.onicecandidate = null;
+        peerConnection.close();
+        peerConnection = null;
     }
-
-    const candidates =
-        pendingIceCandidates.splice(0);
-
-    for (const candidate of candidates) {
-        try {
-            await peerConnection.addIceCandidate(
-                new RTCIceCandidate(candidate)
-            );
-        } catch (error) {
-            console.warn(
-                "FLUSH ICE ERROR:",
-                error
-            );
-        }
-    }
+    pendingIceCandidates = [];
 }
 
 async function startLoop() {
-    if (stopping) {
-        return;
-    }
+    if (stopping) return;
+    const ok = await startMedia();
+    if (!ok) return;
 
-    if (connected) {
-        stopCallTimer();
-        closePeerConnection(true);
-        stopAllRemoteMedia();
+    stopCallTimer();
+    closePeerConnection();
+    stopAllRemoteMedia();
 
-        connected = false;
-        searching = true;
-
-        showSearch("Finding someone...");
-        setRemoteStatus("Searching...");
-        setStatus("Searching...");
-
-        loopBtn.disabled = true;
-
-        socket.emit("skip");
-        return;
-    }
-
-    if (searching) {
-        return;
-    }
-
-    const ready = await startMedia();
-
-    if (!ready) {
-        return;
-    }
-
-    searching = true;
     connected = false;
-
-    loopBtn.disabled = true;
-    stopBtn.disabled = false;
+    searching = true;
 
     showSearch("Finding someone...");
     setRemoteStatus("Searching...");
     setStatus("Searching...");
+
+    loopBtn.disabled = true;
+    stopBtn.disabled = false;
 
     socket.emit("skip");
 }
 
 function stopSession() {
     stopping = true;
-
     searching = false;
     connected = false;
 
     stopCallTimer();
-
     socket.emit("stop-search");
 
-    closePeerConnection(true);
+    closePeerConnection();
     stopAllRemoteMedia();
 
     hideSearch();
-
     setRemoteStatus("Stopped");
     setStatus("Ready");
 
@@ -986,28 +417,15 @@ function stopSession() {
     stopBtn.disabled = true;
     loopBtn.textContent = "🔄 Start Loop";
 
-    setTimeout(() => {
-        stopping = false;
-    }, 150);
+    setTimeout(() => { stopping = false; }, 200);
 }
 
-socket.on("connect", () => {
-    console.log("SOCKET CONNECTED:", socket.id);
-    setStatus(connected ? "Connected" : "Ready");
-});
-
-socket.on("connect_error", error => {
-    console.error("SOCKET ERROR:", error);
-    setStatus("Server reconnecting...");
-});
-
-socket.on("online-count", count => {
-    onlineCount.textContent = String(count);
-});
+// SOCKET EVENTS
+socket.on("connect", () => setStatus("Ready"));
+socket.on("online-count", count => onlineCount.textContent = count);
 
 socket.on("waiting", () => {
     searching = true;
-
     showSearch("Waiting for someone...");
     setRemoteStatus("Waiting...");
     setStatus("Waiting...");
@@ -1015,108 +433,47 @@ socket.on("waiting", () => {
 
 socket.on("match", data => {
     searching = false;
-    connected = false;
-
     hideSearch();
-
-    setRemoteStatus("Connecting...");
     setStatus("Connecting...");
-
-    stopBtn.disabled = false;
-
+    setRemoteStatus("Connecting...");
     createPeer(Boolean(data?.initiator));
 });
 
 socket.on("signal", async data => {
-    if (!data?.type) {
-        return;
-    }
-
-    if (data.type === "offer") {
-        await handleOffer(data.offer);
-    } else if (data.type === "answer") {
-        await handleAnswer(data.answer);
-    } else if (data.type === "candidate") {
-        await handleCandidate(data.candidate);
-    }
+    if (data.type === "offer") await handleOffer(data.offer);
+    else if (data.type === "answer") await handleAnswer(data.answer);
+    else if (data.type === "candidate") await handleCandidate(data.candidate);
 });
 
 socket.on("partner-disconnected", () => {
     connected = false;
     searching = false;
-
     stopCallTimer();
-    closePeerConnection(true);
+    closePeerConnection();
     stopAllRemoteMedia();
-
     hideSearch();
-
     setRemoteStatus("Stranger left");
     setStatus("Ready");
-
     loopBtn.disabled = false;
     stopBtn.disabled = true;
     loopBtn.textContent = "🔄 Start Loop";
-
-    addMessage("System", "Stranger disconnected.");
-});
-
-socket.on("disconnect", reason => {
-    console.warn("SOCKET DISCONNECTED:", reason);
-
-    if (!connected) {
-        setStatus("Reconnecting...");
-    }
+    addMessage("System", "Stranger left.");
 });
 
 function sendMessage() {
     const text = chatInput.value.trim();
-
-    if (!text) {
-        return;
-    }
-
-    if (
-        !dataChannel ||
-        dataChannel.readyState !== "open"
-    ) {
-        addMessage(
-            "System",
-            "Chat is not connected yet."
-        );
-        return;
-    }
-
-    try {
-        dataChannel.send(text);
-        addMessage("Me", text);
-        chatInput.value = "";
-    } catch (error) {
-        console.error(
-            "SEND MESSAGE ERROR:",
-            error
-        );
-    }
+    if (!text || !dataChannel || dataChannel.readyState !== "open") return;
+    dataChannel.send(text);
+    addMessage("Me", text);
+    chatInput.value = "";
 }
 
 function addMessage(name, text) {
-    const message = document.createElement("div");
-    message.className = "message";
-
-    const nameDiv = document.createElement("div");
-    nameDiv.className = "message-name";
-    nameDiv.textContent = name;
-
-    const textDiv = document.createElement("div");
-    textDiv.className = "message-text";
-    textDiv.textContent = text;
-
-    message.appendChild(nameDiv);
-    message.appendChild(textDiv);
-
-    chatMessages.appendChild(message);
-    chatMessages.scrollTop =
-        chatMessages.scrollHeight;
+    const msg = document.createElement("div");
+    msg.className = "message";
+    msg.innerHTML = `<div class="message-name">${name}</div><div class="message-text">${text}</div>`;
+    chatMessages.appendChild(msg);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 loopBtn.addEventListener("click", startLoop);
@@ -1126,82 +483,17 @@ camBtn.addEventListener("click", toggleCam);
 flipBtn.addEventListener("click", flipCamera);
 sendBtn.addEventListener("click", sendMessage);
 
-chatInput.addEventListener("keydown", event => {
-    if (event.key === "Enter") {
-        event.preventDefault();
+chatInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+        e.preventDefault();
         sendMessage();
     }
 });
 
-languageSelect.addEventListener("change", event => {
-    const lang = event.target.value;
-
-    chatInput.placeholder =
-        lang === "tl"
-            ? "Mag-type ng message..."
-            : "Type a message...";
-
-    loopBtn.textContent =
-        connected
-            ? "⏭️ Next"
-            : "🔄 Start Loop";
-});
-
-document.addEventListener(
-    "visibilitychange",
-    () => {
-        if (document.visibilityState === "visible") {
-            localVideo.play().catch(() => {});
-
-            if (remoteVideo.srcObject) {
-                remoteVideo.play().catch(() => {});
-            }
-        }
-    }
-);
-
-/*
- * Mobile browsers may pause media when focus changes.
- * A real touch/click on the page is also a safe point to retry
- * remote playback without adding a "Tap for sound" message.
- */
-document.addEventListener(
-    "pointerdown",
-    () => {
-        if (remoteVideo.srcObject) {
-            remoteVideo.play().catch(() => {});
-        }
-
-        if (localVideo.srcObject) {
-            localVideo.play().catch(() => {});
-        }
-    },
-    { passive: true }
-);
-
-window.addEventListener(
-    "beforeunload",
-    () => {
-        try {
-            socket.emit("stop-search");
-        } catch (e) {}
-
-        stopCallTimer();
-
-        if (localStream) {
-            localStream
-                .getTracks()
-                .forEach(track => track.stop());
-        }
-
-        closePeerConnection(true);
-    }
-);
-
-stopCallTimer();
-setStatus("Ready");
-setRemoteStatus("Waiting...");
-stopBtn.disabled = true;
+// Safari / Mobile Touch Fix to trigger audio/video playback
+document.addEventListener("pointerdown", () => {
+    if (remoteVideo.srcObject) remoteVideo.play().catch(() => {});
+}, { passive: true });
 </script>
 </body>
 </html>
