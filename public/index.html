@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0b1120">
-    <title>MeetLoop - Random Video Chat</title>
 
 ```
+<title>MeetLoop - Random Video Chat</title>
+
 <style>
     * {
         box-sizing: border-box;
@@ -53,6 +54,7 @@
 
         overflow: hidden;
         -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
     }
 
     button,
@@ -249,6 +251,7 @@
         height: calc(100vh - 68px);
 
         display: flex;
+
         gap: 12px;
         padding: 12px;
     }
@@ -425,6 +428,7 @@
     .controls-bar {
         display: flex;
         gap: 8px;
+
         padding: 2px;
     }
 
@@ -686,7 +690,9 @@
 
         .badge {
             min-height: 30px;
+
             padding: 5px 8px;
+
             font-size: 10px;
         }
 
@@ -706,13 +712,16 @@
 
         select {
             min-height: 30px;
+
             padding: 5px 7px;
+
             font-size: 10px;
         }
 
         .main-container {
             height: auto;
-            min-height: calc(100dvh - 60px);
+            min-height:
+                calc(100dvh - 60px);
 
             display: flex;
             flex-direction: column;
@@ -724,6 +733,7 @@
         .video-wrapper {
             width: 100%;
             flex: none;
+
             gap: 8px;
         }
 
@@ -931,8 +941,13 @@
     </div>
 
     <select id="languageSelect">
-        <option value="en">English</option>
-        <option value="tl">Tagalog</option>
+        <option value="en">
+            English
+        </option>
+
+        <option value="tl">
+            Tagalog
+        </option>
     </select>
 
 </div>
@@ -1238,9 +1253,7 @@ const rtcConfig = {
 
 
 let localStream = null;
-
 let peerConnection = null;
-
 let dataChannel = null;
 
 let pendingIceCandidates = [];
@@ -1248,9 +1261,7 @@ let pendingIceCandidates = [];
 let remoteDescriptionSet = false;
 
 let searching = false;
-
 let connected = false;
-
 let stopping = false;
 
 let currentFacingMode = "user";
@@ -1258,14 +1269,12 @@ let currentFacingMode = "user";
 let connectionTimer = null;
 
 let callTimerInterval = null;
-
 let callStartTime = null;
 
 let signalQueue =
     Promise.resolve();
 
-let iceRestartAttempted =
-    false;
+let iceRestartAttempted = false;
 
 
 function setStatus(text) {
@@ -1371,6 +1380,10 @@ function queueSignal(callback) {
     return signalQueue;
 }
 
+
+/* =========================
+   CALL TIMER
+========================= */
 
 function formatCallTime(
     totalSeconds
@@ -1490,6 +1503,10 @@ function stopCallTimer() {
         "00:00:00";
 }
 
+
+/* =========================
+   MEDIA
+========================= */
 
 async function startMedia() {
 
@@ -1611,7 +1628,6 @@ function updateMediaButtons() {
         localStream
             .getAudioTracks()[0];
 
-
     const videoTrack =
         localStream
             .getVideoTracks()[0];
@@ -1686,6 +1702,10 @@ function toggleCam() {
 }
 
 
+/* =========================
+   CAMERA FLIP
+========================= */
+
 async function flipCamera() {
 
     if (!isMobile()) {
@@ -1715,13 +1735,13 @@ async function flipCamera() {
             : "user";
 
 
-    let replacementStream =
+    let newStream =
         null;
 
 
     try {
 
-        replacementStream =
+        newStream =
             await navigator
                 .mediaDevices
                 .getUserMedia({
@@ -1738,11 +1758,12 @@ async function flipCamera() {
 
 
         const newTrack =
-            replacementStream
+            newStream
                 .getVideoTracks()[0];
 
 
         if (!newTrack) {
+
             throw new Error(
                 "No replacement camera"
             );
@@ -1762,16 +1783,15 @@ async function flipCamera() {
                         item =>
                             item.track &&
                             item.track.kind ===
-                            "video"
+                                "video"
                     );
 
 
             if (sender) {
 
-                await sender
-                    .replaceTrack(
-                        newTrack
-                    );
+                await sender.replaceTrack(
+                    newTrack
+                );
             }
         }
 
@@ -1813,9 +1833,9 @@ async function flipCamera() {
         );
 
 
-        if (replacementStream) {
+        if (newStream) {
 
-            replacementStream
+            newStream
                 .getTracks()
                 .forEach(
                     track =>
@@ -1830,6 +1850,10 @@ async function flipCamera() {
     }
 }
 
+
+/* =========================
+   PEER
+========================= */
 
 function createPeer(
     initiator
@@ -1930,7 +1954,7 @@ function createPeer(
                     error => {
 
                         console.warn(
-                            "Remote video play:",
+                            "REMOTE PLAY ERROR:",
                             error
                         );
                     }
@@ -2063,7 +2087,8 @@ function createPeer(
 
 
             if (
-                state === "connecting"
+                state ===
+                "connecting"
             ) {
 
                 setRemoteStatus(
@@ -2077,7 +2102,8 @@ function createPeer(
 
 
             if (
-                state === "connected"
+                state ===
+                "connected"
             ) {
 
                 connected =
@@ -2123,7 +2149,8 @@ function createPeer(
 
 
             if (
-                state === "failed"
+                state ===
+                "failed"
             ) {
 
                 connected =
@@ -2150,6 +2177,17 @@ function createPeer(
 
                 loopBtn.textContent =
                     "🔄 Start Loop";
+            }
+
+
+            if (
+                state ===
+                "disconnected"
+            ) {
+
+                setRemoteStatus(
+                    "Disconnected"
+                );
             }
         };
 
@@ -2232,6 +2270,10 @@ function createPeer(
 }
 
 
+/* =========================
+   OFFER
+========================= */
+
 async function createOffer(
     iceRestart = false
 ) {
@@ -2282,6 +2324,10 @@ async function createOffer(
     }
 }
 
+
+/* =========================
+   OFFER HANDLER
+========================= */
 
 async function handleOffer(
     offer
@@ -2355,6 +2401,10 @@ async function handleOffer(
 }
 
 
+/* =========================
+   ANSWER HANDLER
+========================= */
+
 async function handleAnswer(
     answer
 ) {
@@ -2394,6 +2444,10 @@ async function handleAnswer(
     );
 }
 
+
+/* =========================
+   ICE
+========================= */
 
 async function handleCandidate(
     candidate
@@ -2482,6 +2536,10 @@ async function flushIceCandidates() {
 }
 
 
+/* =========================
+   CLOSE PEER
+========================= */
+
 function closePeerConnection() {
 
     clearConnectionTimer();
@@ -2541,6 +2599,10 @@ function closePeerConnection() {
         null;
 }
 
+
+/* =========================
+   START LOOP
+========================= */
 
 async function startLoop() {
 
@@ -2643,6 +2705,10 @@ async function startLoop() {
 }
 
 
+/* =========================
+   STOP
+========================= */
+
 function stopSession() {
 
     stopping =
@@ -2704,9 +2770,9 @@ function stopSession() {
 }
 
 
-/* =========================================
-   SOCKET
-========================================= */
+/* =========================
+   SOCKET EVENTS
+========================= */
 
 socket.on(
     "connect",
@@ -2924,9 +2990,9 @@ socket.on(
 );
 
 
-/* =========================================
+/* =========================
    CHAT
-========================================= */
+========================= */
 
 function setupDataChannel(
     channel
@@ -3090,9 +3156,9 @@ function addMessage(
 }
 
 
-/* =========================================
-   BUTTON EVENTS
-========================================= */
+/* =========================
+   EVENTS
+========================= */
 
 loopBtn.addEventListener(
     "click",
@@ -3147,9 +3213,9 @@ chatInput.addEventListener(
 );
 
 
-/* =========================================
+/* =========================
    LANGUAGE
-========================================= */
+========================= */
 
 languageSelect.addEventListener(
     "change",
@@ -3173,9 +3239,9 @@ languageSelect.addEventListener(
 );
 
 
-/* =========================================
+/* =========================
    VISIBILITY
-========================================= */
+========================= */
 
 document.addEventListener(
     "visibilitychange",
@@ -3215,9 +3281,9 @@ document.addEventListener(
 );
 
 
-/* =========================================
+/* =========================
    CLEANUP
-========================================= */
+========================= */
 
 window.addEventListener(
     "beforeunload",
@@ -3251,9 +3317,9 @@ window.addEventListener(
 );
 
 
-/* =========================================
+/* =========================
    INITIAL STATE
-========================================= */
+========================= */
 
 stopCallTimer();
 
