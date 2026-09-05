@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Meetloop - Video Chat</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: #0b0f19;
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* HEADER */
+
+        header {
+            background: #111827;
+            padding: 12px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid #1f2937;
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: 900;
+            color: #38bdf8;
+        }
+
+        .brand span {
+            color: #f43f5e;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            background: #1f2937;
+            padding: 7px 13px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #38bdf8;
+            border: 1px solid #374151;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        .online-count {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .language-select {
+            background: #1f2937;
+            color: white;
+            border: 1px solid #374151;
+            padding: 7px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* MAIN */
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            min-height: 0;
+        }
+
+        /* VIDEOS */
+
+        .video-wrapper {
+            flex: 2;
+            min-width: 0;
+        }
+
+        .videos-grid {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            gap: 15px;
+        }
+
+        .video-box {
+            flex: 1;
+            background: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+            transition: filter 0.35s ease, opacity 0.35s ease;
+        }
+
+        /* OME TV STYLE BLUR */
+
+        #remoteVideo.blurred {
+            filter: blur(25px);
+            transform: scale(1.05);
+            opacity: 0.7;
+        }
+
+        #remoteVideo.clear {
+            filter: blur(0);
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .video-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.65);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        /* SEARCH OVERLAY */
+
+        .search-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.25);
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .search-overlay.show {
+            opacity: 1;
+        }
+
+        .search-spinner {
+            width: 35px;
+            height: 35px;
+            border: 3px solid rgba(255,255,255,0.25);
+            border-top-color: #38bdf8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 10px;
+        }
+
+        .search-text {
+            font-size: 13px;
+            color: #e5e7eb;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* CHAT */
+
+        .chat-wrapper {
+            flex: 1;
+            max-width: 400px;
+            min-width: 280px;
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 13px;
+            background: #1f2937;
+            font-weight: 600;
+            border-bottom: 1px solid #374151;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .msg-system {
+            color: #9ca3af;
+            font-size: 12px;
+            font-style: italic;
+            text-align: center;
+            margin: 5px 0;
+        }
+
+        .message {
+            max-width: 85%;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .message-name {
+            font-size: 10px;
+            font-weight: bold;
+            opacity: 0.75;
+            padding: 0 5px;
+        }
+
+        .message-text {
+            padding: 8px 12px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .msg-me {
+            align-self: flex-end;
+        }
+
+        .msg-me .message-name {
+            text-align: right;
+            color: #60a5fa;
+        }
+
+        .msg-me .message-text {
+            background: #2563eb;
+            border-radius: 12px 12px 0 12px;
+        }
+
+        .msg-stranger {
+            align-self: flex-start;
+        }
+
+        .msg-stranger .message-text {
+            background: #374151;
+            border-radius: 12px 12px 12px 0;
+        }
+
+        .chat-input-box {
+            padding: 10px;
+            display: flex;
+            gap: 8px;
+            background: #1f2937;
+            border-top: 1px solid #374151;
+        }
+
+        .chat-input-box input {
+            flex: 1;
+            padding: 10px;
+            background: #0b0f19;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            color: white;
+            outline: none;
+        }
+
+        .chat-input-box input:focus {
+            border-color: #2563eb;
+        }
+
+        .chat-input-box button {
+            padding: 10px 16px;
+            background: #2563eb;
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .chat-input-box button:hover {
+            background: #1d4ed8;
+        }
+
+        /* CONTROLS */
+
+        .controls-bar {
+            min-height: 70px;
+            background: #111827;
+            border-top: 1px solid #1f2937;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-loop {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-loop:hover:not(:disabled) {
+            background: #1d4ed8;
+        }
+
+        .btn-stop {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-stop:hover:not(:disabled) {
+            background: #b91c1c;
+        }
+
+        .btn-toggle {
+            background: #374151;
+            color: white;
+        }
+
+        .btn-toggle.off {
+            background: #f59e0b;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 850px) {
+
+            body {
+                overflow-y: auto;
+            }
+
+            header {
+                flex-wrap: wrap;
+            }
+
+            .main-container {
+                flex-direction: column;
+            }
+
+            .videos-grid {
+                flex-direction: column;
+                min-height: 600px;
+            }
+
+            .chat-wrapper {
+                max-width: 100%;
+                height: 300px;
+            }
+
+            .controls-bar {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+
+    <header>
+
+        <div class="brand">
+            🔄 Meet<span>loop</span>
+        </div>
+
+        <div class="header-right">
+
+            <div class="badge">
+                <span class="dot"></span>
+                <span>
+                    <span id="onlineLabel">Online:</span>
+                    <span id="onlineCount" class="online-count">0</span>
+                </span>
+            </div>
+
+            <select id="languageSelect" class="language-select">
+                <option value="en">🇺🇸 English</option>
+                <option value="tl">🇵🇭 Tagalog</option>
+            </select>
+
+            <div class="badge">
+                <span id="statusText">Ready. Click Start Loop.</span>
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- MAIN -->
+
+    <div class="main-container">
+
+        <!-- VIDEO AREA -->
+
+        <div class="video-wrapper">
+
+            <div class="videos-grid">
+
+                <!-- STRANGER -->
+
+                <div class="video-box">
+
+                    <video
+                        id="remoteVideo"
+                        class="blurred"
+                        autoplay
+                        playsinline>
+                    </video>
+
+                    <div class="video-label" id="strangerLabel">
+                        Stranger
+                    </div>
+
+                    <div
+                        id="searchOverlay"
+                        class="search-overlay">
+
+                        <div class="search-spinner"></div>
+
+                        <div
+                            id="searchOverlayText"
+                            class="search-text">
+                            Finding someone...
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- YOU -->
+
+                <div class="video-box">
+
+                    <video
+                        id="localVideo"
+                        autoplay
+                        muted
+                        playsinline>
+                    </video>
+
+                    <div class="video-label" id="selfLabel">
+                        You
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- CHAT -->
+
+        <div class="chat-wrapper">
+
+            <div
+                class="chat-header"
+                id="chatHeader">
+                💬 Live Chat
+            </div>
+
+            <div
+                class="chat-messages"
+                id="chatBox">
+
+                <div
+                    class="msg-system"
+                    id="welcomeMessage">
+                    Click "Start Loop" to find someone to chat with.
+                </div>
+
+            </div>
+
+            <div class="chat-input-box">
+
+                <input
+                    type="text"
+                    id="msgInput"
+                    placeholder="Type a message..."
+                    disabled
+                    autocomplete="off">
+
+                <button
+                    id="sendBtn"
+                    onclick="sendMessage()"
+                    disabled>
+                    Send
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CONTROLS -->
+
+    <div class="controls-bar">
+
+        <button
+            class="btn btn-loop"
+            id="loopBtn"
+            onclick="toggleLoop()">
+            🔄 Start Loop
+        </button>
+
+        <button
+            class="btn btn-stop"
+            id="stopBtn"
+            onclick="stopSession()"
+            disabled>
+            ⏹️ Stop
+        </button>
+
+        <button
+            class="btn btn-toggle"
+            id="micBtn"
+            onclick="toggleMic()">
+            🎙️ Mic On
+        </button>
+
+        <button
+            class="btn btn-toggle"
+            id="camBtn"
+            onclick="toggleCam()">
+            📷 Cam On
+        </button>
+
+    </div>
+
+
+    <!-- SOCKET.IO -->
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+
+        const socket = io();
+
+        let localStream = null;
+        let peerConnection = null;
+        let dataChannel = null;
+
+        let isSearching = false;
+        let currentLanguage = "en";
+
+        const localVideo =
+            document.getElementById("localVideo");
+
+        const remoteVideo =
+            document.getElementById("remoteVideo");
+
+        const statusText =
+            document.getElementById("statusText");
+
+        const onlineCount =
+            document.getElementById("onlineCount");
+
+        const onlineLabel =
+            document.getElementById("onlineLabel");
+
+        const loopBtn =
+            document.getElementById("loopBtn");
+
+        const stopBtn =
+            document.getElementById("stopBtn");
+
+        const micBtn =
+            document.getElementById("micBtn");
+
+        const camBtn =
+            document.getElementById("camBtn");
+
+        const chatBox =
+            document.getElementById("chatBox");
+
+        const msgInput =
+            document.getElementById("msgInput");
+
+        const sendBtn =
+            document.getElementById("sendBtn");
+
+        const languageSelect =
+            document.getElementById("languageSelect");
+
+        const searchOverlay =
+            document.getElementById("searchOverlay");
+
+        const searchOverlayText =
+            document.getElementById("searchOverlayText");
+
+
+        /* =========================
+           TRANSLATIONS
+        ========================= */
+
+        const translations = {
+
+            en: {
+
+                ready: "Ready. Click Start Loop.",
+
+                searching: "Searching for a stranger...",
+
+                waiting: "Looking for someone to chat with...",
+
+                connected: "🟢 Connected to a Stranger!",
+
+                found:
+                    "🎉 Stranger found! You can now chat.",
+
+                disconnected:
+                    "🔴 Stranger disconnected.",
+
+                disconnectedMsg:
+                    "The stranger left. Click Next to find someone new.",
+
+                stopped:
+                    "Loop stopped.",
+
+                stoppedMsg:
+                    "Searching has been stopped.",
+
+                cameraError:
+                    "⚠️ Unable to access your camera/microphone. Please allow permission in your browser.",
+
+                cameraWait:
+                    "Please wait for your camera to become ready.",
+
+                searchingNew:
+                    "Searching for a new stranger...",
+
+                start:
+                    "🔄 Start Loop",
+
+                next:
+                    "⏭️ Next (ESC)",
+
+                stop:
+                    "⏹️ Stop",
+
+                micOn:
+                    "🎙️ Mic On",
+
+                muted:
+                    "🔇 Muted",
+
+                camOn:
+                    "📷 Cam On",
+
+                camOff:
+                    "🚫 Cam Off",
+
+                send:
+                    "Send",
+
+                typeMessage:
+                    "Type a message...",
+
+                welcome:
+                    'Click "Start Loop" to find someone to chat with.',
+
+                me:
+                    "Me",
+
+                stranger:
+                    "Stranger",
+
+                chat:
+                    "💬 Live Chat",
+
+                online:
+                    "Online:",
+
+                finding:
+                    "Finding someone..."
+
+            },
+
+
+            tl: {
+
+                ready:
+                    "Handa na. Pindutin ang Start Loop.",
+
+                searching:
+                    "Naghahanap ng stranger...",
+
+                waiting:
+                    "Naghahanap ng makakausap...",
+
+                connected:
+                    "🟢 Konektado na sa Stranger!",
+
+                found:
+                    "🎉 May nahanap na stranger! Pwede na kayong mag-chat.",
+
+                disconnected:
+                    "🔴 Umalis ang stranger.",
+
+                disconnectedMsg:
+                    "Umalis ang stranger. Pindutin ang Next para makahanap ng bago.",
+
+                stopped:
+                    "Huminto ang Loop.",
+
+                stoppedMsg:
+                    "Itinigil ang paghahanap.",
+
+                cameraError:
+                    "⚠️ Hindi ma-access ang camera/microphone. Payagan ito sa browser.",
+
+                cameraWait:
+                    "Hintayin munang maging ready ang camera.",
+
+                searchingNew:
+                    "Naghahanap ng bagong stranger...",
+
+                start:
+                    "🔄 Start Loop",
+
+                next:
+                    "⏭️ Next (ESC)",
+
+                stop:
+                    "⏹️ Stop",
+
+                micOn:
+                    "🎙️ Mic On",
+
+                muted:
+                    "🔇 Muted",
+
+                camOn:
+                    "📷 Cam On",
+
+                camOff:
+                    "🚫 Cam Off",
+
+                send:
+                    "Send",
+
+                typeMessage:
+                    "Mag-type ng mensahe...",
+
+                welcome:
+                    'Pindutin ang "Start Loop" para maghanap ng makakausap.',
+
+                me:
+                    "Ako",
+
+                stranger:
+                    "Stranger",
+
+                chat:
+                    "💬 Live Chat",
+
+                online:
+                    "Online:",
+
+                finding:
+                    "Naghahanap..."
+            }
+
+        };
+
+
+        function t(key) {
+
+            return translations[currentLanguage][key];
+
+        }
+
+
+        /* =========================
+           LANGUAGE
+        ========================= */
+
+        languageSelect.addEventListener(
+            "change",
+            function () {
+
+                currentLanguage = this.value;
+
+                document.documentElement.lang =
+                    currentLanguage;
+
+                updateInterface();
+
+            }
+        );
+
+
+        function updateInterface() {
+
+            document.getElementById(
+                "strangerLabel"
+            ).innerText = t("stranger");
+
+            document.getElementById(
+                "selfLabel"
+            ).innerText =
+                currentLanguage === "en"
+                    ? "You"
+                    : "Ikaw";
+
+            document.getElementById(
+                "chatHeader"
+            ).innerText = t("chat");
+
+            onlineLabel.innerText =
+                t("online");
+
+            sendBtn.innerText =
+                t("send");
+
+            msgInput.placeholder =
+                t("typeMessage");
+
+            searchOverlayText.innerText =
+                t("finding");
+
+            stopBtn.innerText =
+                t("stop");
+
+            if (!isSearching) {
+
+                loopBtn.innerText =
+                    t("start");
+
+            }
+
+            const audioTrack =
+                localStream?.getAudioTracks()[0];
+
+            const videoTrack =
+                localStream?.getVideoTracks()[0];
+
+            if (audioTrack) {
+
+                micBtn.innerText =
+                    audioTrack.enabled
+                        ? t("micOn")
+                        : t("muted");
+
+            }
+
+            if (videoTrack) {
+
+                camBtn.innerText =
+                    videoTrack.enabled
+                        ? t("camOn")
+                        : t("camOff");
+
+            }
+
+        }
+
+
+        /* =========================
+           CAMERA + MICROPHONE
+        ========================= */
+
+        navigator.mediaDevices
+            .getUserMedia({
+                video: true,
+                audio: true
+            })
+
+            .then(stream => {
+
+                localStream = stream;
+
+                localVideo.srcObject =
+                    stream;
+
+            })
+
+            .catch(error => {
+
+                console.error(error);
+
+                appendSystemMsg(
+                    t("cameraError")
+                );
+
+            });
+
+
+        /* =========================
+           BLUR
+        ========================= */
+
+        function blurStranger() {
+
+            remoteVideo.classList.remove(
+                "clear"
+            );
+
+            remoteVideo.classList.add(
+                "blurred"
+            );
+
+        }
+
+
+        function clearStrangerBlur() {
+
+            remoteVideo.classList.remove(
+                "blurred"
+            );
+
+            remoteVideo.classList.add(
+                "clear"
+            );
+
+        }
+
+
+        function showSearching() {
+
+            searchOverlay.classList.add(
+                "show"
+            );
+
+        }
+
+
+        function hideSearching() {
+
+            searchOverlay.classList.remove(
+                "show"
+            );
+
+        }
+
+
+        /* =========================
+           START / NEXT
+        ========================= */
+
+        function toggleLoop() {
+
+            if (!localStream) {
+
+                alert(t("cameraWait"));
+
+                return;
+
+            }
+
+            isSearching = true;
+
+            loopBtn.innerText =
+                t("next");
+
+            stopBtn.disabled = false;
+
+            statusText.innerText =
+                t("searching");
+
+            appendSystemMsg(
+                t("searchingNew")
+            );
+
+            /*
+             * Blur stranger before every Next.
+             */
+
+            blurStranger();
+
+            showSearching();
+
+            resetPeer();
+
+            socket.emit("skip");
+
+        }
+
+
+        /* =========================
+           STOP
+        ========================= */
+
+        function stopSession() {
+
+            isSearching = false;
+
+            resetPeer();
+
+            socket.emit(
+                "stop-search"
+            );
+
+            blurStranger();
+
+            hideSearching();
+
+            loopBtn.innerText =
+                t("start");
+
+            stopBtn.disabled = true;
+
+            statusText.innerText =
+                t("stopped");
+
+            appendSystemMsg(
+                t("stoppedMsg")
+            );
+
+        }
+
+
+        /* =========================
+           MIC
+        ========================= */
+
+        function toggleMic() {
+
+            if (!localStream) return;
+
+            const audioTrack =
+                localStream.getAudioTracks()[0];
+
+            if (!audioTrack) return;
+
+            audioTrack.enabled =
+                !audioTrack.enabled;
+
+            micBtn.innerText =
+                audioTrack.enabled
+                    ? t("micOn")
+                    : t("muted");
+
+            micBtn.classList.toggle(
+                "off",
+                !audioTrack.enabled
+            );
+
+        }
+
+
+        /* =========================
+           CAMERA
+        ========================= */
+
+        function toggleCam() {
+
+            if (!localStream) return;
+
+            const videoTrack =
+                localStream.getVideoTracks()[0];
+
+            if (!videoTrack) return;
+
+            videoTrack.enabled =
+                !videoTrack.enabled;
+
+            camBtn.innerText =
+                videoTrack.enabled
+                    ? t("camOn")
+                    : t("camOff");
+
+            camBtn.classList.toggle(
+                "off",
+                !videoTrack.enabled
+            );
+
+        }
+
+
+        /* =========================
+           ONLINE COUNT
+        ========================= */
+
+        socket.on(
+            "online-count",
+            count => {
+
+                onlineCount.innerText =
+                    count;
+
+            }
+        );
+
+
+        /* =========================
+           WAITING
+        ========================= */
+
+        socket.on(
+            "waiting",
+            () => {
+
+                statusText.innerText =
+                    t("waiting");
+
+                showSearching();
+
+            }
+        );
+
+
+        /* =========================
+           MATCH
+        ========================= */
+
+        socket.on(
+            "match",
+            async ({ initiator }) => {
+
+                statusText.innerText =
+                    t("connected");
+
+                appendSystemMsg(
+                    t("found")
+                );
+
+                hideSearching();
+
+                createPeer(
+                    initiator
+                );
+
+                if (initiator) {
+
+                    try {
+
+                        const offer =
+                            await peerConnection
+                                .createOffer();
+
+                        await peerConnection
+                            .setLocalDescription(
+                                offer
+                            );
+
+                        socket.emit(
+                            "signal",
+                            {
+                                sdp:
+                                    peerConnection
+                                        .localDescription
+                            }
+                        );
+
+                    }
+
+                    catch (error) {
+
+                        console.error(
+                            "Offer error:",
+                            error
+                        );
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        /* =========================
+           SIGNALING
+        ========================= */
+
+        socket.on(
+            "signal",
+            async data => {
+
+                if (!peerConnection)
+                    return;
+
+                try {
+
+                    if (data.sdp) {
+
+                        await peerConnection
+                            .setRemoteDescription(
+                                new RTCSessionDescription(
+                                    data.sdp
+                                )
+                            );
+
+                        if (
+                            data.sdp.type ===
+                            "offer"
+                        ) {
+
+                            const answer =
+                                await peerConnection
+                                    .createAnswer();
+
+                            await peerConnection
+                                .setLocalDescription(
+                                    answer
+                                );
+
+                            socket.emit(
+                                "signal",
+                                {
+                                    sdp:
+                                        peerConnection
+                                            .localDescription
+                                }
+                            );
+
+                        }
+
+                    }
+
+                    else if (
+                        data.candidate
+                    ) {
+
+                        await peerConnection
+                            .addIceCandidate(
+                                new RTCIceCandidate(
+                                    data.candidate
+                                )
+                            );
+
+                    }
+
+                }
+
+                catch (error) {
+
+                    console.error(
+                        "WebRTC signaling error:",
+                        error
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =========================
+           PARTNER DISCONNECTED
+        ========================= */
+
+        socket.on(
+            "partner-disconnected",
+            () => {
+
+                statusText.innerText =
+                    t("disconnected");
+
+                appendSystemMsg(
+                    t("disconnectedMsg")
+                );
+
+                blurStranger();
+
+                hideSearching();
+
+                resetPeer();
+
+            }
+        );
+
+
+        /* =========================
+           WEBRTC PEER
+        ========================= */
+
+        function createPeer(
+            initiator
+        ) {
+
+            resetPeer();
+
+            peerConnection =
+                new RTCPeerConnection(
+                    rtcConfig
+                );
+
+            localStream
+                .getTracks()
+                .forEach(track => {
+
+                    peerConnection.addTrack(
+                        track,
+                        localStream
+                    );
+
+                });
+
+
+            peerConnection.ontrack =
+                event => {
+
+                    remoteVideo.srcObject =
+                        event.streams[0];
+
+                    clearStrangerBlur();
+
+                    hideSearching();
+
+                };
+
+
+            peerConnection.onicecandidate =
+                event => {
+
+                    if (
+                        event.candidate
+                    ) {
+
+                        socket.emit(
+                            "signal",
+                            {
+                                candidate:
+                                    event.candidate
+                            }
+                        );
+
+                    }
+
+                };
+
+
+            if (initiator) {
+
+                dataChannel =
+                    peerConnection
+                        .createDataChannel(
+                            "chat"
+                        );
+
+                setupDataChannel();
+
+            }
+
+            else {
+
+                peerConnection.ondatachannel =
+                    event => {
+
+                        dataChannel =
+                            event.channel;
+
+                        setupDataChannel();
+
+                    };
+
+            }
+
+        }
+
+
+        /* =========================
+           DATA CHANNEL
+        ========================= */
+
+        function setupDataChannel() {
+
+            dataChannel.onopen =
+                () => {
+
+                    msgInput.disabled =
+                        false;
+
+                    sendBtn.disabled =
+                        false;
+
+                    msgInput.focus();
+
+                };
+
+
+            dataChannel.onclose =
+                () => {
+
+                    msgInput.disabled =
+                        true;
+
+                    sendBtn.disabled =
+                        true;
+
+                };
+
+
+            dataChannel.onmessage =
+                event => {
+
+                    appendMsg(
+                        event.data,
+                        "stranger"
+                    );
+
+                };
+
+        }
+
+
+        /* =========================
+           SEND MESSAGE
+        ========================= */
+
+        function sendMessage() {
+
+            const text =
+                msgInput.value.trim();
+
+            if (
+                !text ||
+                !dataChannel ||
+                dataChannel.readyState !==
+                "open"
+            ) {
+
+                return;
+
+            }
+
+            dataChannel.send(
+                text
+            );
+
+            appendMsg(
+                text,
+                "me"
+            );
+
+            msgInput.value = "";
+
+        }
+
+
+        /* =========================
+           CHAT MESSAGE
+        ========================= */
+
+        function appendMsg(
+            text,
+            sender
+        ) {
+
+            const message =
+                document.createElement(
+                    "div"
+                );
+
+            message.className =
+                sender === "me"
+                    ? "message msg-me"
+                    : "message msg-stranger";
+
+
+            const name =
+                document.createElement(
+                    "div"
+                );
+
+            name.className =
+                "message-name";
+
+            name.innerText =
+                sender === "me"
+                    ? t("me")
+                    : t("stranger");
+
+
+            const messageText =
+                document.createElement(
+                    "div"
+                );
+
+            messageText.className =
+                "message-text";
+
+            messageText.innerText =
+                text;
+
+
+            message.appendChild(
+                name
+            );
+
+            message.appendChild(
+                messageText
+            );
+
+            chatBox.appendChild(
+                message
+            );
+
+            chatBox.scrollTop =
+                chatBox.scrollHeight;
+
+        }
+
+
+        /* =========================
+           SYSTEM MESSAGE
+        ========================= */
+
+        function appendSystemMsg(
+            text
+        ) {
+
+            const systemMessage =
+                document.createElement(
+                    "div"
+                );
+
+            systemMessage.className =
+                "msg-system";
+
+            systemMessage.innerText =
+                text;
+
+            chatBox.appendChild(
+                systemMessage
+            );
+
+            chatBox.scrollTop =
+                chatBox.scrollHeight;
+
+        }
+
+
+        /* =========================
+           RESET PEER
+        ========================= */
+
+        function resetPeer() {
+
+            if (peerConnection) {
+
+                peerConnection.close();
+
+                peerConnection = null;
+
+            }
+
+            if (dataChannel) {
+
+                try {
+                    dataChannel.close();
+                }
+
+                catch (error) {}
+
+                dataChannel = null;
+
+            }
+
+            remoteVideo.srcObject =
+                null;
+
+            msgInput.disabled =
+                true;
+
+            sendBtn.disabled =
+                true;
+
+        }
+
+
+        /* =========================
+           KEYBOARD SHORTCUTS
+        ========================= */
+
+        window.addEventListener(
+            "keydown",
+            event => {
+
+                if (
+                    event.key === "Escape" &&
+                    isSearching
+                ) {
+
+                    toggleLoop();
+
+                }
+
+                if (
+                    event.key === "Enter" &&
+                    document.activeElement ===
+                    msgInput
+                ) {
+
+                    sendMessage();
+
+                }
+
+            }
+        );
+
+
+        /* =========================
+           WEBRTC CONFIG
+        ========================= */
+
+        const rtcConfig = {
+
+            iceServers: [
+
+                {
+                    urls:
+                        "stun:stun.l.google.com:19302"
+                },
+
+                {
+                    urls:
+                        "stun:stun1.l.google.com:19302"
+                }
+
+            ]
+
+        };
+
+    </script>
+
+</body>
+
+</html>
