@@ -1,1337 +1,1159 @@
-```html
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0b1120">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    >
+```
+<title>MeetLoop - Random Video Chat</title>
 
-    <meta
-        name="theme-color"
-        content="#0b1120"
-    >
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
-    <title>MeetLoop - Random Video Chat</title>
+    :root {
+        --bg: #0b1120;
+        --panel: #111827;
+        --panel-light: #1f2937;
+        --border: rgba(255,255,255,.09);
+        --border-strong: rgba(255,255,255,.15);
+        --blue: #2563eb;
+        --blue2: #3b82f6;
+        --red: #ef4444;
+        --purple: #8b5cf6;
+        --green: #22c55e;
+        --text: #f8fafc;
+        --muted: #94a3b8;
+    }
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background:
+            radial-gradient(
+                circle at top left,
+                rgba(37,99,235,.14),
+                transparent 28%
+            ),
+            radial-gradient(
+                circle at bottom right,
+                rgba(139,92,246,.12),
+                transparent 25%
+            ),
+            var(--bg);
+
+        color: var(--text);
+        overflow: hidden;
+
+        -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input,
+    select {
+        font: inherit;
+    }
+
+    button {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    header {
+        height: 68px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 12px;
+        padding: 0 20px;
+
+        background: rgba(17,24,39,.9);
+        border-bottom: 1px solid var(--border);
+
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+
+        position: relative;
+        z-index: 20;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        font-size: 22px;
+        font-weight: 800;
+
+        white-space: nowrap;
+    }
+
+    .brand-icon {
+        width: 34px;
+        height: 34px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--blue),
+                var(--purple)
+            );
+
+        box-shadow:
+            0 6px 20px rgba(37,99,235,.25);
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+
+        gap: 7px;
+        min-width: 0;
+    }
+
+    .badge {
+        min-height: 34px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 7px 11px;
+
+        border-radius: 999px;
+
+        background: rgba(255,255,255,.055);
+        border: 1px solid var(--border);
+
+        font-size: 12px;
+        font-weight: 700;
+
+        white-space: nowrap;
+    }
+
+    .online {
+        color: #86efac;
+    }
+
+    #statusBadge {
+        color: #cbd5e1;
+    }
+
+    select {
+        min-height: 34px;
+
+        padding: 7px 10px;
+
+        color: white;
+        background: rgba(255,255,255,.055);
+
+        border: 1px solid var(--border);
+        border-radius: 9px;
+
+        outline: none;
+    }
+
+    /* =========================
+       CALL TIMER
+    ========================= */
+
+    #callTimer {
+        gap: 7px;
+
+        transition:
+            color .25s ease,
+            background .25s ease,
+            border-color .25s ease,
+            box-shadow .25s ease;
+    }
+
+    .timer-dot {
+        width: 7px;
+        height: 7px;
+
+        border-radius: 50%;
+        background: #64748b;
+
+        flex: 0 0 auto;
+    }
+
+    .timer-label {
+        color: #94a3b8;
+
+        font-size: 9px;
+        font-weight: 900;
+
+        letter-spacing: .8px;
+    }
+
+    .timer-time {
+        min-width: 58px;
+
+        font-size: 12px;
+        font-weight: 900;
+
+        font-variant-numeric: tabular-nums;
+        letter-spacing: .6px;
+    }
+
+    #callTimer.active {
+        color: #fecaca;
+
+        background:
+            linear-gradient(
+                135deg,
+                rgba(239,68,68,.16),
+                rgba(239,68,68,.06)
+            );
+
+        border-color:
+            rgba(239,68,68,.25);
+
+        box-shadow:
+            0 8px 25px rgba(239,68,68,.08);
+    }
+
+    #callTimer.active .timer-dot {
+        background: var(--red);
+
+        animation:
+            timerPulse 1.5s infinite;
+    }
+
+    @keyframes timerPulse {
+        0% {
+            box-shadow:
+                0 0 0 0
+                rgba(239,68,68,.55);
         }
 
-        :root {
-            --bg: #0b1120;
-            --panel: rgba(17, 24, 39, 0.92);
-            --panel-2: #111827;
-            --border: rgba(255, 255, 255, 0.09);
-            --border-strong: rgba(255, 255, 255, 0.15);
-
-            --blue: #2563eb;
-            --blue-light: #3b82f6;
-
-            --red: #ef4444;
-            --green: #22c55e;
-            --purple: #8b5cf6;
-
-            --text: #f8fafc;
-            --muted: #94a3b8;
+        70% {
+            box-shadow:
+                0 0 0 7px
+                rgba(239,68,68,0);
         }
 
-        html,
+        100% {
+            box-shadow:
+                0 0 0 0
+                rgba(239,68,68,0);
+        }
+    }
+
+    /* =========================
+       MAIN
+    ========================= */
+
+    .main-container {
+        width: 100%;
+        height: calc(100vh - 68px);
+
+        display: flex;
+
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .video-wrapper {
+        flex: 1;
+        min-width: 0;
+        min-height: 0;
+
+        display: flex;
+        flex-direction: column;
+
+        gap: 10px;
+    }
+
+    .videos-grid {
+        flex: 1;
+        min-height: 0;
+
+        display: flex;
+        gap: 10px;
+    }
+
+    .video-box {
+        position: relative;
+
+        flex: 1;
+        min-width: 0;
+        min-height: 0;
+
+        overflow: hidden;
+
+        background: #000;
+
+        border:
+            1px solid var(--border);
+
+        border-radius: 16px;
+
+        box-shadow:
+            0 10px 35px rgba(0,0,0,.25);
+    }
+
+    video {
+        display: block;
+
+        width: 100%;
+        height: 100%;
+
+        object-fit: cover;
+
+        background: #000;
+
+        border: 0;
+        outline: 0;
+    }
+
+    #localVideo {
+        transform: none;
+    }
+
+    .video-label {
+        position: absolute;
+
+        left: 10px;
+        top: 10px;
+
+        z-index: 4;
+
+        padding: 6px 10px;
+
+        background: rgba(0,0,0,.56);
+
+        border:
+            1px solid
+            rgba(255,255,255,.08);
+
+        border-radius: 9px;
+
+        font-size: 12px;
+        font-weight: 700;
+
+        pointer-events: none;
+    }
+
+    .status {
+        position: absolute;
+
+        left: 10px;
+        bottom: 10px;
+
+        z-index: 4;
+
+        padding: 6px 10px;
+
+        background: rgba(0,0,0,.56);
+
+        border:
+            1px solid
+            rgba(255,255,255,.08);
+
+        border-radius: 9px;
+
+        color: #e2e8f0;
+
+        font-size: 11px;
+        font-weight: 600;
+
+        pointer-events: none;
+    }
+
+    /* =========================
+       SEARCH
+    ========================= */
+
+    .search-overlay {
+        position: absolute;
+        inset: 0;
+
+        z-index: 10;
+
+        display: none;
+        align-items: center;
+        justify-content: center;
+
+        background:
+            rgba(2,6,23,.72);
+
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+    }
+
+    .search-box {
+        min-width: 220px;
+
+        padding: 20px;
+
+        text-align: center;
+
+        background:
+            rgba(15,23,42,.82);
+
+        border:
+            1px solid
+            rgba(255,255,255,.08);
+
+        border-radius: 16px;
+    }
+
+    .spinner {
+        width: 42px;
+        height: 42px;
+
+        margin:
+            0 auto 12px;
+
+        border: 4px solid
+            rgba(255,255,255,.12);
+
+        border-top-color: white;
+
+        border-radius: 50%;
+
+        animation:
+            spin .8s linear infinite;
+    }
+
+    #searchText {
+        font-size: 13px;
+        font-weight: 700;
+
+        color: #e2e8f0;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* =========================
+       CONTROLS
+    ========================= */
+
+    .controls-bar {
+        display: flex;
+        gap: 8px;
+
+        padding: 2px;
+    }
+
+    .btn {
+        min-height: 46px;
+
+        padding: 11px 15px;
+
+        border: 1px solid
+            rgba(255,255,255,.04);
+
+        border-radius: 11px;
+
+        color: white;
+
+        cursor: pointer;
+
+        font-size: 13px;
+        font-weight: 800;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 6px;
+
+        user-select: none;
+
+        transition:
+            transform .12s ease,
+            filter .2s ease,
+            opacity .2s ease;
+    }
+
+    .btn:hover:not(:disabled) {
+        filter: brightness(1.08);
+    }
+
+    .btn:active:not(:disabled) {
+        transform: scale(.98);
+    }
+
+    .btn:disabled {
+        opacity: .5;
+        cursor: not-allowed;
+    }
+
+    .btn-loop {
+        flex: 1.5;
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--blue),
+                var(--blue2)
+            );
+
+        box-shadow:
+            0 7px 22px
+            rgba(37,99,235,.18);
+    }
+
+    .btn-stop {
+        flex: 1;
+
+        background:
+            linear-gradient(
+                135deg,
+                #dc2626,
+                #ef4444
+            );
+    }
+
+    .btn-toggle {
+        flex: 1;
+        background: rgba(255,255,255,.07);
+    }
+
+    .btn-flip {
+        display: none;
+        flex: 1;
+
+        background:
+            linear-gradient(
+                135deg,
+                #7c3aed,
+                #8b5cf6
+            );
+    }
+
+    /* =========================
+       CHAT
+    ========================= */
+
+    .chat-wrapper {
+        width: 320px;
+        max-width: 320px;
+        min-height: 0;
+
+        display: flex;
+        flex-direction: column;
+
+        overflow: hidden;
+
+        background:
+            rgba(17,24,39,.9);
+
+        border:
+            1px solid var(--border);
+
+        border-radius: 16px;
+
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    .chat-header {
+        padding: 14px;
+
+        border-bottom:
+            1px solid var(--border);
+
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .chat-messages {
+        flex: 1;
+        min-height: 0;
+
+        padding: 12px;
+
+        overflow-y: auto;
+
+        overscroll-behavior: contain;
+    }
+
+    .message {
+        margin-bottom: 10px;
+
+        word-break: break-word;
+    }
+
+    .message-name {
+        margin-bottom: 3px;
+
+        color: var(--muted);
+
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .message-text {
+        display: inline-block;
+
+        max-width: 90%;
+
+        padding: 8px 10px;
+
+        color: #f8fafc;
+
+        background:
+            rgba(255,255,255,.075);
+
+        border-radius: 10px;
+
+        font-size: 12px;
+
+        white-space: pre-wrap;
+    }
+
+    .chat-input-area {
+        display: flex;
+        gap: 6px;
+
+        padding: 9px;
+
+        border-top:
+            1px solid var(--border);
+    }
+
+    #chatInput {
+        flex: 1;
+        min-width: 0;
+        min-height: 40px;
+
+        padding: 9px 10px;
+
+        background:
+            rgba(2,6,23,.64);
+
+        color: white;
+
+        border:
+            1px solid var(--border-strong);
+
+        border-radius: 9px;
+
+        outline: none;
+    }
+
+    #chatInput:focus {
+        border-color:
+            rgba(59,130,246,.55);
+    }
+
+    #sendBtn {
+        min-width: 60px;
+
+        border: 0;
+        border-radius: 9px;
+
+        color: white;
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--blue),
+                var(--blue2)
+            );
+
+        cursor: pointer;
+
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 850px) {
+
         body {
-            width: 100%;
-            height: 100%;
+            height: 100dvh;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
-
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-
-            color: var(--text);
-
-            background:
-                radial-gradient(
-                    circle at top left,
-                    rgba(37, 99, 235, 0.14),
-                    transparent 28%
-                ),
-                radial-gradient(
-                    circle at bottom right,
-                    rgba(139, 92, 246, 0.12),
-                    transparent 24%
-                ),
-                var(--bg);
-
-            overflow: hidden;
-
-            -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeLegibility;
-        }
-
-        button,
-        input,
-        select {
-            font: inherit;
-        }
-
-        button {
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-
-        /* =========================
-           HEADER
-        ========================= */
 
         header {
-            height: 68px;
+            min-height: 60px;
+            height: auto;
 
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            padding: 8px 10px;
 
-            gap: 12px;
-
-            padding: 0 20px;
-
-            background: rgba(17, 24, 39, 0.88);
-
-            border-bottom: 1px solid var(--border);
-
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-
-            position: relative;
-            z-index: 20;
+            gap: 8px;
         }
 
         .brand {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-
-            font-size: 22px;
-            font-weight: 800;
-
-            white-space: nowrap;
-
-            letter-spacing: -0.4px;
+            font-size: 17px;
         }
 
         .brand-icon {
-            display: inline-flex;
-
-            width: 34px;
-            height: 34px;
-
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 10px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--blue),
-                    var(--purple)
-                );
-
-            box-shadow:
-                0 6px 20px rgba(37, 99, 235, 0.28);
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
         }
 
         .header-right {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-
-            gap: 8px;
-
-            min-width: 0;
+            gap: 4px;
+            flex-wrap: wrap;
         }
 
         .badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            min-height: 30px;
 
-            min-height: 34px;
-
-            padding: 7px 11px;
-
-            border-radius: 999px;
-
-            background: rgba(255, 255, 255, 0.055);
-
-            border: 1px solid var(--border);
-
-            color: var(--text);
-
-            font-size: 12px;
-            font-weight: 700;
-
-            white-space: nowrap;
-        }
-
-        .online {
-            color: #86efac;
-        }
-
-        #statusBadge {
-            color: #cbd5e1;
-        }
-
-        /* =========================
-           AESTHETIC CALL TIMER
-        ========================= */
-
-        #callTimer {
-            gap: 7px;
-
-            padding-left: 11px;
-            padding-right: 12px;
-
-            color: #cbd5e1;
-
-            transition:
-                color 0.25s ease,
-                background 0.25s ease,
-                border-color 0.25s ease,
-                box-shadow 0.25s ease;
-        }
-
-        #callTimer .timer-dot {
-            width: 7px;
-            height: 7px;
-
-            border-radius: 50%;
-
-            background: #64748b;
-
-            flex: 0 0 auto;
-        }
-
-        #callTimer.active {
-            color: #fecaca;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    rgba(239, 68, 68, 0.16),
-                    rgba(239, 68, 68, 0.06)
-                );
-
-            border-color:
-                rgba(239, 68, 68, 0.25);
-
-            box-shadow:
-                0 0 0 1px
-                rgba(239, 68, 68, 0.04),
-                0 8px 25px
-                rgba(239, 68, 68, 0.09);
-        }
-
-        #callTimer.active .timer-dot {
-            background: var(--red);
-
-            box-shadow:
-                0 0 0 0 rgba(239, 68, 68, 0.7);
-
-            animation:
-                timerPulse 1.5s infinite;
-        }
-
-        #callTimer .timer-label {
-            color: #94a3b8;
+            padding: 5px 8px;
 
             font-size: 10px;
-            font-weight: 800;
-
-            text-transform: uppercase;
-
-            letter-spacing: 0.7px;
         }
 
-        #callTimer .timer-time {
-            min-width: 58px;
-
-            font-variant-numeric: tabular-nums;
-
-            font-size: 12px;
-            font-weight: 800;
-
-            letter-spacing: 0.6px;
+        .timer-label {
+            display: none;
         }
 
-        @keyframes timerPulse {
-            0% {
-                box-shadow:
-                    0 0 0 0
-                    rgba(239, 68, 68, 0.55);
-            }
+        .timer-time {
+            min-width: 49px;
+            font-size: 10px;
+        }
 
-            70% {
-                box-shadow:
-                    0 0 0 7px
-                    rgba(239, 68, 68, 0);
-            }
-
-            100% {
-                box-shadow:
-                    0 0 0 0
-                    rgba(239, 68, 68, 0);
-            }
+        .timer-dot {
+            width: 6px;
+            height: 6px;
         }
 
         select {
-            min-height: 34px;
+            min-height: 30px;
 
-            padding: 7px 10px;
+            padding: 5px 7px;
 
-            color: white;
-
-            background: rgba(255, 255, 255, 0.055);
-
-            border: 1px solid var(--border);
-            border-radius: 9px;
-
-            outline: none;
-
-            cursor: pointer;
+            font-size: 10px;
         }
-
-        select:focus {
-            border-color:
-                rgba(59, 130, 246, 0.6);
-        }
-
-        /* =========================
-           MAIN
-        ========================= */
 
         .main-container {
-            width: 100%;
-            height: calc(100vh - 68px);
-
-            display: flex;
-
-            gap: 12px;
-
-            padding: 12px;
-        }
-
-        .video-wrapper {
-            flex: 1;
-            min-width: 0;
-            min-height: 0;
+            height: auto;
+            min-height:
+                calc(100dvh - 60px);
 
             display: flex;
             flex-direction: column;
 
-            gap: 10px;
+            gap: 9px;
+            padding: 8px;
+        }
+
+        .video-wrapper {
+            width: 100%;
+            flex: none;
+
+            gap: 8px;
         }
 
         .videos-grid {
-            flex: 1;
-            min-height: 0;
+            position: relative;
 
-            display: flex;
+            width: 100%;
 
-            gap: 10px;
+            height:
+                min(55dvh, 560px);
+
+            min-height: 300px;
+
+            display: block;
         }
 
         .video-box {
-            position: relative;
+            position: absolute;
 
-            flex: 1;
-
-            min-width: 0;
-            min-height: 0;
-
-            overflow: hidden;
-
-            background:
-                radial-gradient(
-                    circle at center,
-                    #111827,
-                    #000
-                );
-
-            border:
-                1px solid var(--border);
-
-            border-radius: 16px;
-
-            box-shadow:
-                0 10px 35px
-                rgba(0, 0, 0, 0.25);
+            border-radius: 13px;
         }
 
-        video {
-            display: block;
+        .video-box:first-child {
+            inset: 0;
 
             width: 100%;
             height: 100%;
-
-            object-fit: cover;
-
-            background: #000;
-
-            border: 0;
-            outline: 0;
         }
 
-        #localVideo {
-            transform: none;
-        }
-
-        #remoteVideo {
-            cursor: pointer;
-        }
-
-        /* =========================
-           VIDEO LABELS
-        ========================= */
-
-        .video-label {
-            position: absolute;
-
-            top: 10px;
-            left: 10px;
-
-            z-index: 4;
-
-            display: inline-flex;
-            align-items: center;
-
-            padding: 6px 10px;
-
-            color: #fff;
-
-            background: rgba(0, 0, 0, 0.56);
-
-            border:
-                1px solid rgba(255, 255, 255, 0.08);
-
-            border-radius: 9px;
-
-            font-size: 12px;
-            font-weight: 700;
-
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-
-            pointer-events: none;
-        }
-
-        .status {
-            position: absolute;
-
-            left: 10px;
-            bottom: 10px;
-
-            z-index: 4;
-
-            padding: 6px 10px;
-
-            color: #e2e8f0;
-
-            background: rgba(0, 0, 0, 0.56);
-
-            border:
-                1px solid rgba(255, 255, 255, 0.08);
-
-            border-radius: 9px;
-
-            font-size: 11px;
-            font-weight: 600;
-
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-
-            pointer-events: none;
-        }
-
-        .remote-audio-hint {
-            position: absolute;
-
+        .video-box:last-child {
             right: 10px;
             bottom: 10px;
 
-            z-index: 8;
+            width: 31%;
+            height: 30%;
 
-            display: none;
-            align-items: center;
-            justify-content: center;
-
-            min-height: 34px;
-
-            padding: 7px 11px;
-
-            border: 0;
-            border-radius: 9px;
-
-            color: white;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--blue),
-                    var(--blue-light)
-                );
-
-            box-shadow:
-                0 7px 20px
-                rgba(37, 99, 235, 0.28);
-
-            cursor: pointer;
-
-            font-size: 11px;
-            font-weight: 800;
-        }
-
-        /* =========================
-           SEARCH OVERLAY
-        ========================= */
-
-        .search-overlay {
-            position: absolute;
-            inset: 0;
-
-            z-index: 10;
-
-            display: none;
-
-            align-items: center;
-            justify-content: center;
-
-            background:
-                linear-gradient(
-                    rgba(2, 6, 23, 0.68),
-                    rgba(2, 6, 23, 0.76)
-                );
-
-            backdrop-filter: blur(2px);
-        }
-
-        .search-box {
-            min-width: 220px;
-
-            padding: 20px;
-
-            text-align: center;
-
-            border-radius: 16px;
-
-            background:
-                rgba(15, 23, 42, 0.76);
+            z-index: 6;
 
             border:
-                1px solid rgba(255, 255, 255, 0.08);
+                2px solid
+                rgba(255,255,255,.9);
 
             box-shadow:
-                0 15px 45px
-                rgba(0, 0, 0, 0.28);
+                0 8px 20px
+                rgba(0,0,0,.46);
         }
 
-        .spinner {
-            width: 42px;
-            height: 42px;
+        .video-label {
+            left: 7px;
+            top: 7px;
 
-            margin: 0 auto 12px;
+            padding: 5px 7px;
 
-            border: 4px solid
-                rgba(255, 255, 255, 0.12);
-
-            border-top-color: white;
-
-            border-radius: 50%;
-
-            animation:
-                spin 0.8s linear infinite;
+            font-size: 10px;
         }
 
-        #searchText {
-            color: #e2e8f0;
+        .status {
+            left: 7px;
+            bottom: 7px;
 
-            font-size: 13px;
-            font-weight: 700;
+            padding: 5px 7px;
+
+            font-size: 9px;
         }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* =========================
-           CONTROLS
-        ========================= */
 
         .controls-bar {
+            width: 100%;
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 7px;
+
+            padding: 0;
+        }
+
+        .btn {
+            width: 100%;
+            min-height: 48px;
+
+            padding: 10px 6px;
+
+            border-radius: 9px;
+
+            font-size: 11px;
+        }
+
+        .btn-loop,
+        .btn-stop,
+        .btn-toggle {
+            flex: none;
+        }
+
+        .btn-flip {
             display: flex;
+        }
 
-            gap: 8px;
+        .chat-wrapper {
+            width: 100%;
+            max-width: none;
 
-            padding: 2px;
+            height: 250px;
+            min-height: 250px;
+
+            border-radius: 13px;
+        }
+
+        .chat-header {
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        .chat-messages {
+            padding: 9px;
+        }
+
+        .chat-input-area {
+            padding: 8px;
+        }
+
+        #chatInput {
+            min-height: 40px;
+            padding: 9px;
+            font-size: 12px;
+        }
+
+        #sendBtn {
+            min-width: 62px;
+            font-size: 11px;
+        }
+    }
+
+    @media (max-width: 400px) {
+
+        .brand {
+            font-size: 15px;
+        }
+
+        .videos-grid {
+            height: 48dvh;
+            min-height: 270px;
+        }
+
+        .video-box:last-child {
+            width: 34%;
+            height: 30%;
         }
 
         .btn {
             min-height: 46px;
-
-            border: 1px solid
-                rgba(255, 255, 255, 0.04);
-
-            border-radius: 11px;
-
-            padding: 11px 15px;
-
-            color: white;
-
-            background: var(--panel-2);
-
-            cursor: pointer;
-
-            font-size: 13px;
-            font-weight: 800;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            gap: 6px;
-
-            user-select: none;
-
-            transition:
-                transform 0.12s ease,
-                filter 0.2s ease,
-                opacity 0.2s ease;
+            font-size: 10.5px;
         }
-
-        .btn:hover:not(:disabled) {
-            filter: brightness(1.08);
-        }
-
-        .btn:active:not(:disabled) {
-            transform: scale(0.98);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-
-            cursor: not-allowed;
-        }
-
-        .btn-loop {
-            flex: 1.5;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #2563eb,
-                    #3b82f6
-                );
-
-            box-shadow:
-                0 7px 22px
-                rgba(37, 99, 235, 0.18);
-        }
-
-        .btn-stop {
-            flex: 1;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #dc2626,
-                    #ef4444
-                );
-        }
-
-        .btn-toggle {
-            flex: 1;
-
-            background:
-                rgba(255, 255, 255, 0.07);
-        }
-
-        .btn-flip {
-            display: none;
-
-            flex: 1;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #7c3aed,
-                    #8b5cf6
-                );
-        }
-
-        /* =========================
-           CHAT
-        ========================= */
 
         .chat-wrapper {
-            width: 320px;
-            max-width: 320px;
-            min-height: 0;
-
-            display: flex;
-            flex-direction: column;
-
-            overflow: hidden;
-
-            background:
-                rgba(17, 24, 39, 0.88);
-
-            border:
-                1px solid var(--border);
-
-            border-radius: 16px;
-
-            box-shadow:
-                0 12px 35px
-                rgba(0, 0, 0, 0.22);
-
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            height: 230px;
+            min-height: 230px;
         }
+    }
+</style>
+```
 
-        .chat-header {
-            padding: 14px;
-
-            border-bottom:
-                1px solid var(--border);
-
-            font-weight: 800;
-            font-size: 13px;
-        }
-
-        .chat-messages {
-            flex: 1;
-            min-height: 0;
-
-            overflow-y: auto;
-
-            padding: 12px;
-
-            overscroll-behavior: contain;
-        }
-
-        .message {
-            margin-bottom: 10px;
-
-            word-break: break-word;
-        }
-
-        .message-name {
-            margin-bottom: 3px;
-
-            color: var(--muted);
-
-            font-size: 10px;
-            font-weight: 700;
-        }
-
-        .message-text {
-            display: inline-block;
-
-            max-width: 90%;
-
-            padding: 8px 10px;
-
-            background:
-                rgba(255, 255, 255, 0.075);
-
-            border:
-                1px solid
-                rgba(255, 255, 255, 0.04);
-
-            border-radius: 10px;
-
-            color: #f8fafc;
-
-            font-size: 12px;
-
-            white-space: pre-wrap;
-        }
-
-        .chat-input-area {
-            display: flex;
-
-            gap: 6px;
-
-            padding: 9px;
-
-            border-top:
-                1px solid var(--border);
-        }
-
-        #chatInput {
-            flex: 1;
-            min-width: 0;
-
-            min-height: 40px;
-
-            padding: 9px 10px;
-
-            background:
-                rgba(2, 6, 23, 0.64);
-
-            color: white;
-
-            border:
-                1px solid var(--border-strong);
-
-            border-radius: 9px;
-
-            outline: none;
-        }
-
-        #chatInput:focus {
-            border-color:
-                rgba(59, 130, 246, 0.55);
-        }
-
-        #sendBtn {
-            min-width: 60px;
-
-            border: 0;
-            border-radius: 9px;
-
-            color: white;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--blue),
-                    var(--blue-light)
-                );
-
-            cursor: pointer;
-
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        /* =========================
-           MOBILE
-        ========================= */
-
-        @media (max-width: 850px) {
-
-            body {
-                height: 100dvh;
-
-                overflow-y: auto;
-                overflow-x: hidden;
-            }
-
-            header {
-                min-height: 60px;
-                height: auto;
-
-                padding:
-                    8px
-                    10px;
-
-                gap: 8px;
-            }
-
-            .brand {
-                font-size: 17px;
-            }
-
-            .brand-icon {
-                width: 30px;
-                height: 30px;
-                border-radius: 9px;
-            }
-
-            .header-right {
-                gap: 4px;
-
-                flex-wrap: wrap;
-            }
-
-            .badge {
-                min-height: 30px;
-
-                padding: 5px 8px;
-
-                font-size: 10px;
-            }
-
-            #callTimer {
-                gap: 5px;
-            }
-
-            #callTimer .timer-label {
-                display: none;
-            }
-
-            #callTimer .timer-time {
-                min-width: 49px;
-
-                font-size: 10px;
-            }
-
-            #callTimer .timer-dot {
-                width: 6px;
-                height: 6px;
-            }
-
-            select {
-                min-height: 30px;
-
-                padding: 5px 7px;
-
-                font-size: 10px;
-            }
-
-            .main-container {
-                height: auto;
-                min-height:
-                    calc(100dvh - 60px);
-
-                padding: 8px;
-
-                gap: 9px;
-
-                display: flex;
-                flex-direction: column;
-            }
-
-            .video-wrapper {
-                width: 100%;
-
-                flex: none;
-
-                gap: 8px;
-            }
-
-            .videos-grid {
-                position: relative;
-
-                width: 100%;
-
-                height: min(
-                    55dvh,
-                    560px
-                );
-
-                min-height: 300px;
-
-                display: block;
-            }
-
-            .video-box {
-                position: absolute;
-
-                border-radius: 13px;
-            }
-
-            .video-box:first-child {
-                inset: 0;
-
-                width: 100%;
-                height: 100%;
-            }
-
-            .video-box:last-child {
-                right: 10px;
-                bottom: 10px;
-
-                width: 31%;
-                height: 30%;
-
-                z-index: 6;
-
-                border:
-                    2px solid
-                    rgba(255, 255, 255, 0.9);
-
-                box-shadow:
-                    0 8px 20px
-                    rgba(0, 0, 0, 0.46);
-            }
-
-            .video-label {
-                top: 7px;
-                left: 7px;
-
-                padding: 5px 7px;
-
-                border-radius: 8px;
-
-                font-size: 10px;
-            }
-
-            .status {
-                left: 7px;
-                bottom: 7px;
-
-                padding: 5px 7px;
-
-                border-radius: 8px;
-
-                font-size: 9px;
-            }
-
-            .remote-audio-hint {
-                right: 7px;
-                bottom: 7px;
-
-                min-height: 32px;
-
-                padding: 6px 8px;
-
-                border-radius: 8px;
-
-                font-size: 10px;
-            }
-
-            .controls-bar {
-                width: 100%;
-
-                display: grid;
-
-                grid-template-columns:
-                    repeat(2, 1fr);
-
-                gap: 7px;
-
-                padding: 0;
-            }
-
-            .btn {
-                width: 100%;
-
-                min-height: 48px;
-
-                padding: 10px 6px;
-
-                border-radius: 9px;
-
-                font-size: 11px;
-            }
-
-            .btn-loop,
-            .btn-stop,
-            .btn-toggle {
-                flex: none;
-            }
-
-            .btn-flip {
-                display: flex;
-            }
-
-            .chat-wrapper {
-                width: 100%;
-                max-width: none;
-
-                height: 250px;
-                min-height: 250px;
-
-                border-radius: 13px;
-            }
-
-            .chat-header {
-                padding: 10px;
-
-                font-size: 12px;
-            }
-
-            .chat-messages {
-                padding: 9px;
-            }
-
-            .chat-input-area {
-                padding: 8px;
-            }
-
-            #chatInput {
-                min-height: 40px;
-
-                padding: 9px;
-
-                font-size: 12px;
-            }
-
-            #sendBtn {
-                min-width: 62px;
-
-                font-size: 11px;
-            }
-        }
-
-        @media (max-width: 400px) {
-
-            .brand {
-                font-size: 15px;
-            }
-
-            .videos-grid {
-                height: 48dvh;
-                min-height: 270px;
-            }
-
-            .video-box:last-child {
-                width: 34%;
-                height: 30%;
-            }
-
-            .btn {
-                min-height: 46px;
-                font-size: 10.5px;
-            }
-
-            .chat-wrapper {
-                height: 230px;
-                min-height: 230px;
-            }
-        }
-    </style>
 </head>
 
 <body>
 
 <header>
 
-    <div class="brand">
-        <span class="brand-icon">🔄</span>
-        <span>MeetLoop</span>
+```
+<div class="brand">
+    <span class="brand-icon">🔄</span>
+    <span>MeetLoop</span>
+</div>
+
+<div class="header-right">
+
+    <div class="badge online">
+        🟢 Online:
+        <span id="onlineCount">0</span>
     </div>
 
-    <div class="header-right">
-
-        <div class="badge online">
-            🟢 Online:
-            <span id="onlineCount">0</span>
-        </div>
-
-        <div
-            class="badge"
-            id="statusBadge"
-        >
-            Ready
-        </div>
-
-        <div
-            class="badge"
-            id="callTimer"
-            aria-label="Call time"
-        >
-            <span class="timer-dot"></span>
-
-            <span class="timer-label">
-                LIVE
-            </span>
-
-            <span
-                class="timer-time"
-                id="callTimerValue"
-            >
-                00:00:00
-            </span>
-        </div>
-
-        <select id="languageSelect">
-            <option value="en">
-                English
-            </option>
-
-            <option value="tl">
-                Tagalog
-            </option>
-        </select>
-
+    <div
+        class="badge"
+        id="statusBadge"
+    >
+        Ready
     </div>
+
+    <div
+        class="badge"
+        id="callTimer"
+    >
+        <span class="timer-dot"></span>
+
+        <span class="timer-label">
+            LIVE
+        </span>
+
+        <span
+            class="timer-time"
+            id="callTimerValue"
+        >
+            00:00:00
+        </span>
+    </div>
+
+    <select id="languageSelect">
+        <option value="en">English</option>
+        <option value="tl">Tagalog</option>
+    </select>
+
+</div>
+```
 
 </header>
 
-
 <div class="main-container">
 
-    <div class="video-wrapper">
+```
+<div class="video-wrapper">
 
-        <div class="videos-grid">
+    <div class="videos-grid">
 
-            <div class="video-box">
+        <div class="video-box">
 
-                <video
-                    id="remoteVideo"
-                    autoplay
-                    playsinline
-                    preload="auto"
-                ></video>
+            <video
+                id="remoteVideo"
+                autoplay
+                playsinline
+                preload="auto"
+            ></video>
 
-                <div
-                    class="video-label"
-                    id="strangerLabel"
-                >
-                    👤 Stranger
-                </div>
-
-                <div
-                    class="status"
-                    id="remoteStatus"
-                >
-                    Waiting...
-                </div>
-
-                <button
-                    class="remote-audio-hint"
-                    id="remoteAudioHint"
-                    type="button"
-                >
-                    🔊 Tap for sound
-                </button>
-
-                <div
-                    class="search-overlay"
-                    id="searchOverlay"
-                >
-                    <div class="search-box">
-
-                        <div class="spinner"></div>
-
-                        <div id="searchText">
-                            Finding someone...
-                        </div>
-
-                    </div>
-                </div>
-
+            <div
+                class="video-label"
+            >
+                👤 Stranger
             </div>
 
+            <div
+                class="status"
+                id="remoteStatus"
+            >
+                Waiting...
+            </div>
 
-            <div class="video-box">
+            <div
+                class="search-overlay"
+                id="searchOverlay"
+            >
+                <div class="search-box">
 
-                <video
-                    id="localVideo"
-                    autoplay
-                    muted
-                    playsinline
-                    preload="auto"
-                ></video>
+                    <div class="spinner"></div>
 
-                <div class="video-label">
-                    🙂 You
+                    <div id="searchText">
+                        Finding someone...
+                    </div>
+
                 </div>
-
             </div>
 
         </div>
 
 
-        <div class="controls-bar">
+        <div class="video-box">
 
-            <button
-                class="btn btn-loop"
-                id="loopBtn"
-                type="button"
-            >
-                🔄 Start Loop
-            </button>
+            <video
+                id="localVideo"
+                autoplay
+                muted
+                playsinline
+                preload="auto"
+            ></video>
 
-            <button
-                class="btn btn-stop"
-                id="stopBtn"
-                type="button"
-                disabled
-            >
-                ⏹️ Stop
-            </button>
-
-            <button
-                class="btn btn-toggle"
-                id="micBtn"
-                type="button"
-            >
-                🎙️ Mic On
-            </button>
-
-            <button
-                class="btn btn-toggle"
-                id="camBtn"
-                type="button"
-            >
-                📷 Cam On
-            </button>
-
-            <button
-                class="btn btn-flip"
-                id="flipBtn"
-                type="button"
-            >
-                🔄 Flip
-            </button>
+            <div class="video-label">
+                🙂 You
+            </div>
 
         </div>
 
     </div>
 
 
-    <div class="chat-wrapper">
+    <div class="controls-bar">
 
-        <div class="chat-header">
-            💬 Live Chat
-        </div>
-
-        <div
-            class="chat-messages"
-            id="chatMessages"
+        <button
+            class="btn btn-loop"
+            id="loopBtn"
+            type="button"
         >
+            🔄 Start Loop
+        </button>
 
-            <div class="message">
+        <button
+            class="btn btn-stop"
+            id="stopBtn"
+            type="button"
+            disabled
+        >
+            ⏹️ Stop
+        </button>
 
-                <div class="message-name">
-                    System
-                </div>
+        <button
+            class="btn btn-toggle"
+            id="micBtn"
+            type="button"
+        >
+            🎙️ Mic On
+        </button>
 
-                <div class="message-text">
-                    Welcome to MeetLoop!
-                </div>
+        <button
+            class="btn btn-toggle"
+            id="camBtn"
+            type="button"
+        >
+            📷 Cam On
+        </button>
 
-            </div>
-
-        </div>
-
-        <div class="chat-input-area">
-
-            <input
-                id="chatInput"
-                type="text"
-                placeholder="Type a message..."
-                maxlength="300"
-                autocomplete="off"
-            >
-
-            <button
-                id="sendBtn"
-                type="button"
-            >
-                Send
-            </button>
-
-        </div>
+        <button
+            class="btn btn-flip"
+            id="flipBtn"
+            type="button"
+        >
+            🔄 Flip
+        </button>
 
     </div>
 
 </div>
 
 
+<div class="chat-wrapper">
+
+    <div class="chat-header">
+        💬 Live Chat
+    </div>
+
+    <div
+        class="chat-messages"
+        id="chatMessages"
+    >
+
+        <div class="message">
+
+            <div class="message-name">
+                System
+            </div>
+
+            <div class="message-text">
+                Welcome to MeetLoop!
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="chat-input-area">
+
+        <input
+            id="chatInput"
+            type="text"
+            placeholder="Type a message..."
+            maxlength="300"
+            autocomplete="off"
+        >
+
+        <button
+            id="sendBtn"
+            type="button"
+        >
+            Send
+        </button>
+
+    </div>
+
+</div>
+```
+
+</div>
+
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
 "use strict";
-
 
 /* =========================================
    SOCKET
@@ -1344,12 +1166,8 @@ const socket = io({
     ],
 
     reconnection: true,
-
-    reconnectionAttempts:
-        Infinity,
-
+    reconnectionAttempts: Infinity,
     reconnectionDelay: 1000,
-
     reconnectionDelayMax: 5000
 });
 
@@ -1359,99 +1177,58 @@ const socket = io({
 ========================================= */
 
 const localVideo =
-    document.getElementById(
-        "localVideo"
-    );
+    document.getElementById("localVideo");
 
 const remoteVideo =
-    document.getElementById(
-        "remoteVideo"
-    );
+    document.getElementById("remoteVideo");
 
 const loopBtn =
-    document.getElementById(
-        "loopBtn"
-    );
+    document.getElementById("loopBtn");
 
 const stopBtn =
-    document.getElementById(
-        "stopBtn"
-    );
+    document.getElementById("stopBtn");
 
 const micBtn =
-    document.getElementById(
-        "micBtn"
-    );
+    document.getElementById("micBtn");
 
 const camBtn =
-    document.getElementById(
-        "camBtn"
-    );
+    document.getElementById("camBtn");
 
 const flipBtn =
-    document.getElementById(
-        "flipBtn"
-    );
+    document.getElementById("flipBtn");
 
 const searchOverlay =
-    document.getElementById(
-        "searchOverlay"
-    );
+    document.getElementById("searchOverlay");
 
 const searchText =
-    document.getElementById(
-        "searchText"
-    );
+    document.getElementById("searchText");
 
 const remoteStatus =
-    document.getElementById(
-        "remoteStatus"
-    );
+    document.getElementById("remoteStatus");
 
 const onlineCount =
-    document.getElementById(
-        "onlineCount"
-    );
+    document.getElementById("onlineCount");
 
 const statusBadge =
-    document.getElementById(
-        "statusBadge"
-    );
+    document.getElementById("statusBadge");
 
 const chatInput =
-    document.getElementById(
-        "chatInput"
-    );
+    document.getElementById("chatInput");
 
 const chatMessages =
-    document.getElementById(
-        "chatMessages"
-    );
+    document.getElementById("chatMessages");
 
 const sendBtn =
-    document.getElementById(
-        "sendBtn"
-    );
+    document.getElementById("sendBtn");
 
 const languageSelect =
-    document.getElementById(
-        "languageSelect"
-    );
-
-const remoteAudioHint =
-    document.getElementById(
-        "remoteAudioHint"
-    );
+    document.getElementById("languageSelect");
 
 const callTimer =
-    document.getElementById(
-        "callTimer"
-    );
+    document.getElementById("callTimer");
 
 const callTimerValue =
-    document.getElementById(
-        "callTimerValue"
-    );
+    document.getElementById("callTimerValue");
 
 
 /* =========================================
@@ -1459,21 +1236,17 @@ const callTimerValue =
 ========================================= */
 
 const rtcConfig = {
-
     iceServers: [
-
         {
             urls: [
                 "stun:stun.l.google.com:19302",
                 "stun:stun1.l.google.com:19302"
             ]
         },
-
         {
             urls:
                 "stun:stun.cloudflare.com:3478"
         }
-
     ],
 
     iceCandidatePoolSize: 10,
@@ -1509,8 +1282,7 @@ let connected = false;
 
 let stopping = false;
 
-let currentFacingMode =
-    "user";
+let currentFacingMode = "user";
 
 let connectionTimer = null;
 
@@ -1526,48 +1298,100 @@ let iceRestartAttempted =
 
 
 /* =========================================
-   UI HELPERS
+   HELPERS
 ========================================= */
 
-function setStatus(
-    text
-) {
-    statusBadge.textContent =
-        text;
+function setStatus(text) {
+    statusBadge.textContent = text;
 }
 
 
-function setRemoteStatus(
-    text
-) {
-    remoteStatus.textContent =
-        text;
+function setRemoteStatus(text) {
+    remoteStatus.textContent = text;
 }
 
 
-function showSearch(
-    text
-) {
-    searchText.textContent =
-        text;
-
-    searchOverlay.style.display =
-        "flex";
+function showSearch(text) {
+    searchText.textContent = text;
+    searchOverlay.style.display = "flex";
 }
 
 
 function hideSearch() {
-    searchOverlay.style.display =
-        "none";
+    searchOverlay.style.display = "none";
 }
 
 
 function isMobile() {
-    return window
-        .matchMedia(
-            "(max-width: 850px)"
-        )
-        .matches;
+    return window.matchMedia(
+        "(max-width: 850px)"
+    ).matches;
+}
+
+
+function clearConnectionTimer() {
+
+    if (connectionTimer) {
+
+        clearTimeout(
+            connectionTimer
+        );
+
+        connectionTimer = null;
+    }
+}
+
+
+function startConnectionTimer() {
+
+    clearConnectionTimer();
+
+    connectionTimer =
+        setTimeout(
+            () => {
+
+                if (
+                    peerConnection &&
+                    !connected
+                ) {
+
+                    setRemoteStatus(
+                        "Connection failed"
+                    );
+
+                    setStatus(
+                        "Connection failed"
+                    );
+
+                    loopBtn.disabled =
+                        false;
+
+                    loopBtn.textContent =
+                        "🔄 Start Loop";
+                }
+
+            },
+            20000
+        );
+}
+
+
+function queueSignal(callback) {
+
+    signalQueue =
+        signalQueue.then(
+            callback
+        ).catch(
+            error => {
+
+                console.error(
+                    "Signal queue error:",
+                    error
+                );
+            }
+        );
+
+    return signalQueue;
 }
 
 
@@ -1594,20 +1418,11 @@ function formatCallTime(
 
 
     return (
-        String(hours).padStart(
-            2,
-            "0"
-        ) +
+        String(hours).padStart(2, "0") +
         ":" +
-        String(minutes).padStart(
-            2,
-            "0"
-        ) +
+        String(minutes).padStart(2, "0") +
         ":" +
-        String(seconds).padStart(
-            2,
-            "0"
-        )
+        String(seconds).padStart(2, "0")
     );
 }
 
@@ -1624,20 +1439,17 @@ function updateCallTimer() {
 
 
     const elapsed =
-        Math.max(
-            0,
-            Math.floor(
-                (
-                    Date.now() -
-                    callStartTime
-                ) / 1000
-            )
+        Math.floor(
+            (
+                Date.now() -
+                callStartTime
+            ) / 1000
         );
 
 
     callTimerValue.textContent =
         formatCallTime(
-            elapsed
+            Math.max(0, elapsed)
         );
 }
 
@@ -1675,12 +1487,15 @@ function stopCallTimer() {
             null;
     }
 
+
     callStartTime =
         null;
+
 
     callTimer.classList.remove(
         "active"
     );
+
 
     callTimerValue.textContent =
         "00:00:00";
@@ -1688,91 +1503,7 @@ function stopCallTimer() {
 
 
 /* =========================================
-   CONNECTION TIMER
-========================================= */
-
-function clearConnectionTimer() {
-
-    if (connectionTimer) {
-
-        clearTimeout(
-            connectionTimer
-        );
-
-        connectionTimer =
-            null;
-    }
-}
-
-
-function startConnectionTimer() {
-
-    clearConnectionTimer();
-
-
-    connectionTimer =
-        setTimeout(
-            () => {
-
-                if (
-                    peerConnection &&
-                    !connected
-                ) {
-
-                    console.warn(
-                        "WebRTC connection timeout"
-                    );
-
-                    setRemoteStatus(
-                        "Connection failed"
-                    );
-
-                    setStatus(
-                        "Connection failed"
-                    );
-
-                    loopBtn.disabled =
-                        false;
-
-                    loopBtn.textContent =
-                        "🔄 Start Loop";
-                }
-
-            },
-            20000
-        );
-}
-
-
-/* =========================================
-   SIGNAL QUEUE
-========================================= */
-
-function queueSignal(
-    callback
-) {
-
-    signalQueue =
-        signalQueue
-            .then(
-                callback
-            )
-            .catch(
-                error => {
-
-                    console.error(
-                        "Signal queue error:",
-                        error
-                    );
-                }
-            );
-
-    return signalQueue;
-}
-
-
-/* =========================================
-   MEDIA
+   LOCAL CAMERA + MIC
 ========================================= */
 
 async function startMedia() {
@@ -1798,11 +1529,11 @@ async function startMedia() {
     try {
 
         localStream =
-            await navigator.mediaDevices
+            await navigator
+                .mediaDevices
                 .getUserMedia({
 
                     video: {
-
                         facingMode: {
                             ideal:
                                 "user"
@@ -1825,17 +1556,10 @@ async function startMedia() {
                     },
 
                     audio: {
-
-                        echoCancellation:
-                            true,
-
-                        noiseSuppression:
-                            true,
-
-                        autoGainControl:
-                            true
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
                     }
-
                 });
 
 
@@ -1852,11 +1576,8 @@ async function startMedia() {
             true;
 
 
-        await localVideo
-            .play()
-            .catch(
-                () => {}
-            );
+        await localVideo.play()
+            .catch(() => {});
 
 
         currentFacingMode =
@@ -1864,11 +1585,6 @@ async function startMedia() {
 
 
         updateMediaButtons();
-
-
-        setStatus(
-            "Camera ready"
-        );
 
 
         return true;
@@ -1891,7 +1607,7 @@ async function startMedia() {
         ) {
 
             alert(
-                "Camera/microphone permission was denied. Allow Camera and Microphone in Chrome."
+                "Camera/microphone permission was denied. Allow both in Chrome."
             );
 
         } else if (
@@ -1903,19 +1619,10 @@ async function startMedia() {
                 "No camera or microphone was found."
             );
 
-        } else if (
-            error.name ===
-            "NotReadableError"
-        ) {
-
-            alert(
-                "Camera or microphone is already being used by another app."
-            );
-
         } else {
 
             alert(
-                "Hindi ma-access ang camera/microphone. I-check ang Chrome permissions."
+                "Hindi ma-access ang camera/microphone."
             );
         }
 
@@ -1935,7 +1642,6 @@ function updateMediaButtons() {
     const audioTrack =
         localStream
             .getAudioTracks()[0];
-
 
     const videoTrack =
         localStream
@@ -2012,7 +1718,7 @@ function toggleCam() {
 
 
 /* =========================================
-   MOBILE CAMERA FLIP
+   FLIP CAMERA
 ========================================= */
 
 async function flipCamera() {
@@ -2044,8 +1750,7 @@ async function flipCamera() {
             : "user";
 
 
-    let newStream =
-        null;
+    let newStream = null;
 
 
     try {
@@ -2056,9 +1761,8 @@ async function flipCamera() {
                 .getUserMedia({
 
                     video: {
-
                         facingMode: {
-                            exact:
+                            ideal:
                                 newFacingMode
                         }
                     },
@@ -2073,9 +1777,8 @@ async function flipCamera() {
 
 
         if (!newTrack) {
-
             throw new Error(
-                "No replacement camera track"
+                "No new camera track"
             );
         }
 
@@ -2099,10 +1802,9 @@ async function flipCamera() {
 
             if (sender) {
 
-                await sender
-                    .replaceTrack(
-                        newTrack
-                    );
+                await sender.replaceTrack(
+                    newTrack
+                );
             }
         }
 
@@ -2123,11 +1825,8 @@ async function flipCamera() {
             localStream;
 
 
-        await localVideo
-            .play()
-            .catch(
-                () => {}
-            );
+        await localVideo.play()
+            .catch(() => {});
 
 
         currentFacingMode =
@@ -2138,8 +1837,8 @@ async function flipCamera() {
 
     } catch (error) {
 
-        console.warn(
-            "Exact camera flip failed:",
+        console.error(
+            "Flip camera error:",
             error
         );
 
@@ -2155,106 +1854,9 @@ async function flipCamera() {
         }
 
 
-        try {
-
-            const fallbackStream =
-                await navigator
-                    .mediaDevices
-                    .getUserMedia({
-
-                        video: {
-
-                            facingMode: {
-                                ideal:
-                                    newFacingMode
-                            }
-                        },
-
-                        audio: false
-                    });
-
-
-            const fallbackTrack =
-                fallbackStream
-                    .getVideoTracks()[0];
-
-
-            if (!fallbackTrack) {
-                throw new Error(
-                    "No fallback track"
-                );
-            }
-
-
-            fallbackTrack.enabled =
-                oldTrack.enabled;
-
-
-            if (peerConnection) {
-
-                const sender =
-                    peerConnection
-                        .getSenders()
-                        .find(
-                            item =>
-                                item.track &&
-                                item.track.kind ===
-                                "video"
-                        );
-
-
-                if (sender) {
-
-                    await sender
-                        .replaceTrack(
-                            fallbackTrack
-                        );
-                }
-            }
-
-
-            localStream.removeTrack(
-                oldTrack
-            );
-
-            localStream.addTrack(
-                fallbackTrack
-            );
-
-
-            oldTrack.stop();
-
-
-            localVideo.srcObject =
-                localStream;
-
-
-            await localVideo
-                .play()
-                .catch(
-                    () => {}
-                );
-
-
-            currentFacingMode =
-                newFacingMode;
-
-
-            updateMediaButtons();
-
-        } catch (
-            fallbackError
-        ) {
-
-            console.error(
-                "Camera flip failed:",
-                fallbackError
-            );
-
-            alert(
-                "Hindi ma-switch ang camera sa device mo."
-            );
-        }
+        alert(
+            "Hindi ma-switch ang camera."
+        );
     }
 }
 
@@ -2303,18 +1905,16 @@ function createPeer(
     }
 
 
-    /* Remote tracks */
-
     peerConnection.ontrack =
         event => {
 
             console.log(
-                "Remote track received:",
+                "REMOTE TRACK:",
                 event.track.kind
             );
 
 
-            let remoteStream =
+            let stream =
                 remoteVideo.srcObject;
 
 
@@ -2323,35 +1923,32 @@ function createPeer(
                 event.streams[0]
             ) {
 
-                remoteStream =
+                stream =
                     event.streams[0];
 
-            } else if (
-                !remoteStream
-            ) {
+            } else if (!stream) {
 
-                remoteStream =
+                stream =
                     new MediaStream();
             }
 
 
             if (
-                event.streams.length === 0 &&
-                !remoteStream
+                !stream
                     .getTracks()
                     .includes(
                         event.track
                     )
             ) {
 
-                remoteStream.addTrack(
+                stream.addTrack(
                     event.track
                 );
             }
 
 
             remoteVideo.srcObject =
-                remoteStream;
+                stream;
 
 
             remoteVideo.autoplay =
@@ -2361,27 +1958,14 @@ function createPeer(
                 true;
 
 
-            remoteVideo
-                .play()
-                .then(
-                    () => {
-
-                        remoteAudioHint
-                            .style.display =
-                            "none";
-                    }
-                )
+            remoteVideo.play()
                 .catch(
                     error => {
 
                         console.warn(
-                            "Remote autoplay blocked:",
+                            "Remote playback blocked:",
                             error
                         );
-
-                        remoteAudioHint
-                            .style.display =
-                            "flex";
                     }
                 );
 
@@ -2398,26 +1982,24 @@ function createPeer(
         };
 
 
-    /* ICE */
-
     peerConnection.onicecandidate =
         event => {
 
-            if (!event.candidate) {
-                return;
+            if (
+                event.candidate
+            ) {
+
+                socket.emit(
+                    "signal",
+                    {
+                        type:
+                            "candidate",
+
+                        candidate:
+                            event.candidate
+                    }
+                );
             }
-
-
-            socket.emit(
-                "signal",
-                {
-                    type:
-                        "candidate",
-
-                    candidate:
-                        event.candidate
-                }
-            );
         };
 
 
@@ -2435,7 +2017,7 @@ function createPeer(
 
 
             console.log(
-                "ICE state:",
+                "ICE STATE:",
                 state
             );
 
@@ -2481,9 +2063,7 @@ function createPeer(
                         true
                     );
 
-                } catch (
-                    error
-                ) {
+                } catch (error) {
 
                     console.error(
                         "ICE restart error:",
@@ -2494,10 +2074,7 @@ function createPeer(
         };
 
 
-    /* Connection */
-
-    peerConnection
-        .onconnectionstatechange =
+    peerConnection.onconnectionstatechange =
         () => {
 
             if (!peerConnection) {
@@ -2511,14 +2088,19 @@ function createPeer(
 
 
             console.log(
-                "Connection state:",
+                "CONNECTION STATE:",
                 state
             );
 
 
             if (
-                state === "connecting"
+                state ===
+                "connecting"
             ) {
+
+                setStatus(
+                    "Connecting..."
+                );
 
                 setRemoteStatus(
                     "Connecting..."
@@ -2527,7 +2109,8 @@ function createPeer(
 
 
             if (
-                state === "connected"
+                state ===
+                "connected"
             ) {
 
                 connected =
@@ -2536,7 +2119,9 @@ function createPeer(
                 searching =
                     false;
 
+
                 clearConnectionTimer();
+
 
                 hideSearch();
 
@@ -2553,15 +2138,13 @@ function createPeer(
                 loopBtn.disabled =
                     false;
 
-                loopBtn.textContent =
-                    "⏭️ Next";
-
-
                 stopBtn.disabled =
                     false;
 
 
-                /* Start unlimited timer */
+                loopBtn.textContent =
+                    "⏭️ Next";
+
 
                 if (
                     !callStartTime
@@ -2573,11 +2156,16 @@ function createPeer(
 
 
             if (
-                state === "failed"
+                state ===
+                "failed"
             ) {
 
                 connected =
                     false;
+
+                searching =
+                    false;
+
 
                 stopCallTimer();
 
@@ -2600,7 +2188,8 @@ function createPeer(
 
 
             if (
-                state === "disconnected"
+                state ===
+                "disconnected"
             ) {
 
                 setRemoteStatus(
@@ -2610,10 +2199,7 @@ function createPeer(
         };
 
 
-    /* ICE gathering */
-
-    peerConnection
-        .onicegatheringstatechange =
+    peerConnection.onicegatheringstatechange =
         () => {
 
             if (!peerConnection) {
@@ -2622,17 +2208,14 @@ function createPeer(
 
 
             console.log(
-                "ICE gathering:",
+                "ICE GATHERING:",
                 peerConnection
                     .iceGatheringState
             );
         };
 
 
-    /* Signaling */
-
-    peerConnection
-        .onsignalingstatechange =
+    peerConnection.onsignalingstatechange =
         () => {
 
             if (!peerConnection) {
@@ -2641,21 +2224,18 @@ function createPeer(
 
 
             console.log(
-                "Signaling state:",
+                "SIGNALING:",
                 peerConnection
                     .signalingState
             );
         };
 
 
-    /* Data channel */
-
-    peerConnection
-        .ondatachannel =
+    peerConnection.ondatachannel =
         event => {
 
             console.log(
-                "Remote data channel received"
+                "REMOTE DATA CHANNEL"
             );
 
 
@@ -2676,8 +2256,7 @@ function createPeer(
                 .createDataChannel(
                     "chat",
                     {
-                        ordered:
-                            true
+                        ordered: true
                     }
                 );
 
@@ -2717,8 +2296,7 @@ async function createOffer(
                 .createOffer(
                     iceRestart
                         ? {
-                            iceRestart:
-                                true
+                            iceRestart: true
                         }
                         : undefined
                 );
@@ -2745,7 +2323,7 @@ async function createOffer(
     } catch (error) {
 
         console.error(
-            "Offer error:",
+            "CREATE OFFER ERROR:",
             error
         );
     }
@@ -2753,7 +2331,7 @@ async function createOffer(
 
 
 /* =========================================
-   ANSWER
+   OFFER HANDLER
 ========================================= */
 
 async function handleOffer(
@@ -2819,9 +2397,10 @@ async function handleOffer(
             } catch (error) {
 
                 console.error(
-                    "Offer handling error:",
+                    "HANDLE OFFER ERROR:",
                     error
                 );
+
 
                 setRemoteStatus(
                     "Connection error"
@@ -2867,7 +2446,7 @@ async function handleAnswer(
             } catch (error) {
 
                 console.error(
-                    "Answer error:",
+                    "HANDLE ANSWER ERROR:",
                     error
                 );
             }
@@ -2918,7 +2497,7 @@ async function handleCandidate(
             } catch (error) {
 
                 console.error(
-                    "ICE candidate error:",
+                    "ADD ICE ERROR:",
                     error
                 );
             }
@@ -2959,7 +2538,7 @@ async function flushIceCandidates() {
         } catch (error) {
 
             console.error(
-                "ICE flush error:",
+                "FLUSH ICE ERROR:",
                 error
             );
         }
@@ -2968,7 +2547,7 @@ async function flushIceCandidates() {
 
 
 /* =========================================
-   CLOSE PEER
+   CLOSE CONNECTION
 ========================================= */
 
 function closePeerConnection() {
@@ -2990,12 +2569,8 @@ function closePeerConnection() {
     if (dataChannel) {
 
         try {
-
             dataChannel.close();
-
-        } catch (
-            error
-        ) {}
+        } catch (error) {}
 
         dataChannel =
             null;
@@ -3026,9 +2601,7 @@ function closePeerConnection() {
 
             peerConnection.close();
 
-        } catch (
-            error
-        ) {}
+        } catch (error) {}
     }
 
 
@@ -3038,7 +2611,7 @@ function closePeerConnection() {
 
 
 /* =========================================
-   START / NEXT
+   START LOOP
 ========================================= */
 
 async function startLoop() {
@@ -3114,9 +2687,6 @@ async function startLoop() {
     connected =
         false;
 
-    stopping =
-        false;
-
 
     loopBtn.disabled =
         true;
@@ -3177,17 +2747,12 @@ function stopSession() {
         null;
 
 
-    remoteAudioHint.style.display =
-        "none";
-
-
     hideSearch();
 
 
     setRemoteStatus(
         "Stopped"
     );
-
 
     setStatus(
         "Ready"
@@ -3224,10 +2789,9 @@ socket.on(
     () => {
 
         console.log(
-            "Socket connected:",
+            "SOCKET CONNECTED:",
             socket.id
         );
-
 
         setStatus(
             connected
@@ -3243,10 +2807,9 @@ socket.on(
     error => {
 
         console.error(
-            "Socket connection error:",
+            "SOCKET ERROR:",
             error
         );
-
 
         setStatus(
             "Server reconnecting..."
@@ -3282,7 +2845,6 @@ socket.on(
             "Waiting..."
         );
 
-
         setStatus(
             "Waiting..."
         );
@@ -3307,7 +2869,6 @@ socket.on(
         setRemoteStatus(
             "Connecting..."
         );
-
 
         setStatus(
             "Connecting..."
@@ -3391,10 +2952,6 @@ socket.on(
         remoteVideo.srcObject =
             null;
 
-        remoteAudioHint
-            .style.display =
-            "none";
-
 
         hideSearch();
 
@@ -3402,7 +2959,6 @@ socket.on(
         setRemoteStatus(
             "Stranger left"
         );
-
 
         setStatus(
             "Ready"
@@ -3427,7 +2983,7 @@ socket.on(
     reason => {
 
         console.warn(
-            "Socket disconnected:",
+            "SOCKET DISCONNECTED:",
             reason
         );
 
@@ -3459,11 +3015,7 @@ function setupDataChannel(
         () => {
 
             console.log(
-                "Chat connected"
-            );
-
-            setStatus(
-                "Connected"
+                "CHAT CONNECTED"
             );
         };
 
@@ -3472,7 +3024,7 @@ function setupDataChannel(
         () => {
 
             console.log(
-                "Chat disconnected"
+                "CHAT CLOSED"
             );
         };
 
@@ -3481,7 +3033,7 @@ function setupDataChannel(
         error => {
 
             console.error(
-                "Chat error:",
+                "CHAT ERROR:",
                 error
             );
         };
@@ -3545,14 +3097,8 @@ function sendMessage() {
     } catch (error) {
 
         console.error(
-            "Send message error:",
+            "SEND MESSAGE ERROR:",
             error
-        );
-
-
-        addMessage(
-            "System",
-            "Message could not be sent."
         );
     }
 }
@@ -3619,55 +3165,7 @@ function addMessage(
 
 
 /* =========================================
-   REMOTE AUDIO
-========================================= */
-
-async function playRemoteMedia() {
-
-    try {
-
-        remoteVideo.muted =
-            false;
-
-
-        await remoteVideo
-            .play();
-
-
-        remoteAudioHint
-            .style.display =
-            "none";
-
-    } catch (error) {
-
-        console.warn(
-            "Remote playback failed:",
-            error
-        );
-    }
-}
-
-
-remoteVideo.addEventListener(
-    "click",
-    () => {
-
-        playRemoteMedia();
-    }
-);
-
-
-remoteAudioHint.addEventListener(
-    "click",
-    () => {
-
-        playRemoteMedia();
-    }
-);
-
-
-/* =========================================
-   BUTTON EVENTS
+   BUTTONS
 ========================================= */
 
 loopBtn.addEventListener(
@@ -3750,25 +3248,6 @@ languageSelect.addEventListener(
 
 
 /* =========================================
-   ESCAPE
-========================================= */
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key ===
-            "Escape"
-        ) {
-
-            stopSession();
-        }
-    }
-);
-
-
-/* =========================================
    VISIBILITY
 ========================================= */
 
@@ -3824,9 +3303,7 @@ window.addEventListener(
                 "stop-search"
             );
 
-        } catch (
-            error
-        ) {}
+        } catch (error) {}
 
 
         stopCallTimer();
@@ -3869,4 +3346,3 @@ stopBtn.disabled =
 
 </body>
 </html>
-```
