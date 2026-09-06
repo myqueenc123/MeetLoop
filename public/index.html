@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#070b14">
 
-<!-- 🔥 TAB BAR LOGO / FAVICON (MeetLoop by Jm Devs) -->
+<!-- 🔥 TAB BAR LOGO / FAVICON -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%233b82f6'/%3E%3Cstop offset='50%25' stop-color='%238b5cf6'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='%23070b14'/%3E%3Cpath d='M32 12 A20 20 0 0 1 52 32 A20 20 0 0 1 34 52' fill='none' stroke='url(%23g)' stroke-width='6' stroke-linecap='round'/%3E%3Cpolygon points='34,58 30,49 40,49' fill='%23ec4899'/%3E%3Cpath d='M32 52 A20 20 0 0 1 12 32 A20 20 0 0 1 30 12' fill='none' stroke='url(%23g)' stroke-width='6' stroke-linecap='round'/%3E%3Cpolygon points='30,6 34,15 24,15' fill='%233b82f6'/%3E%3Ccircle cx='32' cy='32' r='7' fill='url(%23g)'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%233b82f6'/%3E%3Cstop offset='50%25' stop-color='%238b5cf6'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='%23070b14'/%3E%3Cpath d='M32 12 A20 20 0 0 1 52 32 A20 20 0 0 1 34 52' fill='none' stroke='url(%23g)' stroke-width='6' stroke-linecap='round'/%3E%3Cpolygon points='34,58 30,49 40,49' fill='%23ec4899'/%3E%3Cpath d='M32 52 A20 20 0 0 1 12 32 A20 20 0 0 1 30 12' fill='none' stroke='url(%23g)' stroke-width='6' stroke-linecap='round'/%3E%3Cpolygon points='30,6 34,15 24,15' fill='%233b82f6'/%3E%3Ccircle cx='32' cy='32' r='7' fill='url(%23g)'/%3E%3C/svg%3E">
 
@@ -14,7 +14,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>MeetLoop - Powered by Jm Devs</title>
+<title>MeetLoop - Global Video Chat</title>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -50,7 +50,7 @@ button,input,select{font:inherit}
 button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
 /* =========================================================
-   🚀 WELCOME HOMEPAGE PORTAL (LANDING SCREEN)
+   🚀 WELCOME HOMEPAGE PORTAL
 ========================================================= */
 #welcomePortal{
   position:fixed;inset:0;z-index:999999;
@@ -124,9 +124,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   border:2px solid rgba(59,130,246,.4);
   animation:radarPulse 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
 }
-.ometv-radar-ring:nth-child(2){
-  animation-delay:.6s;
-}
+.ometv-radar-ring:nth-child(2){animation-delay:.6s}
 @keyframes radarPulse{
   0%{transform:scale(0.8);opacity:1}
   100%{transform:scale(1.7);opacity:0}
@@ -145,8 +143,8 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .loader-app-name{
   font-size:24px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:4px;
 }
-.loader-dev-badge{
-  font-size:10px;font-weight:800;color:#38bdf8;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:30px;
+.loader-tagline{
+  font-size:10px;font-weight:800;color:#38bdf8;text-transform:uppercase;letter-spacing:2px;margin-bottom:30px;
 }
 .loader-progress-track{
   width:100%;height:6px;background:rgba(255,255,255,.09);border-radius:999px;
@@ -176,16 +174,11 @@ header{
   border-radius:10px;background:linear-gradient(135deg,#3b82f6,#ec4899);
   box-shadow:0 0 18px rgba(236,72,153,.45);
 }
-.jm-dev-badge{
-  display:inline-flex;align-items:center;gap:5px;padding:4px 9px;
-  font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;
-  border-radius:999px;background:linear-gradient(135deg,#ff007a,#7928ca,#00f0ff);
-  background-size:200% 200%;color:#fff;border:1px solid rgba(255,255,255,.4);
-  box-shadow:0 0 15px rgba(255,0,122,.45);animation:jmPulse 3s ease infinite;user-select:none;
-}
-@keyframes jmPulse{
-  0%,100%{filter:drop-shadow(0 0 8px #ff007a) hue-rotate(0deg)}
-  50%{filter:drop-shadow(0 0 12px #00f0ff) hue-rotate(90deg)}
+.global-badge{
+  display:inline-flex;align-items:center;gap:4px;padding:3px 8px;
+  font-size:9px;font-weight:900;letter-spacing:1px;text-transform:uppercase;
+  border-radius:999px;background:linear-gradient(135deg,rgba(59,130,246,.25),rgba(236,72,153,.25));
+  border:1px solid rgba(255,255,255,.15);color:#38bdf8;user-select:none;
 }
 .header-right{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
 .badge{
@@ -222,6 +215,11 @@ select option{background:#0f172a;color:#fff}
 video{
   display:block;width:100%;height:100%;object-fit:cover;object-position:center center;
   background:#000;border:0;outline:0;transition:opacity .15s ease;
+}
+
+/* 🌟 OMETV-STYLE CLEAN CAMERA BRIGHTNESS & TONE */
+#localVideo{
+  filter: brightness(1.12) contrast(1.06) saturate(1.12);
 }
 #localVideo.mirrored{transform:scaleX(-1)}
 #localVideo.unmirrored{transform:scaleX(1)}
@@ -263,7 +261,7 @@ video{
 #searchText{color:#e2e8f0;font-size:13px;font-weight:800}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* CONTROLS BAR (No Light Button) */
+/* CONTROLS BAR */
 .controls-bar{display:flex;gap:7px;padding:2px}
 .btn{
   min-height:46px;padding:10px 14px;border:1px solid rgba(255,255,255,.06);
@@ -382,7 +380,6 @@ video{
   header{min-height:58px;height:auto;padding:8px 10px;gap:6px}
   .brand{font-size:16px;gap:6px}
   .brand-icon{width:28px;height:28px;border-radius:8px}
-  .jm-dev-badge{font-size:8px;padding:2px 6px}
   .header-right{gap:4px;flex-wrap:wrap}
   .badge{min-height:28px;padding:4px 7px;font-size:10px}
   .timer-label{display:none}
@@ -437,18 +434,18 @@ video{
 <body>
 
 <!-- =========================================================
-     🚀 WELCOME HOMEPAGE PORTAL (LANDING SCREEN)
+     🚀 WELCOME HOMEPAGE PORTAL
 ========================================================= -->
 <div id="welcomePortal">
   <div class="portal-card">
     <div class="portal-logo-ring">🔄</div>
     <h1 class="portal-title">MeetLoop</h1>
-    <div class="portal-subtitle">Powered by Jm Devs • Random Video Chat</div>
+    <div class="portal-subtitle">Global Random Video Chat</div>
 
     <ul class="portal-rules-box">
       <li>🔞 <b>18+ Only:</b> You must be 18 years or older to enter.</li>
       <li>🚫 <b>Strict Zero Tolerance:</b> No nudity, sexual acts, or harassment.</li>
-      <li>📷 <b>Live Face Only:</b> Your camera must show you, live.</li>
+      <li>📷 <b>Live Face Only:</b> Your camera must show your real human face.</li>
       <li>💬 <b>No Dating Requests:</b> Do not ask for gender or use as a dating app.</li>
       <li>⚡ <b>5-Strike System:</b> Violators will be banned automatically.</li>
     </ul>
@@ -472,7 +469,7 @@ video{
     </div>
     
     <div class="loader-app-name">MeetLoop</div>
-    <div class="loader-dev-badge">⚡ POWERED BY JM DEVS</div>
+    <div class="loader-tagline">GLOBAL NETWORK</div>
 
     <div class="loader-progress-track">
       <div class="loader-progress-bar" id="loaderProgressBar"></div>
@@ -530,7 +527,7 @@ video{
   <div class="duplicate-box">
     <div class="dup-icon">⚠️</div>
     <div class="dup-title">MeetLoop Open in Another Tab</div>
-    <div class="dup-desc">Bawal ang dalawang tab nang sabay para iwas lag at conflict sa camera. <b>Itinigil ang session sa tab na ito ni Jm Devs.</b></div>
+    <div class="dup-desc">Bawal ang dalawang tab nang sabay para iwas lag at conflict sa camera. <b>Session paused in this tab.</b></div>
     <button class="dup-btn" id="reclaimSessionBtn" type="button">⚡ Gamitin Dito (Use Here)</button>
   </div>
 </div>
@@ -542,7 +539,7 @@ video{
   <div class="brand">
     <span class="brand-icon">🔄</span>
     <span>MeetLoop</span>
-    <span class="jm-dev-badge">⚡ by Jm Devs</span>
+    <span class="global-badge">🌐 GLOBAL</span>
   </div>
   <div class="header-right">
     <div class="badge online">🟢 <span id="onlineLabel">Online:</span>&nbsp;<span id="onlineCount">0</span></div>
@@ -618,7 +615,7 @@ video{
   <div class="chat-wrapper">
     <div class="chat-header">
       <span id="chatHeader">💬 Live Chat</span>
-      <span style="font-size:10px;color:var(--muted);font-weight:700">⚡ Jm Devs Core</span>
+      <span style="font-size:10px;color:var(--muted);font-weight:700">⚡ MeetLoop Engine</span>
     </div>
     <div class="chat-messages" id="chatMessages">
       <div class="message">
@@ -627,9 +624,9 @@ video{
 <b>Welcome to MeetLoop.</b>
 18+ You must be 18 or older
 No nudity, hate speech, or harassment
-Your camera must show you, live
+Your camera must show your face, live
 Do not ask for gender — this is not a dating site
-Violators will be banned</div>
+Violators will be permanently banned</div>
       </div>
     </div>
     <div class="chat-input-area">
@@ -652,18 +649,15 @@ window.enterMeetLoop = function() {
   const pBar = document.getElementById("loaderProgressBar");
   const sText = document.getElementById("loaderStatusText");
 
-  // Itago ang landing portal
   if (portal) {
     portal.classList.add("portal-hidden");
     portal.style.display = "none";
   }
 
-  // Ipakita ang OmeTV Loading Screen
   if (loader) {
     loader.style.display = "flex";
   }
 
-  // Ligtas na i-unlock ang audio
   try {
     const ra = document.getElementById("remoteAudio");
     if (ra) {
@@ -672,21 +666,19 @@ window.enterMeetLoop = function() {
     }
   } catch(e) {}
 
-  // Simulan ang camera habang naglo-load
   const mediaPromise = startMedia().catch(e => console.warn(e));
 
-  // Sequence ng Loading Animation
   pBar.style.width = "25%";
-  sText.textContent = "Connecting to network...";
+  sText.textContent = "Connecting to global network...";
 
   setTimeout(() => {
     pBar.style.width = "55%";
-    sText.textContent = "Initializing camera & audio hardware...";
+    sText.textContent = "Calibrating HD video & audio hardware...";
   }, 450);
 
   setTimeout(() => {
     pBar.style.width = "85%";
-    sText.textContent = "Applying security & community protection...";
+    sText.textContent = "Applying real-time community protection...";
   }, 950);
 
   setTimeout(async () => {
@@ -706,7 +698,7 @@ window.enterMeetLoop = function() {
 };
 
 /* =========================================================
-   1. 18+ BAN SECURITY & OMETV REPORT ENGINE
+   1. 18+ BAN SECURITY & REPORT ENGINE
 ========================================================= */
 const bannedOverlay = document.getElementById("bannedOverlay");
 const banCountdown = document.getElementById("banCountdown");
@@ -804,7 +796,7 @@ secretUnbanIcon.addEventListener("click", () => {
   if (banClickCount >= 3) {
     localStorage.removeItem("meetloop_ban_until");
     localStorage.setItem("meetloop_strikes", "0");
-    alert("Admin Verified: Device Unbanned!");
+    alert("System: Device Unbanned!");
     location.reload();
   }
 });
@@ -816,7 +808,7 @@ window.unban = function() {
 };
 
 /* =========================================================
-   2. RELIABLE HUMAN FACE & LIVENESS DETECTOR (FIXED)
+   2. STRICT ANTI-CHEAT HUMAN FACE & LIVENESS DETECTOR
 ========================================================= */
 const faceModalOverlay = document.getElementById("faceModalOverlay");
 const closeFaceModalBtn = document.getElementById("closeFaceModalBtn");
@@ -844,63 +836,90 @@ async function verifyStrictHumanFace() {
     return false;
   }
 
-  // 1. Gamitin ang Native Chrome/Android AI FaceDetector API kung available
+  // 1. HARDWARE AI FACE DETECTOR (Chrome, Android, Edge)
   if ('FaceDetector' in window) {
     try {
       const detector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 2 });
       const faces = await detector.detect(localVideo);
+      
+      // Kung sumuporta ang browser pero walang makitang mukha, BAWAL PUMASOK
       if (faces && faces.length > 0) {
-        return true;
+        const f = faces[0].boundingBox;
+        // Siguraduhing totoong tao at hindi napakalayong tuldok (minimum 12% ng screen)
+        if (f.width >= localVideo.videoWidth * 0.12 && f.height >= localVideo.videoHeight * 0.12) {
+          return true;
+        }
       }
+      return false; // Native face check failed!
     } catch(err) {
-      console.warn("Native FaceDetector fallback triggered:", err);
+      console.warn("Falling back to advanced facial variance:", err);
     }
   }
 
-  // 2. Adaptive Vision Fallback Engine
+  // 2. ADVANCED ANTI-WALL / ANTI-OBJECT TEXTURE ENGINE
   try {
     const canvas = document.createElement("canvas");
-    canvas.width = 72;
-    canvas.height = 54;
+    const W = 96, H = 72;
+    canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    ctx.drawImage(localVideo, 0, 0, 72, 54);
+    ctx.drawImage(localVideo, 0, 0, W, H);
 
-    const frame = ctx.getImageData(0, 0, 72, 54).data;
+    const frame = ctx.getImageData(0, 0, W, H).data;
+    const totalPixels = W * H;
+
     let totalLuma = 0;
-    let skinToneMatches = 0;
-    let totalPixels = 72 * 54;
-    let centerSkinPixels = 0;
+    let lumaValues = new Float32Array(totalPixels);
+    let skinMatches = 0;
+    let centerSkinMatches = 0;
 
-    for (let i = 0; i < frame.length; i += 4) {
+    for (let i = 0, p = 0; i < frame.length; i += 4, p++) {
       const r = frame[i], g = frame[i+1], b = frame[i+2];
       const y = 0.299 * r + 0.587 * g + 0.114 * b;
+      lumaValues[p] = y;
       totalLuma += y;
 
       const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
       const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
 
-      if (cb >= 70 && cb <= 140 && cr >= 125 && cr <= 185 && y >= 25 && y <= 245) {
-        skinToneMatches++;
-        const pixelIdx = i / 4;
-        const x = pixelIdx % 72;
-        const yCoord = Math.floor(pixelIdx / 72);
-        if (x >= 18 && x <= 54 && yCoord >= 10 && yCoord <= 44) {
-          centerSkinPixels++;
+      // Real human facial tone color boundary
+      if (cb >= 75 && cb <= 135 && cr >= 130 && cr <= 180 && y >= 32 && y <= 235) {
+        skinMatches++;
+        const x = p % W;
+        const yCoord = Math.floor(p / W);
+        // Face focal zone
+        if (x >= W * 0.20 && x <= W * 0.80 && yCoord >= H * 0.15 && yCoord <= H * 0.85) {
+          centerSkinMatches++;
         }
       }
     }
 
     const avgLuma = totalLuma / totalPixels;
-    if (avgLuma < 15 || avgLuma > 248) return false;
 
-    const overallRatio = skinToneMatches / totalPixels;
-    if (overallRatio >= 0.06 || centerSkinPixels >= 40) {
-      return true;
+    // A. Sobrang dilim o putok sa puti (Tinatakpan ang camera o tinutok sa bumbilya)
+    if (avgLuma < 25 || avgLuma > 235) return false;
+
+    // B. Variance Check: Ang mukha ay may mata, kilay, ilong, at anino (Hindi makinis tulad ng pader o kisame)
+    let varianceSum = 0;
+    for (let p = 0; p < totalPixels; p++) {
+      const diff = lumaValues[p] - avgLuma;
+      varianceSum += diff * diff;
+    }
+    const lumaVariance = varianceSum / totalPixels;
+
+    // Kapag mababa ang variance (< 110), ito ay pader, kisame, damit, o patag na bagay!
+    if (lumaVariance < 110) {
+      return false;
     }
 
-    return false;
-  } catch(e) {
+    // C. Density Check: Kailangan may buong mukha sa gitna ng camera
+    const centerRatio = centerSkinMatches / (W * H * 0.42);
+    if (centerRatio < 0.16) {
+      return false;
+    }
+
     return true;
+  } catch(e) {
+    return false;
   }
 }
 
@@ -986,7 +1005,7 @@ const translations = {
     waiting: "Waiting...",
     searching: "Searching...",
     finding: "Finding someone...",
-    verifying: "Checking face...",
+    verifying: "Verifying live face...",
     waitingPartner: "Waiting for someone...",
     connected: "Connected",
     live: "Live",
@@ -1002,9 +1021,9 @@ const translations = {
     camOff: "🚫 Cam Off",
     flip: "🔄 Flip",
     showCam: "Show Cam",
-    faceModalTitle: "Human Face Required",
-    faceModalDesc: "Face required to start matching! Inanimate objects, walls, ceilings, or covered lenses are not allowed. Please face the camera properly.",
-    faceModalBtn: "Got it, I'll face the camera",
+    faceModalTitle: "Real Human Face Required",
+    faceModalDesc: "Face detection failed! Walls, ceilings, objects, or covered cameras are strictly not allowed. Please look directly into the camera.",
+    faceModalBtn: "Got it, I will face the camera",
     chatHeader: "💬 Live Chat",
     inputPlaceholder: "Type a message...",
     send: "Send",
@@ -1036,7 +1055,7 @@ const translations = {
     flip: "🔄 Iikot",
     showCam: "Ipakita Cam",
     faceModalTitle: "Kailangan ng Totoong Mukha ng Tao",
-    faceModalDesc: "Bawal mag-start nang walang totoong mukha ng tao. Bawal ang pader, damit, lamesa, o kung anu-anong bagay. Paki-itapat ang iyong mukha sa camera.",
+    faceModalDesc: "Bawal mag-start nang walang totoong mukha ng tao. Bawal ang pader, damit, lamesa, kisame o kung anu-anong bagay. Paki-itapat nang maayos ang mukha sa camera.",
     faceModalBtn: "OK, Itatapat ko ang mukha ko",
     chatHeader: "💬 Usapan",
     inputPlaceholder: "Mag-type ng mensahe...",
@@ -1284,7 +1303,7 @@ try {
     });
   }
 } catch(e) {
-  console.warn("Socket.io initialize note:", e);
+  console.warn("Socket.io note:", e);
 }
 
 const localVideo = document.getElementById("localVideo");
@@ -1415,6 +1434,18 @@ async function startMedia() {
     localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
     await localVideo.play().catch(() => {});
     
+    // Auto-adjust hardware exposure if supported
+    const vTrack = localStream.getVideoTracks()[0];
+    if (vTrack && vTrack.getCapabilities) {
+      try {
+        const caps = vTrack.getCapabilities();
+        if (caps.exposureCompensation) {
+          const maxEV = Math.min(caps.exposureCompensation.max || 1.0, 1.0);
+          vTrack.applyConstraints({ advanced: [{ exposureCompensation: maxEV }] }).catch(() => {});
+        }
+      } catch(e) {}
+    }
+
     updateMediaButtons();
     return true;
   } catch (error) {
@@ -1790,7 +1821,7 @@ function sendMessage() {
   if (text === "/unban") {
     localStorage.removeItem("meetloop_ban_until");
     localStorage.setItem("meetloop_strikes", "0");
-    alert("Admin Verified: Unbanned.");
+    alert("System: Device Unbanned.");
     location.reload();
     return;
   }
