@@ -36,7 +36,7 @@ html,body{width:100%;height:100%}
 body{
   font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   color:var(--text);
-  background:radial-gradient(circle at top left,rgba(37,99,235,.18),transparent 30%),radial-gradient(circle at bottom right,rgba(236,72,153,.15),transparent 28%),var(--bg);
+  background:radial-gradient(circle at top left,rgba(37,99,235,.15),transparent 30%),radial-gradient(circle at bottom right,rgba(236,72,153,.12),transparent 28%),var(--bg);
   overflow:hidden;
   -webkit-font-smoothing:antialiased;
 }
@@ -44,12 +44,12 @@ button,input,select{font:inherit}
 button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
 header{
-  height:68px;
+  height:62px;
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:12px;
-  padding:0 20px;
+  padding:0 18px;
   background:rgba(15,23,42,.92);
   border-bottom:1px solid var(--border);
   backdrop-filter:blur(14px);
@@ -57,11 +57,11 @@ header{
   position:relative;
   z-index:20;
 }
-.brand{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:900;white-space:nowrap}
+.brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:900;white-space:nowrap}
 .brand-icon{
-  width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+  width:34px;height:34px;display:flex;align-items:center;justify-content:center;
   border-radius:10px;background:linear-gradient(135deg,#3b82f6,#ec4899);
-  box-shadow:0 0 20px rgba(236,72,153,.45);
+  box-shadow:0 0 18px rgba(236,72,153,.45);
 }
 
 /* 🔥 MAANGAS NA JM DEVS BADGE */
@@ -69,7 +69,7 @@ header{
   display:inline-flex;
   align-items:center;
   gap:5px;
-  padding:4px 10px;
+  padding:3px 9px;
   font-size:10px;
   font-weight:900;
   letter-spacing:1px;
@@ -79,45 +79,52 @@ header{
   background-size:200% 200%;
   color:#fff;
   border:1px solid rgba(255,255,255,.4);
-  box-shadow:0 0 15px rgba(255,0,122,.5),inset 0 0 6px rgba(255,255,255,.3);
+  box-shadow:0 0 15px rgba(255,0,122,.45),inset 0 0 6px rgba(255,255,255,.3);
   animation:jmPulse 3s ease infinite;
   user-select:none;
 }
 @keyframes jmPulse{
   0%,100%{filter:drop-shadow(0 0 8px #ff007a) hue-rotate(0deg)}
-  50%{filter:drop-shadow(0 0 14px #00f0ff) hue-rotate(90deg)}
+  50%{filter:drop-shadow(0 0 12px #00f0ff) hue-rotate(90deg)}
 }
 
 .header-right{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
 .badge{
-  min-height:34px;display:inline-flex;align-items:center;justify-content:center;
-  padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.055);
-  border:1px solid var(--border);font-size:12px;font-weight:700;white-space:nowrap;
+  min-height:32px;display:inline-flex;align-items:center;justify-content:center;
+  padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.055);
+  border:1px solid var(--border);font-size:11px;font-weight:700;white-space:nowrap;
 }
 .online{color:#86efac}
 #statusBadge{color:#cbd5e1}
 
 select{
-  min-height:34px;padding:6px 12px;color:#fff;background:rgba(255,255,255,.08);
-  border:1px solid var(--border-strong);border-radius:9px;outline:none;cursor:pointer;
-  font-weight:700;font-size:12px;
+  min-height:32px;padding:5px 10px;color:#fff;background:rgba(255,255,255,.08);
+  border:1px solid var(--border-strong);border-radius:8px;outline:none;cursor:pointer;
+  font-weight:700;font-size:11px;
 }
 select option{background:#0f172a;color:#fff}
 
-#callTimer{gap:7px;transition:color .25s,background .25s,border-color .25s,box-shadow .25s}
+#callTimer{gap:6px;transition:color .25s,background .25s,border-color .25s,box-shadow .25s}
 .timer-dot{width:7px;height:7px;border-radius:50%;background:#64748b;flex:0 0 auto}
 .timer-label{color:#94a3b8;font-size:9px;font-weight:900;letter-spacing:.8px}
-.timer-time{min-width:58px;font-size:12px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.6px}
+.timer-time{min-width:54px;font-size:11px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.6px}
 #callTimer.active{color:#fecaca;background:linear-gradient(135deg,rgba(239,68,68,.16),rgba(239,68,68,.06));border-color:rgba(239,68,68,.25);box-shadow:0 8px 25px rgba(239,68,68,.08)}
 #callTimer.active .timer-dot{background:var(--red);animation:timerPulse 1.5s infinite}
 @keyframes timerPulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}70%{box-shadow:0 0 0 7px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
 
-.main-container{width:100%;height:calc(100vh - 68px);display:flex;gap:12px;padding:12px}
-.video-wrapper{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px}
-.videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:10px}
-.video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#000;border:1px solid var(--border);border-radius:18px;box-shadow:0 12px 35px rgba(0,0,0,.45);transition:all .25s ease}
+/* 🔥 MAIN CONTAINER (OMETV 2-COLUMN DESKTOP / STACKED MOBILE) */
+.main-container{width:100%;height:calc(100vh - 62px);display:flex;gap:10px;padding:10px}
+.video-wrapper{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:8px}
 
-/* 🎯 NATURAL OMETV VIDEO RENDERING (ZERO ZOOM, ZERO LAG) */
+/* TRUE OMETV DUAL-SCREEN ARENA */
+.videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:8px}
+.video-box{
+  position:relative;flex:1;min-width:0;min-height:0;
+  overflow:hidden;background:#030712;border:1px solid var(--border);
+  border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+
+/* OMETV NATURAL VIDEO (ZERO ZOOM CROP) */
 video{
   display:block;
   width:100%;
@@ -130,19 +137,18 @@ video{
 }
 #localVideo{transform:scaleX(-1)}
 
-/* Hide/Show camera controls */
+/* Hide camera button */
 #hideLocalBtn{
-  position:absolute;top:6px;right:6px;z-index:8;width:24px;height:24px;
+  position:absolute;top:8px;right:8px;z-index:8;width:26px;height:26px;
   border-radius:50%;background:rgba(0,0,0,.68);color:#fff;border:1px solid rgba(255,255,255,.3);
-  font-size:10px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:all .2s;backdrop-filter:blur(6px);
 }
 #hideLocalBtn:hover{background:rgba(239,68,68,.9);transform:scale(1.05)}
-#hideLocalBtn:active{transform:scale(.92)}
 
 #showLocalBtn{
-  position:absolute;right:12px;bottom:12px;z-index:7;display:none;
-  align-items:center;gap:6px;padding:9px 14px;border-radius:999px;
+  position:absolute;right:12px;bottom:12px;z-index:9;display:none;
+  align-items:center;gap:6px;padding:8px 14px;border-radius:999px;
   background:rgba(15,23,42,.92);border:1px solid rgba(59,130,246,.5);
   color:#fff;font-size:11px;font-weight:800;cursor:pointer;
   box-shadow:0 0 15px rgba(59,130,246,.4);backdrop-filter:blur(10px);
@@ -150,56 +156,57 @@ video{
 #showLocalBtn:hover{background:rgba(37,99,235,.95)}
 
 .video-label{
-  position:absolute;left:10px;top:10px;z-index:4;padding:6px 11px;
+  position:absolute;left:10px;top:10px;z-index:4;padding:5px 10px;
   background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.12);
-  border-radius:10px;font-size:12px;font-weight:800;pointer-events:none;
+  border-radius:8px;font-size:11px;font-weight:800;pointer-events:none;
   backdrop-filter:blur(6px);
 }
 .status{
-  position:absolute;left:10px;bottom:10px;z-index:4;padding:6px 11px;
+  position:absolute;left:10px;bottom:10px;z-index:4;padding:5px 10px;
   background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.12);
-  border-radius:10px;color:#e2e8f0;font-size:11px;font-weight:700;pointer-events:none;
+  border-radius:8px;color:#e2e8f0;font-size:10px;font-weight:700;pointer-events:none;
   backdrop-filter:blur(6px);
 }
 
 .search-overlay{
   position:absolute;inset:0;z-index:10;display:none;align-items:center;
-  justify-content:center;background:rgba(2,6,23,.82);backdrop-filter:blur(4px);
+  justify-content:center;background:rgba(2,6,23,.85);backdrop-filter:blur(4px);
   -webkit-backdrop-filter:blur(4px);
 }
-.search-box{min-width:230px;padding:24px;text-align:center;background:rgba(15,23,42,.9);border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 15px 35px rgba(0,0,0,.5)}
-.spinner{width:42px;height:42px;margin:0 auto 14px;border:4px solid rgba(255,255,255,.1);border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite}
-#searchText{color:#e2e8f0;font-size:13px;font-weight:800}
+.search-box{min-width:220px;padding:22px;text-align:center;background:rgba(15,23,42,.92);border:1px solid rgba(255,255,255,.12);border-radius:16px}
+.spinner{width:38px;height:38px;margin:0 auto 12px;border:3px solid rgba(255,255,255,.1);border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite}
+#searchText{color:#e2e8f0;font-size:12px;font-weight:800}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.controls-bar{display:flex;gap:8px;padding:2px}
+/* OMETV STYLE BOTTOM ACTION BAR */
+.controls-bar{display:flex;gap:7px;padding:2px}
 .btn{
-  min-height:46px;padding:11px 15px;border:1px solid rgba(255,255,255,.06);
-  border-radius:12px;color:#fff;background:var(--panel);cursor:pointer;font-size:13px;
+  min-height:46px;padding:10px 14px;border:1px solid rgba(255,255,255,.06);
+  border-radius:11px;color:#fff;background:var(--panel);cursor:pointer;font-size:13px;
   font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;
   user-select:none;transition:transform .12s,filter .2s,opacity .2s;
 }
 .btn:hover:not(:disabled){filter:brightness(1.15)}
 .btn:active:not(:disabled){transform:scale(.98)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
-.btn-loop{flex:1.5;background:linear-gradient(135deg,var(--blue),var(--blue2));box-shadow:0 6px 20px rgba(37,99,235,.3)}
+.btn-loop{flex:1.8;background:linear-gradient(135deg,var(--blue),var(--blue2));box-shadow:0 6px 20px rgba(37,99,235,.3)}
 .btn-stop{flex:1;background:linear-gradient(135deg,#dc2626,#ef4444)}
-.btn-toggle{flex:1;background:rgba(255,255,255,.07)}
-.btn-flip{display:none;flex:1;background:linear-gradient(135deg,#7c3aed,#8b5cf6)}
+.btn-toggle{flex:0.8;background:rgba(255,255,255,.07)}
+.btn-flip{display:none;flex:0.8;background:linear-gradient(135deg,#7c3aed,#8b5cf6)}
 
 .chat-wrapper{
   width:320px;max-width:320px;min-height:0;display:flex;flex-direction:column;
   overflow:hidden;background:rgba(15,23,42,.92);border:1px solid var(--border);
-  border-radius:18px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-radius:14px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
 }
-.chat-header{padding:14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:space-between}
+.chat-header{padding:12px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:space-between}
 .chat-messages{flex:1;min-height:0;padding:12px;overflow-y:auto;overscroll-behavior:contain}
-.message{margin-bottom:12px;word-break:break-word}
-.message-name{margin-bottom:4px;color:var(--muted);font-size:10px;font-weight:800}
+.message{margin-bottom:10px;word-break:break-word}
+.message-name{margin-bottom:3px;color:var(--muted);font-size:10px;font-weight:800}
 .message-text{
-  display:inline-block;max-width:96%;padding:10px 13px;color:#f8fafc;
-  background:rgba(255,255,255,.08);border-radius:12px;font-size:12px;
-  line-height:1.48;white-space:pre-wrap;
+  display:inline-block;max-width:96%;padding:9px 12px;color:#f8fafc;
+  background:rgba(255,255,255,.08);border-radius:10px;font-size:12px;
+  line-height:1.45;white-space:pre-wrap;
 }
 .dev-banner{
   background:linear-gradient(135deg,rgba(255,0,122,.15),rgba(0,240,255,.15));
@@ -207,12 +214,12 @@ video{
 }
 .update-badge{
   display:inline-block;background:linear-gradient(135deg,#ff007a,#7928ca);
-  color:#fff;font-weight:900;font-size:10px;padding:2px 7px;border-radius:6px;margin-bottom:6px;
+  color:#fff;font-weight:900;font-size:9px;padding:2px 6px;border-radius:5px;margin-bottom:5px;
 }
-.chat-input-area{display:flex;gap:6px;padding:10px;border-top:1px solid var(--border)}
-#chatInput{flex:1;min-width:0;min-height:42px;padding:9px 12px;background:rgba(2,6,23,.64);color:#fff;border:1px solid var(--border-strong);border-radius:10px;outline:none}
+.chat-input-area{display:flex;gap:6px;padding:9px;border-top:1px solid var(--border)}
+#chatInput{flex:1;min-width:0;min-height:40px;padding:8px 11px;background:rgba(2,6,23,.64);color:#fff;border:1px solid var(--border-strong);border-radius:9px;outline:none;font-size:12px}
 #chatInput:focus{border-color:rgba(59,130,246,.7)}
-#sendBtn{min-width:66px;border:0;border-radius:10px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue2));cursor:pointer;font-size:12px;font-weight:800}
+#sendBtn{min-width:62px;border:0;border-radius:9px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue2));cursor:pointer;font-size:12px;font-weight:800}
 
 /* SINGLE TAB TAKEOVER MODAL */
 #duplicateTabOverlay{
@@ -222,64 +229,67 @@ video{
   display:none;align-items:center;justify-content:center;padding:20px;
 }
 .duplicate-box{
-  max-width:420px;width:100%;padding:32px 24px;text-align:center;
+  max-width:420px;width:100%;padding:30px 22px;text-align:center;
   background:rgba(17,24,39,.9);border:1px solid rgba(239,68,68,.3);
-  border-radius:24px;box-shadow:0 0 50px rgba(239,68,68,.25);
+  border-radius:22px;box-shadow:0 0 50px rgba(239,68,68,.25);
   animation:timerPulse 2s infinite;
 }
-.dup-icon{font-size:48px;margin-bottom:12px}
-.dup-title{font-size:19px;font-weight:900;color:#fecaca;margin-bottom:8px}
-.dup-desc{font-size:13px;color:#cbd5e1;line-height:1.5;margin-bottom:20px}
+.dup-icon{font-size:46px;margin-bottom:12px}
+.dup-title{font-size:18px;font-weight:900;color:#fecaca;margin-bottom:8px}
+.dup-desc{font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:18px}
 .dup-btn{
-  width:100%;min-height:48px;font-size:14px;font-weight:900;
-  border-radius:12px;border:0;cursor:pointer;color:#fff;
+  width:100%;min-height:46px;font-size:13px;font-weight:900;
+  border-radius:11px;border:0;cursor:pointer;color:#fff;
   background:linear-gradient(135deg,#2563eb,#3b82f6);
   box-shadow:0 6px 20px rgba(37,99,235,.4);transition:transform .12s;
 }
 .dup-btn:active{transform:scale(.97)}
 
-/* 🎯 OMETV PROPORTIONAL RATIO (WALANG ZOOM CROP, BUONG MUKHA AT BALIKAT KITA) */
+/* 🔥 TRUE OMETV MOBILE EXPERIENCE (50/50 SPLIT SCREEN: STRANGER TOP, YOU BOTTOM) */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto;overflow-x:hidden}
-  header{min-height:58px;height:auto;padding:8px 10px;gap:6px}
-  .brand{font-size:16px;gap:6px}
+  header{min-height:54px;height:auto;padding:6px 10px;gap:6px}
+  .brand{font-size:15px;gap:6px}
   .brand-icon{width:26px;height:26px;border-radius:7px}
-  .jm-dev-badge{font-size:9px;padding:3px 7px}
+  .jm-dev-badge{font-size:8px;padding:2px 6px}
   .header-right{gap:4px;flex-wrap:wrap}
-  .badge{min-height:28px;padding:4px 7px;font-size:10px}
+  .badge{min-height:26px;padding:3px 6px;font-size:9px}
   .timer-label{display:none}
-  .timer-time{min-width:48px;font-size:10px}
-  select{min-height:28px;padding:4px 6px;font-size:10px}
-  .main-container{height:auto;min-height:calc(100dvh - 58px);display:flex;flex-direction:column;gap:8px;padding:8px}
-  .video-wrapper{width:100%;flex:none;gap:8px}
-  .videos-grid{position:relative;width:100%;height:min(55dvh,540px);min-height:280px;display:block}
-  .video-box{position:absolute;border-radius:16px}
-  .video-box:first-child{inset:0;width:100%;height:100%}
+  .timer-time{min-width:44px;font-size:9px}
+  select{min-height:26px;padding:3px 5px;font-size:9px}
+  .main-container{height:auto;min-height:calc(100dvh - 54px);display:flex;flex-direction:column;gap:6px;padding:6px}
+  .video-wrapper{width:100%;flex:none;gap:6px}
 
-  /* SAKTONG 3:4 MOBILE RATIO: Sakto sa camera ng cellphone, zero crop, hindi nakadikit sa mukha */
-  #localVideoBox{
-    right:10px;
-    bottom:10px;
-    width:30vw;
-    max-width:130px;
-    aspect-ratio:3 / 4;
-    height:auto;
-    z-index:6;
-    border:2.5px solid rgba(255,255,255,.9);
-    box-shadow:0 8px 24px rgba(0,0,0,.65);
-    border-radius:14px;
+  /* OMETV MOBILE 50/50 SPLIT CONTAINER */
+  .videos-grid{
+    display:flex;
+    flex-direction:column;
+    width:100%;
+    height:min(58dvh,560px);
+    min-height:320px;
+    gap:6px;
   }
+  .video-box{
+    position:relative;
+    width:100%;
+    flex:1;
+    min-height:0;
+    border-radius:12px;
+  }
+
+  /* OmeTV Native proportions */
   #localVideoBox.camera-hidden{display:none !important}
-  .video-label{left:7px;top:7px;padding:4px 7px;font-size:10px}
-  .status{left:7px;bottom:7px;padding:4px 7px;font-size:9px}
-  .controls-bar{width:100%;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:0}
-  .btn{width:100%;min-height:46px;padding:8px 6px;border-radius:10px;font-size:11px}
-  .btn-loop,.btn-stop,.btn-toggle{flex:none}
+  .video-label{left:6px;top:6px;padding:3px 7px;font-size:9px}
+  .status{left:6px;bottom:6px;padding:3px 7px;font-size:8px}
+  
+  .controls-bar{width:100%;display:grid;grid-template-columns:1.5fr 1fr 0.8fr 0.8fr 0.8fr;gap:5px;padding:0}
+  .btn{width:100%;min-height:44px;padding:6px 4px;border-radius:9px;font-size:11px}
   .btn-flip{display:flex}
-  .chat-wrapper{width:100%;max-width:none;height:260px;min-height:260px;border-radius:14px}
-  .chat-header{padding:10px;font-size:12px}
-  .chat-messages{padding:9px}
-  .chat-input-area{padding:8px}
+
+  .chat-wrapper{width:100%;max-width:none;height:240px;min-height:240px;border-radius:12px}
+  .chat-header{padding:8px 10px;font-size:11px}
+  .chat-messages{padding:8px}
+  .chat-input-area{padding:6px}
 }
 </style>
 </head>
@@ -325,8 +335,10 @@ video{
 
 <div class="main-container">
   <div class="video-wrapper">
+    <!-- 🔥 TRUE OMETV DUAL ARENA (SPLIT 50/50: STRANGER TOP, YOU BOTTOM) -->
     <div class="videos-grid">
-      <div class="video-box">
+      <!-- Stranger Screen -->
+      <div class="video-box" id="remoteVideoBox">
         <video id="remoteVideo" autoplay playsinline webkit-playsinline muted></video>
         <audio id="remoteAudio" autoplay playsinline></audio>
         <div class="video-label" id="remoteLabel">👤 Stranger</div>
@@ -339,7 +351,7 @@ video{
         </div>
       </div>
 
-      <!-- Local Camera (3:4 Natural OmeTV Ratio) -->
+      <!-- Your Screen (OmeTV View - Wide Angle, No Zoom) -->
       <div class="video-box" id="localVideoBox">
         <video id="localVideo" autoplay muted playsinline webkit-playsinline></video>
         <div class="video-label" id="localLabel">🙂 You</div>
@@ -349,11 +361,12 @@ video{
       <button id="showLocalBtn" type="button">👁️ <span id="showLocalText">Show Cam</span></button>
     </div>
 
+    <!-- Controls -->
     <div class="controls-bar">
-      <button class="btn btn-loop" id="loopBtn" type="button">🔄 Start Loop</button>
+      <button class="btn btn-loop" id="loopBtn" type="button">🔄 Start</button>
       <button class="btn btn-stop" id="stopBtn" type="button" disabled>⏹️ Stop</button>
-      <button class="btn btn-toggle" id="micBtn" type="button">🎙️ Mic On</button>
-      <button class="btn btn-toggle" id="camBtn" type="button">📷 Cam On</button>
+      <button class="btn btn-toggle" id="micBtn" type="button">🎙️ Mic</button>
+      <button class="btn btn-toggle" id="camBtn" type="button">📷 Cam</button>
       <button class="btn btn-flip" id="flipBtn" type="button">🔄 Flip</button>
     </div>
   </div>
@@ -366,12 +379,12 @@ video{
     <div class="chat-messages" id="chatMessages">
       <div class="message">
         <div class="message-name">👑 System • Jm Devs</div>
-        <div class="message-text dev-banner"><span class="update-badge">PRO VERIFIED</span>
+        <div class="message-text dev-banner"><span class="update-badge">OMETV PRO EDITION</span>
 🚀 <b>MeetLoop v3.0 • Built by Jm Devs</b>
-• 📷 <b>OmeTV View:</b> Natural wide-angle FOV (No zoom, full view).
-• ⚡ <b>Zero-Lag & Zero-Delay:</b> Instant real-time video stream.
+• 📺 <b>OmeTV 50/50 View:</b> True dual-screen split (No zoom crop).
+• ⚡ <b>Zero-Lag Engine:</b> Instant real-time video stream.
 • 🔊 <b>Auto Audio:</b> Clear voice with zero delay.
-• 🔒 <b>Single Tab Mode:</b> Protected session.</div>
+• 🔒 <b>Single Tab Mode:</b> 1 tab only protected session.</div>
       </div>
     </div>
     <div class="chat-input-area">
@@ -468,7 +481,7 @@ const translations = {
     disconnected: "Disconnected",
     stopped: "Stopped",
     strangerLeft: "Stranger left",
-    startLoop: "🔄 Start Loop",
+    startLoop: "🔄 Start",
     next: "⏭️ Next",
     stop: "⏹️ Stop",
     micOn: "🎙️ Mic On",
@@ -497,7 +510,7 @@ const translations = {
     disconnected: "Naputol",
     stopped: "Tinigil",
     strangerLeft: "Umalis ang kausap",
-    startLoop: "🔄 Simulan ang Loop",
+    startLoop: "🔄 Simulan",
     next: "⏭️ Kasunod",
     stop: "⏹️ Itigil",
     micOn: "🎙️ Mic Bukas",
@@ -526,13 +539,13 @@ const translations = {
     disconnected: "Desconectado",
     stopped: "Detenido",
     strangerLeft: "El extraño se fue",
-    startLoop: "🔄 Iniciar Loop",
+    startLoop: "🔄 Iniciar",
     next: "⏭️ Siguiente",
     stop: "⏹️ Detener",
-    micOn: "🎙️ Mic Encendido",
-    micOff: "🔇 Mic Apagado",
-    camOn: "📷 Cámara Encendida",
-    camOff: "🚫 Cámara Apagada",
+    micOn: "🎙️ Mic",
+    micOff: "🔇 Mic",
+    camOn: "📷 Cam",
+    camOff: "🚫 Cam",
     flip: "🔄 Girar",
     showCam: "Mostrar Cámara",
     chatHeader: "💬 Chat en vivo",
@@ -555,13 +568,13 @@ const translations = {
     disconnected: "切断されました",
     stopped: "停止",
     strangerLeft: "相手が退出しました",
-    startLoop: "🔄 ループ開始",
+    startLoop: "🔄 開始",
     next: "⏭️ 次へ",
     stop: "⏹️ 停止",
-    micOn: "🎙️ マイクON",
-    micOff: "🔇 マイクOFF",
-    camOn: "📷 カメラON",
-    camOff: "🚫 カメラOFF",
+    micOn: "🎙️ マイク",
+    micOff: "🔇 マイク",
+    camOn: "📷 カメラ",
+    camOff: "🚫 カメラ",
     flip: "🔄 反転",
     showCam: "カメラ表示",
     chatHeader: "💬 ライブチャット",
@@ -587,10 +600,10 @@ const translations = {
     startLoop: "🔄 시작",
     next: "⏭️ 다음",
     stop: "⏹️ 중지",
-    micOn: "🎙️ 마이크 켬",
-    micOff: "🔇 마이크 끔",
-    camOn: "📷 카메라 켬",
-    camOff: "🚫 카메라 끔",
+    micOn: "🎙️ 마이크",
+    micOff: "🔇 마이크",
+    camOn: "📷 카메라",
+    camOff: "🚫 카메라",
     flip: "🔄 전환",
     showCam: "카메라 보기",
     chatHeader: "💬 실시간 채팅",
@@ -613,13 +626,13 @@ const translations = {
     disconnected: "已断开",
     stopped: "已停止",
     strangerLeft: "对方已离开",
-    startLoop: "🔄 开始匹配",
+    startLoop: "🔄 开始",
     next: "⏭️ 下一个",
     stop: "⏹️ 停止",
-    micOn: "🎙️ 麦克风开",
-    micOff: "🔇 麦克风关",
-    camOn: "📷 摄像头开",
-    camOff: "🚫 摄像头关",
+    micOn: "🎙️ 麦克风",
+    micOff: "🔇 麦克风",
+    camOn: "📷 摄像头",
+    camOff: "🚫 摄像头",
     flip: "🔄 翻转",
     showCam: "显示镜头",
     chatHeader: "💬 实时聊天",
@@ -645,10 +658,10 @@ const translations = {
     startLoop: "🔄 Démarrer",
     next: "⏭️ Suivant",
     stop: "⏹️ Arrêter",
-    micOn: "🎙️ Micro Activé",
-    micOff: "🔇 Micro Coupé",
-    camOn: "📷 Caméra Activée",
-    camOff: "🚫 Caméra Coupée",
+    micOn: "🎙️ Micro",
+    micOff: "🔇 Micro",
+    camOn: "📷 Caméra",
+    camOff: "🚫 Caméra",
     flip: "🔄 Tourner",
     showCam: "Afficher Cam",
     chatHeader: "💬 Chat en direct",
@@ -671,13 +684,13 @@ const translations = {
     disconnected: "Terputus",
     stopped: "Berhenti",
     strangerLeft: "Partner telah keluar",
-    startLoop: "🔄 Mulai Loop",
+    startLoop: "🔄 Mulai",
     next: "⏭️ Lanjut",
     stop: "⏹️ Berhenti",
-    micOn: "🎙️ Mic Nyala",
-    micOff: "🔇 Mic Mati",
-    camOn: "📷 Kamera Nyala",
-    camOff: "🚫 Kamera Mati",
+    micOn: "🎙️ Mic",
+    micOff: "🔇 Mic",
+    camOn: "📷 Kamera",
+    camOff: "🚫 Kamera",
     flip: "🔄 Putar",
     showCam: "Tampilkan Cam",
     chatHeader: "💬 Obrolan Langsung",
@@ -840,12 +853,11 @@ function stopCallTimer() {
 }
 
 /* =========================================================
-   4. NATURAL WIDE OMETV CAMERA (NO DIGITAL ZOOM CROP)
+   4. OMETV NATIVE WIDE CAMERA (NATURAL OPTICAL VIEW)
 ========================================================= */
 async function startMedia() {
   if (localStream) return true;
   try {
-    // Standard uncropped 4:3 native camera stream: walang zoom crop!
     localStream = await navigator.mediaDevices.getUserMedia({
       video: { 
         facingMode: currentFacingMode,
@@ -925,7 +937,7 @@ function stopAllRemoteMedia() {
 }
 
 /* =========================================================
-   5. ZERO-DELAY WEBRTC SIGNALING
+   5. ZERO-DELAY SIGNALING
 ========================================================= */
 function setupDataChannel(channel) {
   dataChannel = channel;
