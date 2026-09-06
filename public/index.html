@@ -322,7 +322,7 @@ video{
   cursor:pointer;color:#fff;background:linear-gradient(135deg,#2563eb,#3b82f6);
 }
 
-/* MOBILE */
+/* MOBILE VIEW */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto;overflow-x:hidden}
   header{min-height:58px;height:auto;padding:8px 10px;gap:6px}
@@ -389,10 +389,10 @@ video{
     <div class="portal-subtitle">Random Video Chat</div>
 
     <ul class="portal-rules-box">
-      <li>🔞 <b>18+ Only:</b> Bawal ang menor de edad.</li>
-      <li>🚫 <b>Zero Tolerance Nudity:</b> Automatic 1-Hour Ban Agad!</li>
-      <li>📷 <b>Live Face Only:</b> Bawal takpan ang camera o walang tao.</li>
-      <li>⚡ <b>Single Report Rule:</b> Isang report lang kada stranger.</li>
+      <li>🔞 <b>18+ Only:</b> Minors are strictly prohibited.</li>
+      <li>🚫 <b>Zero Tolerance:</b> Nudity or sexual acts result in an instant 1-hour ban.</li>
+      <li>📷 <b>Live Face Only:</b> Walls, ceilings, or covered cameras are forbidden.</li>
+      <li>⚡ <b>Single Report Limit:</b> Only 1 report allowed per stranger to prevent trolling.</li>
     </ul>
 
     <button class="portal-open-btn" id="openPortalBtn" type="button" onclick="enterMeetLoop()">
@@ -425,15 +425,15 @@ video{
 <div id="reportModalOverlay">
   <div class="report-modal-box">
     <div style="font-size:36px;margin-bottom:6px">🚩</div>
-    <h3 style="font-size:17px;font-weight:900;color:#fecaca;margin-bottom:6px">Report Stranger</h3>
-    <p style="font-size:12px;color:#94a3b8">Piliin ang dahilan ayon sa patakaran:</p>
+    <h3 style="font-size:17px;font-weight:900;color:#fecaca;margin-bottom:6px" id="reportModalTitle">Report Stranger</h3>
+    <p style="font-size:12px;color:#94a3b8" id="reportModalSubtitle">Select a reason according to community rules:</p>
     <div class="report-reasons">
-      <div class="report-opt" onclick="submitReport('Hubad / Nudity')">🔞 Hubad o Sexual Acts (Instant 1-Hour Ban)</div>
-      <div class="report-opt" onclick="submitReport('Menor de Edad')">👶 Menor de edad (&lt;18 Years Old)</div>
-      <div class="report-opt" onclick="submitReport('Bastos / Harassment')">🤬 Bastos, Hate Speech, o Panggugulo</div>
-      <div class="report-opt" onclick="submitReport('Fake Cam / Walang Mukha')">📵 Pader, Kisame, o Walang Mukha</div>
+      <div class="report-opt" onclick="submitReport('Hubad / Nudity')">🔞 Nudity or Sexual Acts (Instant 1-Hour Ban)</div>
+      <div class="report-opt" onclick="submitReport('Menor de Edad')">👶 Underage Person (&lt;18 Years Old)</div>
+      <div class="report-opt" onclick="submitReport('Bastos / Harassment')">🤬 Vulgar Language, Hate Speech, or Harassment</div>
+      <div class="report-opt" onclick="submitReport('Fake Cam / Walang Mukha')">📵 Wall, Ceiling, Object, or Fake Camera</div>
     </div>
-    <button class="btn btn-stop" style="width:100%" onclick="closeReportModal()">Kanselahin (Cancel)</button>
+    <button class="btn btn-stop" style="width:100%" onclick="closeReportModal()" id="cancelReportBtn">Cancel</button>
   </div>
 </div>
 
@@ -446,13 +446,13 @@ video{
       1-Hour Ban Imposed • Rule Violation
     </div>
     <p style="color:#cbd5e1;font-size:13px;line-height:1.5;margin-bottom:16px">
-      Ang iyong koneksyon ay pansamantalang sinuspinde dahil sa paglabag sa Community Guidelines ng MeetLoop.
+      Your connection is temporarily suspended due to a violation of MeetLoop Community Guidelines.
     </p>
     <div class="ban-clock-container">
       <div style="font-size:11px;color:#94a3b8;font-weight:800;margin-bottom:4px">UNBAN IN:</div>
       <div id="banCountdown" style="font-size:38px;font-weight:900;color:#fecaca;font-family:monospace;letter-spacing:3px">60:00</div>
     </div>
-    <div style="font-size:11px;color:#94a3b8">Kusa kang maa-unban pagpatak ng 00:00. Hindi mawawala ang ban kahit mag-refresh ka.</div>
+    <div style="font-size:11px;color:#94a3b8">You will be unbanned automatically when the countdown reaches 00:00. Refreshing will not bypass this ban.</div>
   </div>
 </div>
 
@@ -461,8 +461,8 @@ video{
   <div class="duplicate-box">
     <div class="dup-icon">⚠️</div>
     <div class="dup-title" id="dupTitle">MeetLoop Open in Another Tab</div>
-    <div class="dup-desc" id="dupDesc">Bawal ang dalawang tab nang sabay para iwas lag at conflict sa camera. <b>Session paused in this tab.</b></div>
-    <button class="dup-btn" id="reclaimSessionBtn" type="button">⚡ Gamitin Dito (Use Here)</button>
+    <div class="dup-desc" id="dupDesc">Running multiple tabs at the same time is not allowed to prevent camera conflicts. <b>Session paused in this tab.</b></div>
+    <button class="dup-btn" id="reclaimSessionBtn" type="button">⚡ Use Here</button>
   </div>
 </div>
 
@@ -471,8 +471,8 @@ video{
   <div class="face-modal-card">
     <div class="face-modal-icon">👤</div>
     <div class="face-modal-title" id="faceModalTitle">Human Face Required</div>
-    <div class="face-modal-desc" id="faceModalDesc">Bawal mag-start nang walang mukha ng tao. Paki-itapat nang maayos ang mukha sa camera.</div>
-    <button class="face-modal-btn" id="closeFaceModalBtn" type="button">OK, Itatapat ko</button>
+    <div class="face-modal-desc" id="faceModalDesc">Starting without a real human face is strictly prohibited. Walls, clothes, tables, or ceilings are not allowed. Please look directly at the camera.</div>
+    <button class="face-modal-btn" id="closeFaceModalBtn" type="button">OK, I will face the camera</button>
   </div>
 </div>
 
@@ -491,7 +491,7 @@ video{
       <span class="timer-time" id="callTimerValue">00:00</span>
     </div>
     <select id="languageSelect">
-      <option value="en">English (US)</option>
+      <option value="en" selected>English (US)</option>
       <option value="tl">Tagalog (PH)</option>
       <option value="es">Español (ES)</option>
       <option value="ja">日本語 (JA)</option>
@@ -529,7 +529,7 @@ video{
         <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
         <div id="camOffOverlay">
           <div style="font-size:32px;margin-bottom:4px">📷</div>
-          <div>Camera Off</div>
+          <div id="camOffText">Camera Off</div>
         </div>
         <div class="video-label" id="localLabel">🙂 You</div>
         <button id="hideLocalBtn" type="button">✕</button>
@@ -559,9 +559,9 @@ video{
         <div class="message-name">MeetLoop Guidelines</div>
         <div class="message-text meetloop-rules-card"><span class="rules-badge-tag">🔞 18+ RULES</span>
 <b>Welcome to MeetLoop.</b>
-• 18+ Only. Zero tolerance sa hubad o pambabastos.
-• Automatic 1-Hour Ban sa anumang paglabag.
-• Isang report lang kada stranger para maiwasan ang trip.</div>
+• 18+ Only. Zero tolerance for nudity, sexual acts, or harassment.
+• Automatic 1-Hour Ban upon serious violation.
+• Only 1 report allowed per stranger to avoid abuse.</div>
       </div>
     </div>
     <div class="chat-input-area">
@@ -665,75 +665,156 @@ let banTimerInterval = null;
 let hasReportedCurrentStranger = false;
 let isTabTerminated = false;
 
-/* 8-LANGUAGE TRANSLATION MATRIX */
+/* DEFAULT LANGUAGE: ENGLISH */
+let currentLang = localStorage.getItem("meetloop_lang") || "en";
+
 const translations = {
   en: {
     online: "Online:", ready: "Ready", stranger: "👤 Stranger", you: "🙂 You",
     waiting: "Waiting...", searching: "Searching...", finding: "Finding someone...",
+    verifying: "Verifying face...", waitingPartner: "Waiting for partner...",
     connected: "Connected", live: "Live", disconnected: "Disconnected", stopped: "Stopped",
     strangerLeft: "Stranger left", start: "▶️ Start", next: "⏭️ Next", stop: "⏹️ Stop",
     micOn: "🎙️ Mic On", micOff: "🔇 Mic Off", camOn: "📷 Cam On", camOff: "🚫 Cam Off",
-    flip: "🔄 Flip", showCam: "Show Cam", chatHeader: "💬 Live Chat", inputPlaceholder: "Type a message...", send: "Send"
+    flip: "🔄 Flip", showCam: "Show Cam", chatHeader: "💬 Live Chat", inputPlaceholder: "Type a message...", send: "Send",
+    chatConnected: "Chat connected.", reportedNotice: "✓ Reported",
+    reportedSuccess: "🚩 Stranger reported. Connecting to next person...",
+    alreadyReported: "You have already reported this user.",
+    warningModalTitle: "Human Face Required",
+    warningModalDesc: "Starting without a real human face is strictly prohibited. Please look directly at the camera.",
+    warningModalBtn: "OK, I will face the camera",
+    dupTitle: "MeetLoop Open in Another Tab",
+    dupDesc: "Running multiple tabs at the same time is not allowed. Session paused in this tab.",
+    dupBtn: "⚡ Use Here"
   },
   tl: {
     online: "Online:", ready: "Handa", stranger: "👤 Kausap", you: "🙂 Ikaw",
     waiting: "Naghihintay...", searching: "Naghahanap...", finding: "Naghahanap ng makakausap...",
+    verifying: "Sinusuri ang mukha...", waitingPartner: "Naghihintay ng partner...",
     connected: "Konektado", live: "Live", disconnected: "Naputol", stopped: "Tinigil",
     strangerLeft: "Umalis ang kausap", start: "▶️ Simulan", next: "⏭️ Kasunod", stop: "⏹️ Itigil",
     micOn: "🎙️ Mic Bukas", micOff: "🔇 Mic Naka-off", camOn: "📷 Cam Bukas", camOff: "🚫 Cam Naka-off",
-    flip: "🔄 Iikot", showCam: "Ipakita Cam", chatHeader: "💬 Usapan", inputPlaceholder: "Mag-type ng mensahe...", send: "Ipadala"
+    flip: "🔄 Iikot", showCam: "Ipakita Cam", chatHeader: "💬 Usapan", inputPlaceholder: "Mag-type ng mensahe...", send: "Ipadala",
+    chatConnected: "Konektado na ang chat.", reportedNotice: "✓ Na-report na",
+    reportedSuccess: "🚩 Na-report mo ang user. Nililipat ka na sa susunod...",
+    alreadyReported: "Nai-report mo na ang user na ito.",
+    warningModalTitle: "Kailangan ng Mukha ng Tao",
+    warningModalDesc: "Bawal mag-start nang walang mukha ng tao sa camera. Paki-itapat nang maayos ang iyong mukha.",
+    warningModalBtn: "OK, Itatapat ko",
+    dupTitle: "Bukas ang MeetLoop sa Ibang Tab",
+    dupDesc: "Bawal ang dalawang tab nang sabay. Naka-pause muna ang session dito.",
+    dupBtn: "⚡ Gamitin Dito"
   },
   es: {
     online: "En línea:", ready: "Listo", stranger: "👤 Extraño", you: "🙂 Tú",
     waiting: "Esperando...", searching: "Buscando...", finding: "Buscando a alguien...",
+    verifying: "Verificando rostro...", waitingPartner: "Esperando compañero...",
     connected: "Conectado", live: "En vivo", disconnected: "Desconectado", stopped: "Detenido",
     strangerLeft: "El extraño se fue", start: "▶️ Iniciar", next: "⏭️ Siguiente", stop: "⏹️ Detener",
     micOn: "🎙️ Mic Encendido", micOff: "🔇 Mic Apagado", camOn: "📷 Cámara Encendida", camOff: "🚫 Cámara Apagada",
-    flip: "🔄 Girar", showCam: "Mostrar Cámara", chatHeader: "💬 Chat en vivo", inputPlaceholder: "Escribe un mensaje...", send: "Enviar"
+    flip: "🔄 Girar", showCam: "Mostrar Cámara", chatHeader: "💬 Chat en vivo", inputPlaceholder: "Escribe un mensaje...", send: "Enviar",
+    chatConnected: "Chat conectado.", reportedNotice: "✓ Reportado",
+    reportedSuccess: "🚩 Usuario reportado. Conectando al siguiente...",
+    alreadyReported: "Ya has reportado a este usuario.",
+    warningModalTitle: "Se requiere rostro humano",
+    warningModalDesc: "No se permite iniciar sin un rostro humano real visible. Mire hacia la cámara.",
+    warningModalBtn: "Entendido",
+    dupTitle: "MeetLoop abierto en otra pestaña",
+    dupDesc: "No se permiten múltiples pestañas abiertas. Sesión en pausa aquí.",
+    dupBtn: "⚡ Usar aquí"
   },
   ja: {
     online: "オンライン:", ready: "準備完了", stranger: "👤 相手", you: "🙂 あなた",
     waiting: "待機中...", searching: "検索中...", finding: "相手を探しています...",
+    verifying: "顔を確認中...", waitingPartner: "誰かを待っています...",
     connected: "接続完了", live: "ライブ", disconnected: "切断", stopped: "停止",
     strangerLeft: "相手が退出しました", start: "▶️ 開始", next: "⏭️ 次へ", stop: "⏹️ 停止",
     micOn: "🎙️ マイクON", micOff: "🔇 マイクOFF", camOn: "📷 カメラON", camOff: "🚫 カメラOFF",
-    flip: "🔄 反転", showCam: "カメラ表示", chatHeader: "💬 ライブチャット", inputPlaceholder: "メッセージを入力...", send: "送信"
+    flip: "🔄 反転", showCam: "カメラ表示", chatHeader: "💬 ライブチャット", inputPlaceholder: "メッセージを入力...", send: "送信",
+    chatConnected: "チャットが接続されました。", reportedNotice: "✓ 通報済み",
+    reportedSuccess: "🚩 通報しました。次の人を探しています...",
+    alreadyReported: "すでにこのユーザーを通報しています。",
+    warningModalTitle: "人間の顔が必要です",
+    warningModalDesc: "人間の顔が映っていないと開始できません。カメラを正面に向けてください。",
+    warningModalBtn: "了解しました",
+    dupTitle: "他のタブで開いています",
+    dupDesc: "複数のタブを同時に開くことはできません。このタブは一時停止中です。",
+    dupBtn: "⚡ ここで使用する"
   },
   ko: {
     online: "온라인:", ready: "준비됨", stranger: "👤 상대방", you: "🙂 나",
     waiting: "대기 중...", searching: "검색 중...", finding: "대화 상대를 찾는 중...",
+    verifying: "얼굴 확인 중...", waitingPartner: "상대를 기다리는 중...",
     connected: "연결됨", live: "라이브", disconnected: "연결 끊김", stopped: "정지됨",
     strangerLeft: "상대방이 나갔습니다", start: "▶️ 시작", next: "⏭️ 다음", stop: "⏹️ 중지",
     micOn: "🎙️ 마이크 켬", micOff: "🔇 마이크 끔", camOn: "📷 카메라 켬", camOff: "🚫 카메라 끔",
-    flip: "🔄 전환", showCam: "카메라 보기", chatHeader: "💬 실시간 채팅", inputPlaceholder: "메시지를 입력하세요...", send: "전송"
+    flip: "🔄 전환", showCam: "카메라 보기", chatHeader: "💬 실시간 채팅", inputPlaceholder: "메시지를 입력하세요...", send: "전송",
+    chatConnected: "채팅이 연결되었습니다.", reportedNotice: "✓ 신고됨",
+    reportedSuccess: "🚩 사용자를 신고했습니다. 다음 사람으로 이동합니다...",
+    alreadyReported: "이미 이 사용자를 신고했습니다.",
+    warningModalTitle: "실제 사람 얼굴 필요",
+    warningModalDesc: "실제 얼굴이 보이지 않으면 시작할 수 없습니다. 카메라를 정면으로 바라보세요.",
+    warningModalBtn: "확인했습니다",
+    dupTitle: "다른 탭에서 실행 중",
+    dupDesc: "두 개 이상의 탭을 동시에 사용할 수 없습니다. 현재 탭이 일시 중지되었습니다.",
+    dupBtn: "⚡ 여기서 사용"
   },
   zh: {
     online: "在线:", ready: "就绪", stranger: "👤 陌生人", you: "🙂 你",
     waiting: "等待中...", searching: "寻找中...", finding: "正在寻找聊天对象...",
+    verifying: "正在检测人脸...", waitingPartner: "等待对方加入...",
     connected: "已连接", live: "直播中", disconnected: "已断开", stopped: "已停止",
     strangerLeft: "对方已离开", start: "▶️ 开始", next: "⏭️ 下一个", stop: "⏹️ 停止",
     micOn: "🎙️ 麦克风开", micOff: "🔇 麦克风关", camOn: "📷 摄像头开", camOff: "🚫 摄像头关",
-    flip: "🔄 翻转", showCam: "显示镜头", chatHeader: "💬 实时聊天", inputPlaceholder: "输入消息...", send: "发送"
+    flip: "🔄 翻转", showCam: "显示镜头", chatHeader: "💬 实时聊天", inputPlaceholder: "输入消息...", send: "发送",
+    chatConnected: "聊天已连接。", reportedNotice: "✓ 已举报",
+    reportedSuccess: "🚩 举报成功，正在切换至下一位...",
+    alreadyReported: "您已经举报过此用户。",
+    warningModalTitle: "必须有人脸",
+    warningModalDesc: "镜头前必须出现真人脸部方可开始，请正对摄像头。",
+    warningModalBtn: "我知道了",
+    dupTitle: "已在其他标签页打开",
+    dupDesc: "不能同时开启两个页面，当前页面已暂停会话。",
+    dupBtn: "⚡ 在此页面使用"
   },
   fr: {
     online: "En ligne:", ready: "Prêt", stranger: "👤 Inconnu", you: "🙂 Vous",
     waiting: "En attente...", searching: "Recherche...", finding: "Recherche de quelqu'un...",
+    verifying: "Vérification visage...", waitingPartner: "En attente d'un partenaire...",
     connected: "Connecté", live: "En direct", disconnected: "Déconnecté", stopped: "Arrêté",
     strangerLeft: "L'inconnu est parti", start: "▶️ Démarrer", next: "⏭️ Suivant", stop: "⏹️ Arrêter",
     micOn: "🎙️ Micro Activé", micOff: "🔇 Micro Coupé", camOn: "📷 Caméra Activée", camOff: "🚫 Caméra Coupée",
-    flip: "🔄 Tourner", showCam: "Afficher Cam", chatHeader: "💬 Chat en direct", inputPlaceholder: "Tapez un message...", send: "Envoyer"
+    flip: "🔄 Tourner", showCam: "Afficher Cam", chatHeader: "💬 Chat en direct", inputPlaceholder: "Tapez un message...", send: "Envoyer",
+    chatConnected: "Chat connecté.", reportedNotice: "✓ Signalé",
+    reportedSuccess: "🚩 Utilisateur signalé. Connexion au suivant...",
+    alreadyReported: "Vous avez déjà signalé cet utilisateur.",
+    warningModalTitle: "Visage humain requis",
+    warningModalDesc: "Impossible de commencer sans un vrai visage humain. Regardez la caméra.",
+    warningModalBtn: "Compris",
+    dupTitle: "MeetLoop ouvert dans un autre onglet",
+    dupDesc: "Les onglets multiples ne sont pas autorisés. Session en pause.",
+    dupBtn: "⚡ Utiliser ici"
   },
   id: {
     online: "Online:", ready: "Siap", stranger: "👤 Orang Lain", you: "🙂 Anda",
     waiting: "Menunggu...", searching: "Mencari...", finding: "Mencari seseorang...",
+    verifying: "Memeriksa wajah...", waitingPartner: "Menunggu partner...",
     connected: "Terhubung", live: "Live", disconnected: "Terputus", stopped: "Berhenti",
     strangerLeft: "Partner telah keluar", start: "▶️ Mulai", next: "⏭️ Lanjut", stop: "⏹️ Berhenti",
     micOn: "🎙️ Mic Nyala", micOff: "🔇 Mic Mati", camOn: "📷 Kamera Nyala", camOff: "🚫 Kamera Mati",
-    flip: "🔄 Putar", showCam: "Tampilkan Cam", chatHeader: "💬 Obrolan Langsung", inputPlaceholder: "Ketik pesan...", send: "Kirim"
+    flip: "🔄 Putar", showCam: "Tampilkan Cam", chatHeader: "💬 Obrolan Langsung", inputPlaceholder: "Ketik pesan...", send: "Kirim",
+    chatConnected: "Obrolan terhubung.", reportedNotice: "✓ Dilaporkan",
+    reportedSuccess: "🚩 Pengguna dilaporkan. Menghubungkan ke orang berikutnya...",
+    alreadyReported: "Anda sudah melaporkan pengguna ini.",
+    warningModalTitle: "Wajah Manusia Diperlukan",
+    warningModalDesc: "Dilarang memulai tanpa wajah manusia asli di depan kamera.",
+    warningModalBtn: "Saya mengerti",
+    dupTitle: "MeetLoop Terbuka di Tab Lain",
+    dupDesc: "Tidak boleh membuka beberapa tab bersamaan. Sesi dijeda di sini.",
+    dupBtn: "⚡ Gunakan di sini"
   }
 };
 
-let currentLang = localStorage.getItem("meetloop_lang") || "en";
 function t(k){ return translations[currentLang]?.[k] || translations["en"]?.[k] || ""; }
 
 function updateUILanguage() {
@@ -744,7 +825,15 @@ function updateUILanguage() {
   chatInput.placeholder = t("inputPlaceholder");
   sendBtn.textContent = t("send");
   document.getElementById("showLocalText").textContent = t("showCam");
-  
+
+  document.getElementById("faceModalTitle").textContent = t("warningModalTitle");
+  document.getElementById("faceModalDesc").textContent = t("warningModalDesc");
+  document.getElementById("closeFaceModalBtn").textContent = t("warningModalBtn");
+
+  document.getElementById("dupTitle").textContent = t("dupTitle");
+  document.getElementById("dupDesc").textContent = t("dupDesc");
+  document.getElementById("reclaimSessionBtn").textContent = t("dupBtn");
+
   if (!connected && !searching) {
     statusBadge.textContent = t("ready");
     remoteStatus.textContent = t("waiting");
@@ -851,7 +940,7 @@ function runBanCountdown(banUntil) {
       localStorage.removeItem("meetloop_ban_reason");
       localStorage.setItem("meetloop_strikes", "0");
       bannedOverlay.style.display = "none";
-      alert("Tapos na ang 1-Hour ban mo. Paki-sunod ang patakaran.");
+      alert("Your 1-hour suspension has ended. Please follow the guidelines.");
       location.reload();
     }
   }, 1000);
@@ -874,7 +963,7 @@ checkBanStatus();
 reportStrangerBtn.addEventListener("click", () => {
   if (!connected) return;
   if (hasReportedCurrentStranger) {
-    alert("Nai-report mo na ang user na ito. Bawal i-spam.");
+    alert(t("alreadyReported"));
     return;
   }
   reportModalOverlay.style.display = "flex";
@@ -889,7 +978,7 @@ function submitReport(reason) {
   if (!connected) return;
 
   if (hasReportedCurrentStranger) {
-    alert("Nai-report mo na ang user na ito.");
+    alert(t("alreadyReported"));
     return;
   }
 
@@ -897,7 +986,7 @@ function submitReport(reason) {
   reportStrangerBtn.disabled = true;
   reportStrangerBtn.style.opacity = "0.5";
   reportStrangerBtn.style.cursor = "not-allowed";
-  reportStrangerBtn.textContent = "✓ Reported";
+  reportStrangerBtn.textContent = t("reportedNotice");
 
   if (dataChannel && dataChannel.readyState === "open") {
     try {
@@ -909,7 +998,7 @@ function submitReport(reason) {
     socket.emit("report-user", { reason: reason });
   }
 
-  addMessage("System", `🚩 Na-report mo ang user (${reason}). Nililipat ka na sa susunod...`);
+  addMessage("System", t("reportedSuccess"));
   setTimeout(() => {
     startLoop();
   }, 400);
@@ -917,8 +1006,8 @@ function submitReport(reason) {
 
 function handleIncomingReport(reason) {
   if (reason.includes("Hubad") || reason.includes("Nudity") || reason.includes("Menor")) {
-    alert(`🚨 INSTANT 1-HOUR BAN: Na-report ka sa hindi pinapahintulutang gawi (${reason})!`);
-    triggerInstantOneHourBan(`Kritikal na Paglabag: ${reason}`);
+    alert(`🚨 INSTANT 1-HOUR SUSPENSION: You were reported for a critical violation (${reason})!`);
+    triggerInstantOneHourBan(`Critical Violation: ${reason}`);
     return;
   }
 
@@ -926,11 +1015,11 @@ function handleIncomingReport(reason) {
   localStorage.setItem("meetloop_strikes", strikes.toString());
 
   if (strikes >= 2) {
-    alert(`🚨 1-HOUR SUSPENSION: Naipon ang mga ulat laban sa'yo dahil sa ${reason}!`);
-    triggerInstantOneHourBan(`Naipong Reports: ${reason}`);
+    alert(`🚨 1-HOUR SUSPENSION: Multiple violation reports received (${reason})!`);
+    triggerInstantOneHourBan(`Accumulated Reports: ${reason}`);
   } else {
-    alert(`⚠️ BABALA (1/2): Na-report ka dahil sa "${reason}". Isa pang report at maba-ban ka sa loob ng 1 ORAS!`);
-    addMessage("System", `⚠️ Babala: Nai-report ang iyong ikinilos (${reason}).`);
+    alert(`⚠️ WARNING (1/2): You were reported for "${reason}". Next violation will cause a 1-HOUR BAN!`);
+    addMessage("System", `⚠️ Warning: A report was filed against your stream (${reason}).`);
   }
 }
 
@@ -1257,7 +1346,7 @@ function createPeer(initiator) {
 
 function setupDataChannel(ch) {
   dataChannel = ch;
-  ch.onopen = () => addMessage("System", t("chatConnected") || "Chat connected.");
+  ch.onopen = () => addMessage("System", t("chatConnected"));
   ch.onmessage = (e) => {
     try {
       const parsed = JSON.parse(e.data);
@@ -1336,7 +1425,7 @@ async function startLoop() {
   const ok = await startMedia();
   if (!ok) return;
 
-  showSearch(t("verifying") || "Verifying face...");
+  showSearch(t("verifying"));
   const faceVerified = await verifyStrictHumanFace();
   if (!faceVerified) {
     hideSearch();
@@ -1391,7 +1480,7 @@ if (socket) {
   
   socket.on("waiting", () => {
     searching = true;
-    showSearch(t("waitingPartner") || "Waiting for partner...");
+    showSearch(t("waitingPartner"));
     remoteStatus.textContent = t("waiting");
   });
 
@@ -1417,8 +1506,8 @@ if (socket) {
   });
 
   socket.on("warning-strike", (data) => {
-    alert(`⚠️ BABALA: Nai-report ka dahil sa "${data.reason}". Kapag inulit mo pa, maba-ban ka sa loob ng 1 ORAS!`);
-    addMessage("System", `⚠️ Babala: Nai-report ang iyong ikinilos (${data.reason}).`);
+    alert(`⚠️ WARNING: You were reported for "${data.reason}". Next violation will result in a 1-HOUR BAN!`);
+    addMessage("System", `⚠️ Warning: Your stream was reported (${data.reason}).`);
   });
 }
 
@@ -1483,7 +1572,7 @@ languageSelect.addEventListener("change", (e) => {
   updateUILanguage();
 });
 
-// Initial UI Setup
+// INITIAL SETUP IN ENGLISH
 updateUILanguage();
 </script>
 </body>
