@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#070b14">
 
-<!-- 🔥 TAB BAR LOGO / FAVICON -->
+<!-- TAB BAR LOGO / FAVICON -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%233b82f6'/%3E%3Cstop offset='50%25' stop-color='%238b5cf6'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='%23070b14'/%3E%3Cpath d='M32 12 A20 20 0 0 1 52 32 A20 20 0 0 1 34 52' fill='none' stroke='url(%23g)' stroke-width='6' stroke-linecap='round'/%3E%3Cpolygon points='34,58 30,49 40,49' fill='%23ec4899'/%3E%3Cpath d='M32 52 A20 20 0 0 1 12 32 A20 20 0 0 1 30 12' fill='none' stroke='url(%23g)' stroke-width='6' stroke-linecap='round'/%3E%3Cpolygon points='30,6 34,15 24,15' fill='%233b82f6'/%3E%3Ccircle cx='32' cy='32' r='7' fill='url(%23g)'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%233b82f6'/%3E%3Cstop offset='50%25' stop-color='%238b5cf6'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='%23070b14'/%3E%3Cpath d='M32 12 A20 20 0 0 1 52 32 A20 20 0 0 1 34 52' fill='none' stroke='url(%23g)' stroke-width='6' stroke-linecap='round'/%3E%3Cpolygon points='34,58 30,49 40,49' fill='%23ec4899'/%3E%3Cpath d='M32 52 A20 20 0 0 1 12 32 A20 20 0 0 1 30 12' fill='none' stroke='url(%23g)' stroke-width='6' stroke-linecap='round'/%3E%3Cpolygon points='30,6 34,15 24,15' fill='%233b82f6'/%3E%3Ccircle cx='32' cy='32' r='7' fill='url(%23g)'/%3E%3C/svg%3E">
 
@@ -14,7 +14,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>MeetLoop - Global Video Chat</title>
+<title>MeetLoop</title>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -39,7 +39,7 @@ body{
   font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   color:var(--text);
   background: 
-    linear-gradient(135deg, rgba(7, 11, 20, 0.6), rgba(15, 23, 42, 0.72)),
+    linear-gradient(135deg, rgba(7, 11, 20, 0.65), rgba(15, 23, 42, 0.75)),
     url('meetloop-bg.png') center/cover no-repeat fixed,
     #070b14;
   overflow:hidden;
@@ -56,7 +56,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   position:fixed;inset:0;z-index:999999;
   display:flex;align-items:center;justify-content:center;padding:20px;
   background: 
-    linear-gradient(135deg, rgba(7, 11, 20, 0.5), rgba(15, 23, 42, 0.65)),
+    linear-gradient(135deg, rgba(7, 11, 20, 0.6), rgba(15, 23, 42, 0.75)),
     url('meetloop-bg.png') center/cover no-repeat fixed,
     #070b14;
   transition:opacity .35s ease, visibility .35s ease;
@@ -68,96 +68,89 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   pointer-events:none !important;
 }
 .portal-card{
-  max-width:480px;width:100%;padding:38px 28px;text-align:center;
-  background:rgba(15,23,42,.88);border:1.5px solid rgba(255,255,255,.2);
-  border-radius:28px;box-shadow:0 25px 70px rgba(0,0,0,.9), 0 0 40px rgba(37,99,235,.3);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  animation:portalEntrance .45s cubic-bezier(.16,1,.3,1);
+  max-width:460px;width:100%;padding:38px 28px;text-align:center;
+  background:rgba(15,23,42,.92);border:1.5px solid rgba(255,255,255,.15);
+  border-radius:26px;box-shadow:0 25px 70px rgba(0,0,0,.9), 0 0 40px rgba(37,99,235,.25);
+  backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);
+  animation:portalEntrance .4s cubic-bezier(.16,1,.3,1);
 }
 @keyframes portalEntrance{
-  from{transform:scale(.92) translateY(18px);opacity:0}
+  from{transform:scale(.94) translateY(14px);opacity:0}
   to{transform:scale(1) translateY(0);opacity:1}
 }
 .portal-logo-ring{
-  width:72px;height:72px;margin:0 auto 16px;border-radius:22px;
+  width:68px;height:68px;margin:0 auto 16px;border-radius:20px;
   background:linear-gradient(135deg,#3b82f6,#ec4899);
-  display:flex;align-items:center;justify-content:center;font-size:36px;
-  box-shadow:0 0 30px rgba(236,72,153,.5);
+  display:flex;align-items:center;justify-content:center;font-size:34px;
+  box-shadow:0 0 25px rgba(236,72,153,.4);
 }
-.portal-title{font-size:32px;font-weight:900;letter-spacing:.5px;margin-bottom:6px;color:#fff}
+.portal-title{font-size:30px;font-weight:900;letter-spacing:.5px;margin-bottom:6px;color:#fff}
 .portal-subtitle{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:20px}
 .portal-rules-box{
   text-align:left;font-size:12px;color:#cbd5e1;line-height:1.7;margin-bottom:24px;
-  background:rgba(255,255,255,.05);padding:14px 18px;border-radius:16px;border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.04);padding:14px 18px;border-radius:15px;border:1px solid rgba(255,255,255,.08);
 }
 .portal-rules-box li{margin-bottom:6px}
 .portal-open-btn{
   width:100%;min-height:54px;font-size:16px;font-weight:900;
   border-radius:14px;border:0;cursor:pointer;color:#fff;
   background:linear-gradient(135deg,#2563eb,#ec4899);
-  box-shadow:0 8px 30px rgba(236,72,153,.45);transition:transform .15s,filter .2s;
-  display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:.5px;
+  box-shadow:0 8px 30px rgba(236,72,153,.4);transition:transform .15s,filter .2s;
+  display:flex;align-items:center;justify-content:center;gap:10px;
 }
 .portal-open-btn:hover{filter:brightness(1.15);transform:translateY(-2px)}
 .portal-open-btn:active{transform:scale(.98)}
 
 /* =========================================================
-   🌀 OMETV-STYLE APP LOADING SCREEN
+   🌀 OMETV-STYLE CLEAN LOADING SCREEN
 ========================================================= */
 #ometvLoader{
   position:fixed;inset:0;z-index:999998;
   display:none;align-items:center;justify-content:center;
-  background:radial-gradient(circle at center, #0e1726 0%, #050811 100%);
+  background:#070b14;
   flex-direction:column;padding:24px;
-  transition:opacity .45s ease, visibility .45s ease;
+  transition:opacity .35s ease, visibility .35s ease;
 }
 .loader-content{
   display:flex;flex-direction:column;align-items:center;text-align:center;
-  max-width:340px;width:100%;
+  max-width:300px;width:100%;
 }
 .ometv-radar-box{
-  position:relative;width:95px;height:95px;
+  position:relative;width:90px;height:90px;
   display:flex;align-items:center;justify-content:center;margin-bottom:24px;
 }
 .ometv-radar-ring{
   position:absolute;inset:0;border-radius:50%;
-  border:2px solid rgba(59,130,246,.4);
+  border:2px solid rgba(59,130,246,.35);
   animation:radarPulse 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
 }
 .ometv-radar-ring:nth-child(2){animation-delay:.6s}
 @keyframes radarPulse{
-  0%{transform:scale(0.8);opacity:1}
-  100%{transform:scale(1.7);opacity:0}
+  0%{transform:scale(0.85);opacity:1}
+  100%{transform:scale(1.75);opacity:0}
 }
 .ometv-loader-logo{
-  width:64px;height:64px;border-radius:20px;
+  width:60px;height:60px;border-radius:18px;
   background:linear-gradient(135deg,#3b82f6,#ec4899);
-  display:flex;align-items:center;justify-content:center;font-size:32px;
-  box-shadow:0 0 28px rgba(59,130,246,.6);
-  z-index:2;animation:logoSpinFloat 3s ease-in-out infinite;
-}
-@keyframes logoSpinFloat{
-  0%,100%{transform:translateY(0) scale(1)}
-  50%{transform:translateY(-5px) scale(1.04)}
+  display:flex;align-items:center;justify-content:center;font-size:30px;
+  box-shadow:0 0 25px rgba(59,130,246,.55);
+  z-index:2;
 }
 .loader-app-name{
-  font-size:24px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:4px;
-}
-.loader-tagline{
-  font-size:10px;font-weight:800;color:#38bdf8;text-transform:uppercase;letter-spacing:2px;margin-bottom:30px;
+  font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:20px;
 }
 .loader-progress-track{
-  width:100%;height:6px;background:rgba(255,255,255,.09);border-radius:999px;
-  overflow:hidden;position:relative;margin-bottom:14px;border:1px solid rgba(255,255,255,.05);
+  width:100%;height:5px;background:rgba(255,255,255,.08);border-radius:999px;
+  overflow:hidden;position:relative;margin-bottom:12px;
 }
 .loader-progress-bar{
   width:0%;height:100%;border-radius:999px;
-  background:linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
-  box-shadow:0 0 14px rgba(236,72,153,.8);
-  transition:width .25s ease-out;
+  background:linear-gradient(90deg, #3b82f6, #ec4899);
+  box-shadow:0 0 10px rgba(236,72,153,.7);
+  transition:width .2s ease-out;
 }
-.loader-status-text{
-  font-size:12px;font-weight:700;color:#94a3b8;min-height:18px;letter-spacing:.3px;
+.loader-info-row{
+  display:flex;justify-content:space-between;width:100%;font-size:11px;font-weight:700;color:#94a3b8;
 }
 
 /* =========================================================
@@ -173,12 +166,6 @@ header{
   width:35px;height:35px;display:flex;align-items:center;justify-content:center;
   border-radius:10px;background:linear-gradient(135deg,#3b82f6,#ec4899);
   box-shadow:0 0 18px rgba(236,72,153,.45);
-}
-.global-badge{
-  display:inline-flex;align-items:center;gap:4px;padding:3px 8px;
-  font-size:9px;font-weight:900;letter-spacing:1px;text-transform:uppercase;
-  border-radius:999px;background:linear-gradient(135deg,rgba(59,130,246,.25),rgba(236,72,153,.25));
-  border:1px solid rgba(255,255,255,.15);color:#38bdf8;user-select:none;
 }
 .header-right{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
 .badge{
@@ -217,7 +204,7 @@ video{
   background:#000;border:0;outline:0;transition:opacity .15s ease;
 }
 
-/* 🌟 OMETV-STYLE CLEAN CAMERA BRIGHTNESS & TONE */
+/* OMETV CLEAN WEBCAM FILTER */
 #localVideo{
   filter: brightness(1.12) contrast(1.06) saturate(1.12);
 }
@@ -225,7 +212,7 @@ video{
 #localVideo.unmirrored{transform:scaleX(1)}
 
 #camOffOverlay{
-  position:absolute;inset:0;background:#090d16;color:#94a3b8;
+  position:absolute;inset:0;background:#080c14;color:#94a3b8;
   display:none;flex-direction:column;align-items:center;justify-content:center;gap:6px;
   font-size:12px;font-weight:800;z-index:3;
 }
@@ -307,7 +294,7 @@ video{
 #chatInput{flex:1;min-width:0;min-height:40px;padding:9px 11px;background:rgba(2,6,23,.64);color:#fff;border:1px solid var(--border-strong);border-radius:9px;outline:none;font-size:12px}
 #sendBtn{min-width:64px;border:0;border-radius:9px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue2));cursor:pointer;font-size:12px;font-weight:800}
 
-/* 🚩 REPORT REASONS MODAL */
+/* REPORT REASONS MODAL */
 #reportModalOverlay{
   position:fixed;inset:0;z-index:999999;
   background:rgba(3,7,18,.85);backdrop-filter:blur(14px);
@@ -325,7 +312,7 @@ video{
 }
 .report-opt:hover{background:rgba(239,68,68,.2);border-color:#ef4444}
 
-/* 🚫 LIVE BAN SCREEN */
+/* LIVE BAN SCREEN */
 #bannedOverlay{
   position:fixed;inset:0;z-index:9999999;
   background:radial-gradient(circle at center,rgba(30,0,0,.98),#080000);
@@ -357,7 +344,7 @@ video{
   background:linear-gradient(135deg,var(--blue),var(--blue2));font-weight:800;cursor:pointer;
 }
 
-/* 🛡️ STRICT FACE WARNING */
+/* STRICT FACE WARNING */
 #faceModalOverlay{
   position:fixed;inset:0;z-index:99999;background:rgba(3,7,18,.88);backdrop-filter:blur(14px);
   display:none;align-items:center;justify-content:center;padding:20px;
@@ -374,7 +361,7 @@ video{
   cursor:pointer;color:#fff;background:linear-gradient(135deg,#2563eb,#3b82f6);
 }
 
-/* 📱 MOBILE VIEW */
+/* MOBILE VIEW */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto;overflow-x:hidden}
   header{min-height:58px;height:auto;padding:8px 10px;gap:6px}
@@ -440,7 +427,7 @@ video{
   <div class="portal-card">
     <div class="portal-logo-ring">🔄</div>
     <h1 class="portal-title">MeetLoop</h1>
-    <div class="portal-subtitle">Global Random Video Chat</div>
+    <div class="portal-subtitle">Random Video Chat</div>
 
     <ul class="portal-rules-box">
       <li>🔞 <b>18+ Only:</b> You must be 18 years or older to enter.</li>
@@ -458,7 +445,7 @@ video{
 </div>
 
 <!-- =========================================================
-   🌀 OMETV-STYLE REALISTIC LOADING SCREEN
+   🌀 OMETV-STYLE CLEAN LOADING SCREEN
 ========================================================= -->
 <div id="ometvLoader">
   <div class="loader-content">
@@ -469,17 +456,19 @@ video{
     </div>
     
     <div class="loader-app-name">MeetLoop</div>
-    <div class="loader-tagline">GLOBAL NETWORK</div>
 
     <div class="loader-progress-track">
       <div class="loader-progress-bar" id="loaderProgressBar"></div>
     </div>
     
-    <div class="loader-status-text" id="loaderStatusText">Connecting to server...</div>
+    <div class="loader-info-row">
+      <span id="loaderStatusText">Connecting...</span>
+      <span id="loaderPercent">0%</span>
+    </div>
   </div>
 </div>
 
-<!-- 🚩 REPORT REASONS MODAL -->
+<!-- REPORT REASONS MODAL -->
 <div id="reportModalOverlay">
   <div class="report-modal-box">
     <div style="font-size:36px;margin-bottom:6px">🚩</div>
@@ -495,7 +484,7 @@ video{
   </div>
 </div>
 
-<!-- 🚫 LIVE BAN COUNTDOWN SCREEN -->
+<!-- LIVE BAN SCREEN -->
 <div id="bannedOverlay">
   <div class="banned-box">
     <div id="secretUnbanIcon" style="font-size:50px;margin-bottom:10px;cursor:pointer;user-select:none">🚫</div>
@@ -512,12 +501,12 @@ video{
   </div>
 </div>
 
-<!-- 🛡️ STRICT HUMAN FACE WARNING MODAL -->
+<!-- STRICT FACE WARNING -->
 <div id="faceModalOverlay">
   <div class="face-modal-card">
     <div class="face-modal-icon">👤</div>
     <div class="face-modal-title" id="faceModalTitle">Human Face Required</div>
-    <div class="face-modal-desc" id="faceModalDesc">Bawal mag-start nang walang mukha ng tao. Bawal ang pader, damit, lamesa, o kung anu-anong bagay. Paki-itapat ang iyong totoong mukha sa camera.</div>
+    <div class="face-modal-desc" id="faceModalDesc">Bawal mag-start nang walang mukha ng tao. Bawal ang pader, damit, lamesa, kisame o kung anu-anong bagay. Paki-itapat nang maayos ang mukha sa camera.</div>
     <button class="face-modal-btn" id="closeFaceModalBtn" type="button">OK, Itatapat ko</button>
   </div>
 </div>
@@ -533,13 +522,12 @@ video{
 </div>
 
 <!-- =========================================================
-     APP HEADER
+   APP HEADER
 ========================================================= -->
 <header>
   <div class="brand">
     <span class="brand-icon">🔄</span>
     <span>MeetLoop</span>
-    <span class="global-badge">🌐 GLOBAL</span>
   </div>
   <div class="header-right">
     <div class="badge online">🟢 <span id="onlineLabel">Online:</span>&nbsp;<span id="onlineCount">0</span></div>
@@ -563,7 +551,7 @@ video{
 </header>
 
 <!-- =========================================================
-     MAIN APP ARENA
+   MAIN APP ARENA
 ========================================================= -->
 <div class="main-container">
   <div class="video-wrapper">
@@ -589,6 +577,7 @@ video{
       <div class="video-box" id="localVideoBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
         
+        <!-- CAMERA OFF OVERLAY -->
         <div id="camOffOverlay">
           <div style="font-size:32px;margin-bottom:4px">📷</div>
           <div>Camera Off</div>
@@ -615,7 +604,7 @@ video{
   <div class="chat-wrapper">
     <div class="chat-header">
       <span id="chatHeader">💬 Live Chat</span>
-      <span style="font-size:10px;color:var(--muted);font-weight:700">⚡ MeetLoop Engine</span>
+      <span style="font-size:10px;color:var(--muted);font-weight:700">⚡ MeetLoop</span>
     </div>
     <div class="chat-messages" id="chatMessages">
       <div class="message">
@@ -650,13 +639,12 @@ Violators will be permanently banned</div>
     if (navEntries.length > 0) {
       isReload = (navEntries[0].type === "reload");
     } else if (window.performance && window.performance.navigation) {
-      isReload = (window.performance.navigation.type === 1); // 1 = TYPE_RELOAD
+      isReload = (window.performance.navigation.type === 1);
     }
   } catch(e) {}
 
   const wasEntered = sessionStorage.getItem("meetloop_session_active") === "true";
 
-  // Kapag REFRESH lang at nakapasok na dati, diretso agad sa Video Arena
   if (isReload && wasEntered) {
     window.addEventListener("DOMContentLoaded", () => {
       const portal = document.getElementById("welcomePortal");
@@ -671,21 +659,20 @@ Violators will be permanently banned</div>
       startMedia().catch(e => console.warn(e));
     });
   } else {
-    // Kapag bagong Search, bagong tab, o tinype sa address bar: balik sa dating Open Meetloop
     sessionStorage.removeItem("meetloop_session_active");
   }
 })();
 
 /* =========================================================
-   🚀 OMETV-STYLE INTRO LOADING HANDLER
+   🚀 OMETV-STYLE CLEAN INTRO LOADING HANDLER
 ========================================================= */
 window.enterMeetLoop = function() {
-  // Mark session as active sa tab na ito
   sessionStorage.setItem("meetloop_session_active", "true");
 
   const portal = document.getElementById("welcomePortal");
   const loader = document.getElementById("ometvLoader");
   const pBar = document.getElementById("loaderProgressBar");
+  const pNum = document.getElementById("loaderPercent");
   const sText = document.getElementById("loaderStatusText");
 
   if (portal) {
@@ -705,35 +692,41 @@ window.enterMeetLoop = function() {
     }
   } catch(e) {}
 
-  const mediaPromise = startMedia().catch(e => console.warn(e));
+  // Simulan na agad ang camera
+  const mediaPromise = startMedia();
 
-  pBar.style.width = "25%";
-  sText.textContent = "Connecting to global network...";
+  // Fast OmeTV Realistic Progress
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    progress += Math.floor(Math.random() * 14) + 12;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(progressInterval);
+    }
+    pBar.style.width = progress + "%";
+    pNum.textContent = progress + "%";
 
-  setTimeout(() => {
-    pBar.style.width = "55%";
-    sText.textContent = "Calibrating HD video & audio hardware...";
-  }, 450);
-
-  setTimeout(() => {
-    pBar.style.width = "85%";
-    sText.textContent = "Applying real-time community protection...";
-  }, 950);
+    if (progress < 40) sText.textContent = "Connecting...";
+    else if (progress < 80) sText.textContent = "Checking camera...";
+    else sText.textContent = "Ready!";
+  }, 120);
 
   setTimeout(async () => {
-    pBar.style.width = "100%";
-    sText.textContent = "Ready! Welcome to MeetLoop.";
     await mediaPromise;
+    clearInterval(progressInterval);
+    pBar.style.width = "100%";
+    pNum.textContent = "100%";
+    sText.textContent = "Ready!";
 
     setTimeout(() => {
       if (loader) {
         loader.style.opacity = "0";
         setTimeout(() => {
           loader.style.display = "none";
-        }, 450);
+        }, 350);
       }
-    }, 350);
-  }, 1450);
+    }, 250);
+  }, 1100);
 };
 
 /* =========================================================
@@ -856,10 +849,10 @@ closeFaceModalBtn.addEventListener("click", () => {
   faceModalOverlay.style.display = "none";
 });
 
-async function ensureVideoReady(video, maxWaitMs = 1200) {
+async function ensureVideoReady(video, maxWaitMs = 1500) {
   const start = Date.now();
   while ((video.readyState < 2 || video.videoWidth === 0) && (Date.now() - start < maxWaitMs)) {
-    await new Promise(r => setTimeout(r, 80));
+    await new Promise(r => setTimeout(r, 60));
   }
   return video.readyState >= 2 && video.videoWidth > 0;
 }
@@ -918,7 +911,6 @@ async function verifyStrictHumanFace() {
       const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
       const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
 
-      // Human skin color boundary
       if (cb >= 75 && cb <= 135 && cr >= 130 && cr <= 180 && y >= 32 && y <= 235) {
         skinMatches++;
         const x = p % W;
@@ -931,10 +923,10 @@ async function verifyStrictHumanFace() {
 
     const avgLuma = totalLuma / totalPixels;
 
-    // A. Sobrang dilim o putok sa puti
+    // Sobrang dilim o putok sa puti (Tinatakpan ang camera)
     if (avgLuma < 25 || avgLuma > 235) return false;
 
-    // B. Variance Check: Ang mukha ay may mata, ilong, at anino (Hindi makinis tulad ng pader o kisame)
+    // Variance Check (Mata, ilong, anino ng mukha)
     let varianceSum = 0;
     for (let p = 0; p < totalPixels; p++) {
       const diff = lumaValues[p] - avgLuma;
@@ -942,12 +934,12 @@ async function verifyStrictHumanFace() {
     }
     const lumaVariance = varianceSum / totalPixels;
 
-    // Kapag mababa sa 110 ang variance, ito ay pader, kisame, damit, o patag na bagay
+    // Kapag mababa ang variance (< 110), ito ay pader, kisame, damit, o patag na bagay
     if (lumaVariance < 110) {
       return false;
     }
 
-    // C. Density Check: Sapat na laki ng mukha sa gitna ng camera
+    // Density Check: Sapat na laki ng mukha sa gitna ng camera
     const centerRatio = centerSkinMatches / (W * H * 0.42);
     if (centerRatio < 0.16) {
       return false;
@@ -1432,13 +1424,16 @@ function stopCallTimer() {
 }
 
 /* =========================================================
-   6. CAMERA HARDWARE & CONTROLS
+   6. CAMERA HARDWARE & CONTROLS (INAYOS ANG CAMERA OFF BUG)
 ========================================================= */
 async function startMedia() {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live')) {
     localVideo.srcObject = localStream;
     localVideo.muted = true;
+    camOffOverlay.style.display = "none";
+    localVideo.style.opacity = "1";
     await localVideo.play().catch(() => {});
+    updateMediaButtons();
     return true;
   }
   
@@ -1468,9 +1463,11 @@ async function startMedia() {
     localVideo.srcObject = localStream;
     localVideo.muted = true;
     localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
+    camOffOverlay.style.display = "none";
+    localVideo.style.opacity = "1";
     await localVideo.play().catch(() => {});
     
-    // Auto-adjust hardware exposure
+    // Auto-adjust exposure
     const vTrack = localStream.getVideoTracks()[0];
     if (vTrack && vTrack.getCapabilities) {
       try {
@@ -1486,6 +1483,7 @@ async function startMedia() {
     return true;
   } catch (error) {
     console.error("Camera Error:", error);
+    camOffOverlay.style.display = "flex";
     alert(t("permAlert"));
     return false;
   }
