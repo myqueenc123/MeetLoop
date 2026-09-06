@@ -29,12 +29,13 @@
   --purple:#8b5cf6;
   --cyan:#06b6d4;
   --pink:#ec4899;
+  --yellow:#eab308;
   --text:#f8fafc;
   --muted:#94a3b8;
 }
 html,body{width:100%;height:100%}
 
-/* 🌌 CRISP BACKGROUND (WALANG BLUR) */
+/* 🌌 CRISP BACKGROUND (WALANG PAMPALABO) */
 body{
   font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   color:var(--text);
@@ -123,9 +124,9 @@ select option{background:#0f172a;color:#fff}
 .main-container{width:100%;height:calc(100vh - 64px);display:flex;gap:12px;padding:12px}
 .video-wrapper{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px}
 .videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:10px}
-.video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#030712;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 35px rgba(0,0,0,.45)}
+.video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#030712;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 35px rgba(0,0,0,.45);transition:box-shadow .3s ease}
 
-/* NATURAL OPTICAL VIDEO */
+/* 💡 CAMERA BRIGHTNESS MODES */
 video{
   display:block;
   width:100%;
@@ -135,9 +136,21 @@ video{
   background:#000;
   border:0;
   outline:0;
+  transition:filter .2s ease, opacity .15s ease;
 }
 #localVideo.mirrored{transform:scaleX(-1)}
 #localVideo.unmirrored{transform:scaleX(1)}
+
+/* Camera Brightness Levels */
+#localVideo.light-off{filter:none}
+#localVideo.light-boost{filter:brightness(1.22) contrast(1.06) saturate(1.08)}
+#localVideo.light-super{filter:brightness(1.45) contrast(1.12) saturate(1.12)}
+
+/* Soft-light ring halo glow sa paligid ng camera box para lumiwanag ang mukha sa dilim */
+.video-box.halo-glow{
+  box-shadow:0 0 35px rgba(255,245,230,.35), 0 10px 35px rgba(0,0,0,.6) !important;
+  border-color:rgba(255,255,255,.6) !important;
+}
 
 /* 📷 CAMERA OFF OVERLAY */
 #camOffOverlay{
@@ -187,10 +200,10 @@ video{
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* CONTROLS BAR */
-.controls-bar{display:flex;gap:8px;padding:2px}
+.controls-bar{display:flex;gap:7px;padding:2px}
 .btn{
-  min-height:46px;padding:11px 15px;border:1px solid rgba(255,255,255,.06);
-  border-radius:11px;color:#fff;background:rgba(15,23,42,.85);cursor:pointer;font-size:13px;
+  min-height:46px;padding:10px 14px;border:1px solid rgba(255,255,255,.06);
+  border-radius:11px;color:#fff;background:rgba(15,23,42,.85);cursor:pointer;font-size:12px;
   font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;
   user-select:none;transition:transform .12s,filter .2s,opacity .2s;backdrop-filter:blur(10px);
 }
@@ -201,10 +214,11 @@ video{
 /* START / NEXT BUTTON */
 .btn-loop{
   flex:1.6;background:linear-gradient(135deg,var(--blue),var(--blue2));
-  box-shadow:0 6px 20px rgba(37,99,235,.3);
+  box-shadow:0 6px 20px rgba(37,99,235,.3);font-size:13px;
 }
 .btn-stop{flex:1;background:linear-gradient(135deg,#dc2626,#ef4444)}
 .btn-toggle{flex:1;background:rgba(255,255,255,.07)}
+.btn-light{flex:1.1;background:linear-gradient(135deg,rgba(234,179,8,.2),rgba(234,179,8,.08));border-color:rgba(234,179,8,.3);color:#fef08a}
 .btn-flip{display:none;flex:1;background:linear-gradient(135deg,#7c3aed,#8b5cf6)}
 
 .chat-wrapper{
@@ -391,9 +405,9 @@ video{
   .video-label{left:7px;top:7px;padding:4px 7px;font-size:10px}
   .status{left:7px;bottom:7px;padding:4px 7px;font-size:9px}
 
-  .controls-bar{width:100%;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:0}
-  .btn{width:100%;min-height:46px;padding:8px 6px;border-radius:9px;font-size:11px}
-  .btn-loop,.btn-stop,.btn-toggle{flex:none}
+  .controls-bar{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:0}
+  .btn{width:100%;min-height:44px;padding:6px 4px;border-radius:9px;font-size:11px}
+  .btn-loop{grid-column:span 2}
   .btn-flip{display:flex}
 
   .chat-wrapper{width:100%;max-width:none;height:250px;min-height:250px;border-radius:13px}
@@ -406,7 +420,7 @@ video{
 
 <body>
 
-<!-- 🔞 18+ RULES MODAL (MAY DIRECT ONCLICK PARA 100% GAGANA ANG CONTINUE) -->
+<!-- 🔞 18+ RULES MODAL -->
 <div id="rulesModalOverlay">
   <div class="rules-modal-box">
     <span class="rules-badge-18">🔞 18+ RESTRICTED</span>
@@ -503,9 +517,9 @@ video{
         </div>
       </div>
 
-      <!-- User Camera -->
+      <!-- User Camera (With OmeTV Soft-Glow Illumination) -->
       <div class="video-box" id="localVideoBox">
-        <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
+        <video id="localVideo" class="mirrored light-boost" autoplay muted playsinline webkit-playsinline></video>
         
         <!-- 📷 CAMERA OFF OVERLAY -->
         <div id="camOffOverlay">
@@ -525,6 +539,8 @@ video{
     <div class="controls-bar">
       <button class="btn btn-loop" id="loopBtn" type="button">▶️ Start</button>
       <button class="btn btn-stop" id="stopBtn" type="button" disabled>⏹️ Stop</button>
+      <!-- 💡 OMETV CAMERA BRIGHTNESS BOOST BUTTON -->
+      <button class="btn btn-light" id="lightBtn" type="button">💡 Light: Boost</button>
       <button class="btn btn-toggle" id="micBtn" type="button">🎙️ Mic On</button>
       <button class="btn btn-toggle" id="camBtn" type="button">📷 Cam On</button>
       <button class="btn btn-flip" id="flipBtn" type="button">🔄 Flip</button>
@@ -562,13 +578,14 @@ Violators will be banned</div>
 "use strict";
 
 /* =========================================================
-   1. 18+ RULES & PERMISSION ENGINE (100% GAGANA ANG CONTINUE)
+   1. 18+ RULES & PERMISSION ENGINE
 ========================================================= */
 const rulesModalOverlay = document.getElementById("rulesModalOverlay");
 const bannedOverlay = document.getElementById("bannedOverlay");
 const banCountdown = document.getElementById("banCountdown");
 const reportStrangerBtn = document.getElementById("reportStrangerBtn");
 const secretUnbanIcon = document.getElementById("secretUnbanIcon");
+const lightBtn = document.getElementById("lightBtn");
 
 let banTimerInterval = null;
 
@@ -607,23 +624,27 @@ function runBanCountdown(banUntil) {
 
 checkBanStatus();
 
-// 🔥 DIRECT HANDLER PARA SA "I AGREE & I AM 18+ (CONTINUE)"
+if (sessionStorage.getItem("meetloop_session_agreed") === "true") {
+  rulesModalOverlay.style.display = "none";
+  startMedia();
+} else {
+  rulesModalOverlay.style.display = "flex";
+}
+
 window.handleAcceptRules = function() {
   try {
     sessionStorage.setItem("meetloop_session_agreed", "true");
   } catch(e) {}
 
-  // Isara agad ang modal
   if (rulesModalOverlay) {
     rulesModalOverlay.classList.add("modal-closed");
     rulesModalOverlay.style.display = "none";
   }
 
-  // Buksan agad ang camera at audio
   startMedia();
 };
 
-// OMETV REPORT SYSTEM
+// REPORT SYSTEM
 reportStrangerBtn.addEventListener("click", () => {
   if (!connected) return;
   const reason = prompt("Dahilan ng Report:\n1 - Hubad / Nudity\n2 - Menor de edad (<18)\n3 - Bastos / Harassment\n4 - Bawal na Bagay / Walang Mukha");
@@ -836,6 +857,9 @@ const translations = {
     camOff: "🚫 Cam Off",
     flip: "🔄 Flip",
     showCam: "Show Cam",
+    lightOff: "💡 Light: Off",
+    lightBoost: "💡 Light: Boost",
+    lightSuper: "💡 Light: Max",
     faceModalTitle: "Human Face Required",
     faceModalDesc: "Face required to start matching! Inanimate objects, walls, ceilings, or covered lenses are not allowed. Please face the camera properly.",
     faceModalBtn: "Got it, I'll face the camera",
@@ -869,6 +893,9 @@ const translations = {
     camOff: "🚫 Cam Naka-off",
     flip: "🔄 Iikot",
     showCam: "Ipakita Cam",
+    lightOff: "💡 Ilaw: Patay",
+    lightBoost: "💡 Ilaw: Liwanag",
+    lightSuper: "💡 Ilaw: Sagad",
     faceModalTitle: "Kailangan ng Totoong Mukha ng Tao",
     faceModalDesc: "Bawal mag-start nang walang totoong mukha ng tao. Bawal ang pader, damit, lamesa, o kung anu-anong bagay. Paki-itapat ang iyong mukha sa camera.",
     faceModalBtn: "OK, Itatapat ko ang mukha ko",
@@ -902,6 +929,9 @@ const translations = {
     camOff: "🚫 Cámara Apagada",
     flip: "🔄 Girar",
     showCam: "Mostrar Cámara",
+    lightOff: "💡 Luz: Apagada",
+    lightBoost: "💡 Luz: Media",
+    lightSuper: "💡 Luz: Máx",
     faceModalTitle: "Se requiere rostro humano real",
     faceModalDesc: "¡Se requiere rostro humano! No se permiten objetos, paredes ni techos. Mire a la cámara directamente.",
     faceModalBtn: "Entendido",
@@ -935,6 +965,9 @@ const translations = {
     camOff: "🚫 カメラOFF",
     flip: "🔄 反転",
     showCam: "カメラ表示",
+    lightOff: "💡 ライト: 切",
+    lightBoost: "💡 ライト: 中",
+    lightSuper: "💡 ライト: 強",
     faceModalTitle: "実際の人間の顔が必要です",
     faceModalDesc: "開始するには本物の顔を映してください。壁、天井、無生物は禁止されています。",
     faceModalBtn: "了解しました",
@@ -968,6 +1001,9 @@ const translations = {
     camOff: "🚫 카메라 끔",
     flip: "🔄 전환",
     showCam: "카메라 보기",
+    lightOff: "💡 조명: 끔",
+    lightBoost: "💡 조명: 중간",
+    lightSuper: "💡 조명: 최대",
     faceModalTitle: "실제 사람 얼굴이 필요합니다",
     faceModalDesc: "시작하려면 실제 얼굴을 비춰주세요. 물건, 벽, 천장은 금지됩니다.",
     faceModalBtn: "확인했습니다",
@@ -1001,6 +1037,9 @@ const translations = {
     camOff: "🚫 摄像头关",
     flip: "🔄 翻转",
     showCam: "显示镜头",
+    lightOff: "💡 补光: 关",
+    lightBoost: "💡 补光: 中",
+    lightSuper: "💡 补光: 强",
     faceModalTitle: "必须检测到真实人脸",
     faceModalDesc: "开始前必须将真实人脸对准镜头。严禁对着物品、墙壁或天花板。",
     faceModalBtn: "我知道了",
@@ -1034,6 +1073,9 @@ const translations = {
     camOff: "🚫 Caméra Coupée",
     flip: "🔄 Tourner",
     showCam: "Afficher Cam",
+    lightOff: "💡 Lumière: Désactivée",
+    lightBoost: "💡 Lumière: Moyenne",
+    lightSuper: "💡 Lumière: Max",
     faceModalTitle: "Véritable visage humain requis",
     faceModalDesc: "Visage humain requis ! Aucun objet, mur ou plafond n'est autorisé. Regardez la caméra.",
     faceModalBtn: "Compris",
@@ -1067,6 +1109,9 @@ const translations = {
     camOff: "🚫 Kamera Mati",
     flip: "🔄 Putar",
     showCam: "Tampilkan Cam",
+    lightOff: "💡 Lampu: Mati",
+    lightBoost: "💡 Lampu: Sedang",
+    lightSuper: "💡 Lampu: Terang",
     faceModalTitle: "Wajah Manusia Asli Diperlukan",
     faceModalDesc: "Wajib menghadapkan wajah manusia asli ke kamera. Dilarang mengarahkan ke benda, meja, dinding, atau langit-langit.",
     faceModalBtn: "Saya mengerti",
@@ -1079,6 +1124,7 @@ const translations = {
 };
 
 let currentLang = localStorage.getItem("meetloop_lang") || "en";
+let currentLightMode = localStorage.getItem("meetloop_light_mode") || "boost"; // default: boost
 
 function t(key) {
   return translations[currentLang]?.[key] || translations["en"]?.[key] || "";
@@ -1103,7 +1149,62 @@ function updateUILanguage() {
 
   stopBtn.textContent = t("stop");
   flipBtn.textContent = t("flip");
+  updateLightUI();
   updateMediaButtons();
+}
+
+/* =========================================================
+   💡 OMETV CAMERA LIGHTING & EXPOSURE ENGINE
+========================================================= */
+function updateLightUI() {
+  localVideo.classList.remove("light-off", "light-boost", "light-super");
+  localVideoBox.classList.remove("halo-glow");
+
+  if (currentLightMode === "off") {
+    localVideo.classList.add("light-off");
+    lightBtn.textContent = t("lightOff");
+  } else if (currentLightMode === "boost") {
+    localVideo.classList.add("light-boost");
+    localVideoBox.classList.add("halo-glow");
+    lightBtn.textContent = t("lightBoost");
+  } else if (currentLightMode === "super") {
+    localVideo.classList.add("light-super");
+    localVideoBox.classList.add("halo-glow");
+    lightBtn.textContent = t("lightSuper");
+  }
+}
+
+function toggleLight() {
+  if (currentLightMode === "off") {
+    currentLightMode = "boost";
+  } else if (currentLightMode === "boost") {
+    currentLightMode = "super";
+  } else {
+    currentLightMode = "off";
+  }
+  localStorage.setItem("meetloop_light_mode", currentLightMode);
+  updateLightUI();
+  applyHardwareCameraExposure();
+}
+
+// Subukang taasan ang Exposure sa mismong camera sensor kung suportado ng phone/webcam
+function applyHardwareCameraExposure() {
+  const track = localStream?.getVideoTracks()[0];
+  if (!track || !track.getCapabilities) return;
+  try {
+    const caps = track.getCapabilities();
+    const constraints = {};
+    if (caps.exposureCompensation) {
+      const maxEV = caps.exposureCompensation.max || 2;
+      constraints.exposureCompensation = (currentLightMode === "super") ? maxEV : (currentLightMode === "boost" ? Math.min(maxEV, 1.2) : 0);
+    }
+    if (caps.exposureMode && caps.exposureMode.includes('continuous')) {
+      constraints.exposureMode = 'continuous';
+    }
+    if (Object.keys(constraints).length > 0) {
+      track.applyConstraints({ advanced: [constraints] }).catch(() => {});
+    }
+  } catch(e) {}
 }
 
 /* =========================================================
@@ -1264,6 +1365,9 @@ async function startMedia() {
     localVideo.muted = true;
     localVideo.className = "mirrored";
     await localVideo.play().catch(() => {});
+    
+    updateLightUI();
+    applyHardwareCameraExposure();
     updateMediaButtons();
     return true;
   } catch (error) {
@@ -1352,6 +1456,9 @@ async function flipCamera() {
     if (currentAudioTrack) {
       currentAudioTrack.enabled = true;
     }
+    
+    updateLightUI();
+    applyHardwareCameraExposure();
   } catch(err) {
     console.error("Flip Camera Error:", err);
     currentFacingMode = "user";
@@ -1534,7 +1641,7 @@ function closePeerConnection() {
 }
 
 /* =========================================================
-   8. 🔥 OMEGLE START / NEXT (WITH FAST FACE SCANNER)
+   8. 🔥 OMEGLE START / NEXT
 ========================================================= */
 async function startLoop() {
   if (stopping || isTabTerminated) return;
@@ -1546,7 +1653,6 @@ async function startLoop() {
   const ok = await startMedia();
   if (!ok) return;
 
-  // Bago mag-start, suriin muna kung may tao sa camera
   showSearch(t("verifying"));
   const faceVerified = verifyStrictHumanFace();
   
@@ -1597,7 +1703,7 @@ function stopSession() {
 }
 
 /* =========================================================
-   9. SOCKET EVENTS (AUTO-NEXT ON DISCONNECT)
+   9. SOCKET EVENTS
 ========================================================= */
 socket.on("connect", () => {
   if (!connected && !searching) statusBadge.textContent = t("ready");
@@ -1627,7 +1733,6 @@ socket.on("signal", async data => {
   else if (data.type === "candidate") await handleCandidate(data.candidate);
 });
 
-// Auto-Next kapag nag-leave ang kausap
 socket.on("partner-disconnected", () => {
   addMessage("System", t("strangerLeft"));
   
@@ -1690,6 +1795,7 @@ showLocalBtn.addEventListener("click", (e) => {
   showLocalBtn.classList.remove("btn-visible");
 });
 
+lightBtn.addEventListener("click", toggleLight);
 loopBtn.addEventListener("click", startLoop);
 stopBtn.addEventListener("click", stopSession);
 micBtn.addEventListener("click", toggleMic);
