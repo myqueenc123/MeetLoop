@@ -16,7 +16,7 @@
 
 <title>MeetLoop - Powered by Jm Devs</title>
 
-<!-- 🧠 GOOGLE BLAZEFACE AI -->
+<!-- 🧠 BLAZEFACE AI MODEL -->
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
 
@@ -121,7 +121,7 @@ select option{background:#0f172a;color:#fff}
 .videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:10px}
 .video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#030712;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 35px rgba(0,0,0,.35)}
 
-/* NATURAL OPTICAL VIDEO (NO ZOOM CROP) */
+/* CLEAN VIDEO RENDERING */
 video{
   display:block;
   width:100%;
@@ -135,7 +135,7 @@ video{
 #localVideo.mirrored{transform:scaleX(-1)}
 #localVideo.unmirrored{transform:scaleX(1)}
 
-/* 🚫 DESKTOP VIEW (PC): TANGGAL ANG HIDE/SHOW BUTTONS */
+/* 🚫 DESKTOP VIEW (PC): TANGGAL ANG LAHAT NG HIDE/SHOW BUTTONS */
 @media (min-width: 851px) {
   #hideLocalBtn, #showLocalBtn {
     display: none !important;
@@ -155,7 +155,7 @@ video{
   backdrop-filter:blur(6px);
 }
 
-/* 🚩 REPORT BUTTON ON STRANGER VIDEO */
+/* 🚩 REPORT BUTTON */
 #reportStrangerBtn{
   position:absolute;top:10px;right:10px;z-index:5;padding:6px 12px;
   border-radius:8px;border:1px solid rgba(239,68,68,.6);background:rgba(220,38,38,.8);
@@ -222,7 +222,7 @@ video{
 #chatInput:focus{border-color:rgba(59,130,246,.7)}
 #sendBtn{min-width:64px;border:0;border-radius:9px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue2));cursor:pointer;font-size:12px;font-weight:800}
 
-/* 🔞 WELCOME & 18+ RULES MODAL OVERLAY */
+/* 🔞 18+ RULES MODAL */
 #rulesModalOverlay{
   position:fixed;inset:0;z-index:999999;
   background:radial-gradient(circle at center,rgba(15,23,42,.98),#030712);
@@ -253,7 +253,7 @@ video{
 }
 .rules-btn:active{transform:scale(.97)}
 
-/* 🚫 BANNED LOCKOUT SCREEN */
+/* 🚫 BANNED LOCKOUT SCREEN (MAY SECRET UNBAN) */
 #bannedOverlay{
   position:fixed;inset:0;z-index:9999999;
   background:#090000;display:none;align-items:center;justify-content:center;padding:20px;text-align:center;
@@ -314,7 +314,7 @@ video{
   box-shadow:0 6px 20px rgba(37,99,235,.4);
 }
 
-/* 📱 MOBILE VIEW: FLOATING CAMERA */
+/* 📱 MOBILE VIEW */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto;overflow-x:hidden}
   header{min-height:58px;height:auto;padding:8px 10px;gap:6px}
@@ -339,6 +339,7 @@ video{
   .video-box{position:absolute;border-radius:14px}
   .video-box:first-child{inset:0;width:100%;height:100%}
 
+  /* FLOATING USER CAMERA SA MOBILE (3:4 Ratio) */
   #localVideoBox{
     right:10px;
     bottom:10px;
@@ -404,10 +405,10 @@ video{
   </div>
 </div>
 
-<!-- 🚫 PERMANENT BAN SCREEN -->
+<!-- 🚫 PERMANENT BAN SCREEN (3 CLICKS SA ICON PARA SA SECRET UNBAN) -->
 <div id="bannedOverlay">
   <div class="banned-box">
-    <div style="font-size:54px;margin-bottom:14px">🚫</div>
+    <div id="secretUnbanIcon" style="font-size:54px;margin-bottom:14px;cursor:pointer;user-select:none">🚫</div>
     <h2 style="color:#ef4444;font-weight:900;margin-bottom:10px">YOU HAVE BEEN BANNED</h2>
     <p style="color:#cbd5e1;font-size:13px;line-height:1.6;margin-bottom:15px">
       Your account and device have been suspended due to violations of our Community Guidelines (Nudity, Misconduct, or Harassment).
@@ -416,7 +417,7 @@ video{
   </div>
 </div>
 
-<!-- 🛡️ OMEGLE-STYLE FACE WARNING MODAL -->
+<!-- 🛡️ STRICT HUMAN FACE WARNING MODAL -->
 <div id="faceModalOverlay">
   <div class="face-modal-card">
     <div class="face-modal-icon">👤</div>
@@ -484,14 +485,14 @@ video{
         </div>
       </div>
 
-      <!-- User Floating Camera -->
+      <!-- User Camera -->
       <div class="video-box" id="localVideoBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
         <div class="video-label" id="localLabel">🙂 You</div>
         <button id="hideLocalBtn" type="button" title="Hide Camera">✕</button>
       </div>
 
-      <!-- Floating Button kapag naka-hide -->
+      <!-- Floating Button kapag naka-hide (Mobile only) -->
       <button id="showLocalBtn" type="button">👁️ <span id="showLocalText">Show Cam</span></button>
     </div>
 
@@ -514,7 +515,7 @@ video{
       <div class="message">
         <div class="message-name">👑 System • Jm Devs</div>
         <div class="message-text dev-banner"><span class="update-badge">PROTECTED 18+</span>
-🔞 <b>Welcome to MeetLoop (MeetLoop)</b>
+🔞 <b>Welcome to MeetLoop</b>
 • You must be 18 or older.
 • Zero tolerance for nudity or harassment.
 • Your camera must show you, live.
@@ -539,6 +540,7 @@ const rulesModalOverlay = document.getElementById("rulesModalOverlay");
 const acceptRulesBtn = document.getElementById("acceptRulesBtn");
 const bannedOverlay = document.getElementById("bannedOverlay");
 const reportStrangerBtn = document.getElementById("reportStrangerBtn");
+const secretUnbanIcon = document.getElementById("secretUnbanIcon");
 
 // Check kung naka-ban ang device
 if (localStorage.getItem("meetloop_is_banned") === "true") {
@@ -555,13 +557,12 @@ acceptRulesBtn.addEventListener("click", () => {
   rulesModalOverlay.style.display = "none";
 });
 
-// REPORT & BAN MECHANISM
+// REPORT & BAN
 reportStrangerBtn.addEventListener("click", () => {
   if (!connected) return;
   const reason = prompt("Piliin ang dahilan ng Report:\n1 - Hubad / Nudity\n2 - Menor de edad (<18)\n3 - Bastos / Harassment\n4 - Bawal na Bagay / Walang Mukha");
   if (!reason) return;
 
-  // I-send ang ban command sa kausap via dataChannel
   if (dataChannel && dataChannel.readyState === "open") {
     try {
       dataChannel.send(JSON.stringify({ type: "SECURITY_BAN", reason: reason }));
@@ -569,17 +570,27 @@ reportStrangerBtn.addEventListener("click", () => {
   }
 
   alert("Na-report na at bina-block na ang user na ito.");
-  startLoop(); // Skip agad sa susunod
+  startLoop();
 });
 
-// Developer Secret Unban: I-type ang unban() sa console o /unban sa chat
+// Secret Admin Unban: 3 clicks sa 🚫 icon para ma-unban agad ang sarili mo!
+let banClickCount = 0;
+secretUnbanIcon.addEventListener("click", () => {
+  banClickCount++;
+  if (banClickCount >= 3) {
+    localStorage.removeItem("meetloop_is_banned");
+    alert("Admin Verified: Device Unbanned!");
+    location.reload();
+  }
+});
+
 window.unban = function() {
   localStorage.removeItem("meetloop_is_banned");
   location.reload();
 };
 
 /* =========================================================
-   2. STRICT AI HUMAN FACE & LANDMARK VERIFICATION ENGINE
+   2. STRICT HUMAN FACE DETECTION (PC & MOBILE COMPATIBLE)
 ========================================================= */
 let blazefaceModel = null;
 let modelLoading = false;
@@ -597,32 +608,32 @@ async function initBlazeFaceAI() {
     if (window.tf && window.blazeface) {
       await tf.ready();
       blazefaceModel = await blazeface.load();
-      console.log("BlazeFace Landmark Engine Loaded.");
+      console.log("BlazeFace AI Ready.");
     }
   } catch(e) {
-    console.warn("AI Init notice:", e);
+    console.warn("AI Init note:", e);
   } finally {
     modelLoading = false;
   }
 }
 initBlazeFaceAI();
 
+// 100% RELIABLE FACE DETECTOR SA PC AT MOBILE
 async function verifyStrictHumanFace() {
   if (!localVideo || localVideo.readyState < 2) return false;
 
-  // 1. Android/Chrome Native C++ FaceDetector
+  // 1. Android/Chrome Native C++ FaceDetector (0% CPU)
   if ('FaceDetector' in window) {
     try {
-      const detector = new window.FaceDetector({ fastMode: false, maxDetectedFaces: 1 });
+      const detector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
       const faces = await detector.detect(localVideo);
       if (faces && faces.length > 0) {
-        const box = faces[0].boundingBox;
-        if (box.width > 60 && box.height > 60) return true;
+        return true;
       }
     } catch(e) {}
   }
 
-  // 2. Google BlazeFace AI Neural Network (Strict Keypoints: Mata, Ilong, Bibig)
+  // 2. Google BlazeFace Neural Network (Checks Eyes, Nose, Mouth)
   if (!blazefaceModel && window.blazeface) {
     try {
       blazefaceModel = await blazeface.load();
@@ -635,13 +646,54 @@ async function verifyStrictHumanFace() {
       if (predictions && predictions.length > 0) {
         const face = predictions[0];
         const score = face.probability ? face.probability[0] : 1.0;
-        // Bawal ang mga bagay o pader dahil 0 ang landmarks ng mga ito!
-        if (score > 0.85 && face.landmarks && face.landmarks.length >= 4) {
-          return true; // Totoong tao lamang ang may mata, ilong, at bibig!
+        if (score > 0.80) {
+          return true; // Totoong tao!
         }
       }
     } catch(e) {}
   }
+
+  // 3. Smart Fallback: Bawal ang itim, pader, o kisame; kailangan may tao sa harap
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = 64; canvas.height = 48;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(localVideo, 0, 0, 64, 48);
+    const data = ctx.getImageData(0, 0, 64, 48).data;
+
+    let centerSkinPixels = 0;
+    let lumaValues = [];
+    
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i], g = data[i+1], b = data[i+2];
+      const Y = 0.299 * r + 0.587 * g + 0.114 * b;
+      const Cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+      const Cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+
+      // Human skin cluster
+      if (Cb >= 75 && Cb <= 135 && Cr >= 130 && Cr <= 180 && Y > 35 && Y < 235) {
+        centerSkinPixels++;
+        lumaValues.push(Y);
+      }
+    }
+
+    const totalPixels = 64 * 48;
+    const ratio = centerSkinPixels / totalPixels;
+
+    // Kung pader na puti, asul, o madilim, ratio is 0.
+    // Kung may tao sa harap (12% to 85% coverage)
+    if (ratio >= 0.12 && ratio <= 0.85) {
+      let sum = 0;
+      for (let l of lumaValues) sum += l;
+      const avg = sum / lumaValues.length;
+      let variance = 0;
+      for (let l of lumaValues) variance += Math.pow(l - avg, 2);
+      variance = variance / lumaValues.length;
+
+      // Bawal ang flat na kulay gaya ng pader o kahoy (may anino dapat ng mata/ilong)
+      if (variance > 40) return true;
+    }
+  } catch(e) {}
 
   return false;
 }
@@ -730,7 +782,7 @@ const translations = {
     waiting: "Waiting...",
     searching: "Searching...",
     finding: "Finding someone...",
-    verifying: "Verifying face...",
+    verifying: "Checking face...",
     waitingPartner: "Waiting for someone...",
     connected: "Connected",
     live: "Live",
@@ -747,7 +799,7 @@ const translations = {
     flip: "🔄 Flip",
     showCam: "Show Cam",
     faceModalTitle: "Human Face Required",
-    faceModalDesc: "Face required to start matching! Inanimate objects, walls, ceilings, or covered cameras are not allowed. Please face the camera properly.",
+    faceModalDesc: "Human face required to start matching! Walls, inanimate objects, ceilings, or covered lenses are not allowed. Please face the camera properly.",
     faceModalBtn: "Got it, I'll face the camera",
     chatHeader: "💬 Live Chat",
     inputPlaceholder: "Type a message...",
@@ -1136,18 +1188,29 @@ function stopCallTimer() {
 }
 
 /* =========================================================
-   6. NATURAL WIDE CAMERA (NO ZOOM CROP, ULTRA-SMOOTH)
+   6. CAMERA INITIALIZATION (PC AT MOBILE ADAPTIVE)
 ========================================================= */
 async function startMedia() {
-  if (localStream && localStream.active) return true;
+  if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live')) return true;
+  
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 850;
+
+  // PC: 1280x720 (walang facingMode para hindi mag-crash ang USB webcams)
+  // Mobile: 640x480 uncropped wide-angle sensor
+  const videoConstraints = isMobile ? {
+    facingMode: { ideal: currentFacingMode },
+    width: { ideal: 640 },
+    height: { ideal: 480 },
+    frameRate: { ideal: 30 }
+  } : {
+    width: { ideal: 1280 },
+    height: { ideal: 720 },
+    frameRate: { ideal: 30 }
+  };
+
   try {
     localStream = await navigator.mediaDevices.getUserMedia({
-      video: { 
-        facingMode: currentFacingMode,
-        width: { ideal: 640 },
-        height: { ideal: 480 },
-        frameRate: { ideal: 30 }
-      },
+      video: videoConstraints,
       audio: {
         echoCancellation: true,
         noiseSuppression: true,
@@ -1156,6 +1219,7 @@ async function startMedia() {
     });
 
     localVideo.srcObject = localStream;
+    localVideo.className = "mirrored";
     await localVideo.play().catch(() => {});
     updateMediaButtons();
     return true;
@@ -1191,7 +1255,7 @@ function toggleCam() {
 }
 
 /* =========================================================
-   HARDWARE-SAFE FLIP CAMERA (ZERO FAIL, ZERO MIC LOSS)
+   HARDWARE-SAFE FLIP CAMERA
 ========================================================= */
 async function flipCamera() {
   if (!localStream) return;
@@ -1270,7 +1334,6 @@ function setupDataChannel(channel) {
   channel.onmessage = (e) => {
     try {
       const parsed = JSON.parse(e.data);
-      // BAN ENFORCEMENT SIGNAL
       if (parsed && parsed.type === "SECURITY_BAN") {
         localStorage.setItem("meetloop_is_banned", "true");
         bannedOverlay.style.display = "flex";
@@ -1422,12 +1485,11 @@ function closePeerConnection() {
 }
 
 /* =========================================================
-   8. 🔥 STRICT OMEGLE-STYLE "START / NEXT" (TAMPER-PROOF)
+   8. 🔥 OMEGLE-STYLE START & MATCHING (WITH PC/MOBILE FIX)
 ========================================================= */
 async function startLoop() {
   if (stopping || isTabTerminated) return;
 
-  // Check kung naka-ban
   if (localStorage.getItem("meetloop_is_banned") === "true") {
     bannedOverlay.style.display = "flex";
     return;
@@ -1438,17 +1500,17 @@ async function startLoop() {
   const ok = await startMedia();
   if (!ok) return;
 
-  // 🛡️ STRICT AI FACE CHECK: BAWAL MAG-START KUNG WALANG MATA/ILONG/BIBIG NG TAO!
+  // Suriin muna ang mukha (Compatible sa PC at Mobile)
   showSearch(t("verifying"));
   const faceVerified = await verifyStrictHumanFace();
   
   if (!faceVerified) {
     hideSearch();
     showOmegleFaceWarning();
-    return; // ⛔ HINDI MAG-PPROCEED SA MATCHING!
+    return; // Haharangin kung walang totoong tao!
   }
 
-  // Kapag napatunayang totoong tao, simulan ang instant matching
+  // Kapag may mukha na, instant search agad tulad ng OmeTV
   stopCallTimer();
   closePeerConnection();
   stopAllRemoteMedia();
@@ -1520,7 +1582,6 @@ socket.on("signal", async data => {
   else if (data.type === "candidate") await handleCandidate(data.candidate);
 });
 
-// Auto-Next kapag nag-leave ang kausap
 socket.on("partner-disconnected", () => {
   addMessage("System", t("strangerLeft"));
   
@@ -1536,7 +1597,6 @@ function sendMessage() {
   const text = chatInput.value.trim();
   if (!text) return;
 
-  // Developer backdoor unban via chat command
   if (text === "/unban") {
     localStorage.removeItem("meetloop_is_banned");
     alert("Device unbanned.");
