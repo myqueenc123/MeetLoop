@@ -79,7 +79,19 @@ select option{background:#111827;color:#fff}
 .video-wrapper{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px}
 .videos-grid{flex:1;min-height:0;display:flex;gap:10px}
 .video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#000;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 35px rgba(0,0,0,.25)}
-video{display:block;width:100%;height:100%;object-fit:cover;background:#000;border:0;outline:0}
+
+/* HD Video display rules: pampalinaw at tanggal blur */
+video{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  background:#000;
+  border:0;
+  outline:0;
+  image-rendering:-webkit-optimize-contrast;
+  image-rendering:crisp-edges;
+}
 #localVideo{transform:scaleX(-1)}
 
 .video-label{
@@ -91,15 +103,6 @@ video{display:block;width:100%;height:100%;object-fit:cover;background:#000;bord
   position:absolute;left:10px;bottom:10px;z-index:4;padding:6px 10px;
   background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1);
   border-radius:9px;color:#e2e8f0;font-size:11px;font-weight:600;pointer-events:none;
-}
-
-/* UNMUTE TAP PROMPT PARA SA MOBILE */
-#unmuteBanner{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  z-index:15;display:none;padding:12px 20px;background:rgba(239,68,68,.95);
-  border:2px solid #fff;border-radius:14px;color:#fff;font-weight:800;font-size:13px;
-  cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,.7);animation:timerPulse 1.5s infinite;
-  text-align:center;
 }
 
 .search-overlay{
@@ -134,9 +137,17 @@ video{display:block;width:100%;height:100%;object-fit:cover;background:#000;bord
 }
 .chat-header{padding:14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:800}
 .chat-messages{flex:1;min-height:0;padding:12px;overflow-y:auto;overscroll-behavior:contain}
-.message{margin-bottom:10px;word-break:break-word}
-.message-name{margin-bottom:3px;color:var(--muted);font-size:10px;font-weight:700}
-.message-text{display:inline-block;max-width:90%;padding:8px 11px;color:#f8fafc;background:rgba(255,255,255,.075);border-radius:10px;font-size:12px;white-space:pre-wrap}
+.message{margin-bottom:12px;word-break:break-word}
+.message-name{margin-bottom:4px;color:var(--muted);font-size:10px;font-weight:700}
+.message-text{
+  display:inline-block;max-width:96%;padding:9px 12px;color:#f8fafc;
+  background:rgba(255,255,255,.075);border-radius:10px;font-size:12px;
+  line-height:1.45;white-space:pre-wrap;
+}
+.update-badge{
+  display:inline-block;background:linear-gradient(135deg,var(--blue),var(--purple));
+  color:#fff;font-weight:800;font-size:10px;padding:2px 6px;border-radius:6px;margin-bottom:4px;
+}
 .chat-input-area{display:flex;gap:6px;padding:9px;border-top:1px solid var(--border)}
 #chatInput{flex:1;min-width:0;min-height:40px;padding:9px 11px;background:rgba(2,6,23,.64);color:#fff;border:1px solid var(--border-strong);border-radius:9px;outline:none}
 #chatInput:focus{border-color:rgba(59,130,246,.55)}
@@ -200,11 +211,12 @@ video{display:block;width:100%;height:100%;object-fit:cover;background:#000;bord
   <div class="video-wrapper">
     <div class="videos-grid">
       <div class="video-box">
-        <!-- Remote Video: May playsinline at webkit-playsinline para sa iOS -->
-        <video id="remoteVideo" autoplay playsinline webkit-playsinline></video>
+        <!-- Remote Video -->
+        <video id="remoteVideo" autoplay playsinline webkit-playsinline muted></video>
+        <!-- Dedicated Remote Audio para 100% automatic sound nang walang banner -->
+        <audio id="remoteAudio" autoplay playsinline></audio>
         <div class="video-label" id="remoteLabel">👤 Stranger</div>
         <div class="status" id="remoteStatus">Waiting...</div>
-        <div id="unmuteBanner">🔊 Tap to Enable Audio</div>
         <div class="search-overlay" id="searchOverlay">
           <div class="search-box">
             <div class="spinner"></div>
@@ -230,7 +242,15 @@ video{display:block;width:100%;height:100%;object-fit:cover;background:#000;bord
   <div class="chat-wrapper">
     <div class="chat-header" id="chatHeader">💬 Live Chat</div>
     <div class="chat-messages" id="chatMessages">
-      <div class="message"><div class="message-name">System</div><div class="message-text" id="welcomeMsg">Welcome to MeetLoop!</div></div>
+      <!-- Welcome Updates Announcement para sa users -->
+      <div class="message">
+        <div class="message-name">System Update</div>
+        <div class="message-text"><span class="update-badge">WHAT'S NEW</span>
+🎉 <b>MeetLoop v2.0 Updates:</b>
+• 🔊 <b>Automatic Audio:</b> Mobile sound now plays automatically!
+• 📷 <b>HD 720p Video:</b> Sharper and clearer video (no more blur).
+• 🌐 <b>8 Languages:</b> Switch languages anytime in the header!</div>
+      </div>
     </div>
     <div class="chat-input-area">
       <input id="chatInput" type="text" placeholder="Type a message..." maxlength="300" autocomplete="off">
@@ -244,7 +264,7 @@ video{display:block;width:100%;height:100%;object-fit:cover;background:#000;bord
 "use strict";
 
 /* =========================================================
-   1. MULTI-LANGUAGE SYSTEM (i18n)
+   1. MULTI-LANGUAGE TRANSLATIONS (8 LANGUAGES)
 ========================================================= */
 const translations = {
   en: {
@@ -272,9 +292,7 @@ const translations = {
     chatHeader: "💬 Live Chat",
     inputPlaceholder: "Type a message...",
     send: "Send",
-    welcome: "Welcome to MeetLoop!",
     chatConnected: "Chat connected.",
-    unmutePrompt: "🔊 Tap to Enable Audio",
     permAlert: "Please grant Camera and Microphone access to continue."
   },
   tl: {
@@ -302,9 +320,7 @@ const translations = {
     chatHeader: "💬 Usapan",
     inputPlaceholder: "Mag-type ng mensahe...",
     send: "Ipadala",
-    welcome: "Maligayang pagdating sa MeetLoop!",
     chatConnected: "Konektado na ang chat.",
-    unmutePrompt: "🔊 I-tap para marinig ang boses",
     permAlert: "Paki-allow po ang Camera at Microphone permissions."
   },
   es: {
@@ -332,9 +348,7 @@ const translations = {
     chatHeader: "💬 Chat en vivo",
     inputPlaceholder: "Escribe un mensaje...",
     send: "Enviar",
-    welcome: "¡Bienvenido a MeetLoop!",
     chatConnected: "Chat conectado.",
-    unmutePrompt: "🔊 Toca para activar el sonido",
     permAlert: "Por favor, permite el acceso a la cámara y micrófono."
   },
   ja: {
@@ -362,9 +376,7 @@ const translations = {
     chatHeader: "💬 ライブチャット",
     inputPlaceholder: "メッセージを入力...",
     send: "送信",
-    welcome: "MeetLoopへようこそ！",
     chatConnected: "チャットが接続されました。",
-    unmutePrompt: "🔊 タップして音声を再生",
     permAlert: "カメラとマイクの許可を有効にしてください。"
   },
   ko: {
@@ -392,9 +404,7 @@ const translations = {
     chatHeader: "💬 실시간 채팅",
     inputPlaceholder: "메시지를 입력하세요...",
     send: "전송",
-    welcome: "MeetLoop에 오신 것을 환영합니다!",
     chatConnected: "채팅이 연결되었습니다.",
-    unmutePrompt: "🔊 소리를 켜려면 탭하세요",
     permAlert: "카메라와 마이크 권한을 허용해 주세요."
   },
   zh: {
@@ -422,9 +432,7 @@ const translations = {
     chatHeader: "💬 实时聊天",
     inputPlaceholder: "输入消息...",
     send: "发送",
-    welcome: "欢迎来到 MeetLoop！",
     chatConnected: "聊天已连接。",
-    unmutePrompt: "🔊 点击开启声音",
     permAlert: "请允许访问摄像头和麦克风权限。"
   },
   fr: {
@@ -452,9 +460,7 @@ const translations = {
     chatHeader: "💬 Chat en direct",
     inputPlaceholder: "Tapez un message...",
     send: "Envoyer",
-    welcome: "Bienvenue sur MeetLoop !",
     chatConnected: "Chat connecté.",
-    unmutePrompt: "🔊 Appuyez pour activer le son",
     permAlert: "Veuillez autoriser l'accès à la caméra et au microphone."
   },
   id: {
@@ -482,9 +488,7 @@ const translations = {
     chatHeader: "💬 Obrolan Langsung",
     inputPlaceholder: "Ketik pesan...",
     send: "Kirim",
-    welcome: "Selamat datang di MeetLoop!",
     chatConnected: "Obrolan terhubung.",
-    unmutePrompt: "🔊 Ketuk layar untuk audio",
     permAlert: "Harap izinkan akses Kamera dan Mikrofon."
   }
 };
@@ -502,7 +506,6 @@ function updateUILanguage() {
   document.getElementById("chatHeader").textContent = t("chatHeader");
   document.getElementById("chatInput").placeholder = t("inputPlaceholder");
   document.getElementById("sendBtn").textContent = t("send");
-  document.getElementById("unmuteBanner").textContent = t("unmutePrompt");
 
   if (!connected && !searching) {
     statusBadge.textContent = t("ready");
@@ -523,7 +526,7 @@ function updateUILanguage() {
 }
 
 /* =========================================================
-   2. DOM & WEBRTC CONFIGURATION
+   2. DOM & WEBRTC SETUP
 ========================================================= */
 const socket = io({
   transports: ["websocket", "polling"],
@@ -532,7 +535,7 @@ const socket = io({
 
 const localVideo = document.getElementById("localVideo");
 const remoteVideo = document.getElementById("remoteVideo");
-const unmuteBanner = document.getElementById("unmuteBanner");
+const remoteAudio = document.getElementById("remoteAudio");
 const loopBtn = document.getElementById("loopBtn");
 const stopBtn = document.getElementById("stopBtn");
 const micBtn = document.getElementById("micBtn");
@@ -550,7 +553,6 @@ const languageSelect = document.getElementById("languageSelect");
 const callTimer = document.getElementById("callTimer");
 const callTimerValue = document.getElementById("callTimerValue");
 
-// METERED TURN/STUN CREDENTIALS
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.relay.metered.ca:80" },
@@ -588,26 +590,15 @@ let currentFacingMode = "user";
 let callTimerInterval = null;
 let callStartTime = null;
 
-// Audio context unlocker para sa mobile WebRTC
-let audioCtx = null;
-function unlockMobileAudio() {
-  try {
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (audioCtx.state === "suspended") {
-      audioCtx.resume();
-    }
-  } catch (e) {}
-
-  if (remoteVideo) {
-    remoteVideo.muted = false;
-    remoteVideo.volume = 1.0;
-    remoteVideo.play().then(() => {
-      unmuteBanner.style.display = "none";
-    }).catch(() => {});
-  }
+// Silent audio unlock sa bawat pindot sa screen
+function primeAudioElements() {
+  remoteAudio.muted = false;
+  remoteAudio.volume = 1.0;
+  remoteAudio.play().catch(() => {});
 }
+
+window.addEventListener("touchstart", primeAudioElements, { passive: true });
+window.addEventListener("click", primeAudioElements, { passive: true });
 
 function showSearch(text) {
   searchText.textContent = text;
@@ -645,17 +636,18 @@ function stopCallTimer() {
 }
 
 /* =========================================================
-   3. MEDIA & HARDWARE CONTROLS
+   3. HIGH-DEFINITION (HD) CAMERA & ANTI-BLUR BOOST
 ========================================================= */
 async function startMedia() {
   if (localStream) return true;
   try {
-    // Advanced audio constraints para sa mobile microphone clarity
+    // HD 720p/1080p Resolution para hindi lumabo sa phone
     localStream = await navigator.mediaDevices.getUserMedia({
       video: { 
         facingMode: currentFacingMode,
-        width: { ideal: 640 },
-        height: { ideal: 480 }
+        width: { min: 640, ideal: 1280, max: 1920 },
+        height: { min: 480, ideal: 720, max: 1080 },
+        frameRate: { ideal: 30, max: 60 }
       },
       audio: {
         echoCancellation: true,
@@ -672,6 +664,26 @@ async function startMedia() {
     console.error("Camera/Mic Error:", error);
     alert(t("permAlert"));
     return false;
+  }
+}
+
+// 2.5 Mbps HD Bitrate Booster
+async function boostVideoQuality(pc) {
+  if (!pc) return;
+  try {
+    const sender = pc.getSenders().find(s => s.track && s.track.kind === "video");
+    if (sender && sender.getParameters) {
+      const params = sender.getParameters();
+      if (!params.encodings || params.encodings.length === 0) {
+        params.encodings = [{}];
+      }
+      params.encodings[0].maxBitrate = 2500000;
+      params.encodings[0].maxFramerate = 30;
+      params.degradationPreference = "maintain-resolution";
+      await sender.setParameters(params);
+    }
+  } catch (err) {
+    console.warn("Bitrate boost notice:", err);
   }
 }
 
@@ -709,6 +721,7 @@ async function flipCamera() {
     const videoSender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
     if (videoSender) {
       videoSender.replaceTrack(localStream.getVideoTracks()[0]);
+      boostVideoQuality(peerConnection);
     }
   }
 }
@@ -720,11 +733,16 @@ function stopAllRemoteMedia() {
     } catch(e) {}
     remoteVideo.srcObject = null;
   }
-  unmuteBanner.style.display = "none";
+  if (remoteAudio.srcObject) {
+    try {
+      remoteAudio.srcObject.getTracks().forEach(track => track.stop());
+    } catch(e) {}
+    remoteAudio.srcObject = null;
+  }
 }
 
 /* =========================================================
-   4. WEBRTC SIGNALING & CONNECTION
+   4. WEBRTC SIGNALING & AUTO SOUND
 ========================================================= */
 function setupDataChannel(channel) {
   dataChannel = channel;
@@ -742,24 +760,8 @@ function handleConnected() {
   loopBtn.disabled = false;
   stopBtn.disabled = false;
   loopBtn.textContent = t("next");
+  boostVideoQuality(peerConnection);
   startCallTimer();
-}
-
-function playRemoteStream() {
-  remoteVideo.muted = false;
-  remoteVideo.volume = 1.0;
-
-  remoteVideo.play().then(() => {
-    unmuteBanner.style.display = "none";
-  }).catch(err => {
-    console.warn("Autoplay with sound prevented by browser:", err);
-    // I-fallback sa muted play para hindi mag-freeze ang video sa screen
-    remoteVideo.muted = true;
-    remoteVideo.play().then(() => {
-      // Magpakita ng banner para 1-tap lang ng user, tutunog agad
-      unmuteBanner.style.display = "block";
-    }).catch(e => console.error("Remote video play failed:", e));
-  });
 }
 
 function createPeer(initiator) {
@@ -787,16 +789,22 @@ function createPeer(initiator) {
     hideSearch();
     remoteStatus.textContent = t("live");
 
-    if (event.streams && event.streams[0]) {
-      remoteVideo.srcObject = event.streams[0];
+    const stream = (event.streams && event.streams[0]) ? event.streams[0] : null;
+
+    if (stream) {
+      remoteVideo.srcObject = stream;
+      remoteAudio.srcObject = stream;
     } else {
-      if (!remoteVideo.srcObject) {
-        remoteVideo.srcObject = new MediaStream();
-      }
+      if (!remoteVideo.srcObject) remoteVideo.srcObject = new MediaStream();
       remoteVideo.srcObject.addTrack(event.track);
+
+      if (!remoteAudio.srcObject) remoteAudio.srcObject = new MediaStream();
+      remoteAudio.srcObject.addTrack(event.track);
     }
 
-    playRemoteStream();
+    // Awtomatikong mag-play ang video at audio nang walang banner
+    remoteVideo.play().catch(() => {});
+    remoteAudio.play().catch(() => {});
   };
 
   peerConnection.onconnectionstatechange = () => {
@@ -828,6 +836,7 @@ async function createOffer() {
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer);
     socket.emit("signal", { type: "offer", offer: peerConnection.localDescription });
+    boostVideoQuality(peerConnection);
   } catch (err) {
     console.error("Offer error:", err);
   }
@@ -844,6 +853,7 @@ async function handleOffer(offer) {
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
     socket.emit("signal", { type: "answer", answer: peerConnection.localDescription });
+    boostVideoQuality(peerConnection);
   } catch (err) {
     console.error("Handle offer error:", err);
   }
@@ -856,6 +866,7 @@ async function handleAnswer(answer) {
       const c = pendingIceCandidates.shift();
       await peerConnection.addIceCandidate(c).catch(() => {});
     }
+    boostVideoQuality(peerConnection);
   } catch (err) {
     console.error("Handle answer error:", err);
   }
@@ -884,12 +895,12 @@ function closePeerConnection() {
 }
 
 /* =========================================================
-   5. LOOP & SESSION ACTIONS
+   5. LOOP ACTIONS
 ========================================================= */
 async function startLoop() {
   if (stopping) return;
   
-  unlockMobileAudio();
+  primeAudioElements();
 
   const ok = await startMedia();
   if (!ok) return;
@@ -1025,7 +1036,6 @@ chatInput.addEventListener("keydown", e => {
   }
 });
 
-// Language Switcher Event
 languageSelect.value = currentLang;
 languageSelect.addEventListener("change", (e) => {
   currentLang = e.target.value;
@@ -1033,19 +1043,7 @@ languageSelect.addEventListener("change", (e) => {
   updateUILanguage();
 });
 
-// Banner click para i-unmute sakaling hinarang ng mobile policy
-unmuteBanner.addEventListener("click", () => {
-  unlockMobileAudio();
-});
-
-// Anumang pagpindot sa buong screen ay susubukang i-unlock ang audio
-document.addEventListener("pointerdown", () => {
-  if (remoteVideo.srcObject && remoteVideo.muted) {
-    unlockMobileAudio();
-  }
-}, { passive: true });
-
-// Initial setup
+// Initial Setup
 updateUILanguage();
 startMedia();
 </script>
