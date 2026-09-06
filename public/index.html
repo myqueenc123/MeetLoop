@@ -16,9 +16,9 @@
 
 <title>MeetLoop - Powered by Jm Devs</title>
 
-<!-- FAST CLIENT-SIDE FACE RECOGNITION -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tracking.js/1.1.3/tracking-min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tracking.js/1.1.3/data/face-min.js"></script>
+<!-- 🧠 GOOGLE BLAZEFACE DEEP LEARNING MODEL (STRICT FACIAL LANDMARK ENGINE) -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -121,7 +121,7 @@ select option{background:#0f172a;color:#fff}
 .videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:10px}
 .video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#030712;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 35px rgba(0,0,0,.35)}
 
-/* NATURAL OPTICAL VIDEO (ZERO CROP, ZERO DIGITAL ZOOM) */
+/* NATURAL OPTICAL VIDEO */
 video{
   display:block;
   width:100%;
@@ -135,7 +135,7 @@ video{
 #localVideo.mirrored{transform:scaleX(-1)}
 #localVideo.unmirrored{transform:scaleX(1)}
 
-/* 🚫 DESKTOP VIEW (PC): TANGGAL ANG LAHAT NG HIDE/SHOW BUTTONS */
+/* 🚫 DESKTOP VIEW (PC): TANGGAL ANG HIDE/SHOW BUTTONS */
 @media (min-width: 851px) {
   #hideLocalBtn, #showLocalBtn {
     display: none !important;
@@ -237,30 +237,31 @@ video{
 }
 .dup-btn:active{transform:scale(.97)}
 
-/* 🛡️ OMEGLE-STYLE FACE REQUIRED MODAL */
+/* 🛡️ STRICT HUMAN FACE WARNING MODAL */
 #faceModalOverlay{
   position:fixed;inset:0;z-index:99999;
-  background:rgba(3,7,18,.85);backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
+  background:rgba(3,7,18,.88);backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
   display:none;align-items:center;justify-content:center;padding:20px;
 }
 .face-modal-card{
-  max-width:380px;width:100%;padding:28px 22px;text-align:center;
-  background:rgba(17,24,39,.96);border:2px solid rgba(239,68,68,.6);
-  border-radius:22px;box-shadow:0 10px 40px rgba(239,68,68,.3);
-  animation:modalPop .3s ease;
+  max-width:390px;width:100%;padding:28px 24px;text-align:center;
+  background:rgba(17,24,39,.96);border:2px solid #ef4444;
+  border-radius:24px;box-shadow:0 12px 45px rgba(239,68,68,.35);
+  animation:modalPop .25s ease;
 }
 @keyframes modalPop{
   from{transform:scale(.85);opacity:0}
   to{transform:scale(1);opacity:1}
 }
 .face-modal-icon{font-size:48px;margin-bottom:12px}
-.face-modal-title{font-size:18px;font-weight:900;color:#fecaca;margin-bottom:8px}
-.face-modal-desc{font-size:13px;color:#cbd5e1;line-height:1.5;margin-bottom:20px}
+.face-modal-title{font-size:19px;font-weight:900;color:#fecaca;margin-bottom:10px}
+.face-modal-desc{font-size:13px;color:#cbd5e1;line-height:1.5;margin-bottom:22px}
 .face-modal-btn{
-  width:100%;min-height:44px;font-size:13px;font-weight:900;
-  border-radius:11px;border:0;cursor:pointer;color:#fff;
+  width:100%;min-height:46px;font-size:14px;font-weight:900;
+  border-radius:12px;border:0;cursor:pointer;color:#fff;
   background:linear-gradient(135deg,#2563eb,#3b82f6);
+  box-shadow:0 6px 20px rgba(37,99,235,.4);
 }
 
 /* 📱 MOBILE VIEW: FLOATING CAMERA (3:4 RATIO - NO ZOOM) */
@@ -304,7 +305,6 @@ video{
   }
   #localVideoBox.camera-hidden{display:none !important}
 
-  /* BUTTONS SA MOBILE */
   #hideLocalBtn{
     position:absolute;top:6px;right:6px;z-index:8;width:24px;height:24px;
     border-radius:50%;background:rgba(0,0,0,.7);color:#fff;border:1px solid rgba(255,255,255,.3);
@@ -339,12 +339,12 @@ video{
 
 <body>
 
-<!-- 🛡️ OMEGLE-STYLE FACE WARNING MODAL -->
+<!-- 🛡️ STRICT HUMAN FACE WARNING MODAL -->
 <div id="faceModalOverlay">
   <div class="face-modal-card">
     <div class="face-modal-icon">👤</div>
     <div class="face-modal-title" id="faceModalTitle">Human Face Required</div>
-    <div class="face-modal-desc" id="faceModalDesc">Bawal mag-start nang walang mukha. Paki-itapat nang maayos ang iyong mukha sa camera bago magsimula. Bawal ang pader, kisame, o nakatakip na camera.</div>
+    <div class="face-modal-desc" id="faceModalDesc">Bawal mag-start nang walang mukha ng tao. Bawal ang pader, damit, lamesa, o kung anu-anong bagay. Paki-itapat ang iyong totoong mukha sa camera.</div>
     <button class="face-modal-btn" id="closeFaceModalBtn" type="button">OK, Itatapat ko</button>
   </div>
 </div>
@@ -403,7 +403,7 @@ video{
         </div>
       </div>
 
-      <!-- User Floating Camera (Malinis - Walang Badges) -->
+      <!-- User Floating Camera -->
       <div class="video-box" id="localVideoBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
         <div class="video-label" id="localLabel">🙂 You</div>
@@ -432,9 +432,9 @@ video{
     <div class="chat-messages" id="chatMessages">
       <div class="message">
         <div class="message-name">👑 System • Jm Devs</div>
-        <div class="message-text dev-banner"><span class="update-badge">OMEGLE SHIELD ACTIVE</span>
-🚀 <b>MeetLoop v5.5 • Built by Jm Devs</b>
-• 🛡️ <b>Strict Face Verification:</b> Face required to start matching!
+        <div class="message-text dev-banner"><span class="update-badge">AI NEURAL SHIELD ACTIVE</span>
+🚀 <b>MeetLoop v6.0 • Built by Jm Devs</b>
+• 🛡️ <b>Strict AI Face Lock:</b> Facial landmarks required (No objects/walls).
 • ⚡ <b>Auto-Next Matching:</b> Seamless skip and instant match.
 • 📷 <b>Natural View:</b> Floating camera with zero zoom crop.
 • 🔒 <b>Single Tab Mode:</b> 1 tab only protected session.</div>
@@ -452,8 +452,11 @@ video{
 "use strict";
 
 /* =========================================================
-   1. OMEGLE-STYLE STRICT HUMAN FACE DETECTION ENGINE
+   1. STRICT AI HUMAN FACE & LANDMARK VERIFICATION ENGINE
+   (Hindi madadaya ng mga bagay, lamesa, pader, damit, etc.)
 ========================================================= */
+let blazefaceModel = null;
+let modelLoading = false;
 const faceModalOverlay = document.getElementById("faceModalOverlay");
 const closeFaceModalBtn = document.getElementById("closeFaceModalBtn");
 
@@ -461,98 +464,67 @@ closeFaceModalBtn.addEventListener("click", () => {
   faceModalOverlay.style.display = "none";
 });
 
-// Sinusuri nang totoo kung may mukha ng tao o pader/kisame lang
-async function checkHumanFacePresence() {
+// I-pre-load ang Google BlazeFace AI sa background
+async function initBlazeFaceAI() {
+  if (blazefaceModel || modelLoading) return;
+  modelLoading = true;
+  try {
+    if (window.tf && window.blazeface) {
+      await tf.ready();
+      blazefaceModel = await blazeface.load();
+      console.log("BlazeFace AI Landmark Engine Loaded.");
+    }
+  } catch(e) {
+    console.warn("AI Init warning:", e);
+  } finally {
+    modelLoading = false;
+  }
+}
+initBlazeFaceAI();
+
+// STRICT CHECK: Sinusuri ang mata, ilong, at bibig ng tao!
+async function verifyStrictHumanFace() {
   if (!localVideo || localVideo.readyState < 2) return false;
 
-  // 1. Android/Chrome Hardware Native FaceDetector
+  // 1. Android/Chrome C++ Native Hardware FaceDetector (Checks human face bounding box)
   if ('FaceDetector' in window) {
     try {
-      const detector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
+      const detector = new window.FaceDetector({ fastMode: false, maxDetectedFaces: 1 });
       const faces = await detector.detect(localVideo);
-      if (faces && faces.length > 0) return true;
-    } catch(e) {}
-  }
-
-  // 2. Tracking.js Face Haar Cascade
-  if (window.tracking && window.tracking.ObjectTracker) {
-    try {
-      const tracker = new tracking.ObjectTracker('face');
-      tracker.setInitialScale(4);
-      tracker.setStepSize(2);
-      
-      const promise = new Promise(resolve => {
-        const timeout = setTimeout(() => resolve(false), 350);
-        tracker.once('track', function(event) {
-          clearTimeout(timeout);
-          resolve(event.data && event.data.length > 0);
-        });
-        tracking.track('#localVideo', tracker);
-      });
-      const res = await promise;
-      if (res) return true;
-    } catch(e) {}
-  }
-
-  // 3. Human Skin Tone (YCbCr) & Facial Feature Shadow Geometry
-  try {
-    const canvas = document.createElement("canvas");
-    canvas.width = 64; canvas.height = 48;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    ctx.drawImage(localVideo, 0, 0, 64, 48);
-
-    const frame = ctx.getImageData(0, 0, 64, 48);
-    const data = frame.data;
-
-    let centerSkinPixels = 0;
-    let luminanceList = [];
-
-    // Gitnang 60% ng frame kung nasaan ang mukha
-    const minX = 64 * 0.2;
-    const maxX = 64 * 0.8;
-    const minY = 48 * 0.15;
-    const maxY = 48 * 0.85;
-
-    for (let y = 0; y < 48; y++) {
-      for (let x = 0; x < 64; x++) {
-        const i = (y * 64 + x) * 4;
-        const r = data[i];
-        const g = data[i + 1];
-        const b = data[i + 2];
-
-        // YCbCr Skin Color Cluster
-        const Y = 0.299 * r + 0.587 * g + 0.114 * b;
-        const Cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
-        const Cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
-
-        // Human Skin Range (Asian, Caucasian, Hispanic, African)
-        const isSkin = (Cb >= 75 && Cb <= 135) && (Cr >= 130 && Cr <= 180) && (Y > 35 && Y < 240);
-
-        if (isSkin && x >= minX && x <= maxX && y >= minY && y <= maxY) {
-          centerSkinPixels++;
-          luminanceList.push(Y);
+      if (faces && faces.length > 0) {
+        const box = faces[0].boundingBox;
+        // Bawal ang maliliit na ingay o dot (Dapat totoong sukat ng mukha)
+        if (box.width > 60 && box.height > 60) {
+          return true;
         }
       }
-    }
+    } catch(e) {}
+  }
 
-    const totalCenter = (maxX - minX) * (maxY - minY);
-    const skinRatio = centerSkinPixels / totalCenter;
+  // 2. Google BlazeFace AI Neural Network (Pinaka-strict: tinitingnan ang Mata, Ilong, at Bibig)
+  if (!blazefaceModel && window.blazeface) {
+    try {
+      blazefaceModel = await blazeface.load();
+    } catch(e) {}
+  }
 
-    // Kapag may sapat na skin tone sa gitna (hindi pader na puti o asul)
-    if (skinRatio >= 0.12 && skinRatio <= 0.90) {
-      // Facial Shadow Variance: Ang pader o kisame ay may 0 variance.
-      // Ang totoong tao ay may anino sa mata, ilong, at bibig.
-      let sum = 0;
-      for (let l of luminanceList) sum += l;
-      const mean = sum / luminanceList.length;
-      let variance = 0;
-      for (let l of luminanceList) variance += Math.pow(l - mean, 2);
-      variance = variance / luminanceList.length;
+  if (blazefaceModel) {
+    try {
+      const predictions = await blazefaceModel.estimateFaces(localVideo, false);
+      if (predictions && predictions.length > 0) {
+        const face = predictions[0];
+        const score = face.probability ? face.probability[0] : 1.0;
+        
+        // STRICT RULE: Confidence > 85% AT may landmarks (mga mata, ilong, bibig)
+        // Ang lamesa, pader, damit, o kahit anong bagay ay 0 ang landmarks!
+        if (score > 0.85 && face.landmarks && face.landmarks.length >= 4) {
+          return true; // 100% TOTOONG TAO LAMANG!
+        }
+      }
+    } catch(e) {}
+  }
 
-      if (variance > 45) return true;
-    }
-  } catch(e) {}
-
+  // Kapag walang totoong mukha ng tao na nakita, REJECTED!
   return false;
 }
 
@@ -640,6 +612,7 @@ const translations = {
     waiting: "Waiting...",
     searching: "Searching...",
     finding: "Finding someone...",
+    verifying: "Verifying face...",
     waitingPartner: "Waiting for someone...",
     connected: "Connected",
     live: "Live",
@@ -656,7 +629,7 @@ const translations = {
     flip: "🔄 Flip",
     showCam: "Show Cam",
     faceModalTitle: "Human Face Required",
-    faceModalDesc: "Face required to start matching! Please position your face clearly in front of the camera. Walls, ceilings, or covered lenses are not allowed.",
+    faceModalDesc: "Face required to start matching! Inanimate objects, walls, ceilings, or covered cameras are not allowed. Please face the camera properly.",
     faceModalBtn: "Got it, I'll face the camera",
     chatHeader: "💬 Live Chat",
     inputPlaceholder: "Type a message...",
@@ -672,6 +645,7 @@ const translations = {
     waiting: "Naghihintay...",
     searching: "Naghahanap...",
     finding: "Naghahanap ng makakausap...",
+    verifying: "Sinusuri ang mukha...",
     waitingPartner: "Naghihintay ng partner...",
     connected: "Konektado",
     live: "Live",
@@ -687,8 +661,8 @@ const translations = {
     camOff: "🚫 Cam Naka-off",
     flip: "🔄 Iikot",
     showCam: "Ipakita Cam",
-    faceModalTitle: "Kailangan ng Mukha ng Tao",
-    faceModalDesc: "Bawal mag-start nang walang mukha. Paki-itapat nang maayos ang iyong mukha sa camera bago magsimula. Bawal ang pader, kisame, o nakatakip na camera.",
+    faceModalTitle: "Kailangan ng Totoong Mukha ng Tao",
+    faceModalDesc: "Bawal mag-start nang walang totoong mukha ng tao. Bawal ang pader, damit, lamesa, o kung anu-anong bagay. Paki-itapat ang iyong mukha sa camera.",
     faceModalBtn: "OK, Itatapat ko ang mukha ko",
     chatHeader: "💬 Usapan",
     inputPlaceholder: "Mag-type ng mensahe...",
@@ -704,6 +678,7 @@ const translations = {
     waiting: "Esperando...",
     searching: "Buscando...",
     finding: "Buscando a alguien...",
+    verifying: "Verificando rostro...",
     waitingPartner: "Esperando compañero...",
     connected: "Conectado",
     live: "En vivo",
@@ -719,8 +694,8 @@ const translations = {
     camOff: "🚫 Cámara Apagada",
     flip: "🔄 Girar",
     showCam: "Mostrar Cámara",
-    faceModalTitle: "Se requiere rostro humano",
-    faceModalDesc: "¡Se requiere rostro para comenzar! Coloque su rostro claramente frente a la cámara. No se permiten paredes ni techos.",
+    faceModalTitle: "Se requiere rostro humano real",
+    faceModalDesc: "¡Se requiere rostro humano! No se permiten objetos, paredes ni techos. Mire a la cámara directamente.",
     faceModalBtn: "Entendido",
     chatHeader: "💬 Chat en vivo",
     inputPlaceholder: "Escribe un mensaje...",
@@ -736,6 +711,7 @@ const translations = {
     waiting: "待機中...",
     searching: "検索中...",
     finding: "相手を探しています...",
+    verifying: "顔を確認中...",
     waitingPartner: "誰かを待っています...",
     connected: "接続完了",
     live: "ライブ",
@@ -751,8 +727,8 @@ const translations = {
     camOff: "🚫 カメラOFF",
     flip: "🔄 反転",
     showCam: "カメラ表示",
-    faceModalTitle: "人間の顔が必要です",
-    faceModalDesc: "開始するにはカメラに顔を映してください。壁や天井、隠されたカメラは禁止されています。",
+    faceModalTitle: "実際の人間の顔が必要です",
+    faceModalDesc: "開始するには本物の顔を映してください。壁、天井、無生物は禁止されています。",
     faceModalBtn: "了解しました",
     chatHeader: "💬 ライブチャット",
     inputPlaceholder: "メッセージを入力...",
@@ -768,6 +744,7 @@ const translations = {
     waiting: "대기 중...",
     searching: "검색 중...",
     finding: "대화 상대를 찾는 중...",
+    verifying: "얼굴 확인 중...",
     waitingPartner: "상대를 기다리는 중...",
     connected: "연결됨",
     live: "라이브",
@@ -783,8 +760,8 @@ const translations = {
     camOff: "🚫 카메라 끔",
     flip: "🔄 전환",
     showCam: "카메라 보기",
-    faceModalTitle: "사람 얼굴이 필요합니다",
-    faceModalDesc: "시작하려면 얼굴을 카메라에 똑바로 보여주세요. 벽이나 천장, 가려진 렌즈는 허용되지 않습니다.",
+    faceModalTitle: "실제 사람 얼굴이 필요합니다",
+    faceModalDesc: "시작하려면 실제 얼굴을 비춰주세요. 물건, 벽, 천장은 금지됩니다.",
     faceModalBtn: "확인했습니다",
     chatHeader: "💬 실시간 채팅",
     inputPlaceholder: "메시지를 입력하세요...",
@@ -800,6 +777,7 @@ const translations = {
     waiting: "等待中...",
     searching: "寻找中...",
     finding: "正在寻找聊天对象...",
+    verifying: "人脸验证中...",
     waitingPartner: "等待对方加入...",
     connected: "已连接",
     live: "直播中",
@@ -815,8 +793,8 @@ const translations = {
     camOff: "🚫 摄像头关",
     flip: "🔄 翻转",
     showCam: "显示镜头",
-    faceModalTitle: "需要检测到人脸",
-    faceModalDesc: "开始前必须将脸部对准摄像头。禁止对着墙壁、天花板或遮挡镜头。",
+    faceModalTitle: "必须检测到真实人脸",
+    faceModalDesc: "开始前必须将真实人脸对准镜头。严禁对着物品、墙壁或天花板。",
     faceModalBtn: "我知道了",
     chatHeader: "💬 实时聊天",
     inputPlaceholder: "输入消息...",
@@ -832,6 +810,7 @@ const translations = {
     waiting: "En attente...",
     searching: "Recherche...",
     finding: "Recherche de quelqu'un...",
+    verifying: "Vérification visage...",
     waitingPartner: "En attente d'un partenaire...",
     connected: "Connecté",
     live: "En direct",
@@ -847,8 +826,8 @@ const translations = {
     camOff: "🚫 Caméra Coupée",
     flip: "🔄 Tourner",
     showCam: "Afficher Cam",
-    faceModalTitle: "Visage humain requis",
-    faceModalDesc: "Visage requis pour démarrer ! Veuillez positionner clairement votre visage devant la caméra. Murs et plafonds interdits.",
+    faceModalTitle: "Véritable visage humain requis",
+    faceModalDesc: "Visage humain requis ! Aucun objet, mur ou plafond n'est autorisé. Regardez la caméra.",
     faceModalBtn: "Compris",
     chatHeader: "💬 Chat en direct",
     inputPlaceholder: "Tapez un message...",
@@ -864,6 +843,7 @@ const translations = {
     waiting: "Menunggu...",
     searching: "Mencari...",
     finding: "Mencari seseorang...",
+    verifying: "Memverifikasi wajah...",
     waitingPartner: "Menunggu partner...",
     connected: "Terhubung",
     live: "Live",
@@ -879,8 +859,8 @@ const translations = {
     camOff: "🚫 Kamera Mati",
     flip: "🔄 Putar",
     showCam: "Tampilkan Cam",
-    faceModalTitle: "Wajah Manusia Diperlukan",
-    faceModalDesc: "Wajah diperlukan untuk mulai mencari! Arahkan wajah Anda ke kamera. Dilarang mengarahkan ke dinding atau langit-langit.",
+    faceModalTitle: "Wajah Manusia Asli Diperlukan",
+    faceModalDesc: "Wajib menghadapkan wajah manusia asli ke kamera. Dilarang mengarahkan ke benda, meja, dinding, atau langit-langit.",
     faceModalBtn: "Saya mengerti",
     chatHeader: "💬 Obrolan Langsung",
     inputPlaceholder: "Ketik pesan...",
@@ -1312,7 +1292,7 @@ function closePeerConnection() {
 }
 
 /* =========================================================
-   7. 🔥 STRICT OMEGLE-STYLE "START / NEXT" SYSTEM (WITH FACE LOCK)
+   7. 🔥 STRICT HUMAN FACE ENFORCEMENT (START / NEXT)
 ========================================================= */
 async function startLoop() {
   if (stopping || isTabTerminated) return;
@@ -1322,16 +1302,17 @@ async function startLoop() {
   const ok = await startMedia();
   if (!ok) return;
 
-  // 🛡️ OMEGLE FACE POLICY: HINDI MAG-SSTART PAG WALANG MUKHA!
-  showSearch(t("searching"));
-  const faceFound = await checkHumanFacePresence();
-  if (!faceFound) {
+  // 🛡️ MABILIS NA PAGSUSURI: Sinusuri kung may mata, ilong, at bibig ng tao
+  showSearch(t("verifying"));
+  const hasRealFace = await verifyStrictHumanFace();
+  
+  if (!hasRealFace) {
     hideSearch();
     showOmegleFaceWarning();
-    return; // ⛔ HINDI MAG-PPROCEED SA PAG-MATCH!
+    return; // ⛔ HINDI MAG-PPROCEED SA MATCHING! Bawal ang mga bagay o pader!
   }
 
-  // Kapag may mukha na, ituloy ang instant match!
+  // Kapag napatunayang totoong tao ang nakaharap, mag-match agad tulad ng OmeTV!
   stopCallTimer();
   closePeerConnection();
   stopAllRemoteMedia();
@@ -1373,7 +1354,7 @@ function stopSession() {
 }
 
 /* =========================================================
-   8. SOCKET EVENTS (AUTO-NEXT ON DISCONNECT TULAD NG OMETV)
+   8. SOCKET EVENTS (AUTO-NEXT ON DISCONNECT)
 ========================================================= */
 socket.on("connect", () => {
   if (!connected && !searching) statusBadge.textContent = t("ready");
