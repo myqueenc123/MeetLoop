@@ -34,14 +34,16 @@
 }
 html,body{width:100%;height:100%}
 
-/* 🌌 MALINAW AT SHARP NA BACKGROUND (WALANG PAMPALABO) */
+/* 🌌 BACKGROUND PICTURE WITH CRISP GLOW (WALANG PAMPALABO) */
 body{
   font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   color:var(--text);
   background: 
-    linear-gradient(135deg, rgba(7, 11, 20, 0.55), rgba(15, 23, 42, 0.65)),
-    url('meetloop-bg.png') center/cover no-repeat fixed;
-  background-color: var(--bg);
+    linear-gradient(135deg, rgba(7, 11, 20, 0.45), rgba(15, 23, 42, 0.55)),
+    url('meetloop-bg.png') center/cover no-repeat fixed,
+    radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.28), transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(236, 72, 153, 0.22), transparent 45%),
+    #070b14;
   overflow:hidden;
   -webkit-font-smoothing:antialiased;
 }
@@ -56,7 +58,7 @@ header{
   justify-content:space-between;
   gap:12px;
   padding:0 20px;
-  background:rgba(15,23,42,.88);
+  background:rgba(15,23,42,.85);
   border-bottom:1px solid var(--border);
   backdrop-filter:blur(14px);
   -webkit-backdrop-filter:blur(14px);
@@ -238,7 +240,7 @@ video{
 /* 🔞 18+ RULES MODAL OVERLAY (LALAGI ITONG LILITAW PAGKABISITA) */
 #rulesModalOverlay{
   position:fixed;inset:0;z-index:999999;
-  background:rgba(3,7,18,.78);
+  background:rgba(3,7,18,.75);
   display:flex;align-items:center;justify-content:center;padding:20px;
 }
 .rules-modal-box{
@@ -401,7 +403,7 @@ video{
 
 <body>
 
-<!-- 🔞 18+ RULES MODAL (LALABAS BAGO PUMASOK SA SITE) -->
+<!-- 🔞 18+ RULES MODAL -->
 <div id="rulesModalOverlay">
   <div class="rules-modal-box">
     <span class="rules-badge-18">🔞 18+ RESTRICTED</span>
@@ -557,7 +559,7 @@ Violators will be banned</div>
 "use strict";
 
 /* =========================================================
-   1. 18+ RULES & PERMISSION ENGINE (LAGING LILITAW SA START)
+   1. 18+ RULES & PERMISSION ENGINE (ALWAYS PROMPTS ON VISIT)
 ========================================================= */
 const rulesModalOverlay = document.getElementById("rulesModalOverlay");
 const acceptRulesBtn = document.getElementById("acceptRulesBtn");
@@ -1498,216 +1500,4 @@ async function handleAnswer(answer) {
   try {
     await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
     while (pendingIceCandidates.length > 0) {
-      const c = pendingIceCandidates.shift();
-      await peerConnection.addIceCandidate(c).catch(() => {});
-    }
-  } catch (err) {
-    console.error("Handle answer error:", err);
-  }
-}
-
-async function handleCandidate(candidate) {
-  const ice = new RTCIceCandidate(candidate);
-  if (peerConnection && peerConnection.remoteDescription) {
-    await peerConnection.addIceCandidate(ice).catch(() => {});
-  } else {
-    pendingIceCandidates.push(ice);
-  }
-}
-
-function closePeerConnection() {
-  if (dataChannel) { try { dataChannel.close(); } catch(e){} dataChannel = null; }
-  if (peerConnection) {
-    try {
-      peerConnection.ontrack = null;
-      peerConnection.onicecandidate = null;
-      peerConnection.close();
-    } catch(e) {}
-    peerConnection = null;
-  }
-  pendingIceCandidates = [];
-}
-
-/* =========================================================
-   8. 🔥 OMEGLE START / NEXT (WITH FAST FACE SCANNER)
-========================================================= */
-async function startLoop() {
-  if (stopping || isTabTerminated) return;
-
-  if (checkBanStatus()) return;
-
-  primeAudioElements();
-
-  const ok = await startMedia();
-  if (!ok) return;
-
-  // Bago mag-start, suriin muna kung may tao sa camera
-  showSearch(t("verifying"));
-  const faceVerified = verifyStrictHumanFace();
-  
-  if (!faceVerified) {
-    hideSearch();
-    showOmegleFaceWarning();
-    return;
-  }
-
-  stopCallTimer();
-  closePeerConnection();
-  stopAllRemoteMedia();
-
-  connected = false;
-  searching = true;
-
-  showSearch(t("finding"));
-  remoteStatus.textContent = t("searching");
-  statusBadge.textContent = t("searching");
-
-  loopBtn.textContent = t("next");
-  loopBtn.disabled = false;
-  stopBtn.disabled = false;
-
-  socket.emit("skip");
-}
-
-function stopSession() {
-  stopping = true;
-  searching = false;
-  connected = false;
-
-  stopCallTimer();
-  socket.emit("stop-search");
-
-  closePeerConnection();
-  stopAllRemoteMedia();
-
-  hideSearch();
-  remoteStatus.textContent = t("stopped");
-  statusBadge.textContent = t("ready");
-
-  loopBtn.disabled = false;
-  stopBtn.disabled = true;
-  loopBtn.textContent = t("start");
-
-  setTimeout(() => { stopping = false; }, 200);
-}
-
-/* =========================================================
-   9. SOCKET EVENTS (AUTO-NEXT ON DISCONNECT)
-========================================================= */
-socket.on("connect", () => {
-  if (!connected && !searching) statusBadge.textContent = t("ready");
-});
-
-socket.on("online-count", count => {
-  onlineCount.textContent = count;
-});
-
-socket.on("waiting", () => {
-  searching = true;
-  showSearch(t("waitingPartner"));
-  remoteStatus.textContent = t("waiting");
-  statusBadge.textContent = t("waiting");
-});
-
-socket.on("match", data => {
-  searching = false;
-  statusBadge.textContent = t("searching");
-  remoteStatus.textContent = t("searching");
-  createPeer(Boolean(data?.initiator));
-});
-
-socket.on("signal", async data => {
-  if (data.type === "offer") await handleOffer(data.offer);
-  else if (data.type === "answer") await handleAnswer(data.answer);
-  else if (data.type === "candidate") await handleCandidate(data.candidate);
-});
-
-// Auto-Next kapag nag-leave ang kausap
-socket.on("partner-disconnected", () => {
-  addMessage("System", t("strangerLeft"));
-  
-  if (!stopping) {
-    startLoop();
-  }
-});
-
-/* =========================================================
-   10. CHAT SYSTEM
-========================================================= */
-function sendMessage() {
-  const text = chatInput.value.trim();
-  if (!text) return;
-
-  if (text === "/unban") {
-    localStorage.removeItem("meetloop_ban_until");
-    localStorage.setItem("meetloop_strikes", "0");
-    alert("Admin Verified: Unbanned.");
-    location.reload();
-    return;
-  }
-
-  if (!dataChannel || dataChannel.readyState !== "open") return;
-  dataChannel.send(text);
-  addMessage(t("you").replace(/[^a-zA-Z0-9\u00C0-\u024F\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f\uac00-\ud7af]/g, "").trim() || "Me", text);
-  chatInput.value = "";
-}
-
-function addMessage(name, text) {
-  const msg = document.createElement("div");
-  msg.className = "message";
-  msg.innerHTML = `<div class="message-name">${name}</div><div class="message-text">${escapeHTML(text)}</div>`;
-  chatMessages.appendChild(msg);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function escapeHTML(str) {
-  return str.replace(/[&<>'"]/g, tag => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    "'": '&#39;',
-    '"': '&quot;'
-  }[tag] || tag));
-}
-
-/* =========================================================
-   11. EVENT LISTENERS
-========================================================= */
-hideLocalBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  localVideoBox.classList.add("camera-hidden");
-  showLocalBtn.classList.add("btn-visible");
-});
-
-showLocalBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  localVideoBox.classList.remove("camera-hidden");
-  showLocalBtn.classList.remove("btn-visible");
-});
-
-loopBtn.addEventListener("click", startLoop);
-stopBtn.addEventListener("click", stopSession);
-micBtn.addEventListener("click", toggleMic);
-camBtn.addEventListener("click", toggleCam);
-flipBtn.addEventListener("click", flipCamera);
-sendBtn.addEventListener("click", sendMessage);
-
-chatInput.addEventListener("keydown", e => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    sendMessage();
-  }
-});
-
-languageSelect.value = currentLang;
-languageSelect.addEventListener("change", (e) => {
-  currentLang = e.target.value;
-  localStorage.setItem("meetloop_lang", currentLang);
-  updateUILanguage();
-});
-
-// Initial Setup
-updateUILanguage();
-</script>
-</body>
-</html>
+      const c = pending
