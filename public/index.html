@@ -26,6 +26,9 @@
   --blue2:#3b82f6;
   --red:#ef4444;
   --purple:#8b5cf6;
+  --cyan:#06b6d4;
+  --pink:#ec4899;
+  --yellow:#eab308;
   --text:#f8fafc;
   --muted:#94a3b8;
 }
@@ -351,6 +354,9 @@ video{
   }
   #showLocalBtn.btn-visible{display:flex !important}
 
+  .video-label{left:7px;top:7px;padding:4px 7px;font-size:10px}
+  .status{left:7px;bottom:7px;padding:4px 7px;font-size:9px}
+
   .controls-bar{width:100%;display:grid;grid-template-columns:repeat(6,1fr);gap:5px;padding:0}
   .btn{width:100%;min-height:44px;padding:6px 4px;border-radius:9px;font-size:11px}
   .btn-loop{grid-column:span 4}
@@ -379,7 +385,7 @@ video{
       <li>🔞 <b>18+ Only:</b> Bawal ang menor de edad.</li>
       <li>🚫 <b>Zero Tolerance Nudity:</b> Automatic 1-Hour Ban Agad!</li>
       <li>📷 <b>Live Face Only:</b> Bawal takpan ang camera o walang tao.</li>
-      <li>⚡ <b>Single Report Rule:</b> Isang report lang kada user.</li>
+      <li>⚡ <b>Single Report Rule:</b> Isang report lang kada stranger.</li>
     </ul>
 
     <button class="portal-open-btn" id="openPortalBtn" type="button" onclick="enterMeetLoop()">
@@ -453,7 +459,7 @@ video{
   </div>
 </div>
 
-<!-- HEADER -->
+<!-- APP HEADER -->
 <header>
   <div class="brand">
     <span class="brand-icon">🔄</span>
@@ -589,11 +595,40 @@ const callTimer = document.getElementById("callTimer");
 const callTimerValue = document.getElementById("callTimerValue");
 const languageSelect = document.getElementById("languageSelect");
 
+/* =========================================================
+   🔥 METERED TURN/STUN CREDENTIALS (INILAGAY DITO)
+========================================================= */
 const rtcConfig = {
   iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun1.l.google.com:19302" },
-    { urls: "stun:stun2.l.google.com:19302" }
+    {
+      urls: "stun:stun.relay.metered.ca:80"
+    },
+    {
+      urls: "turn:standard.relay.metered.ca:80",
+      username: "0974f7094bbb79185dd1d4ce",
+      credential: "jqFOtepU3tMVTfEX"
+    },
+    {
+      urls: "turn:standard.relay.metered.ca:80?transport=tcp",
+      username: "0974f7094bbb79185dd1d4ce",
+      credential: "jqFOtepU3tMVTfEX"
+    },
+    {
+      urls: "turn:standard.relay.metered.ca:443",
+      username: "0974f7094bbb79185dd1d4ce",
+      credential: "jqFOtepU3tMVTfEX"
+    },
+    {
+      urls: "turns:standard.relay.metered.ca:443?transport=tcp",
+      username: "0974f7094bbb79185dd1d4ce",
+      credential: "jqFOtepU3tMVTfEX"
+    },
+    {
+      urls: "stun:stun.l.google.com:19302"
+    },
+    {
+      urls: "stun:stun1.l.google.com:19302"
+    }
   ]
 };
 
@@ -882,10 +917,9 @@ document.getElementById("closeFaceModalBtn").addEventListener("click", () => {
 });
 
 /* =========================================================
-   6. CAMERA HARDWARE CONTROLLER (NO STREAM CRASH)
+   6. CAMERA HARDWARE CONTROLLER (NO CRASH)
 ========================================================= */
 async function startMedia() {
-  // Kung may buhay nang stream, gamitin ito at huwag sirain
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live')) {
     if (localVideo.srcObject !== localStream) {
       localVideo.srcObject = localStream;
@@ -991,7 +1025,7 @@ function stopAllRemoteMedia() {
 }
 
 /* =========================================================
-   7. WEBRTC ENGINE (STATE GUARDED)
+   7. WEBRTC ENGINE (METERED ENABLED)
 ========================================================= */
 function showSearch(text) {
   searchText.textContent = text;
@@ -1028,7 +1062,6 @@ function handleConnected() {
   connected = true;
   searching = false;
 
-  // I-reset ang Report Button para sa bagong stranger
   hasReportedCurrentStranger = false;
   reportStrangerBtn.disabled = false;
   reportStrangerBtn.style.opacity = "1";
@@ -1162,7 +1195,7 @@ function closePeerConnection() {
 }
 
 /* =========================================================
-   8. MATCHING LOOP (START / NEXT)
+   8. MATCHING LOOP
 ========================================================= */
 async function startLoop() {
   if (stopping) return;
@@ -1258,7 +1291,7 @@ if (socket) {
 }
 
 /* =========================================================
-   10. CHAT SYSTEM & EVENTS
+   10. CHAT SYSTEM & UI EVENTS
 ========================================================= */
 function sendMessage() {
   const txt = chatInput.value.trim();
