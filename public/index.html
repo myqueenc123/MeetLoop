@@ -26,9 +26,6 @@
   --blue2:#3b82f6;
   --red:#ef4444;
   --purple:#8b5cf6;
-  --cyan:#06b6d4;
-  --pink:#ec4899;
-  --yellow:#eab308;
   --text:#f8fafc;
   --muted:#94a3b8;
 }
@@ -55,7 +52,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   position:fixed;inset:0;z-index:999999;
   display:flex;align-items:center;justify-content:center;padding:20px;
   background: 
-    linear-gradient(135deg, rgba(7, 11, 20, 0.6), rgba(15, 23, 42, 0.75)),
+    linear-gradient(135deg, rgba(7, 11, 20, 0.85), rgba(15, 23, 42, 0.95)),
     url('meetloop-bg.png') center/cover no-repeat fixed,
     #070b14;
   transition:opacity .35s ease, visibility .35s ease;
@@ -106,51 +103,26 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 #ometvLoader{
   position:fixed;inset:0;z-index:999998;
   display:none;align-items:center;justify-content:center;
-  background:#070b14;
-  flex-direction:column;padding:24px;
+  background:#070b14;flex-direction:column;padding:24px;
   transition:opacity .35s ease, visibility .35s ease;
 }
-.loader-content{
-  display:flex;flex-direction:column;align-items:center;text-align:center;
-  max-width:300px;width:100%;
-}
-.ometv-radar-box{
-  position:relative;width:90px;height:90px;
-  display:flex;align-items:center;justify-content:center;margin-bottom:24px;
-}
+.loader-content{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:300px;width:100%}
+.ometv-radar-box{position:relative;width:90px;height:90px;display:flex;align-items:center;justify-content:center;margin-bottom:24px}
 .ometv-radar-ring{
-  position:absolute;inset:0;border-radius:50%;
-  border:2px solid rgba(59,130,246,.35);
+  position:absolute;inset:0;border-radius:50%;border:2px solid rgba(59,130,246,.35);
   animation:radarPulse 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
 }
 .ometv-radar-ring:nth-child(2){animation-delay:.6s}
-@keyframes radarPulse{
-  0%{transform:scale(0.85);opacity:1}
-  100%{transform:scale(1.75);opacity:0}
-}
+@keyframes radarPulse{0%{transform:scale(0.85);opacity:1}100%{transform:scale(1.75);opacity:0}}
 .ometv-loader-logo{
-  width:60px;height:60px;border-radius:18px;
-  background:linear-gradient(135deg,#3b82f6,#ec4899);
+  width:60px;height:60px;border-radius:18px;background:linear-gradient(135deg,#3b82f6,#ec4899);
   display:flex;align-items:center;justify-content:center;font-size:30px;
-  box-shadow:0 0 25px rgba(59,130,246,.55);
-  z-index:2;
+  box-shadow:0 0 25px rgba(59,130,246,.55);z-index:2;
 }
-.loader-app-name{
-  font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:20px;
-}
-.loader-progress-track{
-  width:100%;height:5px;background:rgba(255,255,255,.08);border-radius:999px;
-  overflow:hidden;position:relative;margin-bottom:12px;
-}
-.loader-progress-bar{
-  width:0%;height:100%;border-radius:999px;
-  background:linear-gradient(90deg, #3b82f6, #ec4899);
-  box-shadow:0 0 10px rgba(236,72,153,.7);
-  transition:width .2s ease-out;
-}
-.loader-info-row{
-  display:flex;justify-content:space-between;width:100%;font-size:11px;font-weight:700;color:#94a3b8;
-}
+.loader-app-name{font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:20px}
+.loader-progress-track{width:100%;height:5px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;position:relative;margin-bottom:12px}
+.loader-progress-bar{width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg, #3b82f6, #ec4899);box-shadow:0 0 10px rgba(236,72,153,.7);transition:width .2s ease-out}
+.loader-info-row{display:flex;justify-content:space-between;width:100%;font-size:11px;font-weight:700;color:#94a3b8}
 
 /* =========================================================
    HEADER & NAVBAR
@@ -163,8 +135,7 @@ header{
 .brand{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:900;white-space:nowrap}
 .brand-icon{
   width:35px;height:35px;display:flex;align-items:center;justify-content:center;
-  border-radius:10px;background:linear-gradient(135deg,#3b82f6,#ec4899);
-  box-shadow:0 0 18px rgba(236,72,153,.45);
+  border-radius:10px;background:linear-gradient(135deg,#3b82f6,#ec4899);box-shadow:0 0 18px rgba(236,72,153,.45);
 }
 .header-right{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
 .badge{
@@ -203,9 +174,7 @@ video{
   background:#000;border:0;outline:0;transition:opacity .15s ease;
 }
 
-#localVideo{
-  filter: brightness(1.12) contrast(1.06) saturate(1.12);
-}
+#localVideo{filter:brightness(1.12) contrast(1.06) saturate(1.12)}
 #localVideo.mirrored{transform:scaleX(-1)}
 #localVideo.unmirrored{transform:scaleX(1)}
 
@@ -312,7 +281,7 @@ video{
 }
 .report-opt:hover{background:rgba(239,68,68,.2);border-color:#ef4444}
 
-/* OMETV LIVE 1-HOUR BAN SCREEN */
+/* OMETV 1-HOUR BAN OVERLAY */
 #bannedOverlay{
   position:fixed;inset:0;z-index:9999999;
   background:radial-gradient(circle at center,rgba(40,0,0,.98),#0a0000);
@@ -382,9 +351,6 @@ video{
   }
   #showLocalBtn.btn-visible{display:flex !important}
 
-  .video-label{left:7px;top:7px;padding:4px 7px;font-size:10px}
-  .status{left:7px;bottom:7px;padding:4px 7px;font-size:9px}
-
   .controls-bar{width:100%;display:grid;grid-template-columns:repeat(6,1fr);gap:5px;padding:0}
   .btn{width:100%;min-height:44px;padding:6px 4px;border-radius:9px;font-size:11px}
   .btn-loop{grid-column:span 4}
@@ -411,9 +377,9 @@ video{
 
     <ul class="portal-rules-box">
       <li>🔞 <b>18+ Only:</b> Bawal ang menor de edad.</li>
-      <li>🚫 <b>Zero Tolerance Nudity:</b> Automatic 1-Hour IP Ban agad!</li>
-      <li>📷 <b>Live Face Only:</b> Bawal ang pader, kisame, o walang mukha.</li>
-      <li>⚡ <b>Single Report Limit:</b> Bawal mag-spam ng report sa parehong user.</li>
+      <li>🚫 <b>Zero Tolerance Nudity:</b> Automatic 1-Hour Ban Agad!</li>
+      <li>📷 <b>Live Face Only:</b> Bawal takpan ang camera o walang tao.</li>
+      <li>⚡ <b>Single Report Rule:</b> Isang report lang kada user.</li>
     </ul>
 
     <button class="portal-open-btn" id="openPortalBtn" type="button" onclick="enterMeetLoop()">
@@ -447,7 +413,7 @@ video{
   <div class="report-modal-box">
     <div style="font-size:36px;margin-bottom:6px">🚩</div>
     <h3 style="font-size:17px;font-weight:900;color:#fecaca;margin-bottom:6px">Report Stranger</h3>
-    <p style="font-size:12px;color:#94a3b8">Piliin ang dahilan ng pag-report ayon sa patakaran:</p>
+    <p style="font-size:12px;color:#94a3b8">Piliin ang dahilan ayon sa patakaran:</p>
     <div class="report-reasons">
       <div class="report-opt" onclick="submitReport('Hubad / Nudity')">🔞 Hubad o Sexual Acts (Instant 1-Hour Ban)</div>
       <div class="report-opt" onclick="submitReport('Menor de Edad')">👶 Menor de edad (&lt;18 Years Old)</div>
@@ -458,7 +424,7 @@ video{
   </div>
 </div>
 
-<!-- 1-HOUR BAN OVERLAY -->
+<!-- OMETV 1-HOUR BAN OVERLAY -->
 <div id="bannedOverlay">
   <div class="banned-box">
     <div id="secretUnbanIcon" style="font-size:50px;margin-bottom:10px;cursor:pointer;user-select:none">🚫</div>
@@ -467,13 +433,13 @@ video{
       1-Hour Ban Imposed • Rule Violation
     </div>
     <p style="color:#cbd5e1;font-size:13px;line-height:1.5;margin-bottom:16px">
-      Ang iyong device/IP ay pansamantalang sinuspinde dahil sa paglabag sa Community Guidelines ng MeetLoop.
+      Ang iyong koneksyon ay pansamantalang sinuspinde dahil sa paglabag sa Community Guidelines ng MeetLoop.
     </p>
     <div class="ban-clock-container">
       <div style="font-size:11px;color:#94a3b8;font-weight:800;margin-bottom:4px">UNBAN IN:</div>
       <div id="banCountdown" style="font-size:38px;font-weight:900;color:#fecaca;font-family:monospace;letter-spacing:3px">60:00</div>
     </div>
-    <div style="font-size:11px;color:#94a3b8">Kusa kang maa-unban pagpatak ng 00:00. Kahit mag-refresh o mag-incognito ka, hindi mawawala ang ban.</div>
+    <div style="font-size:11px;color:#94a3b8">Kusa kang maa-unban pagpatak ng 00:00. Hindi mawawala ang ban kahit mag-refresh ka.</div>
   </div>
 </div>
 
@@ -482,12 +448,12 @@ video{
   <div class="face-modal-card">
     <div class="face-modal-icon">👤</div>
     <div class="face-modal-title" id="faceModalTitle">Human Face Required</div>
-    <div class="face-modal-desc" id="faceModalDesc">Bawal mag-start nang walang mukha ng tao. Bawal ang pader, damit, lamesa, kisame o kung anu-anong bagay. Paki-itapat nang maayos ang mukha sa camera.</div>
+    <div class="face-modal-desc" id="faceModalDesc">Bawal mag-start nang walang mukha ng tao. Paki-itapat nang maayos ang mukha sa camera.</div>
     <button class="face-modal-btn" id="closeFaceModalBtn" type="button">OK, Itatapat ko</button>
   </div>
 </div>
 
-<!-- APP HEADER -->
+<!-- HEADER -->
 <header>
   <div class="brand">
     <span class="brand-icon">🔄</span>
@@ -504,6 +470,12 @@ video{
     <select id="languageSelect">
       <option value="en">English (US)</option>
       <option value="tl">Tagalog (PH)</option>
+      <option value="es">Español (ES)</option>
+      <option value="ja">日本語 (JA)</option>
+      <option value="ko">한국어 (KO)</option>
+      <option value="zh">中文 (ZH)</option>
+      <option value="fr">Français (FR)</option>
+      <option value="id">Bahasa Indonesia</option>
     </select>
   </div>
 </header>
@@ -537,7 +509,7 @@ video{
           <div>Camera Off</div>
         </div>
         <div class="video-label" id="localLabel">🙂 You</div>
-        <button id="hideLocalBtn" type="button" title="Hide Camera">✕</button>
+        <button id="hideLocalBtn" type="button">✕</button>
       </div>
 
       <button id="showLocalBtn" type="button">👁️ <span id="showLocalText">Show Cam</span></button>
@@ -553,6 +525,7 @@ video{
     </div>
   </div>
 
+  <!-- Chat -->
   <div class="chat-wrapper">
     <div class="chat-header">
       <span id="chatHeader">💬 Live Chat</span>
@@ -563,9 +536,9 @@ video{
         <div class="message-name">MeetLoop Guidelines</div>
         <div class="message-text meetloop-rules-card"><span class="rules-badge-tag">🔞 18+ RULES</span>
 <b>Welcome to MeetLoop.</b>
-• 18+ Only. Zero tolerance sa hubad o kahalayan.
+• 18+ Only. Zero tolerance sa hubad o pambabastos.
 • Automatic 1-Hour Ban sa anumang paglabag.
-• Isang report lang kada user para maiwasan ang trip.</div>
+• Isang report lang kada stranger para maiwasan ang trip.</div>
       </div>
     </div>
     <div class="chat-input-area">
@@ -580,7 +553,7 @@ video{
 "use strict";
 
 /* =========================================================
-   1. GLOBAL VARIABLES & WEBRTC CONFIG
+   1. GLOBAL VARIABLES & TRANSLATIONS
 ========================================================= */
 const bannedOverlay = document.getElementById("bannedOverlay");
 const banCountdown = document.getElementById("banCountdown");
@@ -588,11 +561,13 @@ const banReasonLabel = document.getElementById("banReasonLabel");
 const reportStrangerBtn = document.getElementById("reportStrangerBtn");
 const reportModalOverlay = document.getElementById("reportModalOverlay");
 const secretUnbanIcon = document.getElementById("secretUnbanIcon");
+
 const localVideo = document.getElementById("localVideo");
 const localVideoBox = document.getElementById("localVideoBox");
 const camOffOverlay = document.getElementById("camOffOverlay");
 const hideLocalBtn = document.getElementById("hideLocalBtn");
 const showLocalBtn = document.getElementById("showLocalBtn");
+
 const remoteVideo = document.getElementById("remoteVideo");
 const remoteAudio = document.getElementById("remoteAudio");
 const loopBtn = document.getElementById("loopBtn");
@@ -600,16 +575,19 @@ const stopBtn = document.getElementById("stopBtn");
 const micBtn = document.getElementById("micBtn");
 const camBtn = document.getElementById("camBtn");
 const flipBtn = document.getElementById("flipBtn");
+
 const searchOverlay = document.getElementById("searchOverlay");
 const searchText = document.getElementById("searchText");
 const remoteStatus = document.getElementById("remoteStatus");
 const onlineCount = document.getElementById("onlineCount");
 const statusBadge = document.getElementById("statusBadge");
+
 const chatInput = document.getElementById("chatInput");
 const chatMessages = document.getElementById("chatMessages");
 const sendBtn = document.getElementById("sendBtn");
 const callTimer = document.getElementById("callTimer");
 const callTimerValue = document.getElementById("callTimerValue");
+const languageSelect = document.getElementById("languageSelect");
 
 const rtcConfig = {
   iceServers: [
@@ -622,10 +600,7 @@ const rtcConfig = {
 let socket = null;
 try {
   if (typeof io !== "undefined") {
-    socket = io({
-      transports: ["websocket", "polling"],
-      reconnection: true
-    });
+    socket = io({ transports: ["websocket", "polling"], reconnection: true });
   }
 } catch(e) {}
 
@@ -641,6 +616,33 @@ let callTimerInterval = null;
 let callStartTime = null;
 let banTimerInterval = null;
 let hasReportedCurrentStranger = false; // Isang beses lang kada stranger!
+
+const translations = {
+  en: { online:"Online:", ready:"Ready", stranger:"👤 Stranger", you:"🙂 You", waiting:"Waiting...", searching:"Searching...", finding:"Finding someone...", connected:"Connected", live:"Live", disconnected:"Disconnected", stopped:"Stopped", strangerLeft:"Stranger left", start:"▶️ Start", next:"⏭️ Next", stop:"⏹️ Stop", micOn:"🎙️ Mic On", micOff:"🔇 Mic Off", camOn:"📷 Cam On", camOff:"🚫 Cam Off", flip:"🔄 Flip", showCam:"Show Cam", chatHeader:"💬 Live Chat", inputPlaceholder:"Type a message...", send:"Send" },
+  tl: { online:"Online:", ready:"Handa", stranger:"👤 Kausap", you:"🙂 Ikaw", waiting:"Naghihintay...", searching:"Naghahanap...", finding:"Naghahanap ng makakausap...", connected:"Konektado", live:"Live", disconnected:"Naputol", stopped:"Tinigil", strangerLeft:"Umalis ang kausap", start:"▶️ Simulan", next:"⏭️ Kasunod", stop:"⏹️ Itigil", micOn:"🎙️ Mic Bukas", micOff:"🔇 Mic Naka-off", camOn:"📷 Cam Bukas", camOff:"🚫 Cam Naka-off", flip:"🔄 Iikot", showCam:"Ipakita Cam", chatHeader:"💬 Usapan", inputPlaceholder:"Mag-type ng mensahe...", send:"Ipadala" }
+};
+let currentLang = localStorage.getItem("meetloop_lang") || "en";
+function t(k){ return translations[currentLang]?.[k] || translations["en"]?.[k] || ""; }
+
+function updateUILanguage() {
+  document.getElementById("onlineLabel").textContent = t("online");
+  document.getElementById("remoteLabel").textContent = t("stranger");
+  document.getElementById("localLabel").textContent = t("you");
+  document.getElementById("chatHeader").textContent = t("chatHeader");
+  chatInput.placeholder = t("inputPlaceholder");
+  sendBtn.textContent = t("send");
+  document.getElementById("showLocalText").textContent = t("showCam");
+  if (!connected && !searching) {
+    statusBadge.textContent = t("ready");
+    remoteStatus.textContent = t("waiting");
+    loopBtn.textContent = t("start");
+  } else {
+    loopBtn.textContent = t("next");
+  }
+  stopBtn.textContent = t("stop");
+  flipBtn.textContent = t("flip");
+  updateMediaButtons();
+}
 
 /* =========================================================
    2. 1-HOUR BAN SYSTEM (OMETV ENGINE)
@@ -687,7 +689,6 @@ function triggerInstantOneHourBan(reason) {
   const banUntil = Date.now() + ONE_HOUR;
   localStorage.setItem("meetloop_ban_until", banUntil.toString());
   localStorage.setItem("meetloop_ban_reason", reason);
-
   stopSession();
   checkBanStatus();
 }
@@ -695,12 +696,12 @@ function triggerInstantOneHourBan(reason) {
 checkBanStatus();
 
 /* =========================================================
-   3. REPORT HANDLER (ONE REPORT PER PAIR)
+   3. REPORT HANDLER (ONE REPORT PER PAIR LIMIT)
 ========================================================= */
 reportStrangerBtn.addEventListener("click", () => {
   if (!connected) return;
   if (hasReportedCurrentStranger) {
-    alert("Nai-report mo na ang user na ito. Hindi na pwedeng ulitin.");
+    alert("Nai-report mo na ang user na ito. Bawal i-spam.");
     return;
   }
   reportModalOverlay.style.display = "flex";
@@ -719,21 +720,21 @@ function submitReport(reason) {
     return;
   }
 
-  // I-disable agad ang Report button
+  // I-lock agad ang report button
   hasReportedCurrentStranger = true;
   reportStrangerBtn.disabled = true;
   reportStrangerBtn.style.opacity = "0.5";
   reportStrangerBtn.style.cursor = "not-allowed";
   reportStrangerBtn.textContent = "✓ Reported";
 
-  // Ipadala sa dataChannel
+  // Ipadala sa kausap via DataChannel
   if (dataChannel && dataChannel.readyState === "open") {
     try {
       dataChannel.send(JSON.stringify({ type: "REPORT_STRIKE", reason: reason }));
     } catch(e) {}
   }
 
-  // Ipadala sa Socket server kung available
+  // Ipadala sa server
   if (socket) {
     socket.emit("report-user", { reason: reason });
   }
@@ -741,23 +742,23 @@ function submitReport(reason) {
   addMessage("System", `🚩 Na-report mo ang user (${reason}). Nililipat ka na sa susunod...`);
   setTimeout(() => {
     startLoop();
-  }, 500);
+  }, 400);
 }
 
 function handleIncomingReport(reason) {
-  // CRITICAL OFFENSE = INSTANT 1-HOUR BAN AGAD
+  // CRITICAL OFFENSE: Automatic 1-Hour Ban Agad!
   if (reason.includes("Hubad") || reason.includes("Nudity") || reason.includes("Menor")) {
-    alert(`🚨 INSTANT 1-HOUR SUSPENSION: Na-report ka sa pinagbabawal na gawi (${reason})!`);
+    alert(`🚨 INSTANT 1-HOUR BAN: Na-report ka sa hindi pinapahintulutang gawi (${reason})!`);
     triggerInstantOneHourBan(`Kritikal na Paglabag: ${reason}`);
     return;
   }
 
-  // Accumulative strikes para sa ibang violation
+  // Minor reports: 2 Strikes = 1-Hour Ban
   let strikes = parseInt(localStorage.getItem("meetloop_strikes") || "0") + 1;
   localStorage.setItem("meetloop_strikes", strikes.toString());
 
   if (strikes >= 2) {
-    alert(`🚨 1-HOUR SUSPENSION: Naipon ang mga report laban sa'yo dahil sa ${reason}!`);
+    alert(`🚨 1-HOUR SUSPENSION: Naipon ang mga ulat laban sa'yo dahil sa ${reason}!`);
     triggerInstantOneHourBan(`Naipong Reports: ${reason}`);
   } else {
     alert(`⚠️ BABALA (1/2): Na-report ka dahil sa "${reason}". Isa pang report at maba-ban ka sa loob ng 1 ORAS!`);
@@ -765,7 +766,7 @@ function handleIncomingReport(reason) {
   }
 }
 
-// Secret Unban clicker (3 clicks sa icon para sa admin test)
+// Secret Unban clicker (3 clicks sa icon)
 let banClickCount = 0;
 secretUnbanIcon.addEventListener("click", () => {
   banClickCount++;
@@ -779,7 +780,7 @@ secretUnbanIcon.addEventListener("click", () => {
 });
 
 /* =========================================================
-   4. INTRO & PORTAL CONTROLLER
+   4. INTRO PORTAL
 ========================================================= */
 window.enterMeetLoop = function() {
   sessionStorage.setItem("meetloop_session_active", "true");
@@ -794,15 +795,14 @@ window.enterMeetLoop = function() {
   if (loader) loader.style.display = "flex";
 
   try {
-    const ra = document.getElementById("remoteAudio");
-    if (ra) { ra.muted = false; ra.volume = 1.0; }
+    if (remoteAudio) { remoteAudio.muted = false; remoteAudio.volume = 1.0; }
   } catch(e) {}
 
   const mediaPromise = startMedia();
 
   let progress = 0;
   const progressInterval = setInterval(() => {
-    progress += Math.floor(Math.random() * 14) + 12;
+    progress += Math.floor(Math.random() * 15) + 12;
     if (progress >= 100) {
       progress = 100;
       clearInterval(progressInterval);
@@ -811,9 +811,9 @@ window.enterMeetLoop = function() {
     pNum.textContent = progress + "%";
 
     if (progress < 40) sText.textContent = "Connecting to server...";
-    else if (progress < 80) sText.textContent = "Checking camera & network...";
+    else if (progress < 80) sText.textContent = "Checking camera...";
     else sText.textContent = "Ready!";
-  }, 120);
+  }, 100);
 
   setTimeout(async () => {
     await mediaPromise;
@@ -825,14 +825,14 @@ window.enterMeetLoop = function() {
     setTimeout(() => {
       if (loader) {
         loader.style.opacity = "0";
-        setTimeout(() => { loader.style.display = "none"; }, 350);
+        setTimeout(() => { loader.style.display = "none"; }, 300);
       }
-    }, 250);
-  }, 1100);
+    }, 200);
+  }, 900);
 };
 
 /* =========================================================
-   5. ANTI-CHEAT FACE DETECTOR
+   5. STRICT HUMAN FACE DETECTION
 ========================================================= */
 async function verifyStrictHumanFace() {
   if (!localVideo) return false;
@@ -871,7 +871,7 @@ async function verifyStrictHumanFace() {
     for (let y of lumaArr) variance += Math.pow(y - avg, 2);
     variance = variance / lumaArr.length;
 
-    return variance > 100;
+    return variance > 90;
   } catch(e) {
     return true;
   }
@@ -882,12 +882,15 @@ document.getElementById("closeFaceModalBtn").addEventListener("click", () => {
 });
 
 /* =========================================================
-   6. CAMERA HARDWARE & CONTROLS
+   6. CAMERA HARDWARE CONTROLLER (NO STREAM CRASH)
 ========================================================= */
 async function startMedia() {
+  // Kung may buhay nang stream, gamitin ito at huwag sirain
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live')) {
-    localVideo.srcObject = localStream;
-    localVideo.muted = true;
+    if (localVideo.srcObject !== localStream) {
+      localVideo.srcObject = localStream;
+      localVideo.muted = true;
+    }
     camOffOverlay.style.display = "none";
     localVideo.style.opacity = "1";
     await localVideo.play().catch(() => {});
@@ -902,8 +905,7 @@ async function startMedia() {
       video: {
         facingMode: { ideal: currentFacingMode },
         width: { ideal: isMobile ? 640 : 1280 },
-        height: { ideal: isMobile ? 480 : 720 },
-        frameRate: { ideal: 30 }
+        height: { ideal: isMobile ? 480 : 720 }
       },
       audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
     });
@@ -928,8 +930,8 @@ function updateMediaButtons() {
   if (!localStream) return;
   const a = localStream.getAudioTracks()[0];
   const v = localStream.getVideoTracks()[0];
-  if (a) micBtn.textContent = a.enabled ? "🎙️ Mic On" : "🔇 Mic Off";
-  if (v) camBtn.textContent = v.enabled ? "📷 Cam On" : "🚫 Cam Off";
+  if (a) micBtn.textContent = a.enabled ? t("micOn") : t("micOff");
+  if (v) camBtn.textContent = v.enabled ? t("camOn") : t("camOff");
 }
 
 function toggleMic() {
@@ -952,12 +954,16 @@ async function flipCamera() {
   currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
   
   try {
-    localStream.getVideoTracks().forEach(t => t.stop());
+    const oldTrack = localStream.getVideoTracks()[0];
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: currentFacingMode } }
     });
     const newTrack = stream.getVideoTracks()[0];
-    localStream.removeTrack(localStream.getVideoTracks()[0]);
+    
+    if (oldTrack) {
+      oldTrack.stop();
+      localStream.removeTrack(oldTrack);
+    }
     localStream.addTrack(newTrack);
     localVideo.srcObject = localStream;
     localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
@@ -985,7 +991,7 @@ function stopAllRemoteMedia() {
 }
 
 /* =========================================================
-   7. WEBRTC ENGINE & MATCHING
+   7. WEBRTC ENGINE (STATE GUARDED)
 ========================================================= */
 function showSearch(text) {
   searchText.textContent = text;
@@ -1022,7 +1028,7 @@ function handleConnected() {
   connected = true;
   searching = false;
 
-  // Ibalik sa clickable ang Report button para sa bagong stranger
+  // I-reset ang Report Button para sa bagong stranger
   hasReportedCurrentStranger = false;
   reportStrangerBtn.disabled = false;
   reportStrangerBtn.style.opacity = "1";
@@ -1030,11 +1036,11 @@ function handleConnected() {
   reportStrangerBtn.textContent = "🚩 Report";
 
   hideSearch();
-  statusBadge.textContent = "Connected";
-  remoteStatus.textContent = "Live";
+  statusBadge.textContent = t("connected");
+  remoteStatus.textContent = t("live");
   loopBtn.disabled = false;
   stopBtn.disabled = false;
-  loopBtn.textContent = "⏭️ Next";
+  loopBtn.textContent = t("next");
   startCallTimer();
 }
 
@@ -1043,7 +1049,9 @@ function createPeer(initiator) {
   peerConnection = new RTCPeerConnection(rtcConfig);
 
   if (localStream) {
-    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+    localStream.getTracks().forEach(track => {
+      peerConnection.addTrack(track, localStream);
+    });
   }
 
   peerConnection.onicecandidate = (e) => {
@@ -1052,7 +1060,7 @@ function createPeer(initiator) {
 
   peerConnection.ontrack = (e) => {
     hideSearch();
-    remoteStatus.textContent = "Live";
+    remoteStatus.textContent = t("live");
     const stream = (e.streams && e.streams[0]) ? e.streams[0] : null;
 
     if (stream) {
@@ -1070,7 +1078,7 @@ function createPeer(initiator) {
 
   peerConnection.onconnectionstatechange = () => {
     if (peerConnection?.connectionState === "connected") handleConnected();
-    else if (peerConnection?.connectionState === "disconnected") remoteStatus.textContent = "Disconnected";
+    else if (peerConnection?.connectionState === "disconnected") remoteStatus.textContent = t("disconnected");
   };
 
   if (initiator) {
@@ -1120,9 +1128,11 @@ async function handleOffer(offer) {
 
 async function handleAnswer(ans) {
   try {
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(ans));
-    while (pendingIceCandidates.length > 0) {
-      await peerConnection.addIceCandidate(pendingIceCandidates.shift());
+    if (peerConnection && peerConnection.signalingState === "have-local-offer") {
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(ans));
+      while (pendingIceCandidates.length > 0) {
+        await peerConnection.addIceCandidate(pendingIceCandidates.shift());
+      }
     }
   } catch(e){}
 }
@@ -1176,10 +1186,10 @@ async function startLoop() {
   connected = false;
   searching = true;
 
-  showSearch("Finding someone...");
-  remoteStatus.textContent = "Searching...";
-  statusBadge.textContent = "Searching...";
-  loopBtn.textContent = "⏭️ Next";
+  showSearch(t("finding"));
+  remoteStatus.textContent = t("searching");
+  statusBadge.textContent = t("searching");
+  loopBtn.textContent = t("next");
   loopBtn.disabled = false;
   stopBtn.disabled = false;
 
@@ -1198,12 +1208,12 @@ function stopSession() {
   stopAllRemoteMedia();
 
   hideSearch();
-  remoteStatus.textContent = "Stopped";
-  statusBadge.textContent = "Ready";
+  remoteStatus.textContent = t("stopped");
+  statusBadge.textContent = t("ready");
 
   loopBtn.disabled = false;
   stopBtn.disabled = true;
-  loopBtn.textContent = "▶️ Start";
+  loopBtn.textContent = t("start");
 
   setTimeout(() => { stopping = false; }, 200);
 }
@@ -1213,39 +1223,42 @@ function stopSession() {
 ========================================================= */
 if (socket) {
   socket.on("online-count", count => { onlineCount.textContent = count; });
+  
   socket.on("waiting", () => {
     searching = true;
     showSearch("Waiting for partner...");
-    remoteStatus.textContent = "Waiting...";
+    remoteStatus.textContent = t("waiting");
   });
+
   socket.on("match", data => {
     searching = false;
     createPeer(Boolean(data?.initiator));
   });
+
   socket.on("signal", async data => {
     if (data.type === "offer") await handleOffer(data.offer);
     else if (data.type === "answer") await handleAnswer(data.answer);
     else if (data.type === "candidate") await handleCandidate(data.candidate);
   });
+
   socket.on("partner-disconnected", () => {
-    addMessage("System", "Stranger left.");
+    addMessage("System", t("strangerLeft"));
     if (!stopping) startLoop();
   });
 
-  // Server IP Ban Responses
   socket.on("ip-banned", (data) => {
     stopSession();
     triggerInstantOneHourBan(data.reason || "Rule Violation");
   });
 
   socket.on("warning-strike", (data) => {
-    alert(`⚠️ BABALA: Nai-report ka dahil sa "${data.reason}". Isa pang report at maba-ban ka sa loob ng 1 ORAS!`);
+    alert(`⚠️ BABALA: Nai-report ka dahil sa "${data.reason}". Kapag inulit mo pa, maba-ban ka sa loob ng 1 ORAS!`);
     addMessage("System", `⚠️ Babala: Nai-report ang iyong ikinilos (${data.reason}).`);
   });
 }
 
 /* =========================================================
-   10. CHAT SYSTEM & UI EVENTS
+   10. CHAT SYSTEM & EVENTS
 ========================================================= */
 function sendMessage() {
   const txt = chatInput.value.trim();
@@ -1297,6 +1310,16 @@ showLocalBtn.addEventListener("click", (e) => {
   localVideoBox.classList.remove("camera-hidden");
   showLocalBtn.classList.remove("btn-visible");
 });
+
+languageSelect.value = currentLang;
+languageSelect.addEventListener("change", (e) => {
+  currentLang = e.target.value;
+  localStorage.setItem("meetloop_lang", currentLang);
+  updateUILanguage();
+});
+
+// Init UI
+updateUILanguage();
 </script>
 </body>
 </html>
