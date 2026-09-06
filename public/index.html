@@ -80,7 +80,7 @@ select option{background:#111827;color:#fff}
 .videos-grid{flex:1;min-height:0;display:flex;gap:10px}
 .video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#000;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 35px rgba(0,0,0,.25)}
 
-/* HD Video display rules: pampalinaw at tanggal blur */
+/* Optimized video render para matalas at hindi blur */
 video{
   display:block;
   width:100%;
@@ -213,7 +213,7 @@ video{
       <div class="video-box">
         <!-- Remote Video -->
         <video id="remoteVideo" autoplay playsinline webkit-playsinline muted></video>
-        <!-- Dedicated Remote Audio para 100% automatic sound nang walang banner -->
+        <!-- Dedicated Audio Element: Automatic Audio Reproduction nang walang banner -->
         <audio id="remoteAudio" autoplay playsinline></audio>
         <div class="video-label" id="remoteLabel">👤 Stranger</div>
         <div class="status" id="remoteStatus">Waiting...</div>
@@ -242,7 +242,7 @@ video{
   <div class="chat-wrapper">
     <div class="chat-header" id="chatHeader">💬 Live Chat</div>
     <div class="chat-messages" id="chatMessages">
-      <!-- Welcome Updates Announcement para sa users -->
+      <!-- Announcement para alam ng users ang mga bago -->
       <div class="message">
         <div class="message-name">System Update</div>
         <div class="message-text"><span class="update-badge">WHAT'S NEW</span>
@@ -526,7 +526,7 @@ function updateUILanguage() {
 }
 
 /* =========================================================
-   2. DOM & WEBRTC SETUP
+   2. DOM & WEBRTC SETUP (GOOGLE STUN PRIORITY)
 ========================================================= */
 const socket = io({
   transports: ["websocket", "polling"],
@@ -553,16 +553,17 @@ const languageSelect = document.getElementById("languageSelect");
 const callTimer = document.getElementById("callTimer");
 const callTimerValue = document.getElementById("callTimerValue");
 
+// INUNA ANG GOOGLE STUN SERVERS PARA 0 MB BAWAS SA METERED QUOTA!
 const rtcConfig = {
   iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" },
+    { urls: "stun:stun2.l.google.com:19302" },
+    { urls: "stun:stun3.l.google.com:19302" },
+    { urls: "stun:stun4.l.google.com:19302" },
     { urls: "stun:stun.relay.metered.ca:80" },
     {
       urls: "turn:global.relay.metered.ca:80",
-      username: "ab517030afee9414b9e155c5",
-      credential: "MCHZdjwDZ2KjW9bv"
-    },
-    {
-      urls: "turn:global.relay.metered.ca:80?transport=tcp",
       username: "ab517030afee9414b9e155c5",
       credential: "MCHZdjwDZ2KjW9bv"
     },
@@ -636,12 +637,11 @@ function stopCallTimer() {
 }
 
 /* =========================================================
-   3. HIGH-DEFINITION (HD) CAMERA & ANTI-BLUR BOOST
+   3. HD VIDEO & TIPID SA BANDWIDTH (1.2 Mbps)
 ========================================================= */
 async function startMedia() {
   if (localStream) return true;
   try {
-    // HD 720p/1080p Resolution para hindi lumabo sa phone
     localStream = await navigator.mediaDevices.getUserMedia({
       video: { 
         facingMode: currentFacingMode,
@@ -667,7 +667,7 @@ async function startMedia() {
   }
 }
 
-// 2.5 Mbps HD Bitrate Booster
+// 1.2 Mbps Bitrate: Napakalinaw na HD pero 50% ang bawas sa data consumption
 async function boostVideoQuality(pc) {
   if (!pc) return;
   try {
@@ -677,7 +677,7 @@ async function boostVideoQuality(pc) {
       if (!params.encodings || params.encodings.length === 0) {
         params.encodings = [{}];
       }
-      params.encodings[0].maxBitrate = 2500000;
+      params.encodings[0].maxBitrate = 1200000;
       params.encodings[0].maxFramerate = 30;
       params.degradationPreference = "maintain-resolution";
       await sender.setParameters(params);
@@ -802,7 +802,6 @@ function createPeer(initiator) {
       remoteAudio.srcObject.addTrack(event.track);
     }
 
-    // Awtomatikong mag-play ang video at audio nang walang banner
     remoteVideo.play().catch(() => {});
     remoteAudio.play().catch(() => {});
   };
