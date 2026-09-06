@@ -1,129 +1,146 @@
-const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
-const path = require("path");
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "*" } });
 
-// Inayos: Nilagyan ng CORS para gumana kahit i-test sa ibang device o IP
-const io = new Server(server, {
-    cors: { origin: "*" }
-});
+app.use(express.static('public'));
 
-app.use(express.static(path.join(__dirname, "public")));
+// --- PERMANENT / SERVER-SIDE IP BAN STORAGE ---
+// Hinding-hindi ito mabubura kahit mag-clear cookies o site data ang user!
+const bannedIPs = new Map(); // ip -> { banUntil: timestamp, reason: string }
+const ipStrikes = new Map(); // ip -> number ng verified reports
 
-let waitingUser = null;
-
-// Inayos: Mas accurate ang sockets.size kaysa sa engine.clientsCount
-function broadcastOnlineCount() {
-    io.emit("online-count", io.sockets.sockets.size);
+function getClientIP(socket) {
+  const forwarded = socket.handshake.headers['x-forwarded-for'];
+  if (forwarded) {
+    return forwarded.split(',')[0].trim();
+  }
+  return socket.handshake.address || socket.conn.remoteAddress;
 }
 
-io.on("connection", (socket) => {
-    console.log("User connected:", socket.id);
-    broadcastOnlineCount();
+// 🛑 SERVER-SIDE GATEKEEPER: Haharangin agad bago pa makapag-connect!
+io.use((socket, next) => {
+  const ip = getClientIP(socket);
+  const banRecord = bannedIPs.get(ip);
 
-    socket.on("skip", () => {
-        // 1. Putulin muna ang koneksyon sa lumang partner kung meron man
-        if (socket.partnerId) {
-            const oldPartner = io.sockets.sockets.get(socket.partnerId);
-
-            if (oldPartner) {
-                oldPartner.partnerId = null;
-                oldPartner.emit("partner-disconnected");
-            }
-            socket.partnerId = null;
-        }
-
-        // Kung siya na mismo ang kasalukuyang naghihintay, huwag nang ulitin
-        if (waitingUser === socket) return;
-
-        // INAYOS: Check kung ang naghihintay ay disconnected na pala (Ghost User Fix)
-        if (waitingUser && !waitingUser.connected) {
-            waitingUser = null;
-        }
-
-        // Kung walang naghihintay, siya ang magiging waitingUser
-        if (!waitingUser) {
-            waitingUser = socket;
-            socket.emit("waiting");
-            console.log("Waiting in line:", socket.id);
-            return;
-        }
-
-        // Kung may naghihintay at buhay pa ang connection, ipares sila
-        const partner = waitingUser;
-        waitingUser = null;
-
-        // Proteksyon para hindi maipares ang sarili sa sarili
-        if (partner.id === socket.id) {
-            waitingUser = socket;
-            socket.emit("waiting");
-            return;
-        }
-
-        socket.partnerId = partner.id;
-        partner.partnerId = socket.id;
-
-        partner.emit("match", { initiator: true });
-        socket.emit("match", { initiator: false });
-
-        console.log("Matched:", partner.id, "<->", socket.id);
-    });
-
-    socket.on("stop-search", () => {
-        if (waitingUser === socket) {
-            waitingUser = null;
-            console.log("Stopped searching:", socket.id);
-        }
-
-        if (socket.partnerId) {
-            const oldPartner = io.sockets.sockets.get(socket.partnerId);
-
-            if (oldPartner) {
-                oldPartner.partnerId = null;
-                oldPartner.emit("partner-disconnected");
-            }
-            socket.partnerId = null;
-        }
-    });
-
-    socket.on("signal", (data) => {
-        if (!socket.partnerId) return;
-
-        const partner = io.sockets.sockets.get(socket.partnerId);
-
-        // INAYOS: Siguraduhing buhay pa ang socket ng partner bago mag-send ng video signal
-        if (partner && partner.connected) {
-            partner.emit("signal", data);
-        }
-    });
-
-    socket.on("disconnect", () => {
-        console.log("User disconnected:", socket.id);
-
-        if (waitingUser === socket) {
-            waitingUser = null;
-        }
-
-        if (socket.partnerId) {
-            const partner = io.sockets.sockets.get(socket.partnerId);
-
-            if (partner) {
-                partner.partnerId = null;
-                partner.emit("partner-disconnected");
-            }
-            socket.partnerId = null;
-        }
-
-        broadcastOnlineCount();
-    });
+  if (banRecord) {
+    if (banRecord.banUntil > Date.now()) {
+      // BANNED PA RIN ANG IP!
+      return next(new Error(`IP_BANNED:${banRecord.banUntil}:${encodeURIComponent(banRecord.reason)}`));
+    } else {
+      // Tapos na ang 1-Hour ban
+      bannedIPs.delete(ip);
+      ipStrikes.delete(ip);
+    }
+  }
+  next();
 });
 
-// INAYOS: process.env.PORT para ready kapag in-upload online (e.g. Render/Railway)
+let waitingQueue = [];
+const matches = new Map();
+
+io.on('connection', (socket) => {
+  const userIP = getClientIP(socket);
+  io.emit('online-count', io.engine.clientsCount);
+
+  // Padalhan ang client ng signal na ligtas ang IP niya
+  socket.emit('ip-verified');
+
+  function leaveCurrent() {
+    waitingQueue = waitingQueue.filter(id => id !== socket.id);
+    const m = matches.get(socket.id);
+    if (m) {
+      const partner = io.sockets.sockets.get(m.partnerId);
+      if (partner) {
+        partner.emit('partner-disconnected');
+        matches.delete(m.partnerId);
+      }
+      matches.delete(socket.id);
+    }
+  }
+
+  function findMatch() {
+    leaveCurrent();
+    waitingQueue = waitingQueue.filter(id => id !== socket.id && io.sockets.sockets.has(id));
+
+    if (waitingQueue.length > 0) {
+      const partnerId = waitingQueue.shift();
+      const partner = io.sockets.sockets.get(partnerId);
+
+      if (partner) {
+        matches.set(socket.id, { partnerId, reported: false });
+        matches.set(partnerId, { partnerId: socket.id, reported: false });
+
+        socket.emit('match', { initiator: true });
+        partner.emit('match', { initiator: false });
+      } else {
+        waitingQueue.push(socket.id);
+        socket.emit('waiting');
+      }
+    } else {
+      waitingQueue.push(socket.id);
+      socket.emit('waiting');
+    }
+  }
+
+  socket.on('skip', findMatch);
+  socket.on('stop-search', leaveCurrent);
+
+  socket.on('signal', (data) => {
+    const m = matches.get(socket.id);
+    if (m && m.partnerId) {
+      io.to(m.partnerId).emit('signal', data);
+    }
+  });
+
+  // --- OMETV VERIFIED REPORT & IP BAN TRIGGER ---
+  socket.on('report-user', (data) => {
+    const m = matches.get(socket.id);
+    if (!m || m.reported) return;
+    m.reported = true;
+
+    const partner = io.sockets.sockets.get(m.partnerId);
+    if (!partner) return;
+
+    // Tanging verified violations lang ang bibilangin ng server (Anti-Troll)
+    if (data.verified === true) {
+      const partnerIP = getClientIP(partner);
+      const strikes = (ipStrikes.get(partnerIP) || 0) + 1;
+      ipStrikes.set(partnerIP, strikes);
+
+      if (strikes >= 2) {
+        const ONE_HOUR = 60 * 60 * 1000;
+        const banUntil = Date.now() + ONE_HOUR;
+
+        // I-SAVE SA SERVER MEMORY ANG IP
+        bannedIPs.set(partnerIP, {
+          banUntil: banUntil,
+          reason: data.reason || "Rule Violation"
+        });
+
+        partner.emit('ip-banned', {
+          banUntil: banUntil,
+          reason: data.reason || "Rule Violation"
+        });
+
+        setTimeout(() => {
+          partner.disconnect(true);
+        }, 300);
+      }
+    }
+
+    leaveCurrent();
+    findMatch();
+  });
+
+  socket.on('disconnect', () => {
+    leaveCurrent();
+    io.emit('online-count', io.engine.clientsCount);
+  });
+});
+
 const PORT = process.env.PORT || 3000;
-
-server.listen(PORT, () => {
-    console.log(`MeetLoop is running at http://localhost:${PORT}`);
-});
+server.listen(PORT, () => console.log(`MeetLoop Server running on port ${PORT}`));
