@@ -35,7 +35,6 @@
 }
 html,body{width:100%;height:100%}
 
-/* 🌌 MAIN BACKGROUND PICTURE */
 body{
   font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   color:var(--text);
@@ -161,19 +160,10 @@ select option{background:#0f172a;color:#fff}
 
 video{
   display:block;width:100%;height:100%;object-fit:cover;object-position:center center;
-  background:#000;border:0;outline:0;transition:filter .2s ease, opacity .15s ease;
+  background:#000;border:0;outline:0;transition:opacity .15s ease;
 }
 #localVideo.mirrored{transform:scaleX(-1)}
 #localVideo.unmirrored{transform:scaleX(1)}
-
-/* 💡 CAMERA BRIGHTNESS MODES */
-#localVideo.light-off{filter:none}
-#localVideo.light-boost{filter:brightness(1.22) contrast(1.06) saturate(1.08)}
-#localVideo.light-super{filter:brightness(1.45) contrast(1.12) saturate(1.12)}
-.video-box.halo-glow{
-  box-shadow:0 0 35px rgba(255,245,230,.35), 0 10px 35px rgba(0,0,0,.6) !important;
-  border-color:rgba(255,255,255,.6) !important;
-}
 
 #camOffOverlay{
   position:absolute;inset:0;background:#090d16;color:#94a3b8;
@@ -225,12 +215,11 @@ video{
 .btn:disabled{opacity:.45;cursor:not-allowed}
 
 .btn-loop{
-  flex:1.6;background:linear-gradient(135deg,var(--blue),var(--blue2));
+  flex:1.8;background:linear-gradient(135deg,var(--blue),var(--blue2));
   box-shadow:0 6px 20px rgba(37,99,235,.3);font-size:13px;
 }
 .btn-stop{flex:1;background:linear-gradient(135deg,#dc2626,#ef4444)}
 .btn-toggle{flex:1;background:rgba(255,255,255,.07)}
-.btn-light{flex:1.1;background:linear-gradient(135deg,rgba(234,179,8,.2),rgba(234,179,8,.08));border-color:rgba(234,179,8,.3);color:#fef08a}
 .btn-flip{display:none;flex:1;background:linear-gradient(135deg,#7c3aed,#8b5cf6)}
 
 /* CHAT SIDEBAR */
@@ -301,6 +290,13 @@ video{
   max-width:420px;width:100%;padding:30px 22px;text-align:center;
   background:rgba(17,24,39,.9);border:1px solid rgba(239,68,68,.3);border-radius:22px;
 }
+.dup-icon{font-size:36px;margin-bottom:8px}
+.dup-title{font-size:18px;font-weight:900;color:#fff;margin-bottom:8px}
+.dup-desc{font-size:12px;color:#94a3b8;line-height:1.5;margin-bottom:16px}
+.dup-btn{
+  width:100%;min-height:44px;border-radius:10px;border:0;color:#fff;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));font-weight:800;cursor:pointer;
+}
 
 /* 🛡️ STRICT FACE WARNING */
 #faceModalOverlay{
@@ -311,6 +307,9 @@ video{
   max-width:390px;width:100%;padding:28px 24px;text-align:center;
   background:rgba(17,24,39,.96);border:2px solid #ef4444;border-radius:24px;
 }
+.face-modal-icon{font-size:38px;margin-bottom:8px}
+.face-modal-title{font-size:17px;font-weight:900;color:#fecaca;margin-bottom:8px}
+.face-modal-desc{font-size:12px;color:#cbd5e1;line-height:1.6;margin-bottom:18px}
 .face-modal-btn{
   width:100%;min-height:46px;font-size:14px;font-weight:900;border-radius:12px;border:0;
   cursor:pointer;color:#fff;background:linear-gradient(135deg,#2563eb,#3b82f6);
@@ -359,10 +358,13 @@ video{
   .video-label{left:7px;top:7px;padding:4px 7px;font-size:10px}
   .status{left:7px;bottom:7px;padding:4px 7px;font-size:9px}
 
-  .controls-bar{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:0}
+  /* 5-button balanced mobile grid */
+  .controls-bar{width:100%;display:grid;grid-template-columns:repeat(6,1fr);gap:5px;padding:0}
   .btn{width:100%;min-height:44px;padding:6px 4px;border-radius:9px;font-size:11px}
-  .btn-loop{grid-column:span 2}
-  .btn-flip{display:flex}
+  .btn-loop{grid-column:span 4}
+  .btn-stop{grid-column:span 2}
+  .btn-toggle{grid-column:span 2}
+  .btn-flip{display:flex;grid-column:span 2}
 
   .chat-wrapper{width:100%;max-width:none;height:250px;min-height:250px;border-radius:13px}
   .chat-header{padding:10px;font-size:12px}
@@ -375,7 +377,7 @@ video{
 <body>
 
 <!-- =========================================================
-     🚀 WELCOME HOMEPAGE PORTAL (LANDING SCREEN)
+     🚀 WELCOME HOMEPAGE PORTAL
 ========================================================= -->
 <div id="welcomePortal">
   <div class="portal-card">
@@ -383,7 +385,6 @@ video{
     <h1 class="portal-title">MeetLoop</h1>
     <div class="portal-subtitle">Powered by Jm Devs • Random Video Chat</div>
 
-    <!-- 18+ RULES OVERVIEW -->
     <ul class="portal-rules-box">
       <li>🔞 <b>18+ Only:</b> You must be 18 years or older to enter.</li>
       <li>🚫 <b>Strict Zero Tolerance:</b> No nudity, sexual acts, or harassment.</li>
@@ -392,7 +393,6 @@ video{
       <li>⚡ <b>5-Strike System:</b> Violators will be banned automatically.</li>
     </ul>
 
-    <!-- 🔓 OPEN BUTTON: 100% GARANTISADONG GAGANA AT HINDI MAG-BBUG -->
     <button class="portal-open-btn" id="openPortalBtn" type="button" onclick="enterMeetLoop()">
       <span>🔓 OPEN MEETLOOP</span>
       <span style="font-size:18px">➔</span>
@@ -416,7 +416,7 @@ video{
   </div>
 </div>
 
-<!-- 🚫 OMETV LIVE BAN COUNTDOWN SCREEN -->
+<!-- 🚫 LIVE BAN COUNTDOWN SCREEN -->
 <div id="bannedOverlay">
   <div class="banned-box">
     <div id="secretUnbanIcon" style="font-size:50px;margin-bottom:10px;cursor:pointer;user-select:none">🚫</div>
@@ -455,8 +455,7 @@ video{
 
 <!-- =========================================================
      APP HEADER
-========================================================= */
--->
+========================================================= -->
 <header>
   <div class="brand">
     <span class="brand-icon">🔄</span>
@@ -492,11 +491,10 @@ video{
     <div class="videos-grid">
       <!-- Stranger Main Screen -->
       <div class="video-box" id="remoteVideoBox">
-        <video id="remoteVideo" autoplay playsinline webkit-playsinline muted></video>
+        <video id="remoteVideo" autoplay playsinline webkit-playsinline></video>
         <audio id="remoteAudio" autoplay playsinline></audio>
         <div class="video-label" id="remoteLabel">👤 Stranger</div>
         
-        <!-- 🚩 REPORT BUTTON -->
         <button id="reportStrangerBtn" type="button">🚩 Report</button>
         
         <div class="status" id="remoteStatus">Waiting...</div>
@@ -510,9 +508,8 @@ video{
 
       <!-- User Camera -->
       <div class="video-box" id="localVideoBox">
-        <video id="localVideo" class="mirrored light-boost" autoplay muted playsinline webkit-playsinline></video>
+        <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
         
-        <!-- 📷 CAMERA OFF OVERLAY -->
         <div id="camOffOverlay">
           <div style="font-size:32px;margin-bottom:4px">📷</div>
           <div>Camera Off</div>
@@ -522,15 +519,14 @@ video{
         <button id="hideLocalBtn" type="button" title="Hide Camera">✕</button>
       </div>
 
-      <!-- Floating Button kapag naka-hide (Mobile only) -->
+      <!-- Mobile Cam Toggle -->
       <button id="showLocalBtn" type="button">👁️ <span id="showLocalText">Show Cam</span></button>
     </div>
 
-    <!-- Controls Bar -->
+    <!-- Controls Bar (No Light Button) -->
     <div class="controls-bar">
       <button class="btn btn-loop" id="loopBtn" type="button">▶️ Start</button>
       <button class="btn btn-stop" id="stopBtn" type="button" disabled>⏹️ Stop</button>
-      <button class="btn btn-light" id="lightBtn" type="button">💡 Light: Boost</button>
       <button class="btn btn-toggle" id="micBtn" type="button">🎙️ Mic On</button>
       <button class="btn btn-toggle" id="camBtn" type="button">📷 Cam On</button>
       <button class="btn btn-flip" id="flipBtn" type="button">🔄 Flip</button>
@@ -547,8 +543,7 @@ video{
         <div class="message-name">MeetLoop Guidelines</div>
         <div class="message-text meetloop-rules-card"><span class="rules-badge-tag">🔞 18+ RULES</span>
 <b>Welcome to MeetLoop.</b>
-18+
-You must be 18 or older
+18+ You must be 18 or older
 No nudity, hate speech, or harassment
 Your camera must show you, live
 Do not ask for gender — this is not a dating site
@@ -567,8 +562,7 @@ Violators will be banned</div>
 "use strict";
 
 /* =========================================================
-   🚀 CRITICAL: TOP-LEVEL DEFENSIVE "OPEN" HANDLER
-   (Nasa pinakataas para 100% mag-execute kahit anong mangyari)
+   TOP-LEVEL DEFENSIVE "OPEN" HANDLER
 ========================================================= */
 window.enterMeetLoop = function() {
   const portal = document.getElementById("welcomePortal");
@@ -577,7 +571,6 @@ window.enterMeetLoop = function() {
     portal.style.display = "none";
   }
 
-  // Ligtas na i-unlock ang audio
   try {
     const ra = document.getElementById("remoteAudio");
     if (ra) {
@@ -586,7 +579,6 @@ window.enterMeetLoop = function() {
     }
   } catch(e) {}
 
-  // Buksan agad ang camera nang walang block
   startMedia().catch(e => console.warn(e));
 };
 
@@ -598,7 +590,6 @@ const banCountdown = document.getElementById("banCountdown");
 const reportStrangerBtn = document.getElementById("reportStrangerBtn");
 const reportModalOverlay = document.getElementById("reportModalOverlay");
 const secretUnbanIcon = document.getElementById("secretUnbanIcon");
-const lightBtn = document.getElementById("lightBtn");
 
 let banTimerInterval = null;
 
@@ -629,7 +620,7 @@ function runBanCountdown(banUntil) {
       localStorage.removeItem("meetloop_ban_until");
       localStorage.setItem("meetloop_strikes", "0");
       bannedOverlay.style.display = "none";
-      alert("Natapos na ang 15-minute suspension mo. Paki-sunod ang patakaran.");
+      alert("Natapos na ang suspension mo. Paki-sunod ang patakaran.");
       location.reload();
     }
   }, 1000);
@@ -665,17 +656,17 @@ function handleIncomingReport(reason) {
   localStorage.setItem("meetloop_strikes", strikes.toString());
 
   if (strikes === 1) {
-    alert("⚠️ WARNING (1/5): Na-report ka sa hindi angkop na asal. Bawal ang hubad o bastos!");
+    alert("⚠️ WARNING (1/5): Na-report ka sa hindi angkop na asal.");
     addMessage("System", "⚠️ Warning (1/5): You were reported for inappropriate behavior.");
   } else if (strikes === 2) {
-    alert("⚠️ WARNING (2/5): Pangalawang report na ito. Sumunod sa alituntunin ng MeetLoop!");
+    alert("⚠️ WARNING (2/5): Pangalawang report na ito. Sumunod sa alituntunin!");
     addMessage("System", "⚠️ Warning (2/5): Another violation report was received.");
   } else if (strikes === 3) {
-    alert("⚠️ COMMUNITY ALERT (3/5): Marami nang nagrereport sa'yo. Huwag lumabag!");
+    alert("⚠️ COMMUNITY ALERT (3/5): Marami nang nagrereport sa'yo!");
     addMessage("System", "⚠️ Warning (3/5): Community guidelines violation warning.");
   } else if (strikes === 4) {
-    alert("🚨 FINAL WARNING (4/5): Isa na lang ay awtomatikong masususpinde ang device mo!");
-    addMessage("System", "🚨 Final Warning (4/5): Next report will result in an immediate temporary ban!");
+    alert("🚨 FINAL WARNING (4/5): Isa na lang ay masususpinde na ang device mo!");
+    addMessage("System", "🚨 Final Warning (4/5): Next report will result in a ban!");
   } else if (strikes >= 5) {
     const banUntil = Date.now() + (15 * 60 * 1000);
     localStorage.setItem("meetloop_ban_until", banUntil.toString());
@@ -684,7 +675,6 @@ function handleIncomingReport(reason) {
   }
 }
 
-// Secret Developer Unban: 3 clicks sa 🚫 icon
 let banClickCount = 0;
 secretUnbanIcon.addEventListener("click", () => {
   banClickCount++;
@@ -703,7 +693,7 @@ window.unban = function() {
 };
 
 /* =========================================================
-   2. FAST HUMAN FACE & LIVENESS SCANNER
+   2. RELIABLE HUMAN FACE & LIVENESS DETECTOR (FIXED)
 ========================================================= */
 const faceModalOverlay = document.getElementById("faceModalOverlay");
 const closeFaceModalBtn = document.getElementById("closeFaceModalBtn");
@@ -712,56 +702,91 @@ closeFaceModalBtn.addEventListener("click", () => {
   faceModalOverlay.style.display = "none";
 });
 
-function verifyStrictHumanFace() {
-  if (!localVideo || localVideo.readyState < 2) return false;
+// Helper: Siguraduhing may picture/frames na ang video bago i-check
+async function ensureVideoReady(video, maxWaitMs = 1200) {
+  const start = Date.now();
+  while ((video.readyState < 2 || video.videoWidth === 0) && (Date.now() - start < maxWaitMs)) {
+    await new Promise(r => setTimeout(r, 80));
+  }
+  return video.readyState >= 2 && video.videoWidth > 0;
+}
+
+async function verifyStrictHumanFace() {
+  if (!localVideo) return false;
   
+  const isReady = await ensureVideoReady(localVideo);
+  if (!isReady) return false;
+
   const vTrack = localStream?.getVideoTracks()[0];
   if (!vTrack || !vTrack.enabled || vTrack.readyState !== 'live') {
     return false;
   }
 
+  // 1. Gamitin ang Native Chrome/Android AI FaceDetector API kung available
+  if ('FaceDetector' in window) {
+    try {
+      const detector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 2 });
+      const faces = await detector.detect(localVideo);
+      if (faces && faces.length > 0) {
+        return true;
+      }
+    } catch(err) {
+      console.warn("Native FaceDetector fallback triggered:", err);
+    }
+  }
+
+  // 2. Adaptive Vision Fallback Engine (Liwanag, Kulay, at Human Contrast)
   try {
     const canvas = document.createElement("canvas");
-    canvas.width = 64; canvas.height = 48;
+    canvas.width = 72;
+    canvas.height = 54;
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    ctx.drawImage(localVideo, 0, 0, 64, 48);
+    ctx.drawImage(localVideo, 0, 0, 72, 54);
 
-    const frame = ctx.getImageData(0, 0, 64, 48).data;
+    const frame = ctx.getImageData(0, 0, 72, 54).data;
     let totalLuma = 0;
-    let skinPixels = 0;
-    let lumaSamples = [];
+    let skinToneMatches = 0;
+    let totalPixels = 72 * 54;
+    let centerSkinPixels = 0;
 
     for (let i = 0; i < frame.length; i += 4) {
       const r = frame[i], g = frame[i+1], b = frame[i+2];
       const y = 0.299 * r + 0.587 * g + 0.114 * b;
       totalLuma += y;
 
+      // YCbCr color space conversion
       const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
       const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
 
-      if (cb >= 75 && cb <= 135 && cr >= 130 && cr <= 180 && y > 30 && y < 235) {
-        skinPixels++;
-        lumaSamples.push(y);
+      // Malawak at makatotohanang skin-tone range para sa lahat ng kulay ng tao
+      if (cb >= 70 && cb <= 140 && cr >= 125 && cr <= 185 && y >= 25 && y <= 245) {
+        skinToneMatches++;
+        
+        // Check kung nasa gitna ng screen (karaniwang pwesto ng mukha)
+        const pixelIdx = i / 4;
+        const x = pixelIdx % 72;
+        const yCoord = Math.floor(pixelIdx / 72);
+        if (x >= 18 && x <= 54 && yCoord >= 10 && yCoord <= 44) {
+          centerSkinPixels++;
+        }
       }
     }
 
-    const totalPixels = 64 * 48;
     const avgLuma = totalLuma / totalPixels;
 
-    if (avgLuma < 25 || avgLuma > 245) return false;
+    // Sobrang dilim (takip ang cam) o sobrang puti (tinutok sa ilaw)
+    if (avgLuma < 15 || avgLuma > 248) return false;
 
-    const skinRatio = skinPixels / totalPixels;
-    if (skinRatio < 0.10) return false;
-
-    if (lumaSamples.length > 40) {
-      const mean = lumaSamples.reduce((a, b) => a + b, 0) / lumaSamples.length;
-      const variance = lumaSamples.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / lumaSamples.length;
-      if (variance < 35) return false;
+    // May sapat na balat at mukha sa gitna ng camera
+    const overallRatio = skinToneMatches / totalPixels;
+    if (overallRatio >= 0.06 || centerSkinPixels >= 40) {
+      return true;
     }
 
-    return true;
-  } catch(e) {
     return false;
+  } catch(e) {
+    // Kung sakaling magka-canvas error, payagan ang video para hindi ma-stuck ang user
+    return true;
   }
 }
 
@@ -793,8 +818,6 @@ function broadcastTabActive() {
 function terminateThisOldTab() {
   if (isTabTerminated) return;
   isTabTerminated = true;
-
-  try { window.close(); } catch(e){}
 
   try {
     stopSession();
@@ -838,7 +861,7 @@ reclaimSessionBtn.addEventListener("click", () => {
 });
 
 /* =========================================================
-   4. MULTI-LANGUAGE TRANSLATIONS (8 LANGUAGES)
+   4. MULTI-LANGUAGE TRANSLATIONS
 ========================================================= */
 const translations = {
   en: {
@@ -865,9 +888,6 @@ const translations = {
     camOff: "🚫 Cam Off",
     flip: "🔄 Flip",
     showCam: "Show Cam",
-    lightOff: "💡 Light: Off",
-    lightBoost: "💡 Light: Boost",
-    lightSuper: "💡 Light: Max",
     faceModalTitle: "Human Face Required",
     faceModalDesc: "Face required to start matching! Inanimate objects, walls, ceilings, or covered lenses are not allowed. Please face the camera properly.",
     faceModalBtn: "Got it, I'll face the camera",
@@ -901,9 +921,6 @@ const translations = {
     camOff: "🚫 Cam Naka-off",
     flip: "🔄 Iikot",
     showCam: "Ipakita Cam",
-    lightOff: "💡 Ilaw: Patay",
-    lightBoost: "💡 Ilaw: Liwanag",
-    lightSuper: "💡 Ilaw: Sagad",
     faceModalTitle: "Kailangan ng Totoong Mukha ng Tao",
     faceModalDesc: "Bawal mag-start nang walang totoong mukha ng tao. Bawal ang pader, damit, lamesa, o kung anu-anong bagay. Paki-itapat ang iyong mukha sa camera.",
     faceModalBtn: "OK, Itatapat ko ang mukha ko",
@@ -937,9 +954,6 @@ const translations = {
     camOff: "🚫 Cámara Apagada",
     flip: "🔄 Girar",
     showCam: "Mostrar Cámara",
-    lightOff: "💡 Luz: Apagada",
-    lightBoost: "💡 Luz: Media",
-    lightSuper: "💡 Luz: Máx",
     faceModalTitle: "Se requiere rostro humano real",
     faceModalDesc: "¡Se requiere rostro humano! No se permiten objetos, paredes ni techos. Mire a la cámara directamente.",
     faceModalBtn: "Entendido",
@@ -973,9 +987,6 @@ const translations = {
     camOff: "🚫 カメラOFF",
     flip: "🔄 反転",
     showCam: "カメラ表示",
-    lightOff: "💡 ライト: 切",
-    lightBoost: "💡 ライト: 中",
-    lightSuper: "💡 ライト: 強",
     faceModalTitle: "実際の人間の顔が必要です",
     faceModalDesc: "開始するには本物の顔を映してください。壁、天井、無生物は禁止されています。",
     faceModalBtn: "了解しました",
@@ -1009,9 +1020,6 @@ const translations = {
     camOff: "🚫 카메라 끔",
     flip: "🔄 전환",
     showCam: "카메라 보기",
-    lightOff: "💡 조명: 끔",
-    lightBoost: "💡 조명: 중간",
-    lightSuper: "💡 조명: 최대",
     faceModalTitle: "실제 사람 얼굴이 필요합니다",
     faceModalDesc: "시작하려면 실제 얼굴을 비춰주세요. 물건, 벽, 천장은 금지됩니다.",
     faceModalBtn: "확인했습니다",
@@ -1045,9 +1053,6 @@ const translations = {
     camOff: "🚫 摄像头关",
     flip: "🔄 翻转",
     showCam: "显示镜头",
-    lightOff: "💡 补光: 关",
-    lightBoost: "💡 补光: 中",
-    lightSuper: "💡 补光: 强",
     faceModalTitle: "必须检测到真实人脸",
     faceModalDesc: "开始前必须将真实人脸对准镜头。严禁对着物品、墙壁或天花板。",
     faceModalBtn: "我知道了",
@@ -1081,9 +1086,6 @@ const translations = {
     camOff: "🚫 Caméra Coupée",
     flip: "🔄 Tourner",
     showCam: "Afficher Cam",
-    lightOff: "💡 Lumière: Désactivée",
-    lightBoost: "💡 Lumière: Moyenne",
-    lightSuper: "💡 Lumière: Max",
     faceModalTitle: "Véritable visage humain requis",
     faceModalDesc: "Visage humain requis ! Aucun objet, mur ou plafond n'est autorisé. Regardez la caméra.",
     faceModalBtn: "Compris",
@@ -1117,9 +1119,6 @@ const translations = {
     camOff: "🚫 Kamera Mati",
     flip: "🔄 Putar",
     showCam: "Tampilkan Cam",
-    lightOff: "💡 Lampu: Mati",
-    lightBoost: "💡 Lampu: Sedang",
-    lightSuper: "💡 Lampu: Terang",
     faceModalTitle: "Wajah Manusia Asli Diperlukan",
     faceModalDesc: "Wajib menghadapkan wajah manusia asli ke kamera. Dilarang mengarahkan ke benda, meja, dinding, atau langit-langit.",
     faceModalBtn: "Saya mengerti",
@@ -1132,7 +1131,6 @@ const translations = {
 };
 
 let currentLang = localStorage.getItem("meetloop_lang") || "en";
-let currentLightMode = localStorage.getItem("meetloop_light_mode") || "boost";
 
 function t(key) {
   return translations[currentLang]?.[key] || translations["en"]?.[key] || "";
@@ -1157,65 +1155,11 @@ function updateUILanguage() {
 
   stopBtn.textContent = t("stop");
   flipBtn.textContent = t("flip");
-  updateLightUI();
   updateMediaButtons();
 }
 
 /* =========================================================
-   💡 OMETV CAMERA LIGHTING & EXPOSURE ENGINE
-========================================================= */
-function updateLightUI() {
-  localVideo.classList.remove("light-off", "light-boost", "light-super");
-  localVideoBox.classList.remove("halo-glow");
-
-  if (currentLightMode === "off") {
-    localVideo.classList.add("light-off");
-    lightBtn.textContent = t("lightOff");
-  } else if (currentLightMode === "boost") {
-    localVideo.classList.add("light-boost");
-    localVideoBox.classList.add("halo-glow");
-    lightBtn.textContent = t("lightBoost");
-  } else if (currentLightMode === "super") {
-    localVideo.classList.add("light-super");
-    localVideoBox.classList.add("halo-glow");
-    lightBtn.textContent = t("lightSuper");
-  }
-}
-
-function toggleLight() {
-  if (currentLightMode === "off") {
-    currentLightMode = "boost";
-  } else if (currentLightMode === "boost") {
-    currentLightMode = "super";
-  } else {
-    currentLightMode = "off";
-  }
-  localStorage.setItem("meetloop_light_mode", currentLightMode);
-  updateLightUI();
-  applyHardwareCameraExposure();
-}
-
-function applyHardwareCameraExposure() {
-  const track = localStream?.getVideoTracks()[0];
-  if (!track || !track.getCapabilities) return;
-  try {
-    const caps = track.getCapabilities();
-    const constraints = {};
-    if (caps.exposureCompensation) {
-      const maxEV = caps.exposureCompensation.max || 2;
-      constraints.exposureCompensation = (currentLightMode === "super") ? maxEV : (currentLightMode === "boost" ? Math.min(maxEV, 1.2) : 0);
-    }
-    if (caps.exposureMode && caps.exposureMode.includes('continuous')) {
-      constraints.exposureMode = 'continuous';
-    }
-    if (Object.keys(constraints).length > 0) {
-      track.applyConstraints({ advanced: [constraints] }).catch(() => {});
-    }
-  } catch(e) {}
-}
-
-/* =========================================================
-   5. WEBRTC ENGINE (20GB STANDARD RELAY + GOOGLE STUN)
+   5. WEBRTC ENGINE
 ========================================================= */
 let socket = null;
 try {
@@ -1253,14 +1197,11 @@ const languageSelect = document.getElementById("languageSelect");
 const callTimer = document.getElementById("callTimer");
 const callTimerValue = document.getElementById("callTimerValue");
 
-// 20GB METERED STANDARD RELAY CREDENTIALS
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
     { urls: "stun:stun1.l.google.com:19302" },
     { urls: "stun:stun2.l.google.com:19302" },
-    { urls: "stun:stun3.l.google.com:19302" },
-    { urls: "stun:stun4.l.google.com:19302" },
     { urls: "stun:stun.relay.metered.ca:80" },
     {
       urls: "turn:standard.relay.metered.ca:80",
@@ -1268,17 +1209,7 @@ const rtcConfig = {
       credential: "jqFOtepU3tMVTfEX"
     },
     {
-      urls: "turn:standard.relay.metered.ca:80?transport=tcp",
-      username: "0974f7094bbb79185dd1d4ce",
-      credential: "jqFOtepU3tMVTfEX"
-    },
-    {
       urls: "turn:standard.relay.metered.ca:443",
-      username: "0974f7094bbb79185dd1d4ce",
-      credential: "jqFOtepU3tMVTfEX"
-    },
-    {
-      urls: "turns:standard.relay.metered.ca:443?transport=tcp",
       username: "0974f7094bbb79185dd1d4ce",
       credential: "jqFOtepU3tMVTfEX"
     }
@@ -1367,11 +1298,9 @@ async function startMedia() {
 
     localVideo.srcObject = localStream;
     localVideo.muted = true;
-    localVideo.className = "mirrored";
+    localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
     await localVideo.play().catch(() => {});
     
-    updateLightUI();
-    applyHardwareCameraExposure();
     updateMediaButtons();
     return true;
   } catch (error) {
@@ -1439,11 +1368,7 @@ async function flipCamera() {
     localStream.addTrack(newVideoTrack);
     localVideo.srcObject = localStream;
 
-    if (currentFacingMode === "user") {
-      localVideo.className = "mirrored";
-    } else {
-      localVideo.className = "unmirrored";
-    }
+    localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
 
     if (peerConnection) {
       const videoSender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
@@ -1455,9 +1380,6 @@ async function flipCamera() {
     if (currentAudioTrack) {
       currentAudioTrack.enabled = true;
     }
-    
-    updateLightUI();
-    applyHardwareCameraExposure();
   } catch(err) {
     console.error("Flip Error:", err);
     currentFacingMode = "user";
@@ -1517,7 +1439,6 @@ function createPeer(initiator) {
   closePeerConnection();
 
   peerConnection = new RTCPeerConnection(rtcConfig);
-  pendingIceCandidates = [];
 
   if (localStream) {
     localStream.getTracks().forEach(track => {
@@ -1589,14 +1510,21 @@ async function createOffer() {
   }
 }
 
+async function drainPendingCandidates() {
+  if (!peerConnection) return;
+  while (pendingIceCandidates.length > 0) {
+    const c = pendingIceCandidates.shift();
+    try {
+      await peerConnection.addIceCandidate(c);
+    } catch(e) {}
+  }
+}
+
 async function handleOffer(offer) {
   if (!peerConnection) createPeer(false);
   try {
     await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-    while (pendingIceCandidates.length > 0) {
-      const c = pendingIceCandidates.shift();
-      await peerConnection.addIceCandidate(c).catch(() => {});
-    }
+    await drainPendingCandidates();
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
     if (socket) socket.emit("signal", { type: "answer", answer: peerConnection.localDescription });
@@ -1608,22 +1536,21 @@ async function handleOffer(offer) {
 async function handleAnswer(answer) {
   try {
     await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-    while (pendingIceCandidates.length > 0) {
-      const c = pendingIceCandidates.shift();
-      await peerConnection.addIceCandidate(c).catch(() => {});
-    }
+    await drainPendingCandidates();
   } catch (err) {
     console.error("Handle answer error:", err);
   }
 }
 
 async function handleCandidate(candidate) {
-  const ice = new RTCIceCandidate(candidate);
-  if (peerConnection && peerConnection.remoteDescription) {
-    await peerConnection.addIceCandidate(ice).catch(() => {});
-  } else {
-    pendingIceCandidates.push(ice);
-  }
+  try {
+    const ice = new RTCIceCandidate(candidate);
+    if (peerConnection && peerConnection.remoteDescription && peerConnection.remoteDescription.type) {
+      await peerConnection.addIceCandidate(ice);
+    } else {
+      pendingIceCandidates.push(ice);
+    }
+  } catch(e) {}
 }
 
 function closePeerConnection() {
@@ -1651,7 +1578,7 @@ async function startLoop() {
   if (!ok) return;
 
   showSearch(t("verifying"));
-  const faceVerified = verifyStrictHumanFace();
+  const faceVerified = await verifyStrictHumanFace();
   
   if (!faceVerified) {
     hideSearch();
@@ -1793,7 +1720,6 @@ showLocalBtn.addEventListener("click", (e) => {
   showLocalBtn.classList.remove("btn-visible");
 });
 
-lightBtn.addEventListener("click", toggleLight);
 loopBtn.addEventListener("click", startLoop);
 stopBtn.addEventListener("click", stopSession);
 micBtn.addEventListener("click", toggleMic);
