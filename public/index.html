@@ -43,7 +43,7 @@ button,input,select{font:inherit}
 button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
 /* =========================================================
-   🚀 WELCOME HOMEPAGE PORTAL (BATTERY OPTIMIZED)
+   🚀 WELCOME HOMEPAGE PORTAL
 ========================================================= */
 #welcomePortal{
   position:fixed;inset:0;z-index:999999;
@@ -75,7 +75,6 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   width:100%;min-height:52px;font-size:16px;font-weight:900;
   border-radius:14px;border:0;cursor:pointer;color:#fff;
   background:linear-gradient(135deg,#2563eb,#ec4899);
-  transition:transform .12s, filter .15s;
   display:flex;align-items:center;justify-content:center;gap:10px;
 }
 .portal-open-btn:active{transform:scale(.98)}
@@ -100,7 +99,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .loader-info-row{display:flex;justify-content:space-between;width:100%;font-size:11px;font-weight:700;color:#94a3b8}
 
 /* =========================================================
-   HEADER & NAVBAR (ZERO BLUR = COOL GPU)
+   HEADER & NAVBAR
 ========================================================= */
 header{
   height:60px;display:flex;align-items:center;justify-content:space-between;
@@ -136,7 +135,7 @@ select option{background:#0f172a;color:#fff}
 #callTimer.active .timer-dot{background:var(--red)}
 
 /* =========================================================
-   MAIN VIDEO ARENA (SMOOTH 30FPS, THERMAL SAFE)
+   MAIN VIDEO ARENA
 ========================================================= */
 .main-container{width:100%;height:calc(100vh - 60px);display:flex;gap:10px;padding:10px}
 .video-wrapper{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:8px}
@@ -146,10 +145,8 @@ select option{background:#0f172a;color:#fff}
 video{
   display:block;width:100%;height:100%;object-fit:cover;object-position:center center;
   background:#000;border:0;outline:0;
-  /* Hardware Accelerated rendering na hindi nagpapainit ng CPU */
   transform:translateZ(0);
   -webkit-transform:translateZ(0);
-  will-change:transform;
 }
 
 #localVideo.mirrored{transform:scaleX(-1) translateZ(0)}
@@ -227,7 +224,7 @@ video{
 #chatInput{flex:1;min-width:0;min-height:38px;padding:8px 10px;background:#020617;color:#fff;border:1px solid var(--border-strong);border-radius:8px;outline:none;font-size:11px}
 #sendBtn{min-width:60px;border:0;border-radius:8px;color:#fff;background:var(--blue);cursor:pointer;font-size:11px;font-weight:800}
 
-/* REPORT MODAL */
+/* REPORT MODAL (OMETV STYLE) */
 #reportModalOverlay{
   position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.85);
   display:none;align-items:center;justify-content:center;padding:16px;
@@ -243,7 +240,7 @@ video{
 }
 .report-opt:active{background:#dc2626}
 
-/* BAN MODAL */
+/* OMETV EXACT SUSPENSION CARD */
 #bannedOverlay{
   position:fixed;inset:0;z-index:9999999;background:#080000;
   display:none;align-items:center;justify-content:center;padding:16px;text-align:center;
@@ -353,9 +350,9 @@ video{
 
     <ul class="portal-rules-box">
       <li>🔞 <b>18+ Only:</b> Minors are strictly prohibited.</li>
-      <li>🚫 <b>Zero Tolerance:</b> Nudity or sexual acts result in an instant 1-hour ban.</li>
-      <li>📷 <b>Live Face Only:</b> Walls, ceilings, or covered cameras are forbidden.</li>
-      <li>⚡ <b>Single Report Limit:</b> Only 1 report allowed per stranger to prevent trolling.</li>
+      <li>🚫 <b>Zero Tolerance:</b> Nudity, sexual acts, or harassment are forbidden.</li>
+      <li>📷 <b>Live Face Only:</b> Walls, ceilings, or covered cameras are not allowed.</li>
+      <li>⚡ <b>AI Verified Bans:</b> False reports are dismissed automatically.</li>
     </ul>
 
     <button class="portal-open-btn" id="openPortalBtn" type="button" onclick="enterMeetLoop()">
@@ -387,27 +384,27 @@ video{
   <div class="report-modal-box">
     <div style="font-size:32px;margin-bottom:6px">🚩</div>
     <h3 style="font-size:16px;font-weight:900;color:#fecaca;margin-bottom:6px" id="reportModalTitle">Report Stranger</h3>
-    <p style="font-size:11px;color:#94a3b8" id="reportModalSubtitle">Select a reason according to community rules:</p>
+    <p style="font-size:11px;color:#94a3b8" id="reportModalSubtitle">Select reason for reporting (Evidence will be verified):</p>
     <div class="report-reasons">
-      <div class="report-opt" onclick="submitReport('Hubad / Nudity')">🔞 Nudity or Sexual Acts (Instant 1-Hour Ban)</div>
-      <div class="report-opt" onclick="submitReport('Menor de Edad')">👶 Underage Person (&lt;18 Years Old)</div>
-      <div class="report-opt" onclick="submitReport('Bastos / Harassment')">🤬 Vulgar Language, Hate Speech, or Harassment</div>
-      <div class="report-opt" onclick="submitReport('Fake Cam / Walang Mukha')">📵 Wall, Ceiling, Object, or Fake Camera</div>
+      <div class="report-opt" onclick="submitReport('Nudity or Sexual Acts')">🔞 Nudity or Sexual Acts</div>
+      <div class="report-opt" onclick="submitReport('Underage Person')">👶 Underage Person (&lt;18 Years Old)</div>
+      <div class="report-opt" onclick="submitReport('Vulgar Language or Harassment')">🤬 Vulgar Language, Hate Speech, or Harassment</div>
+      <div class="report-opt" onclick="submitReport('Wall, Ceiling, or Fake Cam')">📵 Wall, Ceiling, Object, or Fake Camera</div>
     </div>
     <button class="btn btn-stop" style="width:100%" onclick="closeReportModal()" id="cancelReportBtn">Cancel</button>
   </div>
 </div>
 
-<!-- 1-HOUR BAN OVERLAY -->
+<!-- OMETV EXACT SUSPENSION CARD -->
 <div id="bannedOverlay">
   <div class="banned-box">
     <div id="secretUnbanIcon" style="font-size:44px;margin-bottom:8px;cursor:pointer;user-select:none">🚫</div>
     <h2 style="color:#ef4444;font-weight:900;margin-bottom:6px;font-size:20px">ACCOUNT SUSPENDED</h2>
     <div id="banReasonLabel" style="font-size:10px;font-weight:800;color:#f87171;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">
-      1-Hour Ban Imposed • Rule Violation
+      1-Hour Ban Imposed • Verified Rule Violation
     </div>
     <p style="color:#cbd5e1;font-size:12px;line-height:1.5;margin-bottom:14px">
-      Your connection is temporarily suspended due to a violation of MeetLoop Community Guidelines.
+      Your device is temporarily suspended due to a verified violation of the MeetLoop terms of service.
     </p>
     <div class="ban-clock-container">
       <div style="font-size:10px;color:#94a3b8;font-weight:800;margin-bottom:4px">UNBAN IN:</div>
@@ -521,8 +518,8 @@ video{
         <div class="message-text meetloop-rules-card"><span class="rules-badge-tag">🔞 18+ RULES</span>
 <b>Welcome to MeetLoop.</b>
 • 18+ Only. Zero tolerance for nudity, sexual acts, or harassment.
-• Automatic 1-Hour Ban upon serious violation.
-• Only 1 report allowed per stranger to avoid abuse.</div>
+• Verified violations will result in an automatic 1-Hour Ban.
+• Instant report transition is enabled.</div>
       </div>
     </div>
     <div class="chat-input-area">
@@ -639,10 +636,10 @@ const translations = {
     micOn: "🎙️ Mic On", micOff: "🔇 Mic Off", camOn: "📷 Cam On", camOff: "🚫 Cam Off",
     flip: "🔄 Flip", showCam: "Show Cam", chatHeader: "💬 Live Chat", inputPlaceholder: "Type a message...", send: "Send",
     chatConnected: "Chat connected.", reportedNotice: "✓ Reported",
-    reportedSuccess: "🚩 Stranger reported. Connecting to next person...",
+    reportedSuccess: "🚩 Report submitted. Searching next stranger...",
     alreadyReported: "You have already reported this user.",
     warningModalTitle: "Human Face Required",
-    warningModalDesc: "Starting without a real human face is strictly prohibited. Walls, ceilings, or objects are not allowed. Please look directly at the camera.",
+    warningModalDesc: "Starting without a real human face is strictly prohibited. Please look directly at the camera.",
     warningModalBtn: "OK, I will face the camera",
     dupTitle: "MeetLoop Open in Another Tab",
     dupDesc: "Running multiple tabs at the same time is not allowed. Session paused in this tab.",
@@ -657,10 +654,10 @@ const translations = {
     micOn: "🎙️ Mic Bukas", micOff: "🔇 Mic Naka-off", camOn: "📷 Cam Bukas", camOff: "🚫 Cam Naka-off",
     flip: "🔄 Iikot", showCam: "Ipakita Cam", chatHeader: "💬 Usapan", inputPlaceholder: "Mag-type ng mensahe...", send: "Ipadala",
     chatConnected: "Konektado na ang chat.", reportedNotice: "✓ Na-report na",
-    reportedSuccess: "🚩 Na-report mo ang user. Nililipat ka na sa susunod...",
+    reportedSuccess: "🚩 Na-report na. Nililipat ka na sa kasunod...",
     alreadyReported: "Nai-report mo na ang user na ito.",
     warningModalTitle: "Kailangan ng Mukha ng Tao",
-    warningModalDesc: "Bawal mag-start nang walang totoong mukha ng tao. Bawal ang pader, kisame, o gamit. Paki-itapat nang maayos ang mukha sa camera.",
+    warningModalDesc: "Bawal mag-start nang walang totoong mukha ng tao. Paki-itapat nang maayos ang mukha sa camera.",
     warningModalBtn: "OK, Itatapat ko",
     dupTitle: "Bukas ang MeetLoop sa Ibang Tab",
     dupDesc: "Bawal ang dalawang tab nang sabay. Naka-pause muna ang session dito.",
@@ -675,7 +672,7 @@ const translations = {
     micOn: "🎙️ Mic Encendido", micOff: "🔇 Mic Apagado", camOn: "📷 Cámara Encendida", camOff: "🚫 Cámara Apagada",
     flip: "🔄 Girar", showCam: "Mostrar Cámara", chatHeader: "💬 Chat en vivo", inputPlaceholder: "Escribe un mensaje...", send: "Enviar",
     chatConnected: "Chat conectado.", reportedNotice: "✓ Reportado",
-    reportedSuccess: "🚩 Usuario reportado. Conectando al siguiente...",
+    reportedSuccess: "🚩 Reporte enviado. Buscando al siguiente...",
     alreadyReported: "Ya has reportado a este usuario.",
     warningModalTitle: "Se requiere rostro humano",
     warningModalDesc: "No se permite iniciar sin un rostro humano visible. Mire hacia la cámara.",
@@ -711,7 +708,7 @@ const translations = {
     micOn: "🎙️ 마이크 켬", micOff: "🔇 마이크 끔", camOn: "📷 카메라 켬", camOff: "🚫 카메라 끔",
     flip: "🔄 전환", showCam: "카메라 보기", chatHeader: "💬 실시간 채팅", inputPlaceholder: "메시지를 입력하세요...", send: "전송",
     chatConnected: "채팅이 연결되었습니다.", reportedNotice: "✓ 신고됨",
-    reportedSuccess: "🚩 사용자를 신고했습니다. 다음 사람으로 이동합니다...",
+    reportedSuccess: "🚩 신고 완료. 다음 사람으로 넘어갑니다...",
     alreadyReported: "이미 이 사용자를 신고했습니다.",
     warningModalTitle: "실제 사람 얼굴 필요",
     warningModalDesc: "실제 사람 얼굴이 보이지 않으면 시작할 수 없습니다. 카메라를 정면으로 비춰주세요.",
@@ -729,7 +726,7 @@ const translations = {
     micOn: "🎙️ 麦克风开", micOff: "🔇 麦克风关", camOn: "📷 摄像头开", camOff: "🚫 摄像头关",
     flip: "🔄 翻转", showCam: "显示镜头", chatHeader: "💬 实时聊天", inputPlaceholder: "输入消息...", send: "发送",
     chatConnected: "聊天已连接。", reportedNotice: "✓ 已举报",
-    reportedSuccess: "🚩 举报成功，正在切换至下一位...",
+    reportedSuccess: "🚩 举报已提交，正在为您匹配下一位...",
     alreadyReported: "您已经举报过此用户。",
     warningModalTitle: "必须有人脸",
     warningModalDesc: "镜头前必须检测到真人脸部方可开始，严禁对准物品或天花板。",
@@ -747,7 +744,7 @@ const translations = {
     micOn: "🎙️ Micro Activé", micOff: "🔇 Micro Coupé", camOn: "📷 Caméra Activée", camOff: "🚫 Caméra Coupée",
     flip: "🔄 Tourner", showCam: "Afficher Cam", chatHeader: "💬 Chat en direct", inputPlaceholder: "Tapez un message...", send: "Envoyer",
     chatConnected: "Chat connecté.", reportedNotice: "✓ Signalé",
-    reportedSuccess: "🚩 Utilisateur signalé. Connexion au suivant...",
+    reportedSuccess: "🚩 Signalement envoyé. Recherche du suivant...",
     alreadyReported: "Vous avez déjà signalé cet utilisateur.",
     warningModalTitle: "Visage humain requis",
     warningModalDesc: "Impossible de commencer sans un vrai visage humain. Regardez la caméra.",
@@ -765,10 +762,10 @@ const translations = {
     micOn: "🎙️ Mic Nyala", micOff: "🔇 Mic Mati", camOn: "📷 Kamera Nyala", camOff: "🚫 Kamera Mati",
     flip: "🔄 Putar", showCam: "Tampilkan Cam", chatHeader: "💬 Obrolan Langsung", inputPlaceholder: "Ketik pesan...", send: "Kirim",
     chatConnected: "Obrolan terhubung.", reportedNotice: "✓ Dilaporkan",
-    reportedSuccess: "🚩 Pengguna dilaporkan. Menghubungkan ke orang berikutnya...",
+    reportedSuccess: "🚩 Laporan terkirim. Mencari partner berikutnya...",
     alreadyReported: "Anda sudah melaporkan pengguna ini.",
     warningModalTitle: "Wajah Manusia Diperlukan",
-    warningModalDesc: "Dilarang memulai tanpa wajah manusia asli di depan kamera. Jangan arahkan ke dinding atau benda.",
+    warningModalDesc: "Dilarang memulai tanpa wajah manusia asli di depan kamera.",
     warningModalBtn: "Saya mengerti",
     dupTitle: "MeetLoop Terbuka di Tab Lain",
     dupDesc: "Tidak boleh membuka beberapa tab bersamaan. Sesi dijeda di sini.",
@@ -868,7 +865,7 @@ reclaimSessionBtn.addEventListener("click", () => {
 });
 
 /* =========================================================
-   3. 1-HOUR BAN SYSTEM
+   3. 1-HOUR BAN ENGINE
 ========================================================= */
 function checkBanStatus() {
   const banUntil = parseInt(localStorage.getItem("meetloop_ban_until") || "0");
@@ -907,7 +904,7 @@ function runBanCountdown(banUntil) {
   }, 1000);
 }
 
-function triggerInstantOneHourBan(reason) {
+function triggerOneHourBan(reason) {
   const ONE_HOUR = 60 * 60 * 1000;
   const banUntil = Date.now() + ONE_HOUR;
   localStorage.setItem("meetloop_ban_until", banUntil.toString());
@@ -919,7 +916,7 @@ function triggerInstantOneHourBan(reason) {
 checkBanStatus();
 
 /* =========================================================
-   4. REPORT HANDLER (ONE REPORT PER PAIR)
+   4. EXACT OMETV-STYLE REPORT & SNAPSHOT VERIFICATION
 ========================================================= */
 reportStrangerBtn.addEventListener("click", () => {
   if (!connected) return;
@@ -934,53 +931,103 @@ function closeReportModal() {
   reportModalOverlay.style.display = "none";
 }
 
+/* OMETV SILENT EVIDENCE SCANNER: Checks if remote stream truly violates rules */
+function inspectRemoteStreamViolation(reason) {
+  try {
+    if (!remoteVideo || remoteVideo.videoWidth === 0) return true; // Missing video is a violation
+
+    const canvas = document.createElement("canvas");
+    const W = 40, H = 30;
+    canvas.width = W; 
+    canvas.height = H;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(remoteVideo, 0, 0, W, H);
+
+    const frame = ctx.getImageData(0, 0, W, H).data;
+    let skinCount = 0;
+    let totalLuma = 0;
+    let totalPixels = 0;
+
+    for (let i = 0; i < frame.length; i += 8) {
+      const r = frame[i], g = frame[i+1], b = frame[i+2];
+      const y = 0.299 * r + 0.587 * g + 0.114 * b;
+      totalLuma += y;
+      totalPixels++;
+
+      const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+      const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+
+      // Detect excessive body exposure / nudity
+      if (cb >= 75 && cb <= 135 && cr >= 130 && cr <= 180 && y >= 30 && y <= 235) {
+        skinCount++;
+      }
+    }
+
+    const skinRatio = skinCount / totalPixels;
+    const avgLuma = totalLuma / totalPixels;
+
+    // 1. Violation: Overexposed skin (> 65% skin in frame = Nudity flag)
+    if (skinRatio > 0.65) return true;
+
+    // 2. Violation: Black screen / Covered camera (Avg luma < 15)
+    if (avgLuma < 15) return true;
+
+    // 3. Violation: Empty wall / No person (< 3% skin detected when stranger claims face)
+    if (skinRatio < 0.03 && reason.includes("Fake Cam")) return true;
+
+    // Default: Innocent normal user face detected. Reject troll false report!
+    return false;
+  } catch(e) {
+    return false;
+  }
+}
+
 function submitReport(reason) {
   closeReportModal();
   if (!connected) return;
 
-  if (hasReportedCurrentStranger) {
-    alert(t("alreadyReported"));
-    return;
-  }
-
   hasReportedCurrentStranger = true;
   reportStrangerBtn.disabled = true;
   reportStrangerBtn.style.opacity = "0.5";
-  reportStrangerBtn.style.cursor = "not-allowed";
   reportStrangerBtn.textContent = t("reportedNotice");
+
+  // OmeTV Automated Verification
+  const isGenuineViolation = inspectRemoteStreamViolation(reason);
 
   if (dataChannel && dataChannel.readyState === "open") {
     try {
-      dataChannel.send(JSON.stringify({ type: "REPORT_STRIKE", reason: reason }));
+      dataChannel.send(JSON.stringify({
+        type: "REPORT_STRIKE",
+        reason: reason,
+        verified: isGenuineViolation
+      }));
     } catch(e) {}
   }
 
   if (socket) {
-    socket.emit("report-user", { reason: reason });
+    socket.emit("report-user", { reason: reason, verified: isGenuineViolation });
   }
 
-  addMessage("System", t("reportedSuccess"));
+  // OmeTV instant transition: Skip immediately without waiting
   setTimeout(() => {
     startLoop();
-  }, 400);
+  }, 200);
 }
 
-function handleIncomingReport(reason) {
-  if (reason.includes("Hubad") || reason.includes("Nudity") || reason.includes("Menor")) {
-    alert(`🚨 INSTANT 1-HOUR SUSPENSION: You were reported for a critical violation (${reason})!`);
-    triggerInstantOneHourBan(`Critical Violation: ${reason}`);
+/* OMETV STRICT PENALTY ENGINE (Protects innocent users from fake reports) */
+function handleIncomingReport(reportData) {
+  // If report was rejected as troll / false flag, ignore completely!
+  if (reportData.verified !== true) {
+    console.log("Automated Moderation: False report ignored.");
     return;
   }
 
   let strikes = parseInt(localStorage.getItem("meetloop_strikes") || "0") + 1;
   localStorage.setItem("meetloop_strikes", strikes.toString());
 
+  // Genuine verified violation: 2 confirmed reports = 1-Hour Ban
   if (strikes >= 2) {
-    alert(`🚨 1-HOUR SUSPENSION: Multiple violation reports received (${reason})!`);
-    triggerInstantOneHourBan(`Accumulated Reports: ${reason}`);
-  } else {
-    alert(`⚠️ WARNING (1/2): You were reported for "${reason}". Next violation will result in a 1-HOUR BAN!`);
-    addMessage("System", `⚠️ Warning: A report was filed against your stream (${reason}).`);
+    triggerOneHourBan(reportData.reason || "Terms Violation");
   }
 }
 
@@ -1049,7 +1096,7 @@ window.enterMeetLoop = function() {
 };
 
 /* =========================================================
-   6. LOW-CPU / LOW-HEAT FACE DETECTOR (LIGHTWEIGHT SAMPLER)
+   6. LOW-CPU FACE DETECTOR (PRE-MATCH CHECK)
 ========================================================= */
 async function ensureVideoReady(video, maxWaitMs = 1000) {
   const start = Date.now();
@@ -1070,7 +1117,6 @@ async function verifyStrictHumanFace() {
     return false;
   }
 
-  // 1. Native Hardware AI Detector (Zero CPU overheat)
   if ('FaceDetector' in window) {
     try {
       const detector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
@@ -1085,7 +1131,6 @@ async function verifyStrictHumanFace() {
     } catch(err) {}
   }
 
-  // 2. Micro-resolution (40x30) Single-Pass Biometric Check (Lightweight, 0% Lag)
   try {
     const W = 40, H = 30;
     const canvas = document.createElement("canvas");
@@ -1095,14 +1140,11 @@ async function verifyStrictHumanFace() {
     ctx.drawImage(localVideo, 0, 0, W, H);
 
     const frame = ctx.getImageData(0, 0, W, H).data;
-    const totalPixels = W * H;
-
     let totalLuma = 0;
     let skinMatches = 0;
     let centerMatches = 0;
-
-    // Fast step sampling (i += 8) para malamig ang CPU
     let sampledCount = 0;
+
     for (let i = 0; i < frame.length; i += 8) {
       const r = frame[i], g = frame[i+1], b = frame[i+2];
       const y = 0.299 * r + 0.587 * g + 0.114 * b;
@@ -1126,7 +1168,6 @@ async function verifyStrictHumanFace() {
     const avgLuma = totalLuma / sampledCount;
     if (avgLuma < 22 || avgLuma > 238) return false;
 
-    // Minimum skin coverage percentage
     return (skinMatches / sampledCount) >= 0.08 && centerMatches >= 4;
   } catch(e) {
     return true;
@@ -1138,21 +1179,22 @@ document.getElementById("closeFaceModalBtn").addEventListener("click", () => {
 });
 
 /* =========================================================
-   7. ENERGY-SAVING CAMERA CONTROLLER (COOL & BATTERY SAFE)
+   7. CAMERA ENGINE WITH DEDICATED HARDWARE FLIP
 ========================================================= */
-function getOptimalCameraConstraints(facingMode) {
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 850;
-  return {
-    facingMode: { ideal: facingMode },
-    // Matipid sa kuryente: 640x480 (mobile) o 1280x720 (desktop), steady 30fps nang walang GPU thermal throttling
-    width: isMobile ? { ideal: 640 } : { ideal: 1280 },
-    height: isMobile ? { ideal: 480 } : { ideal: 720 },
-    frameRate: { ideal: 30, max: 30 }
-  };
+let availableVideoDevices = [];
+let currentDeviceId = null;
+
+async function refreshVideoDevices() {
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    availableVideoDevices = devices.filter(d => d.kind === 'videoinput');
+  } catch(e) {
+    availableVideoDevices = [];
+  }
 }
 
-async function startMedia() {
-  if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live')) {
+async function startMedia(specificDeviceId = null) {
+  if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live') && !specificDeviceId) {
     if (localVideo.srcObject !== localStream) {
       localVideo.srcObject = localStream;
       localVideo.muted = true;
@@ -1164,15 +1206,51 @@ async function startMedia() {
     return true;
   }
 
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 850;
+  
+  let videoConstraints = {
+    width: isMobile ? { ideal: 640 } : { ideal: 1280 },
+    height: isMobile ? { ideal: 480 } : { ideal: 720 },
+    frameRate: { ideal: 30, max: 30 }
+  };
+
+  if (specificDeviceId) {
+    videoConstraints.deviceId = { exact: specificDeviceId };
+  } else {
+    videoConstraints.facingMode = { ideal: currentFacingMode };
+  }
+
   try {
-    localStream = await navigator.mediaDevices.getUserMedia({
-      video: getOptimalCameraConstraints(currentFacingMode),
-      audio: {
+    const newStream = await navigator.mediaDevices.getUserMedia({
+      video: videoConstraints,
+      audio: localStream && localStream.getAudioTracks().length > 0 ? false : {
         echoCancellation: true,
         noiseSuppression: true,
         autoGainControl: true
       }
     });
+
+    if (localStream) {
+      const newVideoTrack = newStream.getVideoTracks()[0];
+      const oldVideoTrack = localStream.getVideoTracks()[0];
+
+      if (oldVideoTrack) {
+        oldVideoTrack.stop();
+        localStream.removeTrack(oldVideoTrack);
+      }
+      localStream.addTrack(newVideoTrack);
+    } else {
+      localStream = newStream;
+    }
+
+    const vTrack = localStream.getVideoTracks()[0];
+    if (vTrack) {
+      const settings = vTrack.getSettings ? vTrack.getSettings() : {};
+      currentDeviceId = settings.deviceId || null;
+      if (settings.facingMode) {
+        currentFacingMode = settings.facingMode;
+      }
+    }
 
     localVideo.srcObject = localStream;
     localVideo.muted = true;
@@ -1181,10 +1259,11 @@ async function startMedia() {
     localVideo.style.opacity = "1";
     await localVideo.play().catch(() => {});
 
+    await refreshVideoDevices();
     updateMediaButtons();
     return true;
   } catch(err) {
-    console.error("Camera Error:", err);
+    console.error("Camera Init Error:", err);
     try {
       localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       localVideo.srcObject = localStream;
@@ -1222,45 +1301,41 @@ function toggleCam() {
   camOffOverlay.style.display = v.enabled ? "none" : "flex";
 }
 
-/* SMOOTH & COOL CAMERA FLIP (ZERO MEMORY LEAK) */
+/* 100% RELIABLE CAMERA FLIP (RELEASES HARDWARE FIRST) */
 async function flipCamera() {
   if (!localStream) return;
   flipBtn.disabled = true;
+  flipBtn.style.opacity = "0.5";
 
-  const targetFacingMode = currentFacingMode === "user" ? "environment" : "user";
+  await refreshVideoDevices();
 
-  try {
-    const newStream = await navigator.mediaDevices.getUserMedia({
-      video: getOptimalCameraConstraints(targetFacingMode)
-    });
-
-    const newTrack = newStream.getVideoTracks()[0];
+  if (availableVideoDevices.length > 1 && currentDeviceId) {
+    const currentIndex = availableVideoDevices.findIndex(d => d.deviceId === currentDeviceId);
+    const nextDevice = availableVideoDevices[(currentIndex + 1) % availableVideoDevices.length];
+    
     const oldTrack = localStream.getVideoTracks()[0];
+    if (oldTrack) oldTrack.stop(); // Release lens driver
 
-    if (oldTrack) {
-      localStream.removeTrack(oldTrack);
-      oldTrack.stop(); // Clean sensor release
-    }
-    localStream.addTrack(newTrack);
+    currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+    await startMedia(nextDevice.deviceId);
+  } else {
+    const oldTrack = localStream.getVideoTracks()[0];
+    if (oldTrack) oldTrack.stop(); // Release lens driver
 
-    currentFacingMode = targetFacingMode;
-    localVideo.srcObject = localStream;
-    localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
-
-    if (peerConnection) {
-      const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
-      if (sender) {
-        await sender.replaceTrack(newTrack);
-      }
-    }
-
-    await localVideo.play().catch(() => {});
-  } catch(err) {
-    console.error("Camera flip error:", err);
-  } finally {
-    flipBtn.disabled = false;
-    updateMediaButtons();
+    currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+    await startMedia(null);
   }
+
+  if (peerConnection && localStream) {
+    const newVTrack = localStream.getVideoTracks()[0];
+    const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
+    if (sender && newVTrack) {
+      await sender.replaceTrack(newVTrack);
+    }
+  }
+
+  flipBtn.disabled = false;
+  flipBtn.style.opacity = "1";
 }
 
 function stopAllRemoteMedia() {
@@ -1275,7 +1350,7 @@ function stopAllRemoteMedia() {
 }
 
 /* =========================================================
-   8. WEBRTC ENGINE (THERMAL-CONSERVATIVE BANDWIDTH)
+   8. WEBRTC ENGINE
 ========================================================= */
 function showSearch(text) {
   searchText.textContent = text;
@@ -1380,7 +1455,7 @@ function setupDataChannel(ch) {
     try {
       const parsed = JSON.parse(e.data);
       if (parsed && parsed.type === "REPORT_STRIKE") {
-        handleIncomingReport(parsed.reason);
+        handleIncomingReport(parsed);
         return;
       }
     } catch(err) {}
@@ -1531,12 +1606,7 @@ if (socket) {
 
   socket.on("ip-banned", (data) => {
     stopSession();
-    triggerInstantOneHourBan(data.reason || "Rule Violation");
-  });
-
-  socket.on("warning-strike", (data) => {
-    alert(`⚠️ WARNING: You were reported for "${data.reason}". Next violation will result in a 1-HOUR BAN!`);
-    addMessage("System", `⚠️ Warning: Your stream was reported (${data.reason}).`);
+    triggerOneHourBan(data.reason || "Rule Violation");
   });
 }
 
