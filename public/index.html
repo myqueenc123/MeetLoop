@@ -434,7 +434,7 @@ video{
 <body>
 
 <!-- =========================================================
-     🚀 WELCOME HOMEPAGE PORTAL
+   🚀 WELCOME HOMEPAGE PORTAL
 ========================================================= -->
 <div id="welcomePortal">
   <div class="portal-card">
@@ -458,7 +458,7 @@ video{
 </div>
 
 <!-- =========================================================
-     🌀 OMETV-STYLE REALISTIC LOADING SCREEN
+   🌀 OMETV-STYLE REALISTIC LOADING SCREEN
 ========================================================= -->
 <div id="ometvLoader">
   <div class="loader-content">
@@ -641,9 +641,48 @@ Violators will be permanently banned</div>
 "use strict";
 
 /* =========================================================
+   🔄 REFRESH VS. NEW SEARCH SESSION CONTROLLER
+========================================================= */
+(function checkNavigationSession() {
+  let isReload = false;
+  try {
+    const navEntries = performance.getEntriesByType("navigation");
+    if (navEntries.length > 0) {
+      isReload = (navEntries[0].type === "reload");
+    } else if (window.performance && window.performance.navigation) {
+      isReload = (window.performance.navigation.type === 1); // 1 = TYPE_RELOAD
+    }
+  } catch(e) {}
+
+  const wasEntered = sessionStorage.getItem("meetloop_session_active") === "true";
+
+  // Kapag REFRESH lang at nakapasok na dati, diretso agad sa Video Arena
+  if (isReload && wasEntered) {
+    window.addEventListener("DOMContentLoaded", () => {
+      const portal = document.getElementById("welcomePortal");
+      if (portal) {
+        portal.classList.add("portal-hidden");
+        portal.style.display = "none";
+      }
+      try {
+        const ra = document.getElementById("remoteAudio");
+        if (ra) { ra.muted = false; ra.volume = 1.0; }
+      } catch(e) {}
+      startMedia().catch(e => console.warn(e));
+    });
+  } else {
+    // Kapag bagong Search, bagong tab, o tinype sa address bar: balik sa dating Open Meetloop
+    sessionStorage.removeItem("meetloop_session_active");
+  }
+})();
+
+/* =========================================================
    🚀 OMETV-STYLE INTRO LOADING HANDLER
 ========================================================= */
 window.enterMeetLoop = function() {
+  // Mark session as active sa tab na ito
+  sessionStorage.setItem("meetloop_session_active", "true");
+
   const portal = document.getElementById("welcomePortal");
   const loader = document.getElementById("ometvLoader");
   const pBar = document.getElementById("loaderProgressBar");
@@ -836,21 +875,19 @@ async function verifyStrictHumanFace() {
     return false;
   }
 
-  // 1. HARDWARE AI FACE DETECTOR (Chrome, Android, Edge)
+  // 1. HARDWARE AI FACE DETECTOR (Android / Chrome / Edge)
   if ('FaceDetector' in window) {
     try {
       const detector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 2 });
       const faces = await detector.detect(localVideo);
       
-      // Kung sumuporta ang browser pero walang makitang mukha, BAWAL PUMASOK
       if (faces && faces.length > 0) {
         const f = faces[0].boundingBox;
-        // Siguraduhing totoong tao at hindi napakalayong tuldok (minimum 12% ng screen)
         if (f.width >= localVideo.videoWidth * 0.12 && f.height >= localVideo.videoHeight * 0.12) {
           return true;
         }
       }
-      return false; // Native face check failed!
+      return false; // May hardware detector pero walang nakitang mukha
     } catch(err) {
       console.warn("Falling back to advanced facial variance:", err);
     }
@@ -881,12 +918,11 @@ async function verifyStrictHumanFace() {
       const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
       const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
 
-      // Real human facial tone color boundary
+      // Human skin color boundary
       if (cb >= 75 && cb <= 135 && cr >= 130 && cr <= 180 && y >= 32 && y <= 235) {
         skinMatches++;
         const x = p % W;
         const yCoord = Math.floor(p / W);
-        // Face focal zone
         if (x >= W * 0.20 && x <= W * 0.80 && yCoord >= H * 0.15 && yCoord <= H * 0.85) {
           centerSkinMatches++;
         }
@@ -895,10 +931,10 @@ async function verifyStrictHumanFace() {
 
     const avgLuma = totalLuma / totalPixels;
 
-    // A. Sobrang dilim o putok sa puti (Tinatakpan ang camera o tinutok sa bumbilya)
+    // A. Sobrang dilim o putok sa puti
     if (avgLuma < 25 || avgLuma > 235) return false;
 
-    // B. Variance Check: Ang mukha ay may mata, kilay, ilong, at anino (Hindi makinis tulad ng pader o kisame)
+    // B. Variance Check: Ang mukha ay may mata, ilong, at anino (Hindi makinis tulad ng pader o kisame)
     let varianceSum = 0;
     for (let p = 0; p < totalPixels; p++) {
       const diff = lumaValues[p] - avgLuma;
@@ -906,12 +942,12 @@ async function verifyStrictHumanFace() {
     }
     const lumaVariance = varianceSum / totalPixels;
 
-    // Kapag mababa ang variance (< 110), ito ay pader, kisame, damit, o patag na bagay!
+    // Kapag mababa sa 110 ang variance, ito ay pader, kisame, damit, o patag na bagay
     if (lumaVariance < 110) {
       return false;
     }
 
-    // C. Density Check: Kailangan may buong mukha sa gitna ng camera
+    // C. Density Check: Sapat na laki ng mukha sa gitna ng camera
     const centerRatio = centerSkinMatches / (W * H * 0.42);
     if (centerRatio < 0.16) {
       return false;
@@ -1434,7 +1470,7 @@ async function startMedia() {
     localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
     await localVideo.play().catch(() => {});
     
-    // Auto-adjust hardware exposure if supported
+    // Auto-adjust hardware exposure
     const vTrack = localStream.getVideoTracks()[0];
     if (vTrack && vTrack.getCapabilities) {
       try {
