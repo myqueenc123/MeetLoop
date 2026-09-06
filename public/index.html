@@ -224,7 +224,7 @@ video{
 #chatInput{flex:1;min-width:0;min-height:38px;padding:8px 10px;background:#020617;color:#fff;border:1px solid var(--border-strong);border-radius:8px;outline:none;font-size:11px}
 #sendBtn{min-width:60px;border:0;border-radius:8px;color:#fff;background:var(--blue);cursor:pointer;font-size:11px;font-weight:800}
 
-/* REPORT MODAL (OMETV STYLE) */
+/* REPORT MODAL */
 #reportModalOverlay{
   position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.85);
   display:none;align-items:center;justify-content:center;padding:16px;
@@ -240,7 +240,7 @@ video{
 }
 .report-opt:active{background:#dc2626}
 
-/* OMETV EXACT SUSPENSION CARD */
+/* SERVER-CONTROLLED IP BAN OVERLAY */
 #bannedOverlay{
   position:fixed;inset:0;z-index:9999999;background:#080000;
   display:none;align-items:center;justify-content:center;padding:16px;text-align:center;
@@ -352,7 +352,7 @@ video{
       <li>🔞 <b>18+ Only:</b> Minors are strictly prohibited.</li>
       <li>🚫 <b>Zero Tolerance:</b> Nudity, sexual acts, or harassment are forbidden.</li>
       <li>📷 <b>Live Face Only:</b> Walls, ceilings, or covered cameras are not allowed.</li>
-      <li>⚡ <b>AI Verified Bans:</b> False reports are dismissed automatically.</li>
+      <li>⚡ <b>Server IP Bans:</b> Violations are blocked at the server network level.</li>
     </ul>
 
     <button class="portal-open-btn" id="openPortalBtn" type="button" onclick="enterMeetLoop()">
@@ -395,16 +395,16 @@ video{
   </div>
 </div>
 
-<!-- OMETV EXACT SUSPENSION CARD -->
+<!-- SERVER-CONTROLLED IP BAN OVERLAY -->
 <div id="bannedOverlay">
   <div class="banned-box">
-    <div id="secretUnbanIcon" style="font-size:44px;margin-bottom:8px;cursor:pointer;user-select:none">🚫</div>
-    <h2 style="color:#ef4444;font-weight:900;margin-bottom:6px;font-size:20px">ACCOUNT SUSPENDED</h2>
+    <div style="font-size:44px;margin-bottom:8px;user-select:none">🚫</div>
+    <h2 style="color:#ef4444;font-weight:900;margin-bottom:6px;font-size:20px">IP ADDRESS SUSPENDED</h2>
     <div id="banReasonLabel" style="font-size:10px;font-weight:800;color:#f87171;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">
-      1-Hour Ban Imposed • Verified Rule Violation
+      1-Hour Server Ban • Verified Rule Violation
     </div>
     <p style="color:#cbd5e1;font-size:12px;line-height:1.5;margin-bottom:14px">
-      Your device is temporarily suspended due to a verified violation of the MeetLoop terms of service.
+      Your IP Address has been suspended on the server. Clearing site cookies or using incognito will not bypass this ban.
     </p>
     <div class="ban-clock-container">
       <div style="font-size:10px;color:#94a3b8;font-weight:800;margin-bottom:4px">UNBAN IN:</div>
@@ -518,8 +518,8 @@ video{
         <div class="message-text meetloop-rules-card"><span class="rules-badge-tag">🔞 18+ RULES</span>
 <b>Welcome to MeetLoop.</b>
 • 18+ Only. Zero tolerance for nudity, sexual acts, or harassment.
-• Verified violations will result in an automatic 1-Hour Ban.
-• Instant report transition is enabled.</div>
+• Verified violations result in a server-side 1-Hour IP Ban.
+• False reports are automatically discarded.</div>
       </div>
     </div>
     <div class="chat-input-area">
@@ -541,7 +541,6 @@ const banCountdown = document.getElementById("banCountdown");
 const banReasonLabel = document.getElementById("banReasonLabel");
 const reportStrangerBtn = document.getElementById("reportStrangerBtn");
 const reportModalOverlay = document.getElementById("reportModalOverlay");
-const secretUnbanIcon = document.getElementById("secretUnbanIcon");
 
 const duplicateTabOverlay = document.getElementById("duplicateTabOverlay");
 const reclaimSessionBtn = document.getElementById("reclaimSessionBtn");
@@ -622,6 +621,7 @@ let callStartTime = null;
 let banTimerInterval = null;
 let hasReportedCurrentStranger = false;
 let isTabTerminated = false;
+let isServerBanned = false;
 
 /* DEFAULT LANGUAGE: ENGLISH */
 let currentLang = localStorage.getItem("meetloop_lang") || "en";
@@ -639,7 +639,7 @@ const translations = {
     reportedSuccess: "🚩 Report submitted. Searching next stranger...",
     alreadyReported: "You have already reported this user.",
     warningModalTitle: "Human Face Required",
-    warningModalDesc: "Starting without a real human face is strictly prohibited. Please look directly at the camera.",
+    warningModalDesc: "Starting without a real human face is strictly prohibited. Walls, ceilings, or objects are not allowed. Please look directly at the camera.",
     warningModalBtn: "OK, I will face the camera",
     dupTitle: "MeetLoop Open in Another Tab",
     dupDesc: "Running multiple tabs at the same time is not allowed. Session paused in this tab.",
@@ -657,7 +657,7 @@ const translations = {
     reportedSuccess: "🚩 Na-report na. Nililipat ka na sa kasunod...",
     alreadyReported: "Nai-report mo na ang user na ito.",
     warningModalTitle: "Kailangan ng Mukha ng Tao",
-    warningModalDesc: "Bawal mag-start nang walang totoong mukha ng tao. Paki-itapat nang maayos ang mukha sa camera.",
+    warningModalDesc: "Bawal mag-start nang walang totoong mukha ng tao. Bawal ang pader, kisame, o gamit. Paki-itapat nang maayos ang mukha sa camera.",
     warningModalBtn: "OK, Itatapat ko",
     dupTitle: "Bukas ang MeetLoop sa Ibang Tab",
     dupDesc: "Bawal ang dalawang tab nang sabay. Naka-pause muna ang session dito.",
@@ -865,26 +865,13 @@ reclaimSessionBtn.addEventListener("click", () => {
 });
 
 /* =========================================================
-   3. 1-HOUR BAN ENGINE
+   3. SERVER-LEVEL 1-HOUR IP BAN ENGINE
 ========================================================= */
-function checkBanStatus() {
-  const banUntil = parseInt(localStorage.getItem("meetloop_ban_until") || "0");
-  if (banUntil > Date.now()) {
-    const reason = localStorage.getItem("meetloop_ban_reason") || "Rule Violation";
-    banReasonLabel.textContent = `1-HOUR BAN • ${reason.toUpperCase()}`;
-    bannedOverlay.style.display = "flex";
-    runBanCountdown(banUntil);
-    return true;
-  } else if (banUntil > 0) {
-    localStorage.removeItem("meetloop_ban_until");
-    localStorage.removeItem("meetloop_ban_reason");
-    localStorage.setItem("meetloop_strikes", "0");
-    bannedOverlay.style.display = "none";
-  }
-  return false;
-}
-
 function runBanCountdown(banUntil) {
+  isServerBanned = true;
+  stopSession();
+  bannedOverlay.style.display = "flex";
+
   if (banTimerInterval) clearInterval(banTimerInterval);
   banTimerInterval = setInterval(() => {
     const diff = Math.max(0, Math.floor((banUntil - Date.now()) / 1000));
@@ -894,26 +881,31 @@ function runBanCountdown(banUntil) {
     
     if (diff <= 0) {
       clearInterval(banTimerInterval);
-      localStorage.removeItem("meetloop_ban_until");
-      localStorage.removeItem("meetloop_ban_reason");
-      localStorage.setItem("meetloop_strikes", "0");
       bannedOverlay.style.display = "none";
-      alert("Your 1-hour suspension has ended. Please follow the guidelines.");
+      isServerBanned = false;
+      alert("Your 1-hour IP suspension has ended. Reconnecting...");
       location.reload();
     }
   }, 1000);
 }
 
-function triggerOneHourBan(reason) {
-  const ONE_HOUR = 60 * 60 * 1000;
-  const banUntil = Date.now() + ONE_HOUR;
-  localStorage.setItem("meetloop_ban_until", banUntil.toString());
-  localStorage.setItem("meetloop_ban_reason", reason);
-  stopSession();
-  checkBanStatus();
-}
+// Intercept server socket connection errors (Server-side IP ban)
+if (socket) {
+  socket.on("connect_error", (err) => {
+    if (err.message && err.message.startsWith("IP_BANNED:")) {
+      const parts = err.message.split(":");
+      const banUntil = parseInt(parts[1]);
+      const reason = decodeURIComponent(parts[2] || "Rule Violation");
+      banReasonLabel.textContent = `1-HOUR BAN • ${reason.toUpperCase()}`;
+      runBanCountdown(banUntil);
+    }
+  });
 
-checkBanStatus();
+  socket.on("ip-banned", (data) => {
+    banReasonLabel.textContent = `1-HOUR BAN • ${(data.reason || "Rule Violation").toUpperCase()}`;
+    runBanCountdown(data.banUntil);
+  });
+}
 
 /* =========================================================
    4. EXACT OMETV-STYLE REPORT & SNAPSHOT VERIFICATION
@@ -934,7 +926,7 @@ function closeReportModal() {
 /* OMETV SILENT EVIDENCE SCANNER: Checks if remote stream truly violates rules */
 function inspectRemoteStreamViolation(reason) {
   try {
-    if (!remoteVideo || remoteVideo.videoWidth === 0) return true; // Missing video is a violation
+    if (!remoteVideo || remoteVideo.videoWidth === 0) return true;
 
     const canvas = document.createElement("canvas");
     const W = 40, H = 30;
@@ -957,7 +949,6 @@ function inspectRemoteStreamViolation(reason) {
       const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
       const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
 
-      // Detect excessive body exposure / nudity
       if (cb >= 75 && cb <= 135 && cr >= 130 && cr <= 180 && y >= 30 && y <= 235) {
         skinCount++;
       }
@@ -966,17 +957,11 @@ function inspectRemoteStreamViolation(reason) {
     const skinRatio = skinCount / totalPixels;
     const avgLuma = totalLuma / totalPixels;
 
-    // 1. Violation: Overexposed skin (> 65% skin in frame = Nudity flag)
-    if (skinRatio > 0.65) return true;
+    if (skinRatio > 0.65) return true; // Nudity / excessive skin
+    if (avgLuma < 15) return true; // Black screen
+    if (skinRatio < 0.03 && reason.includes("Fake Cam")) return true; // Wall / ceiling
 
-    // 2. Violation: Black screen / Covered camera (Avg luma < 15)
-    if (avgLuma < 15) return true;
-
-    // 3. Violation: Empty wall / No person (< 3% skin detected when stranger claims face)
-    if (skinRatio < 0.03 && reason.includes("Fake Cam")) return true;
-
-    // Default: Innocent normal user face detected. Reject troll false report!
-    return false;
+    return false; // Innocent normal face detected
   } catch(e) {
     return false;
   }
@@ -991,57 +976,18 @@ function submitReport(reason) {
   reportStrangerBtn.style.opacity = "0.5";
   reportStrangerBtn.textContent = t("reportedNotice");
 
-  // OmeTV Automated Verification
   const isGenuineViolation = inspectRemoteStreamViolation(reason);
 
-  if (dataChannel && dataChannel.readyState === "open") {
-    try {
-      dataChannel.send(JSON.stringify({
-        type: "REPORT_STRIKE",
-        reason: reason,
-        verified: isGenuineViolation
-      }));
-    } catch(e) {}
-  }
-
   if (socket) {
+    // Send verified flag to Node server for permanent IP banning
     socket.emit("report-user", { reason: reason, verified: isGenuineViolation });
   }
 
-  // OmeTV instant transition: Skip immediately without waiting
+  // Instant OmeTV skip transition
   setTimeout(() => {
     startLoop();
   }, 200);
 }
-
-/* OMETV STRICT PENALTY ENGINE (Protects innocent users from fake reports) */
-function handleIncomingReport(reportData) {
-  // If report was rejected as troll / false flag, ignore completely!
-  if (reportData.verified !== true) {
-    console.log("Automated Moderation: False report ignored.");
-    return;
-  }
-
-  let strikes = parseInt(localStorage.getItem("meetloop_strikes") || "0") + 1;
-  localStorage.setItem("meetloop_strikes", strikes.toString());
-
-  // Genuine verified violation: 2 confirmed reports = 1-Hour Ban
-  if (strikes >= 2) {
-    triggerOneHourBan(reportData.reason || "Terms Violation");
-  }
-}
-
-let banClickCount = 0;
-secretUnbanIcon.addEventListener("click", () => {
-  banClickCount++;
-  if (banClickCount >= 3) {
-    localStorage.removeItem("meetloop_ban_until");
-    localStorage.removeItem("meetloop_ban_reason");
-    localStorage.setItem("meetloop_strikes", "0");
-    alert("System: Device Unbanned!");
-    location.reload();
-  }
-});
 
 /* =========================================================
    5. INTRO PORTAL
@@ -1301,7 +1247,7 @@ function toggleCam() {
   camOffOverlay.style.display = v.enabled ? "none" : "flex";
 }
 
-/* 100% RELIABLE CAMERA FLIP (RELEASES HARDWARE FIRST) */
+/* 100% RELIABLE CAMERA FLIP */
 async function flipCamera() {
   if (!localStream) return;
   flipBtn.disabled = true;
@@ -1314,13 +1260,13 @@ async function flipCamera() {
     const nextDevice = availableVideoDevices[(currentIndex + 1) % availableVideoDevices.length];
     
     const oldTrack = localStream.getVideoTracks()[0];
-    if (oldTrack) oldTrack.stop(); // Release lens driver
+    if (oldTrack) oldTrack.stop();
 
     currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
     await startMedia(nextDevice.deviceId);
   } else {
     const oldTrack = localStream.getVideoTracks()[0];
-    if (oldTrack) oldTrack.stop(); // Release lens driver
+    if (oldTrack) oldTrack.stop();
 
     currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
     await startMedia(null);
@@ -1452,13 +1398,6 @@ function setupDataChannel(ch) {
   dataChannel = ch;
   ch.onopen = () => addMessage("System", t("chatConnected"));
   ch.onmessage = (e) => {
-    try {
-      const parsed = JSON.parse(e.data);
-      if (parsed && parsed.type === "REPORT_STRIKE") {
-        handleIncomingReport(parsed);
-        return;
-      }
-    } catch(err) {}
     addMessage("Stranger", e.data);
   };
 }
@@ -1523,8 +1462,7 @@ function closePeerConnection() {
    9. MATCHING LOOP
 ========================================================= */
 async function startLoop() {
-  if (stopping || isTabTerminated) return;
-  if (checkBanStatus()) return;
+  if (stopping || isTabTerminated || isServerBanned) return;
 
   const ok = await startMedia();
   if (!ok) return;
@@ -1603,11 +1541,6 @@ if (socket) {
     addMessage("System", t("strangerLeft"));
     if (!stopping) startLoop();
   });
-
-  socket.on("ip-banned", (data) => {
-    stopSession();
-    triggerOneHourBan(data.reason || "Rule Violation");
-  });
 }
 
 /* =========================================================
@@ -1616,15 +1549,6 @@ if (socket) {
 function sendMessage() {
   const txt = chatInput.value.trim();
   if (!txt) return;
-
-  if (txt === "/unban") {
-    localStorage.removeItem("meetloop_ban_until");
-    localStorage.removeItem("meetloop_ban_reason");
-    localStorage.setItem("meetloop_strikes", "0");
-    alert("System: Device Unbanned.");
-    location.reload();
-    return;
-  }
 
   if (!dataChannel || dataChannel.readyState !== "open") return;
   dataChannel.send(txt);
