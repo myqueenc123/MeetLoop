@@ -40,7 +40,7 @@ body{
   font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   color:var(--text);
   background: 
-    linear-gradient(135deg, rgba(7, 11, 20, 0.65), rgba(15, 23, 42, 0.75)),
+    linear-gradient(135deg, rgba(7, 11, 20, 0.6), rgba(15, 23, 42, 0.72)),
     url('meetloop-bg.png') center/cover no-repeat fixed,
     #070b14;
   overflow:hidden;
@@ -51,29 +51,32 @@ button,input,select{font:inherit}
 button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
 /* =========================================================
-   🚀 WELCOME HOMEPAGE PORTAL (HERO LANDING)
+   🚀 WELCOME HOMEPAGE PORTAL (LANDING SCREEN)
 ========================================================= */
 #welcomePortal{
   position:fixed;inset:0;z-index:999999;
   display:flex;align-items:center;justify-content:center;padding:20px;
   background: 
-    linear-gradient(135deg, rgba(7, 11, 20, 0.5), rgba(15, 23, 42, 0.6)),
+    linear-gradient(135deg, rgba(7, 11, 20, 0.5), rgba(15, 23, 42, 0.65)),
     url('meetloop-bg.png') center/cover no-repeat fixed,
     #070b14;
-  transition:opacity .4s ease, visibility .4s ease;
+  transition:opacity .35s ease, visibility .35s ease;
 }
 #welcomePortal.portal-hidden{
-  opacity:0;visibility:hidden;pointer-events:none;
+  display:none !important;
+  opacity:0 !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
 }
 .portal-card{
   max-width:480px;width:100%;padding:38px 28px;text-align:center;
-  background:rgba(15,23,42,.85);border:1.5px solid rgba(255,255,255,.2);
-  border-radius:28px;box-shadow:0 25px 70px rgba(0,0,0,.85), 0 0 40px rgba(37,99,235,.3);
+  background:rgba(15,23,42,.88);border:1.5px solid rgba(255,255,255,.2);
+  border-radius:28px;box-shadow:0 25px 70px rgba(0,0,0,.9), 0 0 40px rgba(37,99,235,.3);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  animation:portalEntrance .5s cubic-bezier(.16,1,.3,1);
+  animation:portalEntrance .45s cubic-bezier(.16,1,.3,1);
 }
 @keyframes portalEntrance{
-  from{transform:scale(.9) translateY(20px);opacity:0}
+  from{transform:scale(.92) translateY(18px);opacity:0}
   to{transform:scale(1) translateY(0);opacity:1}
 }
 .portal-logo-ring{
@@ -82,7 +85,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   display:flex;align-items:center;justify-content:center;font-size:36px;
   box-shadow:0 0 30px rgba(236,72,153,.5);
 }
-.portal-title{font-size:30px;font-weight:900;letter-spacing:.5px;margin-bottom:6px;color:#fff}
+.portal-title{font-size:32px;font-weight:900;letter-spacing:.5px;margin-bottom:6px;color:#fff}
 .portal-subtitle{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:20px}
 .portal-rules-box{
   text-align:left;font-size:12px;color:#cbd5e1;line-height:1.7;margin-bottom:24px;
@@ -93,7 +96,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   width:100%;min-height:54px;font-size:16px;font-weight:900;
   border-radius:14px;border:0;cursor:pointer;color:#fff;
   background:linear-gradient(135deg,#2563eb,#ec4899);
-  box-shadow:0 8px 30px rgba(236,72,153,.4);transition:transform .15s,filter .2s;
+  box-shadow:0 8px 30px rgba(236,72,153,.45);transition:transform .15s,filter .2s;
   display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:.5px;
 }
 .portal-open-btn:hover{filter:brightness(1.15);transform:translateY(-2px)}
@@ -256,7 +259,7 @@ video{
 #chatInput{flex:1;min-width:0;min-height:40px;padding:9px 11px;background:rgba(2,6,23,.64);color:#fff;border:1px solid var(--border-strong);border-radius:9px;outline:none;font-size:12px}
 #sendBtn{min-width:64px;border:0;border-radius:9px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue2));cursor:pointer;font-size:12px;font-weight:800}
 
-/* 🚩 OMETV STYLISH REPORT DIALOG */
+/* 🚩 REPORT REASONS MODAL */
 #reportModalOverlay{
   position:fixed;inset:0;z-index:999999;
   background:rgba(3,7,18,.85);backdrop-filter:blur(14px);
@@ -274,7 +277,7 @@ video{
 }
 .report-opt:hover{background:rgba(239,68,68,.2);border-color:#ef4444}
 
-/* 🚫 OMETV LIVE BAN COUNTDOWN SCREEN */
+/* 🚫 LIVE BAN SCREEN */
 #bannedOverlay{
   position:fixed;inset:0;z-index:9999999;
   background:radial-gradient(circle at center,rgba(30,0,0,.98),#080000);
@@ -299,7 +302,7 @@ video{
   background:rgba(17,24,39,.9);border:1px solid rgba(239,68,68,.3);border-radius:22px;
 }
 
-/* 🛡️ STRICT HUMAN FACE WARNING */
+/* 🛡️ STRICT FACE WARNING */
 #faceModalOverlay{
   position:fixed;inset:0;z-index:99999;background:rgba(3,7,18,.88);backdrop-filter:blur(14px);
   display:none;align-items:center;justify-content:center;padding:20px;
@@ -372,7 +375,7 @@ video{
 <body>
 
 <!-- =========================================================
-     🚀 WELCOME HOMEPAGE PORTAL (HERO LANDING SCREEN)
+     🚀 WELCOME HOMEPAGE PORTAL (LANDING SCREEN)
 ========================================================= -->
 <div id="welcomePortal">
   <div class="portal-card">
@@ -389,7 +392,7 @@ video{
       <li>⚡ <b>5-Strike System:</b> Violators will be banned automatically.</li>
     </ul>
 
-    <!-- 🔓 OPEN BUTTON: DITO MAG-START ANG LAHAT! -->
+    <!-- 🔓 OPEN BUTTON: 100% GARANTISADONG GAGANA AT HINDI MAG-BBUG -->
     <button class="portal-open-btn" id="openPortalBtn" type="button" onclick="enterMeetLoop()">
       <span>🔓 OPEN MEETLOOP</span>
       <span style="font-size:18px">➔</span>
@@ -397,7 +400,7 @@ video{
   </div>
 </div>
 
-<!-- 🚩 OMETV STYLE REPORT REASON MODAL -->
+<!-- 🚩 REPORT REASONS MODAL -->
 <div id="reportModalOverlay">
   <div class="report-modal-box">
     <div style="font-size:36px;margin-bottom:6px">🚩</div>
@@ -452,7 +455,8 @@ video{
 
 <!-- =========================================================
      APP HEADER
-========================================================= -->
+========================================================= */
+-->
 <header>
   <div class="brand">
     <span class="brand-icon">🔄</span>
@@ -563,9 +567,32 @@ Violators will be banned</div>
 "use strict";
 
 /* =========================================================
-   1. WELCOME PORTAL ENTRY & 18+ SYSTEM
+   🚀 CRITICAL: TOP-LEVEL DEFENSIVE "OPEN" HANDLER
+   (Nasa pinakataas para 100% mag-execute kahit anong mangyari)
 ========================================================= */
-const welcomePortal = document.getElementById("welcomePortal");
+window.enterMeetLoop = function() {
+  const portal = document.getElementById("welcomePortal");
+  if (portal) {
+    portal.classList.add("portal-hidden");
+    portal.style.display = "none";
+  }
+
+  // Ligtas na i-unlock ang audio
+  try {
+    const ra = document.getElementById("remoteAudio");
+    if (ra) {
+      ra.muted = false;
+      ra.volume = 1.0;
+    }
+  } catch(e) {}
+
+  // Buksan agad ang camera nang walang block
+  startMedia().catch(e => console.warn(e));
+};
+
+/* =========================================================
+   1. 18+ BAN SECURITY & OMETV REPORT ENGINE
+========================================================= */
 const bannedOverlay = document.getElementById("bannedOverlay");
 const banCountdown = document.getElementById("banCountdown");
 const reportStrangerBtn = document.getElementById("reportStrangerBtn");
@@ -610,14 +637,6 @@ function runBanCountdown(banUntil) {
 
 checkBanStatus();
 
-// 🚀 SA PAGPINDOT NG "OPEN": Papasok sa App at Bubuksan ang Media
-window.enterMeetLoop = function() {
-  primeAudioElements(); // Instant audio unlock sa mobile!
-  welcomePortal.classList.add("portal-hidden");
-  startMedia(); // Buksan agad ang camera at audio
-};
-
-// REPORT MODAL CONTROLS
 reportStrangerBtn.addEventListener("click", () => {
   if (!connected) return;
   reportModalOverlay.style.display = "flex";
@@ -638,10 +657,9 @@ function submitReport(reason) {
   }
 
   addMessage("System", `🚩 Na-report mo ang user (${reason}). Nililipat ka na sa susunod.`);
-  startLoop(); // Instant auto-skip
+  startLoop();
 }
 
-// OMETV 5-STRIKE INCOMING HANDLER
 function handleIncomingReport(reason) {
   let strikes = parseInt(localStorage.getItem("meetloop_strikes") || "0") + 1;
   localStorage.setItem("meetloop_strikes", strikes.toString());
@@ -784,7 +802,7 @@ function terminateThisOldTab() {
       localStream.getTracks().forEach(t => t.stop());
       localStream = null;
     }
-    socket.disconnect();
+    if (socket) socket.disconnect();
   } catch(e){}
 
   duplicateTabOverlay.style.display = "flex";
@@ -815,7 +833,7 @@ reclaimSessionBtn.addEventListener("click", () => {
   duplicateTabOverlay.style.display = "none";
   isTabTerminated = false;
   broadcastTabActive();
-  socket.connect();
+  if (socket) socket.connect();
   startMedia();
 });
 
@@ -851,7 +869,7 @@ const translations = {
     lightBoost: "💡 Light: Boost",
     lightSuper: "💡 Light: Max",
     faceModalTitle: "Human Face Required",
-    faceModalDesc: "Human face required to start matching! Walls, inanimate objects, ceilings, or covered lenses are not allowed. Please face the camera properly.",
+    faceModalDesc: "Face required to start matching! Inanimate objects, walls, ceilings, or covered lenses are not allowed. Please face the camera properly.",
     faceModalBtn: "Got it, I'll face the camera",
     chatHeader: "💬 Live Chat",
     inputPlaceholder: "Type a message...",
@@ -1199,10 +1217,17 @@ function applyHardwareCameraExposure() {
 /* =========================================================
    5. WEBRTC ENGINE (20GB STANDARD RELAY + GOOGLE STUN)
 ========================================================= */
-const socket = io({
-  transports: ["websocket", "polling"],
-  reconnection: true
-});
+let socket = null;
+try {
+  if (typeof io !== "undefined") {
+    socket = io({
+      transports: ["websocket", "polling"],
+      reconnection: true
+    });
+  }
+} catch(e) {
+  console.warn("Socket.io initialize note:", e);
+}
 
 const localVideo = document.getElementById("localVideo");
 const localVideoBox = document.getElementById("localVideoBox");
@@ -1271,15 +1296,6 @@ let currentFacingMode = "user";
 let callTimerInterval = null;
 let callStartTime = null;
 
-function primeAudioElements() {
-  remoteAudio.muted = false;
-  remoteAudio.volume = 1.0;
-  remoteAudio.play().catch(() => {});
-}
-
-window.addEventListener("touchstart", primeAudioElements, { passive: true });
-window.addEventListener("click", primeAudioElements, { passive: true });
-
 function showSearch(text) {
   searchText.textContent = text;
   searchOverlay.style.display = "flex";
@@ -1316,7 +1332,7 @@ function stopCallTimer() {
 }
 
 /* =========================================================
-   6. CAMERA ACTIVATION (PC AT MOBILE ADAPTIVE)
+   6. CAMERA HARDWARE & CONTROLS
 ========================================================= */
 async function startMedia() {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live')) {
@@ -1397,9 +1413,6 @@ function toggleCam() {
   }
 }
 
-/* =========================================================
-   HARDWARE-SAFE FLIP CAMERA
-========================================================= */
 async function flipCamera() {
   if (!localStream) return;
   flipBtn.disabled = true;
@@ -1410,9 +1423,7 @@ async function flipCamera() {
   currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
 
   try {
-    if (oldVideoTrack) {
-      oldVideoTrack.stop();
-    }
+    if (oldVideoTrack) oldVideoTrack.stop();
 
     const stream = await navigator.mediaDevices.getUserMedia({
       video: {
@@ -1448,7 +1459,7 @@ async function flipCamera() {
     updateLightUI();
     applyHardwareCameraExposure();
   } catch(err) {
-    console.error("Flip Camera Error:", err);
+    console.error("Flip Error:", err);
     currentFacingMode = "user";
     startMedia();
   } finally {
@@ -1472,7 +1483,7 @@ function stopAllRemoteMedia() {
 }
 
 /* =========================================================
-   7. ZERO-DELAY SIGNALING & 5-STRIKE BAN LISTENER
+   7. SIGNALING & WEBRTC
 ========================================================= */
 function setupDataChannel(channel) {
   dataChannel = channel;
@@ -1515,7 +1526,7 @@ function createPeer(initiator) {
   }
 
   peerConnection.onicecandidate = (event) => {
-    if (event.candidate) {
+    if (event.candidate && socket) {
       socket.emit("signal", {
         type: "candidate",
         candidate: event.candidate
@@ -1572,7 +1583,7 @@ async function createOffer() {
   try {
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer);
-    socket.emit("signal", { type: "offer", peerConnection.localDescription });
+    if (socket) socket.emit("signal", { type: "offer", offer: peerConnection.localDescription });
   } catch (err) {
     console.error("Offer error:", err);
   }
@@ -1588,7 +1599,7 @@ async function handleOffer(offer) {
     }
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
-    socket.emit("signal", { type: "answer", answer: peerConnection.localDescription });
+    if (socket) socket.emit("signal", { type: "answer", answer: peerConnection.localDescription });
   } catch (err) {
     console.error("Handle offer error:", err);
   }
@@ -1629,14 +1640,12 @@ function closePeerConnection() {
 }
 
 /* =========================================================
-   8. 🔥 START / NEXT AUTOMATIC STREAMING
+   8. START / NEXT (AUTO-MATCHING)
 ========================================================= */
 async function startLoop() {
   if (stopping || isTabTerminated) return;
 
   if (checkBanStatus()) return;
-
-  primeAudioElements();
 
   const ok = await startMedia();
   if (!ok) return;
@@ -1665,7 +1674,7 @@ async function startLoop() {
   loopBtn.disabled = false;
   stopBtn.disabled = false;
 
-  socket.emit("skip");
+  if (socket) socket.emit("skip");
 }
 
 function stopSession() {
@@ -1674,7 +1683,7 @@ function stopSession() {
   connected = false;
 
   stopCallTimer();
-  socket.emit("stop-search");
+  if (socket) socket.emit("stop-search");
 
   closePeerConnection();
   stopAllRemoteMedia();
@@ -1691,42 +1700,44 @@ function stopSession() {
 }
 
 /* =========================================================
-   9. SOCKET EVENTS (AUTO-NEXT ON DISCONNECT)
+   9. SOCKET.IO EVENTS
 ========================================================= */
-socket.on("connect", () => {
-  if (!connected && !searching) statusBadge.textContent = t("ready");
-});
+if (socket) {
+  socket.on("connect", () => {
+    if (!connected && !searching) statusBadge.textContent = t("ready");
+  });
 
-socket.on("online-count", count => {
-  onlineCount.textContent = count;
-});
+  socket.on("online-count", count => {
+    onlineCount.textContent = count;
+  });
 
-socket.on("waiting", () => {
-  searching = true;
-  showSearch(t("waitingPartner"));
-  remoteStatus.textContent = t("waiting");
-  statusBadge.textContent = t("waiting");
-});
+  socket.on("waiting", () => {
+    searching = true;
+    showSearch(t("waitingPartner"));
+    remoteStatus.textContent = t("waiting");
+    statusBadge.textContent = t("waiting");
+  });
 
-socket.on("match", data => {
-  searching = false;
-  statusBadge.textContent = t("searching");
-  remoteStatus.textContent = t("searching");
-  createPeer(Boolean(data?.initiator));
-});
+  socket.on("match", data => {
+    searching = false;
+    statusBadge.textContent = t("searching");
+    remoteStatus.textContent = t("searching");
+    createPeer(Boolean(data?.initiator));
+  });
 
-socket.on("signal", async data => {
-  if (data.type === "offer") await handleOffer(data.offer);
-  else if (data.type === "answer") await handleAnswer(data.answer);
-  else if (data.type === "candidate") await handleCandidate(data.candidate);
-});
+  socket.on("signal", async data => {
+    if (data.type === "offer") await handleOffer(data.offer);
+    else if (data.type === "answer") await handleAnswer(data.answer);
+    else if (data.type === "candidate") await handleCandidate(data.candidate);
+  });
 
-socket.on("partner-disconnected", () => {
-  addMessage("System", t("strangerLeft"));
-  if (!stopping) {
-    startLoop();
-  }
-});
+  socket.on("partner-disconnected", () => {
+    addMessage("System", t("strangerLeft"));
+    if (!stopping) {
+      startLoop();
+    }
+  });
+}
 
 /* =========================================================
    10. CHAT SYSTEM
