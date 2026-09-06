@@ -48,7 +48,9 @@ body{
 button,input,select{font:inherit}
 button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
-/* WELCOME HOMEPAGE PORTAL */
+/* =========================================================
+   🚀 WELCOME HOMEPAGE PORTAL
+========================================================= */
 #welcomePortal{
   position:fixed;inset:0;z-index:999999;
   display:flex;align-items:center;justify-content:center;padding:20px;
@@ -95,22 +97,24 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .portal-open-btn:hover{filter:brightness(1.15);transform:translateY(-2px)}
 .portal-open-btn:active{transform:scale(.98)}
 
-/* LOADING SCREEN */
-#ometvLoader{
+/* =========================================================
+   🌀 MEETLOOP CLEAN LOADING SCREEN
+========================================================= */
+#meetloopLoader{
   position:fixed;inset:0;z-index:999998;
   display:none;align-items:center;justify-content:center;
   background:#070b14;flex-direction:column;padding:24px;
   transition:opacity .35s ease, visibility .35s ease;
 }
 .loader-content{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:300px;width:100%}
-.ometv-radar-box{position:relative;width:90px;height:90px;display:flex;align-items:center;justify-content:center;margin-bottom:24px}
-.ometv-radar-ring{
+.meetloop-radar-box{position:relative;width:90px;height:90px;display:flex;align-items:center;justify-content:center;margin-bottom:24px}
+.meetloop-radar-ring{
   position:absolute;inset:0;border-radius:50%;border:2px solid rgba(59,130,246,.35);
   animation:radarPulse 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
 }
-.ometv-radar-ring:nth-child(2){animation-delay:.6s}
+.meetloop-radar-ring:nth-child(2){animation-delay:.6s}
 @keyframes radarPulse{0%{transform:scale(0.85);opacity:1}100%{transform:scale(1.75);opacity:0}}
-.ometv-loader-logo{
+.meetloop-loader-logo{
   width:60px;height:60px;border-radius:18px;background:linear-gradient(135deg,#3b82f6,#ec4899);
   display:flex;align-items:center;justify-content:center;font-size:30px;
   box-shadow:0 0 25px rgba(59,130,246,.55);z-index:2;
@@ -120,7 +124,9 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .loader-progress-bar{width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg, #3b82f6, #ec4899);box-shadow:0 0 10px rgba(236,72,153,.7);transition:width .2s ease-out}
 .loader-info-row{display:flex;justify-content:space-between;width:100%;font-size:11px;font-weight:700;color:#94a3b8}
 
-/* HEADER */
+/* =========================================================
+   HEADER & NAVBAR
+========================================================= */
 header{
   height:64px;display:flex;align-items:center;justify-content:space-between;
   gap:12px;padding:0 20px;background:rgba(15,23,42,.85);border-bottom:1px solid var(--border);
@@ -155,7 +161,9 @@ select option{background:#0f172a;color:#fff}
 #callTimer.active .timer-dot{background:var(--red);animation:timerPulse 1.5s infinite}
 @keyframes timerPulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}70%{box-shadow:0 0 0 7px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
 
-/* MAIN ARENA */
+/* =========================================================
+   MAIN VIDEO ARENA
+========================================================= */
 .main-container{width:100%;height:calc(100vh - 64px);display:flex;gap:12px;padding:12px}
 .video-wrapper{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px}
 .videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:10px}
@@ -209,7 +217,7 @@ video{
 #searchText{color:#e2e8f0;font-size:13px;font-weight:800}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* CONTROLS */
+/* CONTROLS BAR */
 .controls-bar{display:flex;gap:7px;padding:2px}
 .btn{
   min-height:46px;padding:10px 14px;border:1px solid rgba(255,255,255,.06);
@@ -229,7 +237,7 @@ video{
 .btn-toggle{flex:1;background:rgba(255,255,255,.07)}
 .btn-flip{display:none;flex:1;background:linear-gradient(135deg,#7c3aed,#8b5cf6)}
 
-/* CHAT */
+/* CHAT SIDEBAR */
 .chat-wrapper{
   width:320px;max-width:320px;min-height:0;display:flex;flex-direction:column;
   overflow:hidden;background:rgba(15,23,42,.85);border:1px solid var(--border);
@@ -402,13 +410,13 @@ video{
   </div>
 </div>
 
-<!-- LOADING SCREEN -->
-<div id="ometvLoader">
+<!-- MEETLOOP CLEAN LOADING SCREEN -->
+<div id="meetloopLoader">
   <div class="loader-content">
-    <div class="ometv-radar-box">
-      <div class="ometv-radar-ring"></div>
-      <div class="ometv-radar-ring"></div>
-      <div class="ometv-loader-logo">🔄</div>
+    <div class="meetloop-radar-box">
+      <div class="meetloop-radar-ring"></div>
+      <div class="meetloop-radar-ring"></div>
+      <div class="meetloop-loader-logo">🔄</div>
     </div>
     <div class="loader-app-name">MeetLoop</div>
     <div class="loader-progress-track">
@@ -576,7 +584,7 @@ video{
 "use strict";
 
 /* =========================================================
-   1. GLOBAL VARIABLES & TRANSLATIONS ENGINE
+   1. GLOBAL VARIABLES & TRANSLATIONS ENGINE (ENGLISH DEFAULT)
 ========================================================= */
 const bannedOverlay = document.getElementById("bannedOverlay");
 const banCountdown = document.getElementById("banCountdown");
@@ -681,7 +689,7 @@ const translations = {
     reportedSuccess: "🚩 Stranger reported. Connecting to next person...",
     alreadyReported: "You have already reported this user.",
     warningModalTitle: "Human Face Required",
-    warningModalDesc: "Starting without a real human face is strictly prohibited. Please look directly at the camera.",
+    warningModalDesc: "Starting without a real human face is strictly prohibited. Walls, ceilings, or objects are not allowed. Please look directly at the camera.",
     warningModalBtn: "OK, I will face the camera",
     dupTitle: "MeetLoop Open in Another Tab",
     dupDesc: "Running multiple tabs at the same time is not allowed. Session paused in this tab.",
@@ -699,7 +707,7 @@ const translations = {
     reportedSuccess: "🚩 Na-report mo ang user. Nililipat ka na sa susunod...",
     alreadyReported: "Nai-report mo na ang user na ito.",
     warningModalTitle: "Kailangan ng Mukha ng Tao",
-    warningModalDesc: "Bawal mag-start nang walang mukha ng tao sa camera. Paki-itapat nang maayos ang iyong mukha.",
+    warningModalDesc: "Bawal mag-start nang walang totoong mukha ng tao. Bawal ang pader, kisame, o gamit. Paki-itapat nang maayos ang mukha sa camera.",
     warningModalBtn: "OK, Itatapat ko",
     dupTitle: "Bukas ang MeetLoop sa Ibang Tab",
     dupDesc: "Bawal ang dalawang tab nang sabay. Naka-pause muna ang session dito.",
@@ -717,10 +725,10 @@ const translations = {
     reportedSuccess: "🚩 Usuario reportado. Conectando al siguiente...",
     alreadyReported: "Ya has reportado a este usuario.",
     warningModalTitle: "Se requiere rostro humano",
-    warningModalDesc: "No se permite iniciar sin un rostro humano real visible. Mire hacia la cámara.",
+    warningModalDesc: "No se permite iniciar sin un rostro humano visible. Mire hacia la cámara.",
     warningModalBtn: "Entendido",
     dupTitle: "MeetLoop abierto en otra pestaña",
-    dupDesc: "No se permiten múltiples pestañas abiertas. Sesión en pausa aquí.",
+    dupDesc: "No se permiten múltiples pestañas abiertas. Sesión en pausa.",
     dupBtn: "⚡ Usar aquí"
   },
   ja: {
@@ -753,7 +761,7 @@ const translations = {
     reportedSuccess: "🚩 사용자를 신고했습니다. 다음 사람으로 이동합니다...",
     alreadyReported: "이미 이 사용자를 신고했습니다.",
     warningModalTitle: "실제 사람 얼굴 필요",
-    warningModalDesc: "실제 얼굴이 보이지 않으면 시작할 수 없습니다. 카메라를 정면으로 바라보세요.",
+    warningModalDesc: "실제 사람 얼굴이 보이지 않으면 시작할 수 없습니다. 카메라를 정면으로 비춰주세요.",
     warningModalBtn: "확인했습니다",
     dupTitle: "다른 탭에서 실행 중",
     dupDesc: "두 개 이상의 탭을 동시에 사용할 수 없습니다. 현재 탭이 일시 중지되었습니다.",
@@ -771,7 +779,7 @@ const translations = {
     reportedSuccess: "🚩 举报成功，正在切换至下一位...",
     alreadyReported: "您已经举报过此用户。",
     warningModalTitle: "必须有人脸",
-    warningModalDesc: "镜头前必须出现真人脸部方可开始，请正对摄像头。",
+    warningModalDesc: "镜头前必须检测到真人脸部方可开始，严禁对准物品或天花板。",
     warningModalBtn: "我知道了",
     dupTitle: "已在其他标签页打开",
     dupDesc: "不能同时开启两个页面，当前页面已暂停会话。",
@@ -807,7 +815,7 @@ const translations = {
     reportedSuccess: "🚩 Pengguna dilaporkan. Menghubungkan ke orang berikutnya...",
     alreadyReported: "Anda sudah melaporkan pengguna ini.",
     warningModalTitle: "Wajah Manusia Diperlukan",
-    warningModalDesc: "Dilarang memulai tanpa wajah manusia asli di depan kamera.",
+    warningModalDesc: "Dilarang memulai tanpa wajah manusia asli di depan kamera. Jangan arahkan ke dinding atau benda.",
     warningModalBtn: "Saya mengerti",
     dupTitle: "MeetLoop Terbuka di Tab Lain",
     dupDesc: "Tidak boleh membuka beberapa tab bersamaan. Sesi dijeda di sini.",
@@ -907,7 +915,7 @@ reclaimSessionBtn.addEventListener("click", () => {
 });
 
 /* =========================================================
-   3. 1-HOUR BAN SYSTEM (OMETV ENGINE)
+   3. 1-HOUR BAN SYSTEM
 ========================================================= */
 function checkBanStatus() {
   const banUntil = parseInt(localStorage.getItem("meetloop_ban_until") || "0");
@@ -1018,7 +1026,7 @@ function handleIncomingReport(reason) {
     alert(`🚨 1-HOUR SUSPENSION: Multiple violation reports received (${reason})!`);
     triggerInstantOneHourBan(`Accumulated Reports: ${reason}`);
   } else {
-    alert(`⚠️ WARNING (1/2): You were reported for "${reason}". Next violation will cause a 1-HOUR BAN!`);
+    alert(`⚠️ WARNING (1/2): You were reported for "${reason}". Next violation will result in a 1-HOUR BAN!`);
     addMessage("System", `⚠️ Warning: A report was filed against your stream (${reason}).`);
   }
 }
@@ -1042,7 +1050,7 @@ window.enterMeetLoop = function() {
   sessionStorage.setItem("meetloop_session_active", "true");
 
   const portal = document.getElementById("welcomePortal");
-  const loader = document.getElementById("ometvLoader");
+  const loader = document.getElementById("meetloopLoader");
   const pBar = document.getElementById("loaderProgressBar");
   const pNum = document.getElementById("loaderPercent");
   const sText = document.getElementById("loaderStatusText");
@@ -1067,7 +1075,7 @@ window.enterMeetLoop = function() {
     pNum.textContent = progress + "%";
 
     if (progress < 40) sText.textContent = "Connecting to server...";
-    else if (progress < 80) sText.textContent = "Checking camera...";
+    else if (progress < 80) sText.textContent = "Checking camera & face detector...";
     else sText.textContent = "Ready!";
   }, 100);
 
@@ -1088,48 +1096,105 @@ window.enterMeetLoop = function() {
 };
 
 /* =========================================================
-   6. STRICT HUMAN FACE DETECTION
+   6. HIGH-ACCURACY FACE & HUMAN PRESENCE DETECTOR
 ========================================================= */
+async function ensureVideoReady(video, maxWaitMs = 1200) {
+  const start = Date.now();
+  while ((video.readyState < 2 || video.videoWidth === 0) && (Date.now() - start < maxWaitMs)) {
+    await new Promise(r => setTimeout(r, 50));
+  }
+  return video.readyState >= 2 && video.videoWidth > 0;
+}
+
 async function verifyStrictHumanFace() {
   if (!localVideo) return false;
-  const vTrack = localStream?.getVideoTracks()[0];
-  if (!vTrack || !vTrack.enabled || vTrack.readyState !== 'live') return false;
+  
+  const isReady = await ensureVideoReady(localVideo);
+  if (!isReady) return false;
 
+  const vTrack = localStream?.getVideoTracks()[0];
+  if (!vTrack || !vTrack.enabled || vTrack.readyState !== 'live') {
+    return false;
+  }
+
+  // 1. Native AI FaceDetector
   if ('FaceDetector' in window) {
     try {
       const detector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 2 });
       const faces = await detector.detect(localVideo);
-      return faces && faces.length > 0;
-    } catch(err) {}
+      if (faces && faces.length > 0) {
+        const f = faces[0].boundingBox;
+        if (f.width >= localVideo.videoWidth * 0.10 && f.height >= localVideo.videoHeight * 0.10) {
+          return true;
+        }
+      }
+      return false;
+    } catch(err) {
+      console.warn("Falling back to computer vision skin variance engine:", err);
+    }
   }
 
+  // 2. High-Accuracy YCbCr Skin-Tone + Center Mass + Variance Pipeline
   try {
     const canvas = document.createElement("canvas");
-    const W = 64, H = 48;
-    canvas.width = W; canvas.height = H;
+    const W = 80, H = 60;
+    canvas.width = W; 
+    canvas.height = H;
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
     ctx.drawImage(localVideo, 0, 0, W, H);
 
     const frame = ctx.getImageData(0, 0, W, H).data;
-    let totalLuma = 0;
-    let lumaArr = [];
+    const totalPixels = W * H;
 
-    for (let i = 0; i < frame.length; i += 4) {
-      const y = 0.299 * frame[i] + 0.587 * frame[i+1] + 0.114 * frame[i+2];
+    let totalLuma = 0;
+    let lumaValues = new Float32Array(totalPixels);
+    let skinMatches = 0;
+    let centerSkinMatches = 0;
+
+    for (let i = 0, p = 0; i < frame.length; i += 4, p++) {
+      const r = frame[i], g = frame[i+1], b = frame[i+2];
+      
+      const y = 0.299 * r + 0.587 * g + 0.114 * b;
+      lumaValues[p] = y;
       totalLuma += y;
-      lumaArr.push(y);
+
+      const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+      const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+
+      if (cb >= 75 && cb <= 135 && cr >= 130 && cr <= 180 && y >= 30 && y <= 235) {
+        skinMatches++;
+        const x = p % W;
+        const yCoord = Math.floor(p / W);
+        if (x >= W * 0.20 && x <= W * 0.80 && yCoord >= H * 0.15 && yCoord <= H * 0.85) {
+          centerSkinMatches++;
+        }
+      }
     }
 
-    const avg = totalLuma / lumaArr.length;
-    if (avg < 20 || avg > 240) return false;
+    const avgLuma = totalLuma / totalPixels;
 
-    let variance = 0;
-    for (let y of lumaArr) variance += Math.pow(y - avg, 2);
-    variance = variance / lumaArr.length;
+    if (avgLuma < 22 || avgLuma > 238) return false;
 
-    return variance > 90;
-  } catch(e) {
+    let varianceSum = 0;
+    for (let p = 0; p < totalPixels; p++) {
+      const diff = lumaValues[p] - avgLuma;
+      varianceSum += diff * diff;
+    }
+    const lumaVariance = varianceSum / totalPixels;
+
+    if (lumaVariance < 100) {
+      return false;
+    }
+
+    const centerDensity = centerSkinMatches / (W * H * 0.42);
+    if (centerDensity < 0.14) {
+      return false;
+    }
+
     return true;
+  } catch(e) {
+    console.error("Face detection error:", e);
+    return false;
   }
 }
 
