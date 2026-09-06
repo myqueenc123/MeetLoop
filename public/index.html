@@ -4,19 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0b1120">
-<title>MeetLoop - Random Video Chat</title>
+
+<!-- ANTI-CACHE -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<title>MeetLoop - Powered by Jm Devs</title>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0b1120;
-  --panel:#111827;
+  --bg:#070b14;
+  --panel:#0f172a;
   --border:rgba(255,255,255,.09);
-  --border-strong:rgba(255,255,255,.15);
+  --border-strong:rgba(255,255,255,.16);
   --blue:#2563eb;
   --blue2:#3b82f6;
   --red:#ef4444;
   --purple:#8b5cf6;
+  --cyan:#06b6d4;
+  --pink:#ec4899;
   --text:#f8fafc;
   --muted:#94a3b8;
 }
@@ -24,7 +32,7 @@ html,body{width:100%;height:100%}
 body{
   font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   color:var(--text);
-  background:radial-gradient(circle at top left,rgba(37,99,235,.14),transparent 28%),radial-gradient(circle at bottom right,rgba(139,92,246,.12),transparent 25%),var(--bg);
+  background:radial-gradient(circle at top left,rgba(37,99,235,.18),transparent 30%),radial-gradient(circle at bottom right,rgba(236,72,153,.15),transparent 28%),var(--bg);
   overflow:hidden;
   -webkit-font-smoothing:antialiased;
 }
@@ -38,19 +46,44 @@ header{
   justify-content:space-between;
   gap:12px;
   padding:0 20px;
-  background:rgba(17,24,39,.92);
+  background:rgba(15,23,42,.92);
   border-bottom:1px solid var(--border);
   backdrop-filter:blur(14px);
   -webkit-backdrop-filter:blur(14px);
   position:relative;
   z-index:20;
 }
-.brand{display:flex;align-items:center;gap:8px;font-size:22px;font-weight:800;white-space:nowrap}
+.brand{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:900;white-space:nowrap}
 .brand-icon{
-  width:34px;height:34px;display:flex;align-items:center;justify-content:center;
-  border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--purple));
-  box-shadow:0 6px 20px rgba(37,99,235,.25);
+  width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+  border-radius:10px;background:linear-gradient(135deg,#3b82f6,#ec4899);
+  box-shadow:0 0 20px rgba(236,72,153,.45);
 }
+
+/* 🔥 MAANGAS NA JM DEVS BADGE */
+.jm-dev-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:4px 10px;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  border-radius:999px;
+  background:linear-gradient(135deg,#ff007a,#7928ca,#00f0ff);
+  background-size:200% 200%;
+  color:#fff;
+  border:1px solid rgba(255,255,255,.4);
+  box-shadow:0 0 15px rgba(255,0,122,.5),inset 0 0 6px rgba(255,255,255,.3);
+  animation:jmPulse 3s ease infinite;
+  user-select:none;
+}
+@keyframes jmPulse{
+  0%,100%{filter:drop-shadow(0 0 8px #ff007a) hue-rotate(0deg)}
+  50%{filter:drop-shadow(0 0 14px #00f0ff) hue-rotate(90deg)}
+}
+
 .header-right{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
 .badge{
   min-height:34px;display:inline-flex;align-items:center;justify-content:center;
@@ -63,9 +96,9 @@ header{
 select{
   min-height:34px;padding:6px 12px;color:#fff;background:rgba(255,255,255,.08);
   border:1px solid var(--border-strong);border-radius:9px;outline:none;cursor:pointer;
-  font-weight:600;font-size:12px;
+  font-weight:700;font-size:12px;
 }
-select option{background:#111827;color:#fff}
+select option{background:#0f172a;color:#fff}
 
 #callTimer{gap:7px;transition:color .25s,background .25s,border-color .25s,box-shadow .25s}
 .timer-dot{width:7px;height:7px;border-radius:50%;background:#64748b;flex:0 0 auto}
@@ -77,10 +110,10 @@ select option{background:#111827;color:#fff}
 
 .main-container{width:100%;height:calc(100vh - 68px);display:flex;gap:12px;padding:12px}
 .video-wrapper{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px}
-.videos-grid{flex:1;min-height:0;display:flex;gap:10px}
-.video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#000;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 35px rgba(0,0,0,.25)}
+.videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:10px}
+.video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#000;border:1px solid var(--border);border-radius:18px;box-shadow:0 12px 35px rgba(0,0,0,.45);transition:all .25s ease}
 
-/* Optimized video render para matalas at hindi blur */
+/* 🔥 ULTRA HD CRYSTAL CLEAR VIDEO RENDERING */
 video{
   display:block;
   width:100%;
@@ -91,73 +124,100 @@ video{
   outline:0;
   image-rendering:-webkit-optimize-contrast;
   image-rendering:crisp-edges;
+  filter:contrast(104%) brightness(102%) saturate(105%);
 }
 #localVideo{transform:scaleX(-1)}
 
+/* Hide/Show camera controls */
+#hideLocalBtn{
+  position:absolute;top:8px;right:8px;z-index:8;width:28px;height:28px;
+  border-radius:50%;background:rgba(0,0,0,.68);color:#fff;border:1px solid rgba(255,255,255,.25);
+  font-size:12px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;backdrop-filter:blur(6px);
+}
+#hideLocalBtn:hover{background:rgba(239,68,68,.9);transform:scale(1.05)}
+#hideLocalBtn:active{transform:scale(.92)}
+
+#showLocalBtn{
+  position:absolute;right:12px;bottom:12px;z-index:7;display:none;
+  align-items:center;gap:6px;padding:9px 14px;border-radius:999px;
+  background:rgba(15,23,42,.92);border:1px solid rgba(59,130,246,.5);
+  color:#fff;font-size:11px;font-weight:800;cursor:pointer;
+  box-shadow:0 0 15px rgba(59,130,246,.4);backdrop-filter:blur(10px);
+}
+#showLocalBtn:hover{background:rgba(37,99,235,.95)}
+
 .video-label{
-  position:absolute;left:10px;top:10px;z-index:4;padding:6px 10px;
-  background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1);
-  border-radius:9px;font-size:12px;font-weight:700;pointer-events:none;
+  position:absolute;left:10px;top:10px;z-index:4;padding:6px 11px;
+  background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;font-size:12px;font-weight:800;pointer-events:none;
+  backdrop-filter:blur(6px);
 }
 .status{
-  position:absolute;left:10px;bottom:10px;z-index:4;padding:6px 10px;
-  background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1);
-  border-radius:9px;color:#e2e8f0;font-size:11px;font-weight:600;pointer-events:none;
+  position:absolute;left:10px;bottom:10px;z-index:4;padding:6px 11px;
+  background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;color:#e2e8f0;font-size:11px;font-weight:700;pointer-events:none;
+  backdrop-filter:blur(6px);
 }
 
 .search-overlay{
   position:absolute;inset:0;z-index:10;display:none;align-items:center;
-  justify-content:center;background:rgba(2,6,23,.78);backdrop-filter:blur(3px);
-  -webkit-backdrop-filter:blur(3px);
+  justify-content:center;background:rgba(2,6,23,.82);backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
 }
-.search-box{min-width:220px;padding:22px;text-align:center;background:rgba(15,23,42,.88);border:1px solid rgba(255,255,255,.1);border-radius:16px}
-.spinner{width:40px;height:40px;margin:0 auto 12px;border:4px solid rgba(255,255,255,.12);border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite}
-#searchText{color:#e2e8f0;font-size:13px;font-weight:700}
+.search-box{min-width:230px;padding:24px;text-align:center;background:rgba(15,23,42,.9);border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 15px 35px rgba(0,0,0,.5)}
+.spinner{width:42px;height:42px;margin:0 auto 14px;border:4px solid rgba(255,255,255,.1);border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite}
+#searchText{color:#e2e8f0;font-size:13px;font-weight:800}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 .controls-bar{display:flex;gap:8px;padding:2px}
 .btn{
-  min-height:46px;padding:11px 15px;border:1px solid rgba(255,255,255,.05);
-  border-radius:11px;color:#fff;background:var(--panel);cursor:pointer;font-size:13px;
+  min-height:46px;padding:11px 15px;border:1px solid rgba(255,255,255,.06);
+  border-radius:12px;color:#fff;background:var(--panel);cursor:pointer;font-size:13px;
   font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;
   user-select:none;transition:transform .12s,filter .2s,opacity .2s;
 }
-.btn:hover:not(:disabled){filter:brightness(1.1)}
+.btn:hover:not(:disabled){filter:brightness(1.15)}
 .btn:active:not(:disabled){transform:scale(.98)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
-.btn-loop{flex:1.5;background:linear-gradient(135deg,var(--blue),var(--blue2));box-shadow:0 7px 22px rgba(37,99,235,.2)}
+.btn-loop{flex:1.5;background:linear-gradient(135deg,var(--blue),var(--blue2));box-shadow:0 6px 20px rgba(37,99,235,.3)}
 .btn-stop{flex:1;background:linear-gradient(135deg,#dc2626,#ef4444)}
 .btn-toggle{flex:1;background:rgba(255,255,255,.07)}
 .btn-flip{display:none;flex:1;background:linear-gradient(135deg,#7c3aed,#8b5cf6)}
 
 .chat-wrapper{
   width:320px;max-width:320px;min-height:0;display:flex;flex-direction:column;
-  overflow:hidden;background:rgba(17,24,39,.9);border:1px solid var(--border);
-  border-radius:16px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  overflow:hidden;background:rgba(15,23,42,.92);border:1px solid var(--border);
+  border-radius:18px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
 }
-.chat-header{padding:14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:800}
+.chat-header{padding:14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:space-between}
 .chat-messages{flex:1;min-height:0;padding:12px;overflow-y:auto;overscroll-behavior:contain}
 .message{margin-bottom:12px;word-break:break-word}
-.message-name{margin-bottom:4px;color:var(--muted);font-size:10px;font-weight:700}
+.message-name{margin-bottom:4px;color:var(--muted);font-size:10px;font-weight:800}
 .message-text{
-  display:inline-block;max-width:96%;padding:9px 12px;color:#f8fafc;
-  background:rgba(255,255,255,.075);border-radius:10px;font-size:12px;
-  line-height:1.45;white-space:pre-wrap;
+  display:inline-block;max-width:96%;padding:10px 13px;color:#f8fafc;
+  background:rgba(255,255,255,.08);border-radius:12px;font-size:12px;
+  line-height:1.48;white-space:pre-wrap;
+}
+.dev-banner{
+  background:linear-gradient(135deg,rgba(255,0,122,.15),rgba(0,240,255,.15));
+  border:1px solid rgba(255,0,122,.3);
 }
 .update-badge{
-  display:inline-block;background:linear-gradient(135deg,var(--blue),var(--purple));
-  color:#fff;font-weight:800;font-size:10px;padding:2px 6px;border-radius:6px;margin-bottom:4px;
+  display:inline-block;background:linear-gradient(135deg,#ff007a,#7928ca);
+  color:#fff;font-weight:900;font-size:10px;padding:2px 7px;border-radius:6px;margin-bottom:6px;
 }
-.chat-input-area{display:flex;gap:6px;padding:9px;border-top:1px solid var(--border)}
-#chatInput{flex:1;min-width:0;min-height:40px;padding:9px 11px;background:rgba(2,6,23,.64);color:#fff;border:1px solid var(--border-strong);border-radius:9px;outline:none}
-#chatInput:focus{border-color:rgba(59,130,246,.55)}
-#sendBtn{min-width:64px;border:0;border-radius:9px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue2));cursor:pointer;font-size:12px;font-weight:800}
+.chat-input-area{display:flex;gap:6px;padding:10px;border-top:1px solid var(--border)}
+#chatInput{flex:1;min-width:0;min-height:42px;padding:9px 12px;background:rgba(2,6,23,.64);color:#fff;border:1px solid var(--border-strong);border-radius:10px;outline:none}
+#chatInput:focus{border-color:rgba(59,130,246,.7)}
+#sendBtn{min-width:66px;border:0;border-radius:10px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue2));cursor:pointer;font-size:12px;font-weight:800}
 
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto;overflow-x:hidden}
   header{min-height:58px;height:auto;padding:8px 10px;gap:6px}
-  .brand{font-size:17px}
-  .brand-icon{width:28px;height:28px;border-radius:8px}
+  .brand{font-size:16px;gap:6px}
+  .brand-icon{width:26px;height:26px;border-radius:7px}
+  .jm-dev-badge{font-size:9px;padding:3px 7px}
   .header-right{gap:4px;flex-wrap:wrap}
   .badge{min-height:28px;padding:4px 7px;font-size:10px}
   .timer-label{display:none}
@@ -168,11 +228,12 @@ video{
   .videos-grid{position:relative;width:100%;height:min(55dvh,540px);min-height:280px;display:block}
   .video-box{position:absolute;border-radius:14px}
   .video-box:first-child{inset:0;width:100%;height:100%}
-  .video-box:last-child{right:10px;bottom:10px;width:32%;height:32%;z-index:6;border:2px solid rgba(255,255,255,.85);box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  #localVideoBox{right:10px;bottom:10px;width:32%;height:32%;z-index:6;border:2px solid rgba(255,255,255,.9);box-shadow:0 8px 24px rgba(0,0,0,.6)}
+  #localVideoBox.camera-hidden{display:none !important}
   .video-label{left:7px;top:7px;padding:4px 7px;font-size:10px}
   .status{left:7px;bottom:7px;padding:4px 7px;font-size:9px}
   .controls-bar{width:100%;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:0}
-  .btn{width:100%;min-height:46px;padding:8px 6px;border-radius:9px;font-size:11px}
+  .btn{width:100%;min-height:46px;padding:8px 6px;border-radius:10px;font-size:11px}
   .btn-loop,.btn-stop,.btn-toggle{flex:none}
   .btn-flip{display:flex}
   .chat-wrapper{width:100%;max-width:none;height:260px;min-height:260px;border-radius:14px}
@@ -185,7 +246,12 @@ video{
 
 <body>
 <header>
-  <div class="brand"><span class="brand-icon">🔄</span><span>MeetLoop</span></div>
+  <div class="brand">
+    <span class="brand-icon">🔄</span>
+    <span>MeetLoop</span>
+    <!-- MAANGAS NA JM DEVS BADGE -->
+    <span class="jm-dev-badge">⚡ by Jm Devs</span>
+  </div>
   <div class="header-right">
     <div class="badge online">🟢 <span id="onlineLabel">Online:</span>&nbsp;<span id="onlineCount">0</span></div>
     <div class="badge" id="statusBadge">Ready</div>
@@ -211,9 +277,7 @@ video{
   <div class="video-wrapper">
     <div class="videos-grid">
       <div class="video-box">
-        <!-- Remote Video -->
         <video id="remoteVideo" autoplay playsinline webkit-playsinline muted></video>
-        <!-- Dedicated Audio Element: Automatic Audio Reproduction nang walang banner -->
         <audio id="remoteAudio" autoplay playsinline></audio>
         <div class="video-label" id="remoteLabel">👤 Stranger</div>
         <div class="status" id="remoteStatus">Waiting...</div>
@@ -224,10 +288,15 @@ video{
           </div>
         </div>
       </div>
-      <div class="video-box">
+
+      <!-- Local Camera (Puwede i-hide gamit ang ✕) -->
+      <div class="video-box" id="localVideoBox">
         <video id="localVideo" autoplay muted playsinline webkit-playsinline></video>
         <div class="video-label" id="localLabel">🙂 You</div>
+        <button id="hideLocalBtn" type="button" title="Hide Camera">✕</button>
       </div>
+
+      <button id="showLocalBtn" type="button">👁️ <span id="showLocalText">Show Cam</span></button>
     </div>
 
     <div class="controls-bar">
@@ -240,16 +309,19 @@ video{
   </div>
 
   <div class="chat-wrapper">
-    <div class="chat-header" id="chatHeader">💬 Live Chat</div>
+    <div class="chat-header">
+      <span id="chatHeader">💬 Live Chat</span>
+      <span style="font-size:10px;color:var(--muted);font-weight:700">⚡ Jm Devs Core</span>
+    </div>
     <div class="chat-messages" id="chatMessages">
-      <!-- Announcement para alam ng users ang mga bago -->
       <div class="message">
-        <div class="message-name">System Update</div>
-        <div class="message-text"><span class="update-badge">WHAT'S NEW</span>
-🎉 <b>MeetLoop v2.0 Updates:</b>
-• 🔊 <b>Automatic Audio:</b> Mobile sound now plays automatically!
-• 📷 <b>HD 720p Video:</b> Sharper and clearer video (no more blur).
-• 🌐 <b>8 Languages:</b> Switch languages anytime in the header!</div>
+        <div class="message-name">👑 System • Jm Devs</div>
+        <div class="message-text dev-banner"><span class="update-badge">PRO VERIFIED</span>
+🚀 <b>MeetLoop v3.0 • Built by Jm Devs</b>
+• 💎 <b>Ultra HD Video:</b> Hardware H.264 engine active (Clear & sharp).
+• 🔊 <b>Auto Audio:</b> Zero delay crystal-clear mobile voice.
+• 🙈 <b>Camera Toggle:</b> Tap '✕' anytime to hide/show your video.
+• 🌐 <b>8 Languages:</b> Global chat ready!</div>
       </div>
     </div>
     <div class="chat-input-area">
@@ -289,6 +361,7 @@ const translations = {
     camOn: "📷 Cam On",
     camOff: "🚫 Cam Off",
     flip: "🔄 Flip",
+    showCam: "Show Cam",
     chatHeader: "💬 Live Chat",
     inputPlaceholder: "Type a message...",
     send: "Send",
@@ -317,6 +390,7 @@ const translations = {
     camOn: "📷 Cam Bukas",
     camOff: "🚫 Cam Naka-off",
     flip: "🔄 Iikot",
+    showCam: "Ipakita Cam",
     chatHeader: "💬 Usapan",
     inputPlaceholder: "Mag-type ng mensahe...",
     send: "Ipadala",
@@ -345,6 +419,7 @@ const translations = {
     camOn: "📷 Cámara Encendida",
     camOff: "🚫 Cámara Apagada",
     flip: "🔄 Girar",
+    showCam: "Mostrar Cámara",
     chatHeader: "💬 Chat en vivo",
     inputPlaceholder: "Escribe un mensaje...",
     send: "Enviar",
@@ -373,6 +448,7 @@ const translations = {
     camOn: "📷 カメラON",
     camOff: "🚫 カメラOFF",
     flip: "🔄 反転",
+    showCam: "カメラ表示",
     chatHeader: "💬 ライブチャット",
     inputPlaceholder: "メッセージを入力...",
     send: "送信",
@@ -401,6 +477,7 @@ const translations = {
     camOn: "📷 카메라 켬",
     camOff: "🚫 카메라 끔",
     flip: "🔄 전환",
+    showCam: "카메라 보기",
     chatHeader: "💬 실시간 채팅",
     inputPlaceholder: "메시지를 입력하세요...",
     send: "전송",
@@ -429,6 +506,7 @@ const translations = {
     camOn: "📷 摄像头开",
     camOff: "🚫 摄像头关",
     flip: "🔄 翻转",
+    showCam: "显示镜头",
     chatHeader: "💬 实时聊天",
     inputPlaceholder: "输入消息...",
     send: "发送",
@@ -457,6 +535,7 @@ const translations = {
     camOn: "📷 Caméra Activée",
     camOff: "🚫 Caméra Coupée",
     flip: "🔄 Tourner",
+    showCam: "Afficher Cam",
     chatHeader: "💬 Chat en direct",
     inputPlaceholder: "Tapez un message...",
     send: "Envoyer",
@@ -485,6 +564,7 @@ const translations = {
     camOn: "📷 Kamera Nyala",
     camOff: "🚫 Kamera Mati",
     flip: "🔄 Putar",
+    showCam: "Tampilkan Cam",
     chatHeader: "💬 Obrolan Langsung",
     inputPlaceholder: "Ketik pesan...",
     send: "Kirim",
@@ -506,6 +586,7 @@ function updateUILanguage() {
   document.getElementById("chatHeader").textContent = t("chatHeader");
   document.getElementById("chatInput").placeholder = t("inputPlaceholder");
   document.getElementById("sendBtn").textContent = t("send");
+  document.getElementById("showLocalText").textContent = t("showCam");
 
   if (!connected && !searching) {
     statusBadge.textContent = t("ready");
@@ -526,7 +607,7 @@ function updateUILanguage() {
 }
 
 /* =========================================================
-   2. DOM & WEBRTC SETUP (GOOGLE STUN PRIORITY)
+   2. DOM & WEBRTC SETUP (JM DEVS PRO ENGINE)
 ========================================================= */
 const socket = io({
   transports: ["websocket", "polling"],
@@ -534,6 +615,9 @@ const socket = io({
 });
 
 const localVideo = document.getElementById("localVideo");
+const localVideoBox = document.getElementById("localVideoBox");
+const hideLocalBtn = document.getElementById("hideLocalBtn");
+const showLocalBtn = document.getElementById("showLocalBtn");
 const remoteVideo = document.getElementById("remoteVideo");
 const remoteAudio = document.getElementById("remoteAudio");
 const loopBtn = document.getElementById("loopBtn");
@@ -553,7 +637,7 @@ const languageSelect = document.getElementById("languageSelect");
 const callTimer = document.getElementById("callTimer");
 const callTimerValue = document.getElementById("callTimerValue");
 
-// INUNA ANG GOOGLE STUN SERVERS PARA 0 MB BAWAS SA METERED QUOTA!
+// METERED TURN CREDENTIALS + FREE GOOGLE STUN PRIORITY
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
@@ -564,18 +648,23 @@ const rtcConfig = {
     { urls: "stun:stun.relay.metered.ca:80" },
     {
       urls: "turn:global.relay.metered.ca:80",
-      username: "ab517030afee9414b9e155c5",
-      credential: "MCHZdjwDZ2KjW9bv"
+      username: "a5236ac4d19d14a300de3d07",
+      credential: "YILTJApXFHPUxOiz"
+    },
+    {
+      urls: "turn:global.relay.metered.ca:80?transport=tcp",
+      username: "a5236ac4d19d14a300de3d07",
+      credential: "YILTJApXFHPUxOiz"
     },
     {
       urls: "turn:global.relay.metered.ca:443",
-      username: "ab517030afee9414b9e155c5",
-      credential: "MCHZdjwDZ2KjW9bv"
+      username: "a5236ac4d19d14a300de3d07",
+      credential: "YILTJApXFHPUxOiz"
     },
     {
       urls: "turns:global.relay.metered.ca:443?transport=tcp",
-      username: "ab517030afee9414b9e155c5",
-      credential: "MCHZdjwDZ2KjW9bv"
+      username: "a5236ac4d19d14a300de3d07",
+      credential: "YILTJApXFHPUxOiz"
     }
   ]
 };
@@ -591,7 +680,7 @@ let currentFacingMode = "user";
 let callTimerInterval = null;
 let callStartTime = null;
 
-// Silent audio unlock sa bawat pindot sa screen
+// Silent Audio Unlock
 function primeAudioElements() {
   remoteAudio.muted = false;
   remoteAudio.volume = 1.0;
@@ -637,16 +726,18 @@ function stopCallTimer() {
 }
 
 /* =========================================================
-   3. HD VIDEO & TIPID SA BANDWIDTH (1.2 Mbps)
+   3. ULTRA-HD VIDEO CAPTURE (1080p/720p ADAPTIVE)
 ========================================================= */
 async function startMedia() {
   if (localStream) return true;
   try {
+    // Dynamic Resolution: Sakto sa Mobile Portrait o Landscape para hindi ma-stretch o mag-blur
+    const isPortrait = window.innerHeight > window.innerWidth;
     localStream = await navigator.mediaDevices.getUserMedia({
       video: { 
         facingMode: currentFacingMode,
-        width: { min: 640, ideal: 1280, max: 1920 },
-        height: { min: 480, ideal: 720, max: 1080 },
+        width: { min: 720, ideal: isPortrait ? 1080 : 1920 },
+        height: { min: 720, ideal: isPortrait ? 1920 : 1080 },
         frameRate: { ideal: 30, max: 60 }
       },
       audio: {
@@ -667,8 +758,36 @@ async function startMedia() {
   }
 }
 
-// 1.2 Mbps Bitrate: Napakalinaw na HD pero 50% ang bawas sa data consumption
-async function boostVideoQuality(pc) {
+// INJECTION: Pinipilit ang 2.5 Mbps Bitrate sa WebRTC Protocol (TANGGAL BLUR)
+function injectHighQualityBitrate(sdp) {
+  return sdp.replace(/a=mid:video\r\n/g, "a=mid:video\r\nb=AS:2500\r\nb=TIAS:2500000\r\n");
+}
+
+// HARDWARE H.264 ENCODER PREFERENCE (Super Sharp Video)
+function prioritizeH264Codecs(pc) {
+  if (!window.RTCRtpSender || !RTCRtpSender.getCapabilities) return;
+  try {
+    const capabilities = RTCRtpSender.getCapabilities("video");
+    if (!capabilities || !capabilities.codecs) return;
+
+    const h264Codecs = capabilities.codecs.filter(c => c.mimeType.toLowerCase() === "video/h264");
+    const otherCodecs = capabilities.codecs.filter(c => c.mimeType.toLowerCase() !== "video/h264");
+    const preferred = [...h264Codecs, ...otherCodecs];
+
+    pc.getTransceivers().forEach(transceiver => {
+      if (transceiver.sender && transceiver.sender.track && transceiver.sender.track.kind === "video") {
+        if (transceiver.setCodecPreferences) {
+          transceiver.setCodecPreferences(preferred);
+        }
+      }
+    });
+  } catch (e) {
+    console.warn("Codec preference notice:", e);
+  }
+}
+
+// ANTI-DOWNSCALING: Bawal mag-drop ng resolution
+async function applyHDEncodingParameters(pc) {
   if (!pc) return;
   try {
     const sender = pc.getSenders().find(s => s.track && s.track.kind === "video");
@@ -677,13 +796,14 @@ async function boostVideoQuality(pc) {
       if (!params.encodings || params.encodings.length === 0) {
         params.encodings = [{}];
       }
-      params.encodings[0].maxBitrate = 1200000;
+      params.encodings[0].scaleResolutionDownBy = 1.0; // Bawal magbawas ng pixels
+      params.encodings[0].maxBitrate = 2500000; // 2.5 Mbps Crystal Clear
       params.encodings[0].maxFramerate = 30;
-      params.degradationPreference = "maintain-resolution";
+      params.degradationPreference = "maintain-resolution"; // Huwag i-blur ang screen
       await sender.setParameters(params);
     }
   } catch (err) {
-    console.warn("Bitrate boost notice:", err);
+    console.warn("Encoding param notice:", err);
   }
 }
 
@@ -721,7 +841,8 @@ async function flipCamera() {
     const videoSender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
     if (videoSender) {
       videoSender.replaceTrack(localStream.getVideoTracks()[0]);
-      boostVideoQuality(peerConnection);
+      prioritizeH264Codecs(peerConnection);
+      applyHDEncodingParameters(peerConnection);
     }
   }
 }
@@ -742,7 +863,7 @@ function stopAllRemoteMedia() {
 }
 
 /* =========================================================
-   4. WEBRTC SIGNALING & AUTO SOUND
+   4. WEBRTC SIGNALING & HIGH-BITRATE NEGOTIATION
 ========================================================= */
 function setupDataChannel(channel) {
   dataChannel = channel;
@@ -760,7 +881,7 @@ function handleConnected() {
   loopBtn.disabled = false;
   stopBtn.disabled = false;
   loopBtn.textContent = t("next");
-  boostVideoQuality(peerConnection);
+  applyHDEncodingParameters(peerConnection);
   startCallTimer();
 }
 
@@ -775,6 +896,8 @@ function createPeer(initiator) {
       peerConnection.addTrack(track, localStream);
     });
   }
+
+  prioritizeH264Codecs(peerConnection);
 
   peerConnection.onicecandidate = (event) => {
     if (event.candidate) {
@@ -833,9 +956,10 @@ function createPeer(initiator) {
 async function createOffer() {
   try {
     const offer = await peerConnection.createOffer();
+    offer.sdp = injectHighQualityBitrate(offer.sdp);
     await peerConnection.setLocalDescription(offer);
     socket.emit("signal", { type: "offer", offer: peerConnection.localDescription });
-    boostVideoQuality(peerConnection);
+    applyHDEncodingParameters(peerConnection);
   } catch (err) {
     console.error("Offer error:", err);
   }
@@ -850,9 +974,10 @@ async function handleOffer(offer) {
       await peerConnection.addIceCandidate(c).catch(() => {});
     }
     const answer = await peerConnection.createAnswer();
+    answer.sdp = injectHighQualityBitrate(answer.sdp);
     await peerConnection.setLocalDescription(answer);
     socket.emit("signal", { type: "answer", answer: peerConnection.localDescription });
-    boostVideoQuality(peerConnection);
+    applyHDEncodingParameters(peerConnection);
   } catch (err) {
     console.error("Handle offer error:", err);
   }
@@ -865,7 +990,7 @@ async function handleAnswer(answer) {
       const c = pendingIceCandidates.shift();
       await peerConnection.addIceCandidate(c).catch(() => {});
     }
-    boostVideoQuality(peerConnection);
+    applyHDEncodingParameters(peerConnection);
   } catch (err) {
     console.error("Handle answer error:", err);
   }
@@ -1021,6 +1146,20 @@ function escapeHTML(str) {
 /* =========================================================
    8. EVENT LISTENERS
 ========================================================= */
+// Hide sariling camera (✕)
+hideLocalBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  localVideoBox.classList.add("camera-hidden");
+  showLocalBtn.style.display = "flex";
+});
+
+// Ibalik ang sariling camera
+showLocalBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  localVideoBox.classList.remove("camera-hidden");
+  showLocalBtn.style.display = "none";
+});
+
 loopBtn.addEventListener("click", startLoop);
 stopBtn.addEventListener("click", stopSession);
 micBtn.addEventListener("click", toggleMic);
