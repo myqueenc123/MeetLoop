@@ -214,8 +214,8 @@ video{
   line-height:1.45;white-space:pre-wrap;
 }
 
-/* 📜 UMINGLE 18+ RULES MESSAGE STYLING */
-.umingle-rules-card{
+/* 📜 MEETLOOP 18+ RULES MESSAGE STYLING */
+.meetloop-rules-card{
   background:linear-gradient(135deg,rgba(220,38,38,.12),rgba(37,99,235,.12));
   border:1px solid rgba(220,38,38,.35);line-height:1.6;font-size:12px;
 }
@@ -400,7 +400,7 @@ video{
 <div id="rulesModalOverlay">
   <div class="rules-modal-box">
     <span class="rules-badge-18">🔞 18+ RESTRICTED</span>
-    <div class="rules-title">Welcome to Umingle</div>
+    <div class="rules-title">Welcome to MeetLoop</div>
     <ul class="rules-list">
       <li>🔞 <b>Age:</b> You must be 18 or older.</li>
       <li>🚫 <b>Zero Tolerance:</b> No nudity, hate speech, or harassment.</li>
@@ -527,11 +527,11 @@ video{
       <span style="font-size:10px;color:var(--muted);font-weight:700">⚡ Jm Devs Core</span>
     </div>
     <div class="chat-messages" id="chatMessages">
-      <!-- 📜 EKSANTONG WELCOME GUIDELINES SA CHAT -->
+      <!-- 📜 EKSANTONG MEETLOOP GUIDELINES SA CHAT -->
       <div class="message">
-        <div class="message-name">Umingle Guidelines</div>
-        <div class="message-text umingle-rules-card"><span class="rules-badge-tag">🔞 18+ RULES</span>
-<b>Welcome to Umingle.</b>
+        <div class="message-name">MeetLoop Guidelines</div>
+        <div class="message-text meetloop-rules-card"><span class="rules-badge-tag">🔞 18+ RULES</span>
+<b>Welcome to MeetLoop.</b>
 18+
 You must be 18 or older
 No nudity, hate speech, or harassment
@@ -563,23 +563,20 @@ const secretUnbanIcon = document.getElementById("secretUnbanIcon");
 
 let banTimerInterval = null;
 
-// Suriin kung kasalukuyang naka-temporary ban
 function checkBanStatus() {
-  const banUntil = parseInt(localStorage.getItem("umingle_ban_until") || "0");
+  const banUntil = parseInt(localStorage.getItem("meetloop_ban_until") || "0");
   if (banUntil > Date.now()) {
     bannedOverlay.style.display = "flex";
     runBanCountdown(banUntil);
     return true;
   } else if (banUntil > 0) {
-    // Expired na ang ban!
-    localStorage.removeItem("umingle_ban_until");
-    localStorage.setItem("umingle_strikes", "0");
+    localStorage.removeItem("meetloop_ban_until");
+    localStorage.setItem("meetloop_strikes", "0");
     bannedOverlay.style.display = "none";
   }
   return false;
 }
 
-// Live Countdown Timer
 function runBanCountdown(banUntil) {
   if (banTimerInterval) clearInterval(banTimerInterval);
   banTimerInterval = setInterval(() => {
@@ -590,8 +587,8 @@ function runBanCountdown(banUntil) {
     
     if (diff <= 0) {
       clearInterval(banTimerInterval);
-      localStorage.removeItem("umingle_ban_until");
-      localStorage.setItem("umingle_strikes", "0");
+      localStorage.removeItem("meetloop_ban_until");
+      localStorage.setItem("meetloop_strikes", "0");
       bannedOverlay.style.display = "none";
       alert("Tapos na ang suspension mo. Paki-sunod ang patakaran.");
       location.reload();
@@ -601,16 +598,16 @@ function runBanCountdown(banUntil) {
 
 checkBanStatus();
 
-if (localStorage.getItem("umingle_18_agreed") === "true") {
+if (localStorage.getItem("meetloop_18_agreed") === "true") {
   rulesModalOverlay.style.display = "none";
 }
 
 acceptRulesBtn.addEventListener("click", () => {
-  localStorage.setItem("umingle_18_agreed", "true");
+  localStorage.setItem("meetloop_18_agreed", "true");
   rulesModalOverlay.style.display = "none";
 });
 
-// OMETV 3-STRIKE REPORT SYSTEM (HINDI INSTANT BAN)
+// OMETV 3-STRIKE REPORT SYSTEM
 reportStrangerBtn.addEventListener("click", () => {
   if (!connected) return;
   const reason = prompt("Dahilan ng Report:\n1 - Hubad / Nudity\n2 - Menor de edad (<18)\n3 - Bastos / Harassment\n4 - Bawal na Bagay / Walang Mukha");
@@ -623,22 +620,20 @@ reportStrangerBtn.addEventListener("click", () => {
   }
 
   alert("Na-report ang user. Nililipat ka na sa susunod.");
-  startLoop(); // Skip agad
+  startLoop();
 });
 
-// Pang-receive ng strike mula sa kausap
 function handleIncomingReport() {
-  let strikes = parseInt(localStorage.getItem("umingle_strikes") || "0") + 1;
-  localStorage.setItem("umingle_strikes", strikes.toString());
+  let strikes = parseInt(localStorage.getItem("meetloop_strikes") || "0") + 1;
+  localStorage.setItem("meetloop_strikes", strikes.toString());
 
   if (strikes === 1) {
     alert("⚠️ BABALA (1/3): May nag-report sa iyo dahil sa hindi angkop na asal. Sumunod sa alituntunin!");
   } else if (strikes === 2) {
     alert("⚠️ HULING BABALA (2/3): Isa pang report at awtomatikong masususpinde ang device mo!");
   } else if (strikes >= 3) {
-    // 3rd strike: 10-Minute Ban tulad ng sa OmeTV!
     const banUntil = Date.now() + (10 * 60 * 1000);
-    localStorage.setItem("umingle_ban_until", banUntil.toString());
+    localStorage.setItem("meetloop_ban_until", banUntil.toString());
     stopSession();
     checkBanStatus();
   }
@@ -649,16 +644,16 @@ let banClickCount = 0;
 secretUnbanIcon.addEventListener("click", () => {
   banClickCount++;
   if (banClickCount >= 3) {
-    localStorage.removeItem("umingle_ban_until");
-    localStorage.setItem("umingle_strikes", "0");
+    localStorage.removeItem("meetloop_ban_until");
+    localStorage.setItem("meetloop_strikes", "0");
     alert("Admin Verified: Device Unbanned!");
     location.reload();
   }
 });
 
 window.unban = function() {
-  localStorage.removeItem("umingle_ban_until");
-  localStorage.setItem("umingle_strikes", "0");
+  localStorage.removeItem("meetloop_ban_until");
+  localStorage.setItem("meetloop_strikes", "0");
   location.reload();
 };
 
@@ -1368,7 +1363,6 @@ function setupDataChannel(channel) {
   channel.onmessage = (e) => {
     try {
       const parsed = JSON.parse(e.data);
-      // PANG-RECEIVE NG STRIKE REPORT MULA SA KAUSAP
       if (parsed && parsed.type === "REPORT_STRIKE") {
         handleIncomingReport();
         return;
@@ -1530,14 +1524,13 @@ async function startLoop() {
   const ok = await startMedia();
   if (!ok) return;
 
-  // Bago mag-start, suriin muna kung may tao sa camera
   showSearch(t("verifying"));
   const faceVerified = verifyStrictHumanFace();
   
   if (!faceVerified) {
     hideSearch();
     showOmegleFaceWarning();
-    return; // ⛔ HINDI MAG-PPROCEED SA MATCHING!
+    return;
   }
 
   stopCallTimer();
@@ -1627,8 +1620,8 @@ function sendMessage() {
   if (!text) return;
 
   if (text === "/unban") {
-    localStorage.removeItem("umingle_ban_until");
-    localStorage.setItem("umingle_strikes", "0");
+    localStorage.removeItem("meetloop_ban_until");
+    localStorage.setItem("meetloop_strikes", "0");
     alert("Admin Verified: Unbanned.");
     location.reload();
     return;
