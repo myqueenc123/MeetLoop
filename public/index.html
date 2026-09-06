@@ -64,6 +64,7 @@ header{
   box-shadow:0 0 20px rgba(236,72,153,.45);
 }
 
+/* 🔥 MAANGAS NA JM DEVS BADGE */
 .jm-dev-badge{
   display:inline-flex;
   align-items:center;
@@ -116,7 +117,7 @@ select option{background:#0f172a;color:#fff}
 .videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:10px}
 .video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#000;border:1px solid var(--border);border-radius:18px;box-shadow:0 12px 35px rgba(0,0,0,.45);transition:all .25s ease}
 
-/* SMOOTH OMETV VIDEO RENDERING (WALANG PAMPABAGAL NA FILTERS) */
+/* 🎯 NATURAL OMETV VIDEO RENDERING (ZERO ZOOM, ZERO LAG) */
 video{
   display:block;
   width:100%;
@@ -237,7 +238,7 @@ video{
 }
 .dup-btn:active{transform:scale(.97)}
 
-/* 🔥 SAKTONG OMETV MOBILE LAYOUT: ZERO CROP, ZERO FAKE ZOOM */
+/* 🎯 OMETV PROPORTIONAL RATIO (WALANG ZOOM CROP, BUONG MUKHA AT BALIKAT KITA) */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto;overflow-x:hidden}
   header{min-height:58px;height:auto;padding:8px 10px;gap:6px}
@@ -255,19 +256,18 @@ video{
   .video-box{position:absolute;border-radius:16px}
   .video-box:first-child{inset:0;width:100%;height:100%}
 
-  /* SAKTONG 9:16 VERTICAL RATIO (Katulad na katulad ng OmeTV, buong katawan/balikat kita) */
+  /* SAKTONG 3:4 MOBILE RATIO: Sakto sa camera ng cellphone, zero crop, hindi nakadikit sa mukha */
   #localVideoBox{
     right:10px;
     bottom:10px;
-    width:24vw;
-    min-width:85px;
-    max-width:115px;
-    aspect-ratio:9 / 16;
+    width:30vw;
+    max-width:130px;
+    aspect-ratio:3 / 4;
     height:auto;
     z-index:6;
-    border:2px solid rgba(255,255,255,.9);
+    border:2.5px solid rgba(255,255,255,.9);
     box-shadow:0 8px 24px rgba(0,0,0,.65);
-    border-radius:12px;
+    border-radius:14px;
   }
   #localVideoBox.camera-hidden{display:none !important}
   .video-label{left:7px;top:7px;padding:4px 7px;font-size:10px}
@@ -339,7 +339,7 @@ video{
         </div>
       </div>
 
-      <!-- Local Camera (9:16 OmeTV Natural Aspect Ratio) -->
+      <!-- Local Camera (3:4 Natural OmeTV Ratio) -->
       <div class="video-box" id="localVideoBox">
         <video id="localVideo" autoplay muted playsinline webkit-playsinline></video>
         <div class="video-label" id="localLabel">🙂 You</div>
@@ -368,10 +368,10 @@ video{
         <div class="message-name">👑 System • Jm Devs</div>
         <div class="message-text dev-banner"><span class="update-badge">PRO VERIFIED</span>
 🚀 <b>MeetLoop v3.0 • Built by Jm Devs</b>
-• 📷 <b>OmeTV View:</b> Natural wide-angle FOV (No lag, no zoom).
-• ⚡ <b>Smooth FPS:</b> Zero stuttering video stream.
+• 📷 <b>OmeTV View:</b> Natural wide-angle FOV (No zoom, full view).
+• ⚡ <b>Zero-Lag & Zero-Delay:</b> Instant real-time video stream.
 • 🔊 <b>Auto Audio:</b> Clear voice with zero delay.
-• 🔒 <b>Single Tab Mode:</b> Protected 1 tab session.</div>
+• 🔒 <b>Single Tab Mode:</b> Protected session.</div>
       </div>
     </div>
     <div class="chat-input-area">
@@ -722,7 +722,7 @@ function updateUILanguage() {
 }
 
 /* =========================================================
-   3. WEBRTC SETUP (SMOOTH GCC BITRATE CONTROL)
+   3. WEBRTC ENGINE (METERED + GOOGLE STUN PRIORITY)
 ========================================================= */
 const socket = io({
   transports: ["websocket", "polling"],
@@ -752,7 +752,6 @@ const languageSelect = document.getElementById("languageSelect");
 const callTimer = document.getElementById("callTimer");
 const callTimerValue = document.getElementById("callTimerValue");
 
-// METERED TURN + GOOGLE STUN PRIORITY
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
@@ -841,17 +840,17 @@ function stopCallTimer() {
 }
 
 /* =========================================================
-   4. OMETV NATURAL WIDE CAMERA (NO DIGITAL ZOOM CROP)
+   4. NATURAL WIDE OMETV CAMERA (NO DIGITAL ZOOM CROP)
 ========================================================= */
 async function startMedia() {
   if (localStream) return true;
   try {
-    // Natural FOV: Sakto sa phone selfie sensor nang walang forced zoom
+    // Standard uncropped 4:3 native camera stream: walang zoom crop!
     localStream = await navigator.mediaDevices.getUserMedia({
       video: { 
         facingMode: currentFacingMode,
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
+        width: { ideal: 640 },
+        height: { ideal: 480 },
         frameRate: { ideal: 30 }
       },
       audio: {
@@ -869,26 +868,6 @@ async function startMedia() {
     console.error("Camera/Mic Error:", error);
     alert(t("permAlert"));
     return false;
-  }
-}
-
-// SMOOTH & BALANCED VIDEO BITRATE (WALANG LAG, WALANG THERMAL STUTTER)
-async function applyHDEncodingParameters(pc) {
-  if (!pc) return;
-  try {
-    const sender = pc.getSenders().find(s => s.track && s.track.kind === "video");
-    if (sender && sender.getParameters) {
-      const params = sender.getParameters();
-      if (!params.encodings || params.encodings.length === 0) {
-        params.encodings = [{}];
-      }
-      params.encodings[0].maxBitrate = 1200000; // 1.2 Mbps smooth rate
-      params.encodings[0].maxFramerate = 30;
-      params.degradationPreference = "maintain-framerate"; // Prayoridad ang walang lag na 30fps
-      await sender.setParameters(params);
-    }
-  } catch (err) {
-    console.warn("Bitrate config:", err);
   }
 }
 
@@ -926,7 +905,6 @@ async function flipCamera() {
     const videoSender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
     if (videoSender) {
       videoSender.replaceTrack(localStream.getVideoTracks()[0]);
-      applyHDEncodingParameters(peerConnection);
     }
   }
 }
@@ -947,7 +925,7 @@ function stopAllRemoteMedia() {
 }
 
 /* =========================================================
-   5. WEBRTC SIGNALING
+   5. ZERO-DELAY WEBRTC SIGNALING
 ========================================================= */
 function setupDataChannel(channel) {
   dataChannel = channel;
@@ -965,7 +943,6 @@ function handleConnected() {
   loopBtn.disabled = false;
   stopBtn.disabled = false;
   loopBtn.textContent = t("next");
-  applyHDEncodingParameters(peerConnection);
   startCallTimer();
 }
 
@@ -1040,7 +1017,6 @@ async function createOffer() {
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer);
     socket.emit("signal", { type: "offer", offer: peerConnection.localDescription });
-    applyHDEncodingParameters(peerConnection);
   } catch (err) {
     console.error("Offer error:", err);
   }
@@ -1057,7 +1033,6 @@ async function handleOffer(offer) {
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
     socket.emit("signal", { type: "answer", answer: peerConnection.localDescription });
-    applyHDEncodingParameters(peerConnection);
   } catch (err) {
     console.error("Handle offer error:", err);
   }
@@ -1070,7 +1045,6 @@ async function handleAnswer(answer) {
       const c = pendingIceCandidates.shift();
       await peerConnection.addIceCandidate(c).catch(() => {});
     }
-    applyHDEncodingParameters(peerConnection);
   } catch (err) {
     console.error("Handle answer error:", err);
   }
