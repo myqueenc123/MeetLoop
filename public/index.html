@@ -16,6 +16,10 @@
 
 <title>MeetLoop - Powered by Jm Devs</title>
 
+<!-- FAST CLIENT-SIDE FACE RECOGNITION -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tracking.js/1.1.3/tracking-min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tracking.js/1.1.3/data/face-min.js"></script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -117,7 +121,7 @@ select option{background:#0f172a;color:#fff}
 .videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:10px}
 .video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#030712;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 35px rgba(0,0,0,.35)}
 
-/* NATURAL OPTICAL VIDEO */
+/* NATURAL OPTICAL VIDEO (ZERO CROP, ZERO DIGITAL ZOOM) */
 video{
   display:block;
   width:100%;
@@ -233,6 +237,32 @@ video{
 }
 .dup-btn:active{transform:scale(.97)}
 
+/* 🛡️ OMEGLE-STYLE FACE REQUIRED MODAL */
+#faceModalOverlay{
+  position:fixed;inset:0;z-index:99999;
+  background:rgba(3,7,18,.85);backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.face-modal-card{
+  max-width:380px;width:100%;padding:28px 22px;text-align:center;
+  background:rgba(17,24,39,.96);border:2px solid rgba(239,68,68,.6);
+  border-radius:22px;box-shadow:0 10px 40px rgba(239,68,68,.3);
+  animation:modalPop .3s ease;
+}
+@keyframes modalPop{
+  from{transform:scale(.85);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+.face-modal-icon{font-size:48px;margin-bottom:12px}
+.face-modal-title{font-size:18px;font-weight:900;color:#fecaca;margin-bottom:8px}
+.face-modal-desc{font-size:13px;color:#cbd5e1;line-height:1.5;margin-bottom:20px}
+.face-modal-btn{
+  width:100%;min-height:44px;font-size:13px;font-weight:900;
+  border-radius:11px;border:0;cursor:pointer;color:#fff;
+  background:linear-gradient(135deg,#2563eb,#3b82f6);
+}
+
 /* 📱 MOBILE VIEW: FLOATING CAMERA (3:4 RATIO - NO ZOOM) */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto;overflow-x:hidden}
@@ -278,7 +308,7 @@ video{
   #hideLocalBtn{
     position:absolute;top:6px;right:6px;z-index:8;width:24px;height:24px;
     border-radius:50%;background:rgba(0,0,0,.7);color:#fff;border:1px solid rgba(255,255,255,.3);
-    font-size:11px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:bold;cursor:pointer;display:flex !important;align-items:center;justify-content:center;
   }
   #showLocalBtn{
     position:absolute;right:12px;bottom:12px;z-index:30;display:none;
@@ -308,6 +338,16 @@ video{
 </head>
 
 <body>
+
+<!-- 🛡️ OMEGLE-STYLE FACE WARNING MODAL -->
+<div id="faceModalOverlay">
+  <div class="face-modal-card">
+    <div class="face-modal-icon">👤</div>
+    <div class="face-modal-title" id="faceModalTitle">Human Face Required</div>
+    <div class="face-modal-desc" id="faceModalDesc">Bawal mag-start nang walang mukha. Paki-itapat nang maayos ang iyong mukha sa camera bago magsimula. Bawal ang pader, kisame, o nakatakip na camera.</div>
+    <button class="face-modal-btn" id="closeFaceModalBtn" type="button">OK, Itatapat ko</button>
+  </div>
+</div>
 
 <!-- SINGLE TAB LOCKOUT OVERLAY -->
 <div id="duplicateTabOverlay">
@@ -363,14 +403,14 @@ video{
         </div>
       </div>
 
-      <!-- User Floating Camera (Clean Screen - No Badges) -->
+      <!-- User Floating Camera (Malinis - Walang Badges) -->
       <div class="video-box" id="localVideoBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
         <div class="video-label" id="localLabel">🙂 You</div>
         <button id="hideLocalBtn" type="button" title="Hide Camera">✕</button>
       </div>
 
-      <!-- 👁️ FLOATING RESTORE BUTTON KAPAG NAKA-HIDE -->
+      <!-- Floating Button kapag naka-hide -->
       <button id="showLocalBtn" type="button">👁️ <span id="showLocalText">Show Cam</span></button>
     </div>
 
@@ -392,11 +432,11 @@ video{
     <div class="chat-messages" id="chatMessages">
       <div class="message">
         <div class="message-name">👑 System • Jm Devs</div>
-        <div class="message-text dev-banner"><span class="update-badge">OMETV TURBO EDITION</span>
-🚀 <b>MeetLoop v5.0 • Built by Jm Devs</b>
-• ⚡ <b>Auto-Next Matching:</b> Seamless skip and auto-find (Exact OmeTV flow).
+        <div class="message-text dev-banner"><span class="update-badge">OMEGLE SHIELD ACTIVE</span>
+🚀 <b>MeetLoop v5.5 • Built by Jm Devs</b>
+• 🛡️ <b>Strict Face Verification:</b> Face required to start matching!
+• ⚡ <b>Auto-Next Matching:</b> Seamless skip and instant match.
 • 📷 <b>Natural View:</b> Floating camera with zero zoom crop.
-• 👁️ <b>Hide/Show Toggle:</b> 100% working camera hide & restore!
 • 🔒 <b>Single Tab Mode:</b> 1 tab only protected session.</div>
       </div>
     </div>
@@ -412,7 +452,119 @@ video{
 "use strict";
 
 /* =========================================================
-   1. SINGLE TAB PROTECTION SYSTEM (JM DEVS TAB LOCK)
+   1. OMEGLE-STYLE STRICT HUMAN FACE DETECTION ENGINE
+========================================================= */
+const faceModalOverlay = document.getElementById("faceModalOverlay");
+const closeFaceModalBtn = document.getElementById("closeFaceModalBtn");
+
+closeFaceModalBtn.addEventListener("click", () => {
+  faceModalOverlay.style.display = "none";
+});
+
+// Sinusuri nang totoo kung may mukha ng tao o pader/kisame lang
+async function checkHumanFacePresence() {
+  if (!localVideo || localVideo.readyState < 2) return false;
+
+  // 1. Android/Chrome Hardware Native FaceDetector
+  if ('FaceDetector' in window) {
+    try {
+      const detector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
+      const faces = await detector.detect(localVideo);
+      if (faces && faces.length > 0) return true;
+    } catch(e) {}
+  }
+
+  // 2. Tracking.js Face Haar Cascade
+  if (window.tracking && window.tracking.ObjectTracker) {
+    try {
+      const tracker = new tracking.ObjectTracker('face');
+      tracker.setInitialScale(4);
+      tracker.setStepSize(2);
+      
+      const promise = new Promise(resolve => {
+        const timeout = setTimeout(() => resolve(false), 350);
+        tracker.once('track', function(event) {
+          clearTimeout(timeout);
+          resolve(event.data && event.data.length > 0);
+        });
+        tracking.track('#localVideo', tracker);
+      });
+      const res = await promise;
+      if (res) return true;
+    } catch(e) {}
+  }
+
+  // 3. Human Skin Tone (YCbCr) & Facial Feature Shadow Geometry
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = 64; canvas.height = 48;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(localVideo, 0, 0, 64, 48);
+
+    const frame = ctx.getImageData(0, 0, 64, 48);
+    const data = frame.data;
+
+    let centerSkinPixels = 0;
+    let luminanceList = [];
+
+    // Gitnang 60% ng frame kung nasaan ang mukha
+    const minX = 64 * 0.2;
+    const maxX = 64 * 0.8;
+    const minY = 48 * 0.15;
+    const maxY = 48 * 0.85;
+
+    for (let y = 0; y < 48; y++) {
+      for (let x = 0; x < 64; x++) {
+        const i = (y * 64 + x) * 4;
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+
+        // YCbCr Skin Color Cluster
+        const Y = 0.299 * r + 0.587 * g + 0.114 * b;
+        const Cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+        const Cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+
+        // Human Skin Range (Asian, Caucasian, Hispanic, African)
+        const isSkin = (Cb >= 75 && Cb <= 135) && (Cr >= 130 && Cr <= 180) && (Y > 35 && Y < 240);
+
+        if (isSkin && x >= minX && x <= maxX && y >= minY && y <= maxY) {
+          centerSkinPixels++;
+          luminanceList.push(Y);
+        }
+      }
+    }
+
+    const totalCenter = (maxX - minX) * (maxY - minY);
+    const skinRatio = centerSkinPixels / totalCenter;
+
+    // Kapag may sapat na skin tone sa gitna (hindi pader na puti o asul)
+    if (skinRatio >= 0.12 && skinRatio <= 0.90) {
+      // Facial Shadow Variance: Ang pader o kisame ay may 0 variance.
+      // Ang totoong tao ay may anino sa mata, ilong, at bibig.
+      let sum = 0;
+      for (let l of luminanceList) sum += l;
+      const mean = sum / luminanceList.length;
+      let variance = 0;
+      for (let l of luminanceList) variance += Math.pow(l - mean, 2);
+      variance = variance / luminanceList.length;
+
+      if (variance > 45) return true;
+    }
+  } catch(e) {}
+
+  return false;
+}
+
+function showOmegleFaceWarning() {
+  document.getElementById("faceModalTitle").textContent = t("faceModalTitle");
+  document.getElementById("faceModalDesc").textContent = t("faceModalDesc");
+  document.getElementById("closeFaceModalBtn").textContent = t("faceModalBtn");
+  faceModalOverlay.style.display = "flex";
+}
+
+/* =========================================================
+   2. SINGLE TAB PROTECTION SYSTEM
 ========================================================= */
 const currentTabId = "tab_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
 const tabChannel = window.BroadcastChannel ? new BroadcastChannel("meetloop_single_tab_bus") : null;
@@ -477,7 +629,7 @@ reclaimSessionBtn.addEventListener("click", () => {
 });
 
 /* =========================================================
-   2. MULTI-LANGUAGE TRANSLATIONS (8 LANGUAGES)
+   3. MULTI-LANGUAGE TRANSLATIONS (8 LANGUAGES)
 ========================================================= */
 const translations = {
   en: {
@@ -503,6 +655,9 @@ const translations = {
     camOff: "🚫 Cam Off",
     flip: "🔄 Flip",
     showCam: "Show Cam",
+    faceModalTitle: "Human Face Required",
+    faceModalDesc: "Face required to start matching! Please position your face clearly in front of the camera. Walls, ceilings, or covered lenses are not allowed.",
+    faceModalBtn: "Got it, I'll face the camera",
     chatHeader: "💬 Live Chat",
     inputPlaceholder: "Type a message...",
     send: "Send",
@@ -532,6 +687,9 @@ const translations = {
     camOff: "🚫 Cam Naka-off",
     flip: "🔄 Iikot",
     showCam: "Ipakita Cam",
+    faceModalTitle: "Kailangan ng Mukha ng Tao",
+    faceModalDesc: "Bawal mag-start nang walang mukha. Paki-itapat nang maayos ang iyong mukha sa camera bago magsimula. Bawal ang pader, kisame, o nakatakip na camera.",
+    faceModalBtn: "OK, Itatapat ko ang mukha ko",
     chatHeader: "💬 Usapan",
     inputPlaceholder: "Mag-type ng mensahe...",
     send: "Ipadala",
@@ -561,6 +719,9 @@ const translations = {
     camOff: "🚫 Cámara Apagada",
     flip: "🔄 Girar",
     showCam: "Mostrar Cámara",
+    faceModalTitle: "Se requiere rostro humano",
+    faceModalDesc: "¡Se requiere rostro para comenzar! Coloque su rostro claramente frente a la cámara. No se permiten paredes ni techos.",
+    faceModalBtn: "Entendido",
     chatHeader: "💬 Chat en vivo",
     inputPlaceholder: "Escribe un mensaje...",
     send: "Enviar",
@@ -590,6 +751,9 @@ const translations = {
     camOff: "🚫 カメラOFF",
     flip: "🔄 反転",
     showCam: "カメラ表示",
+    faceModalTitle: "人間の顔が必要です",
+    faceModalDesc: "開始するにはカメラに顔を映してください。壁や天井、隠されたカメラは禁止されています。",
+    faceModalBtn: "了解しました",
     chatHeader: "💬 ライブチャット",
     inputPlaceholder: "メッセージを入力...",
     send: "送信",
@@ -619,6 +783,9 @@ const translations = {
     camOff: "🚫 카메라 끔",
     flip: "🔄 전환",
     showCam: "카메라 보기",
+    faceModalTitle: "사람 얼굴이 필요합니다",
+    faceModalDesc: "시작하려면 얼굴을 카메라에 똑바로 보여주세요. 벽이나 천장, 가려진 렌즈는 허용되지 않습니다.",
+    faceModalBtn: "확인했습니다",
     chatHeader: "💬 실시간 채팅",
     inputPlaceholder: "메시지를 입력하세요...",
     send: "전송",
@@ -648,6 +815,9 @@ const translations = {
     camOff: "🚫 摄像头关",
     flip: "🔄 翻转",
     showCam: "显示镜头",
+    faceModalTitle: "需要检测到人脸",
+    faceModalDesc: "开始前必须将脸部对准摄像头。禁止对着墙壁、天花板或遮挡镜头。",
+    faceModalBtn: "我知道了",
     chatHeader: "💬 实时聊天",
     inputPlaceholder: "输入消息...",
     send: "发送",
@@ -677,6 +847,9 @@ const translations = {
     camOff: "🚫 Caméra Coupée",
     flip: "🔄 Tourner",
     showCam: "Afficher Cam",
+    faceModalTitle: "Visage humain requis",
+    faceModalDesc: "Visage requis pour démarrer ! Veuillez positionner clairement votre visage devant la caméra. Murs et plafonds interdits.",
+    faceModalBtn: "Compris",
     chatHeader: "💬 Chat en direct",
     inputPlaceholder: "Tapez un message...",
     send: "Envoyer",
@@ -706,6 +879,9 @@ const translations = {
     camOff: "🚫 Kamera Mati",
     flip: "🔄 Putar",
     showCam: "Tampilkan Cam",
+    faceModalTitle: "Wajah Manusia Diperlukan",
+    faceModalDesc: "Wajah diperlukan untuk mulai mencari! Arahkan wajah Anda ke kamera. Dilarang mengarahkan ke dinding atau langit-langit.",
+    faceModalBtn: "Saya mengerti",
     chatHeader: "💬 Obrolan Langsung",
     inputPlaceholder: "Ketik pesan...",
     send: "Kirim",
@@ -743,7 +919,7 @@ function updateUILanguage() {
 }
 
 /* =========================================================
-   3. WEBRTC ENGINE (20GB STANDARD RELAY + GOOGLE STUN)
+   4. WEBRTC ENGINE (20GB STANDARD RELAY + GOOGLE STUN)
 ========================================================= */
 const socket = io({
   transports: ["websocket", "polling"],
@@ -862,7 +1038,7 @@ function stopCallTimer() {
 }
 
 /* =========================================================
-   4. NATURAL WIDE CAMERA (NO ZOOM CROP, ULTRA-SMOOTH)
+   5. NATURAL WIDE CAMERA (NO ZOOM CROP, ULTRA-SMOOTH)
 ========================================================= */
 async function startMedia() {
   if (localStream && localStream.active) return true;
@@ -988,7 +1164,7 @@ function stopAllRemoteMedia() {
 }
 
 /* =========================================================
-   5. ZERO-DELAY SIGNALING (<80ms REAL-TIME)
+   6. ZERO-DELAY SIGNALING (<80ms REAL-TIME)
 ========================================================= */
 function setupDataChannel(channel) {
   dataChannel = channel;
@@ -1136,7 +1312,7 @@ function closePeerConnection() {
 }
 
 /* =========================================================
-   6. 🔥 TRUE OMETV SEAMLESS "START / NEXT" SYSTEM
+   7. 🔥 STRICT OMEGLE-STYLE "START / NEXT" SYSTEM (WITH FACE LOCK)
 ========================================================= */
 async function startLoop() {
   if (stopping || isTabTerminated) return;
@@ -1146,7 +1322,16 @@ async function startLoop() {
   const ok = await startMedia();
   if (!ok) return;
 
-  // I-reset ang dating tawag para maghanap agad ng susunod
+  // 🛡️ OMEGLE FACE POLICY: HINDI MAG-SSTART PAG WALANG MUKHA!
+  showSearch(t("searching"));
+  const faceFound = await checkHumanFacePresence();
+  if (!faceFound) {
+    hideSearch();
+    showOmegleFaceWarning();
+    return; // ⛔ HINDI MAG-PPROCEED SA PAG-MATCH!
+  }
+
+  // Kapag may mukha na, ituloy ang instant match!
   stopCallTimer();
   closePeerConnection();
   stopAllRemoteMedia();
@@ -1158,7 +1343,6 @@ async function startLoop() {
   remoteStatus.textContent = t("searching");
   statusBadge.textContent = t("searching");
 
-  // Palaging 'Next' kapag naghahanap o nasa tawag
   loopBtn.textContent = t("next");
   loopBtn.disabled = false;
   stopBtn.disabled = false;
@@ -1189,7 +1373,7 @@ function stopSession() {
 }
 
 /* =========================================================
-   7. SOCKET EVENTS (AUTO-NEXT ON DISCONNECT)
+   8. SOCKET EVENTS (AUTO-NEXT ON DISCONNECT TULAD NG OMETV)
 ========================================================= */
 socket.on("connect", () => {
   if (!connected && !searching) statusBadge.textContent = t("ready");
@@ -1219,7 +1403,7 @@ socket.on("signal", async data => {
   else if (data.type === "candidate") await handleCandidate(data.candidate);
 });
 
-// Auto-Next kapag nag-skip o nag-leave ang kausap mo
+// Auto-Next kapag nag-leave ang kausap mo
 socket.on("partner-disconnected", () => {
   addMessage("System", t("strangerLeft"));
   
@@ -1229,7 +1413,7 @@ socket.on("partner-disconnected", () => {
 });
 
 /* =========================================================
-   8. CHAT SYSTEM
+   9. CHAT SYSTEM
 ========================================================= */
 function sendMessage() {
   const text = chatInput.value.trim();
@@ -1258,7 +1442,7 @@ function escapeHTML(str) {
 }
 
 /* =========================================================
-   9. EVENT LISTENERS (100% WORKING HIDE & RESTORE)
+   10. EVENT LISTENERS
 ========================================================= */
 hideLocalBtn.addEventListener("click", (e) => {
   e.stopPropagation();
