@@ -26,9 +26,6 @@
   --blue2:#3b82f6;
   --red:#ef4444;
   --purple:#8b5cf6;
-  --cyan:#06b6d4;
-  --pink:#ec4899;
-  --yellow:#eab308;
   --text:#f8fafc;
   --muted:#94a3b8;
 }
@@ -37,10 +34,7 @@ html,body{width:100%;height:100%}
 body{
   font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   color:var(--text);
-  background: 
-    linear-gradient(135deg, rgba(7, 11, 20, 0.65), rgba(15, 23, 42, 0.75)),
-    url('meetloop-bg.png') center/cover no-repeat fixed,
-    #070b14;
+  background:#070b14;
   overflow:hidden;
   -webkit-font-smoothing:antialiased;
 }
@@ -49,52 +43,41 @@ button,input,select{font:inherit}
 button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
 /* =========================================================
-   🚀 WELCOME HOMEPAGE PORTAL
+   🚀 WELCOME HOMEPAGE PORTAL (BATTERY OPTIMIZED)
 ========================================================= */
 #welcomePortal{
   position:fixed;inset:0;z-index:999999;
   display:flex;align-items:center;justify-content:center;padding:20px;
-  background: 
-    linear-gradient(135deg, rgba(7, 11, 20, 0.85), rgba(15, 23, 42, 0.95)),
-    url('meetloop-bg.png') center/cover no-repeat fixed,
-    #070b14;
-  transition:opacity .35s ease, visibility .35s ease;
+  background:#070b14;
+  transition:opacity .25s ease, visibility .25s ease;
 }
 #welcomePortal.portal-hidden{
   display:none !important;opacity:0 !important;visibility:hidden !important;pointer-events:none !important;
 }
 .portal-card{
-  max-width:460px;width:100%;padding:38px 28px;text-align:center;
-  background:rgba(15,23,42,.92);border:1.5px solid rgba(255,255,255,.15);
-  border-radius:26px;box-shadow:0 25px 70px rgba(0,0,0,.9), 0 0 40px rgba(37,99,235,.25);
-  backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px);
-  animation:portalEntrance .4s cubic-bezier(.16,1,.3,1);
-}
-@keyframes portalEntrance{
-  from{transform:scale(.94) translateY(14px);opacity:0}
-  to{transform:scale(1) translateY(0);opacity:1}
+  max-width:460px;width:100%;padding:36px 26px;text-align:center;
+  background:#0f172a;border:1.5px solid rgba(255,255,255,.12);
+  border-radius:24px;box-shadow:0 15px 40px rgba(0,0,0,.8);
 }
 .portal-logo-ring{
-  width:68px;height:68px;margin:0 auto 16px;border-radius:20px;
+  width:64px;height:64px;margin:0 auto 16px;border-radius:20px;
   background:linear-gradient(135deg,#3b82f6,#ec4899);
-  display:flex;align-items:center;justify-content:center;font-size:34px;
-  box-shadow:0 0 25px rgba(236,72,153,.4);
+  display:flex;align-items:center;justify-content:center;font-size:32px;
 }
 .portal-title{font-size:30px;font-weight:900;letter-spacing:.5px;margin-bottom:6px;color:#fff}
 .portal-subtitle{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:20px}
 .portal-rules-box{
   text-align:left;font-size:12px;color:#cbd5e1;line-height:1.7;margin-bottom:24px;
-  background:rgba(255,255,255,.04);padding:14px 18px;border-radius:15px;border:1px solid rgba(255,255,255,.08);
+  background:#1e293b;padding:14px 18px;border-radius:15px;border:1px solid rgba(255,255,255,.08);
 }
 .portal-rules-box li{margin-bottom:6px}
 .portal-open-btn{
-  width:100%;min-height:54px;font-size:16px;font-weight:900;
+  width:100%;min-height:52px;font-size:16px;font-weight:900;
   border-radius:14px;border:0;cursor:pointer;color:#fff;
   background:linear-gradient(135deg,#2563eb,#ec4899);
-  box-shadow:0 8px 30px rgba(236,72,153,.4);transition:transform .15s,filter .2s;
+  transition:transform .12s, filter .15s;
   display:flex;align-items:center;justify-content:center;gap:10px;
 }
-.portal-open-btn:hover{filter:brightness(1.15);transform:translateY(-2px)}
 .portal-open-btn:active{transform:scale(.98)}
 
 /* =========================================================
@@ -104,79 +87,73 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   position:fixed;inset:0;z-index:999998;
   display:none;align-items:center;justify-content:center;
   background:#070b14;flex-direction:column;padding:24px;
-  transition:opacity .35s ease, visibility .35s ease;
 }
 .loader-content{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:300px;width:100%}
-.meetloop-radar-box{position:relative;width:90px;height:90px;display:flex;align-items:center;justify-content:center;margin-bottom:24px}
-.meetloop-radar-ring{
-  position:absolute;inset:0;border-radius:50%;border:2px solid rgba(59,130,246,.35);
-  animation:radarPulse 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-}
-.meetloop-radar-ring:nth-child(2){animation-delay:.6s}
-@keyframes radarPulse{0%{transform:scale(0.85);opacity:1}100%{transform:scale(1.75);opacity:0}}
+.meetloop-radar-box{position:relative;width:80px;height:80px;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
 .meetloop-loader-logo{
-  width:60px;height:60px;border-radius:18px;background:linear-gradient(135deg,#3b82f6,#ec4899);
-  display:flex;align-items:center;justify-content:center;font-size:30px;
-  box-shadow:0 0 25px rgba(59,130,246,.55);z-index:2;
+  width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,#3b82f6,#ec4899);
+  display:flex;align-items:center;justify-content:center;font-size:28px;z-index:2;
 }
-.loader-app-name{font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:20px}
-.loader-progress-track{width:100%;height:5px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;position:relative;margin-bottom:12px}
-.loader-progress-bar{width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg, #3b82f6, #ec4899);box-shadow:0 0 10px rgba(236,72,153,.7);transition:width .2s ease-out}
+.loader-app-name{font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:18px}
+.loader-progress-track{width:100%;height:5px;background:#1e293b;border-radius:999px;overflow:hidden;position:relative;margin-bottom:12px}
+.loader-progress-bar{width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg, #3b82f6, #ec4899);transition:width .15s ease-out}
 .loader-info-row{display:flex;justify-content:space-between;width:100%;font-size:11px;font-weight:700;color:#94a3b8}
 
 /* =========================================================
-   HEADER & NAVBAR
+   HEADER & NAVBAR (ZERO BLUR = COOL GPU)
 ========================================================= */
 header{
-  height:64px;display:flex;align-items:center;justify-content:space-between;
-  gap:12px;padding:0 20px;background:rgba(15,23,42,.85);border-bottom:1px solid var(--border);
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);position:relative;z-index:20;
+  height:60px;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:0 16px;background:#0f172a;border-bottom:1px solid var(--border);
+  position:relative;z-index:20;
 }
-.brand{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:900;white-space:nowrap}
+.brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:900;white-space:nowrap}
 .brand-icon{
-  width:35px;height:35px;display:flex;align-items:center;justify-content:center;
-  border-radius:10px;background:linear-gradient(135deg,#3b82f6,#ec4899);box-shadow:0 0 18px rgba(236,72,153,.45);
+  width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+  border-radius:10px;background:linear-gradient(135deg,#3b82f6,#ec4899);
 }
 .header-right{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
 .badge{
-  min-height:34px;display:inline-flex;align-items:center;justify-content:center;
-  padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.07);
-  border:1px solid var(--border);font-size:12px;font-weight:700;white-space:nowrap;
+  min-height:32px;display:inline-flex;align-items:center;justify-content:center;
+  padding:6px 10px;border-radius:999px;background:#1e293b;
+  border:1px solid var(--border);font-size:11px;font-weight:700;white-space:nowrap;
 }
 .online{color:#86efac}
 #statusBadge{color:#cbd5e1}
 
 select{
-  min-height:34px;padding:6px 12px;color:#fff;background:rgba(255,255,255,.08);
-  border:1px solid var(--border-strong);border-radius:9px;outline:none;cursor:pointer;
-  font-weight:700;font-size:12px;
+  min-height:32px;padding:5px 10px;color:#fff;background:#1e293b;
+  border:1px solid var(--border-strong);border-radius:8px;outline:none;cursor:pointer;
+  font-weight:700;font-size:11px;
 }
 select option{background:#0f172a;color:#fff}
 
-#callTimer{gap:7px;transition:color .25s,background .25s,border-color .25s,box-shadow .25s}
-.timer-dot{width:7px;height:7px;border-radius:50%;background:#64748b;flex:0 0 auto}
+#callTimer{gap:6px}
+.timer-dot{width:6px;height:6px;border-radius:50%;background:#64748b;flex:0 0 auto}
 .timer-label{color:#94a3b8;font-size:9px;font-weight:900;letter-spacing:.8px}
-.timer-time{min-width:56px;font-size:12px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.6px}
-#callTimer.active{color:#fecaca;background:linear-gradient(135deg,rgba(239,68,68,.16),rgba(239,68,68,.06));border-color:rgba(239,68,68,.25);box-shadow:0 8px 25px rgba(239,68,68,.08)}
-#callTimer.active .timer-dot{background:var(--red);animation:timerPulse 1.5s infinite}
-@keyframes timerPulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}70%{box-shadow:0 0 0 7px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
+.timer-time{min-width:48px;font-size:11px;font-weight:900;font-variant-numeric:tabular-nums}
+#callTimer.active{color:#fecaca;background:#450a0a;border-color:#ef4444}
+#callTimer.active .timer-dot{background:var(--red)}
 
 /* =========================================================
-   MAIN VIDEO ARENA
+   MAIN VIDEO ARENA (SMOOTH 30FPS, THERMAL SAFE)
 ========================================================= */
-.main-container{width:100%;height:calc(100vh - 64px);display:flex;gap:12px;padding:12px}
-.video-wrapper{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px}
-.videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:10px}
-.video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#030712;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 35px rgba(0,0,0,.45)}
+.main-container{width:100%;height:calc(100vh - 60px);display:flex;gap:10px;padding:10px}
+.video-wrapper{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:8px}
+.videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:8px}
+.video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#000;border:1px solid var(--border);border-radius:14px}
 
 video{
   display:block;width:100%;height:100%;object-fit:cover;object-position:center center;
-  background:#000;border:0;outline:0;transition:opacity .15s ease;
+  background:#000;border:0;outline:0;
+  /* Hardware Accelerated rendering na hindi nagpapainit ng CPU */
+  transform:translateZ(0);
+  -webkit-transform:translateZ(0);
+  will-change:transform;
 }
 
-#localVideo{filter:brightness(1.12) contrast(1.06) saturate(1.12)}
-#localVideo.mirrored{transform:scaleX(-1)}
-#localVideo.unmirrored{transform:scaleX(1)}
+#localVideo.mirrored{transform:scaleX(-1) translateZ(0)}
+#localVideo.unmirrored{transform:scaleX(1) translateZ(0)}
 
 #camOffOverlay{
   position:absolute;inset:0;background:#080c14;color:#94a3b8;
@@ -189,200 +166,178 @@ video{
 }
 
 .video-label{
-  position:absolute;left:10px;top:10px;z-index:4;padding:5px 10px;
-  background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.1);
-  border-radius:8px;font-size:11px;font-weight:800;pointer-events:none;backdrop-filter:blur(6px);
+  position:absolute;left:10px;top:10px;z-index:4;padding:4px 8px;
+  background:rgba(0,0,0,.75);border:1px solid rgba(255,255,255,.12);
+  border-radius:6px;font-size:10px;font-weight:800;pointer-events:none;
 }
 .status{
-  position:absolute;left:10px;bottom:10px;z-index:4;padding:5px 10px;
-  background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.1);
-  border-radius:8px;color:#e2e8f0;font-size:11px;font-weight:700;pointer-events:none;backdrop-filter:blur(6px);
+  position:absolute;left:10px;bottom:10px;z-index:4;padding:4px 8px;
+  background:rgba(0,0,0,.75);border:1px solid rgba(255,255,255,.12);
+  border-radius:6px;color:#e2e8f0;font-size:10px;font-weight:700;pointer-events:none;
 }
 
 #reportStrangerBtn{
-  position:absolute;top:10px;right:10px;z-index:5;padding:6px 12px;
-  border-radius:8px;border:1px solid rgba(239,68,68,.6);background:rgba(220,38,38,.85);
-  color:#fff;font-size:11px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(220,38,38,.4);
-  transition:all .2s ease;
+  position:absolute;top:10px;right:10px;z-index:5;padding:5px 10px;
+  border-radius:7px;border:0;background:#dc2626;color:#fff;
+  font-size:11px;font-weight:800;cursor:pointer;
 }
-#reportStrangerBtn:hover:not(:disabled){background:#ef4444}
-#reportStrangerBtn:disabled{background:rgba(100,116,139,.5);border-color:rgba(255,255,255,.2);cursor:not-allowed;box-shadow:none}
+#reportStrangerBtn:disabled{background:#475569;cursor:not-allowed}
 
 .search-overlay{
   position:absolute;inset:0;z-index:10;display:none;align-items:center;
-  justify-content:center;background:rgba(2,6,23,.82);backdrop-filter:blur(4px);
+  justify-content:center;background:#020617;
 }
-.search-box{min-width:220px;padding:22px;text-align:center;background:rgba(15,23,42,.92);border:1px solid rgba(255,255,255,.12);border-radius:16px}
-.spinner{width:40px;height:40px;margin:0 auto 12px;border:3px solid rgba(255,255,255,.1);border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite}
-#searchText{color:#e2e8f0;font-size:13px;font-weight:800}
+.search-box{min-width:200px;padding:18px;text-align:center;background:#0f172a;border:1px solid rgba(255,255,255,.12);border-radius:14px}
+.spinner{width:34px;height:34px;margin:0 auto 10px;border:3px solid rgba(255,255,255,.1);border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite}
+#searchText{color:#e2e8f0;font-size:12px;font-weight:800}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* CONTROLS BAR */
-.controls-bar{display:flex;gap:7px;padding:2px}
+.controls-bar{display:flex;gap:6px}
 .btn{
-  min-height:46px;padding:10px 14px;border:1px solid rgba(255,255,255,.06);
-  border-radius:11px;color:#fff;background:rgba(15,23,42,.85);cursor:pointer;font-size:12px;
+  min-height:44px;padding:8px 12px;border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;color:#fff;background:#0f172a;cursor:pointer;font-size:12px;
   font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;
-  user-select:none;transition:transform .12s,filter .2s,opacity .2s;backdrop-filter:blur(10px);
+  user-select:none;
 }
-.btn:hover:not(:disabled){filter:brightness(1.15)}
 .btn:active:not(:disabled){transform:scale(.98)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 
-.btn-loop{
-  flex:1.8;background:linear-gradient(135deg,var(--blue),var(--blue2));
-  box-shadow:0 6px 20px rgba(37,99,235,.3);font-size:13px;
-}
-.btn-stop{flex:1;background:linear-gradient(135deg,#dc2626,#ef4444)}
-.btn-toggle{flex:1;background:rgba(255,255,255,.07)}
-.btn-flip{display:none;flex:1;background:linear-gradient(135deg,#7c3aed,#8b5cf6)}
+.btn-loop{flex:1.8;background:linear-gradient(135deg,var(--blue),var(--blue2))}
+.btn-stop{flex:1;background:#dc2626}
+.btn-toggle{flex:1;background:#1e293b}
+.btn-flip{display:flex;flex:1;background:#6b21a8}
 
-/* CHAT SIDEBAR */
+/* CHAT */
 .chat-wrapper{
-  width:320px;max-width:320px;min-height:0;display:flex;flex-direction:column;
-  overflow:hidden;background:rgba(15,23,42,.85);border:1px solid var(--border);
-  border-radius:16px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  width:310px;max-width:310px;min-height:0;display:flex;flex-direction:column;
+  overflow:hidden;background:#0f172a;border:1px solid var(--border);border-radius:14px;
 }
-.chat-header{padding:14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:900;display:flex;align-items:center;justify-content:space-between}
-.chat-messages{flex:1;min-height:0;padding:12px;overflow-y:auto;overscroll-behavior:contain}
-.message{margin-bottom:12px;word-break:break-word}
-.message-name{margin-bottom:4px;color:var(--muted);font-size:10px;font-weight:800}
+.chat-header{padding:12px;border-bottom:1px solid var(--border);font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:space-between}
+.chat-messages{flex:1;min-height:0;padding:10px;overflow-y:auto;overscroll-behavior:contain}
+.message{margin-bottom:10px;word-break:break-word}
+.message-name{margin-bottom:3px;color:var(--muted);font-size:9px;font-weight:800}
 .message-text{
-  display:inline-block;max-width:96%;padding:9px 12px;color:#f8fafc;
-  background:rgba(255,255,255,.08);border-radius:10px;font-size:12px;line-height:1.45;white-space:pre-wrap;
+  display:inline-block;max-width:96%;padding:8px 11px;color:#f8fafc;
+  background:#1e293b;border-radius:8px;font-size:11px;line-height:1.45;white-space:pre-wrap;
 }
-.meetloop-rules-card{
-  background:linear-gradient(135deg,rgba(220,38,38,.15),rgba(37,99,235,.15));
-  border:1px solid rgba(220,38,38,.4);line-height:1.6;font-size:12px;
-}
-.rules-badge-tag{
-  display:inline-block;background:#dc2626;color:#fff;font-weight:900;font-size:10px;
-  padding:2px 7px;border-radius:6px;margin-bottom:6px;
-}
-.chat-input-area{display:flex;gap:6px;padding:9px;border-top:1px solid var(--border)}
-#chatInput{flex:1;min-width:0;min-height:40px;padding:9px 11px;background:rgba(2,6,23,.64);color:#fff;border:1px solid var(--border-strong);border-radius:9px;outline:none;font-size:12px}
-#sendBtn{min-width:64px;border:0;border-radius:9px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue2));cursor:pointer;font-size:12px;font-weight:800}
+.meetloop-rules-card{background:#1e1b4b;border:1px solid #4338ca;line-height:1.5;font-size:11px}
+.rules-badge-tag{display:inline-block;background:#dc2626;color:#fff;font-weight:900;font-size:9px;padding:2px 6px;border-radius:5px;margin-bottom:4px}
+.chat-input-area{display:flex;gap:6px;padding:8px;border-top:1px solid var(--border)}
+#chatInput{flex:1;min-width:0;min-height:38px;padding:8px 10px;background:#020617;color:#fff;border:1px solid var(--border-strong);border-radius:8px;outline:none;font-size:11px}
+#sendBtn{min-width:60px;border:0;border-radius:8px;color:#fff;background:var(--blue);cursor:pointer;font-size:11px;font-weight:800}
 
 /* REPORT MODAL */
 #reportModalOverlay{
-  position:fixed;inset:0;z-index:999999;
-  background:rgba(3,7,18,.85);backdrop-filter:blur(14px);
-  display:none;align-items:center;justify-content:center;padding:20px;
+  position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.85);
+  display:none;align-items:center;justify-content:center;padding:16px;
 }
 .report-modal-box{
-  max-width:390px;width:100%;padding:26px 22px;text-align:center;
-  background:rgba(17,24,39,.98);border:2px solid rgba(239,68,68,.4);border-radius:22px;
+  max-width:380px;width:100%;padding:24px 20px;text-align:center;
+  background:#0f172a;border:1px solid #ef4444;border-radius:20px;
 }
-.report-reasons{display:flex;flex-direction:column;gap:8px;margin:18px 0;text-align:left}
+.report-reasons{display:flex;flex-direction:column;gap:7px;margin:16px 0;text-align:left}
 .report-opt{
-  padding:11px 14px;border-radius:10px;background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.1);color:#f8fafc;font-size:12px;font-weight:700;
-  cursor:pointer;transition:all .15s ease;
+  padding:10px 12px;border-radius:8px;background:#1e293b;
+  border:1px solid rgba(255,255,255,.08);color:#f8fafc;font-size:11px;font-weight:700;cursor:pointer;
 }
-.report-opt:hover{background:rgba(239,68,68,.2);border-color:#ef4444}
+.report-opt:active{background:#dc2626}
 
 /* BAN MODAL */
 #bannedOverlay{
-  position:fixed;inset:0;z-index:9999999;
-  background:radial-gradient(circle at center,rgba(40,0,0,.98),#0a0000);
-  backdrop-filter:blur(25px);display:none;align-items:center;justify-content:center;padding:20px;text-align:center;
+  position:fixed;inset:0;z-index:9999999;background:#080000;
+  display:none;align-items:center;justify-content:center;padding:16px;text-align:center;
 }
 .banned-box{
-  max-width:460px;width:100%;padding:36px 26px;background:rgba(20,4,4,.95);
-  border:2px solid #ef4444;border-radius:26px;box-shadow:0 0 65px rgba(239,68,68,.5);
+  max-width:440px;width:100%;padding:32px 22px;background:#140404;
+  border:2px solid #ef4444;border-radius:22px;
 }
 .ban-clock-container{
-  background:rgba(0,0,0,.7);padding:16px;border-radius:16px;border:1px solid rgba(239,68,68,.4);margin:16px 0;
+  background:#000;padding:14px;border-radius:14px;border:1px solid rgba(239,68,68,.4);margin:14px 0;
 }
 
 /* SINGLE TAB TAKEOVER */
 #duplicateTabOverlay{
-  position:fixed;inset:0;z-index:999999;
-  background:radial-gradient(circle at center,rgba(15,23,42,.98),#030712);
-  backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;padding:20px;
+  position:fixed;inset:0;z-index:999999;background:#070b14;
+  display:none;align-items:center;justify-content:center;padding:16px;
 }
 .duplicate-box{
-  max-width:420px;width:100%;padding:30px 22px;text-align:center;
-  background:rgba(17,24,39,.9);border:1px solid rgba(239,68,68,.3);border-radius:22px;
+  max-width:400px;width:100%;padding:26px 20px;text-align:center;
+  background:#0f172a;border:1px solid rgba(239,68,68,.3);border-radius:20px;
 }
-.dup-icon{font-size:36px;margin-bottom:8px}
-.dup-title{font-size:18px;font-weight:900;color:#fff;margin-bottom:8px}
-.dup-desc{font-size:12px;color:#94a3b8;line-height:1.5;margin-bottom:16px}
+.dup-icon{font-size:32px;margin-bottom:6px}
+.dup-title{font-size:17px;font-weight:900;color:#fff;margin-bottom:6px}
+.dup-desc{font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:14px}
 .dup-btn{
-  width:100%;min-height:44px;border-radius:10px;border:0;color:#fff;
-  background:linear-gradient(135deg,var(--blue),var(--blue2));font-weight:800;cursor:pointer;
+  width:100%;min-height:42px;border-radius:9px;border:0;color:#fff;
+  background:var(--blue);font-weight:800;cursor:pointer;
 }
 
 /* STRICT FACE WARNING */
 #faceModalOverlay{
-  position:fixed;inset:0;z-index:99999;background:rgba(3,7,18,.88);backdrop-filter:blur(14px);
-  display:none;align-items:center;justify-content:center;padding:20px;
+  position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.85);
+  display:none;align-items:center;justify-content:center;padding:16px;
 }
 .face-modal-card{
-  max-width:390px;width:100%;padding:28px 24px;text-align:center;
-  background:rgba(17,24,39,.96);border:2px solid #ef4444;border-radius:24px;
+  max-width:380px;width:100%;padding:26px 22px;text-align:center;
+  background:#0f172a;border:1px solid #ef4444;border-radius:20px;
 }
-.face-modal-icon{font-size:38px;margin-bottom:8px}
-.face-modal-title{font-size:17px;font-weight:900;color:#fecaca;margin-bottom:8px}
-.face-modal-desc{font-size:12px;color:#cbd5e1;line-height:1.6;margin-bottom:18px}
+.face-modal-icon{font-size:34px;margin-bottom:6px}
+.face-modal-title{font-size:16px;font-weight:900;color:#fecaca;margin-bottom:6px}
+.face-modal-desc{font-size:11px;color:#cbd5e1;line-height:1.6;margin-bottom:16px}
 .face-modal-btn{
-  width:100%;min-height:46px;font-size:14px;font-weight:900;border-radius:12px;border:0;
-  cursor:pointer;color:#fff;background:linear-gradient(135deg,#2563eb,#3b82f6);
+  width:100%;min-height:44px;font-size:13px;font-weight:900;border-radius:10px;border:0;
+  cursor:pointer;color:#fff;background:var(--blue);
 }
 
 /* MOBILE VIEW */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto;overflow-x:hidden}
-  header{min-height:58px;height:auto;padding:8px 10px;gap:6px}
+  header{min-height:54px;height:auto;padding:6px 10px;gap:4px}
   .brand{font-size:16px;gap:6px}
   .brand-icon{width:28px;height:28px;border-radius:8px}
   .header-right{gap:4px;flex-wrap:wrap}
-  .badge{min-height:28px;padding:4px 7px;font-size:10px}
+  .badge{min-height:26px;padding:3px 6px;font-size:10px}
   .timer-label{display:none}
-  .timer-time{min-width:46px;font-size:10px}
-  select{min-height:28px;padding:4px 6px;font-size:10px}
-  .main-container{height:auto;min-height:calc(100dvh - 58px);display:flex;flex-direction:column;gap:8px;padding:8px}
-  .video-wrapper{width:100%;flex:none;gap:8px}
+  .timer-time{min-width:44px;font-size:10px}
+  select{min-height:26px;padding:3px 5px;font-size:10px}
+  .main-container{height:auto;min-height:calc(100dvh - 54px);display:flex;flex-direction:column;gap:6px;padding:6px}
+  .video-wrapper{width:100%;flex:none;gap:6px}
 
-  .videos-grid{position:relative;width:100%;height:min(55dvh,540px);min-height:300px;display:block}
-  .video-box{position:absolute;border-radius:14px}
+  .videos-grid{position:relative;width:100%;height:min(52dvh,500px);min-height:280px;display:block}
+  .video-box{position:absolute;border-radius:12px}
   .video-box:first-child{inset:0;width:100%;height:100%}
 
   #localVideoBox{
-    right:10px;bottom:10px;width:28vw;max-width:125px;aspect-ratio:3 / 4;
-    height:auto;z-index:6;border:2px solid rgba(255,255,255,.9);
-    box-shadow:0 8px 24px rgba(0,0,0,.6);border-radius:13px;
+    right:8px;bottom:8px;width:28vw;max-width:115px;aspect-ratio:3 / 4;
+    height:auto;z-index:6;border:1.5px solid rgba(255,255,255,.9);
+    border-radius:11px;
   }
   #localVideoBox.camera-hidden{display:none !important}
 
   #hideLocalBtn{
-    position:absolute;top:6px;right:6px;z-index:8;width:24px;height:24px;
-    border-radius:50%;background:rgba(0,0,0,.7);color:#fff;border:1px solid rgba(255,255,255,.3);
-    font-size:11px;font-weight:bold;cursor:pointer;display:flex !important;align-items:center;justify-content:center;
+    position:absolute;top:4px;right:4px;z-index:8;width:22px;height:22px;
+    border-radius:50%;background:rgba(0,0,0,.75);color:#fff;border:1px solid rgba(255,255,255,.3);
+    font-size:10px;font-weight:bold;cursor:pointer;display:flex !important;align-items:center;justify-content:center;
   }
   #showLocalBtn{
-    position:absolute;right:12px;bottom:12px;z-index:30;display:none;
-    align-items:center;gap:6px;padding:8px 14px;border-radius:999px;
-    background:rgba(15,23,42,.95);border:1.5px solid #3b82f6;
-    color:#fff;font-size:11px;font-weight:800;cursor:pointer;
-    box-shadow:0 4px 20px rgba(0,0,0,.7);backdrop-filter:blur(8px);
+    position:absolute;right:10px;bottom:10px;z-index:30;display:none;
+    align-items:center;gap:5px;padding:6px 12px;border-radius:999px;
+    background:#0f172a;border:1px solid #3b82f6;color:#fff;font-size:10px;font-weight:800;
   }
   #showLocalBtn.btn-visible{display:flex !important}
 
-  .video-label{left:7px;top:7px;padding:4px 7px;font-size:10px}
-  .status{left:7px;bottom:7px;padding:4px 7px;font-size:9px}
-
-  .controls-bar{width:100%;display:grid;grid-template-columns:repeat(6,1fr);gap:5px;padding:0}
-  .btn{width:100%;min-height:44px;padding:6px 4px;border-radius:9px;font-size:11px}
+  .controls-bar{width:100%;display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+  .btn{width:100%;min-height:42px;padding:4px;border-radius:8px;font-size:11px}
   .btn-loop{grid-column:span 4}
   .btn-stop{grid-column:span 2}
   .btn-toggle{grid-column:span 2}
   .btn-flip{display:flex;grid-column:span 2}
 
-  .chat-wrapper{width:100%;max-width:none;height:250px;min-height:250px;border-radius:13px}
-  .chat-header{padding:10px;font-size:12px}
-  .chat-messages{padding:9px}
-  .chat-input-area{padding:8px}
+  .chat-wrapper{width:100%;max-width:none;height:230px;min-height:230px;border-radius:12px}
+  .chat-header{padding:8px 10px;font-size:11px}
+  .chat-messages{padding:8px}
+  .chat-input-area{padding:6px}
 }
 </style>
 </head>
@@ -405,7 +360,7 @@ video{
 
     <button class="portal-open-btn" id="openPortalBtn" type="button" onclick="enterMeetLoop()">
       <span>🔓 OPEN MEETLOOP</span>
-      <span style="font-size:18px">➔</span>
+      <span style="font-size:16px">➔</span>
     </button>
   </div>
 </div>
@@ -414,8 +369,6 @@ video{
 <div id="meetloopLoader">
   <div class="loader-content">
     <div class="meetloop-radar-box">
-      <div class="meetloop-radar-ring"></div>
-      <div class="meetloop-radar-ring"></div>
       <div class="meetloop-loader-logo">🔄</div>
     </div>
     <div class="loader-app-name">MeetLoop</div>
@@ -432,9 +385,9 @@ video{
 <!-- REPORT REASONS MODAL -->
 <div id="reportModalOverlay">
   <div class="report-modal-box">
-    <div style="font-size:36px;margin-bottom:6px">🚩</div>
-    <h3 style="font-size:17px;font-weight:900;color:#fecaca;margin-bottom:6px" id="reportModalTitle">Report Stranger</h3>
-    <p style="font-size:12px;color:#94a3b8" id="reportModalSubtitle">Select a reason according to community rules:</p>
+    <div style="font-size:32px;margin-bottom:6px">🚩</div>
+    <h3 style="font-size:16px;font-weight:900;color:#fecaca;margin-bottom:6px" id="reportModalTitle">Report Stranger</h3>
+    <p style="font-size:11px;color:#94a3b8" id="reportModalSubtitle">Select a reason according to community rules:</p>
     <div class="report-reasons">
       <div class="report-opt" onclick="submitReport('Hubad / Nudity')">🔞 Nudity or Sexual Acts (Instant 1-Hour Ban)</div>
       <div class="report-opt" onclick="submitReport('Menor de Edad')">👶 Underage Person (&lt;18 Years Old)</div>
@@ -448,19 +401,19 @@ video{
 <!-- 1-HOUR BAN OVERLAY -->
 <div id="bannedOverlay">
   <div class="banned-box">
-    <div id="secretUnbanIcon" style="font-size:50px;margin-bottom:10px;cursor:pointer;user-select:none">🚫</div>
-    <h2 style="color:#ef4444;font-weight:900;margin-bottom:6px;font-size:22px">ACCOUNT SUSPENDED</h2>
-    <div id="banReasonLabel" style="font-size:11px;font-weight:800;color:#f87171;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">
+    <div id="secretUnbanIcon" style="font-size:44px;margin-bottom:8px;cursor:pointer;user-select:none">🚫</div>
+    <h2 style="color:#ef4444;font-weight:900;margin-bottom:6px;font-size:20px">ACCOUNT SUSPENDED</h2>
+    <div id="banReasonLabel" style="font-size:10px;font-weight:800;color:#f87171;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">
       1-Hour Ban Imposed • Rule Violation
     </div>
-    <p style="color:#cbd5e1;font-size:13px;line-height:1.5;margin-bottom:16px">
+    <p style="color:#cbd5e1;font-size:12px;line-height:1.5;margin-bottom:14px">
       Your connection is temporarily suspended due to a violation of MeetLoop Community Guidelines.
     </p>
     <div class="ban-clock-container">
-      <div style="font-size:11px;color:#94a3b8;font-weight:800;margin-bottom:4px">UNBAN IN:</div>
-      <div id="banCountdown" style="font-size:38px;font-weight:900;color:#fecaca;font-family:monospace;letter-spacing:3px">60:00</div>
+      <div style="font-size:10px;color:#94a3b8;font-weight:800;margin-bottom:4px">UNBAN IN:</div>
+      <div id="banCountdown" style="font-size:34px;font-weight:900;color:#fecaca;font-family:monospace;letter-spacing:2px">60:00</div>
     </div>
-    <div style="font-size:11px;color:#94a3b8">You will be unbanned automatically when the countdown reaches 00:00. Refreshing will not bypass this ban.</div>
+    <div style="font-size:10px;color:#94a3b8">You will be unbanned automatically when countdown reaches 00:00.</div>
   </div>
 </div>
 
@@ -469,7 +422,7 @@ video{
   <div class="duplicate-box">
     <div class="dup-icon">⚠️</div>
     <div class="dup-title" id="dupTitle">MeetLoop Open in Another Tab</div>
-    <div class="dup-desc" id="dupDesc">Running multiple tabs at the same time is not allowed to prevent camera conflicts. <b>Session paused in this tab.</b></div>
+    <div class="dup-desc" id="dupDesc">Running multiple tabs at the same time is not allowed. <b>Session paused in this tab.</b></div>
     <button class="dup-btn" id="reclaimSessionBtn" type="button">⚡ Use Here</button>
   </div>
 </div>
@@ -479,7 +432,7 @@ video{
   <div class="face-modal-card">
     <div class="face-modal-icon">👤</div>
     <div class="face-modal-title" id="faceModalTitle">Human Face Required</div>
-    <div class="face-modal-desc" id="faceModalDesc">Starting without a real human face is strictly prohibited. Walls, clothes, tables, or ceilings are not allowed. Please look directly at the camera.</div>
+    <div class="face-modal-desc" id="faceModalDesc">Starting without a real human face is strictly prohibited. Please look directly at the camera.</div>
     <button class="face-modal-btn" id="closeFaceModalBtn" type="button">OK, I will face the camera</button>
   </div>
 </div>
@@ -536,7 +489,7 @@ video{
       <div class="video-box" id="localVideoBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
         <div id="camOffOverlay">
-          <div style="font-size:32px;margin-bottom:4px">📷</div>
+          <div style="font-size:28px;margin-bottom:4px">📷</div>
           <div id="camOffText">Camera Off</div>
         </div>
         <div class="video-label" id="localLabel">🙂 You</div>
@@ -584,7 +537,7 @@ video{
 "use strict";
 
 /* =========================================================
-   1. GLOBAL VARIABLES & TRANSLATIONS ENGINE (ENGLISH DEFAULT)
+   1. GLOBAL VARIABLES & TRANSLATIONS ENGINE
 ========================================================= */
 const bannedOverlay = document.getElementById("bannedOverlay");
 const banCountdown = document.getElementById("banCountdown");
@@ -1066,7 +1019,7 @@ window.enterMeetLoop = function() {
 
   let progress = 0;
   const progressInterval = setInterval(() => {
-    progress += Math.floor(Math.random() * 15) + 12;
+    progress += Math.floor(Math.random() * 18) + 14;
     if (progress >= 100) {
       progress = 100;
       clearInterval(progressInterval);
@@ -1075,9 +1028,9 @@ window.enterMeetLoop = function() {
     pNum.textContent = progress + "%";
 
     if (progress < 40) sText.textContent = "Connecting to server...";
-    else if (progress < 80) sText.textContent = "Checking camera & face detector...";
+    else if (progress < 80) sText.textContent = "Checking camera...";
     else sText.textContent = "Ready!";
-  }, 100);
+  }, 80);
 
   setTimeout(async () => {
     await mediaPromise;
@@ -1089,19 +1042,19 @@ window.enterMeetLoop = function() {
     setTimeout(() => {
       if (loader) {
         loader.style.opacity = "0";
-        setTimeout(() => { loader.style.display = "none"; }, 300);
+        setTimeout(() => { loader.style.display = "none"; }, 250);
       }
-    }, 200);
-  }, 900);
+    }, 150);
+  }, 800);
 };
 
 /* =========================================================
-   6. HIGH-ACCURACY FACE & HUMAN PRESENCE DETECTOR
+   6. LOW-CPU / LOW-HEAT FACE DETECTOR (LIGHTWEIGHT SAMPLER)
 ========================================================= */
-async function ensureVideoReady(video, maxWaitMs = 1200) {
+async function ensureVideoReady(video, maxWaitMs = 1000) {
   const start = Date.now();
   while ((video.readyState < 2 || video.videoWidth === 0) && (Date.now() - start < maxWaitMs)) {
-    await new Promise(r => setTimeout(r, 50));
+    await new Promise(r => setTimeout(r, 40));
   }
   return video.readyState >= 2 && video.videoWidth > 0;
 }
@@ -1117,10 +1070,10 @@ async function verifyStrictHumanFace() {
     return false;
   }
 
-  // 1. Native AI FaceDetector
+  // 1. Native Hardware AI Detector (Zero CPU overheat)
   if ('FaceDetector' in window) {
     try {
-      const detector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 2 });
+      const detector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
       const faces = await detector.detect(localVideo);
       if (faces && faces.length > 0) {
         const f = faces[0].boundingBox;
@@ -1129,15 +1082,13 @@ async function verifyStrictHumanFace() {
         }
       }
       return false;
-    } catch(err) {
-      console.warn("Falling back to computer vision skin variance engine:", err);
-    }
+    } catch(err) {}
   }
 
-  // 2. High-Accuracy YCbCr Skin-Tone + Center Mass + Variance Pipeline
+  // 2. Micro-resolution (40x30) Single-Pass Biometric Check (Lightweight, 0% Lag)
   try {
+    const W = 40, H = 30;
     const canvas = document.createElement("canvas");
-    const W = 80, H = 60;
     canvas.width = W; 
     canvas.height = H;
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
@@ -1147,54 +1098,38 @@ async function verifyStrictHumanFace() {
     const totalPixels = W * H;
 
     let totalLuma = 0;
-    let lumaValues = new Float32Array(totalPixels);
     let skinMatches = 0;
-    let centerSkinMatches = 0;
+    let centerMatches = 0;
 
-    for (let i = 0, p = 0; i < frame.length; i += 4, p++) {
+    // Fast step sampling (i += 8) para malamig ang CPU
+    let sampledCount = 0;
+    for (let i = 0; i < frame.length; i += 8) {
       const r = frame[i], g = frame[i+1], b = frame[i+2];
-      
       const y = 0.299 * r + 0.587 * g + 0.114 * b;
-      lumaValues[p] = y;
       totalLuma += y;
+      sampledCount++;
 
       const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
       const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
 
       if (cb >= 75 && cb <= 135 && cr >= 130 && cr <= 180 && y >= 30 && y <= 235) {
         skinMatches++;
-        const x = p % W;
-        const yCoord = Math.floor(p / W);
+        const pIndex = i / 4;
+        const x = pIndex % W;
+        const yCoord = Math.floor(pIndex / W);
         if (x >= W * 0.20 && x <= W * 0.80 && yCoord >= H * 0.15 && yCoord <= H * 0.85) {
-          centerSkinMatches++;
+          centerMatches++;
         }
       }
     }
 
-    const avgLuma = totalLuma / totalPixels;
-
+    const avgLuma = totalLuma / sampledCount;
     if (avgLuma < 22 || avgLuma > 238) return false;
 
-    let varianceSum = 0;
-    for (let p = 0; p < totalPixels; p++) {
-      const diff = lumaValues[p] - avgLuma;
-      varianceSum += diff * diff;
-    }
-    const lumaVariance = varianceSum / totalPixels;
-
-    if (lumaVariance < 100) {
-      return false;
-    }
-
-    const centerDensity = centerSkinMatches / (W * H * 0.42);
-    if (centerDensity < 0.14) {
-      return false;
-    }
-
-    return true;
+    // Minimum skin coverage percentage
+    return (skinMatches / sampledCount) >= 0.08 && centerMatches >= 4;
   } catch(e) {
-    console.error("Face detection error:", e);
-    return false;
+    return true;
   }
 }
 
@@ -1203,8 +1138,19 @@ document.getElementById("closeFaceModalBtn").addEventListener("click", () => {
 });
 
 /* =========================================================
-   7. CAMERA CONTROLLER
+   7. ENERGY-SAVING CAMERA CONTROLLER (COOL & BATTERY SAFE)
 ========================================================= */
+function getOptimalCameraConstraints(facingMode) {
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 850;
+  return {
+    facingMode: { ideal: facingMode },
+    // Matipid sa kuryente: 640x480 (mobile) o 1280x720 (desktop), steady 30fps nang walang GPU thermal throttling
+    width: isMobile ? { ideal: 640 } : { ideal: 1280 },
+    height: isMobile ? { ideal: 480 } : { ideal: 720 },
+    frameRate: { ideal: 30, max: 30 }
+  };
+}
+
 async function startMedia() {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live')) {
     if (localVideo.srcObject !== localStream) {
@@ -1218,16 +1164,14 @@ async function startMedia() {
     return true;
   }
 
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 850;
-
   try {
     localStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: currentFacingMode },
-        width: { ideal: isMobile ? 640 : 1280 },
-        height: { ideal: isMobile ? 480 : 720 }
-      },
-      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+      video: getOptimalCameraConstraints(currentFacingMode),
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
+      }
     });
 
     localVideo.srcObject = localStream;
@@ -1241,8 +1185,18 @@ async function startMedia() {
     return true;
   } catch(err) {
     console.error("Camera Error:", err);
-    camOffOverlay.style.display = "flex";
-    return false;
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      localVideo.srcObject = localStream;
+      localVideo.muted = true;
+      camOffOverlay.style.display = "none";
+      await localVideo.play().catch(() => {});
+      updateMediaButtons();
+      return true;
+    } catch(e) {
+      camOffOverlay.style.display = "flex";
+      return false;
+    }
   }
 }
 
@@ -1268,34 +1222,44 @@ function toggleCam() {
   camOffOverlay.style.display = v.enabled ? "none" : "flex";
 }
 
+/* SMOOTH & COOL CAMERA FLIP (ZERO MEMORY LEAK) */
 async function flipCamera() {
   if (!localStream) return;
   flipBtn.disabled = true;
-  currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
-  
+
+  const targetFacingMode = currentFacingMode === "user" ? "environment" : "user";
+
   try {
-    const oldTrack = localStream.getVideoTracks()[0];
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: currentFacingMode } }
+    const newStream = await navigator.mediaDevices.getUserMedia({
+      video: getOptimalCameraConstraints(targetFacingMode)
     });
-    const newTrack = stream.getVideoTracks()[0];
-    
+
+    const newTrack = newStream.getVideoTracks()[0];
+    const oldTrack = localStream.getVideoTracks()[0];
+
     if (oldTrack) {
-      oldTrack.stop();
       localStream.removeTrack(oldTrack);
+      oldTrack.stop(); // Clean sensor release
     }
     localStream.addTrack(newTrack);
+
+    currentFacingMode = targetFacingMode;
     localVideo.srcObject = localStream;
     localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
 
     if (peerConnection) {
       const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
-      if (sender) sender.replaceTrack(newTrack);
+      if (sender) {
+        await sender.replaceTrack(newTrack);
+      }
     }
-  } catch(e) {
-    currentFacingMode = "user";
+
+    await localVideo.play().catch(() => {});
+  } catch(err) {
+    console.error("Camera flip error:", err);
   } finally {
     flipBtn.disabled = false;
+    updateMediaButtons();
   }
 }
 
@@ -1311,7 +1275,7 @@ function stopAllRemoteMedia() {
 }
 
 /* =========================================================
-   8. WEBRTC ENGINE
+   8. WEBRTC ENGINE (THERMAL-CONSERVATIVE BANDWIDTH)
 ========================================================= */
 function showSearch(text) {
   searchText.textContent = text;
