@@ -118,7 +118,7 @@ select option{background:#0f172a;color:#fff}
 .videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:10px}
 .video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#030712;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 35px rgba(0,0,0,.35)}
 
-/* NATURAL OPTICAL VIDEO (NO ZOOM CROP) */
+/* NATURAL OPTICAL VIDEO */
 video{
   display:block;
   width:100%;
@@ -132,7 +132,7 @@ video{
 #localVideo.mirrored{transform:scaleX(-1)}
 #localVideo.unmirrored{transform:scaleX(1)}
 
-/* 🚫 TANGGAL ANG HIDE/SHOW BUTTONS SA PC (DESKTOP) */
+/* 🚫 TANGGAL ANG HIDE BUTTON SA PC */
 #hideLocalBtn, #showLocalBtn {
   display: none !important;
 }
@@ -148,24 +148,6 @@ video{
   background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.1);
   border-radius:8px;color:#e2e8f0;font-size:11px;font-weight:700;pointer-events:none;
   backdrop-filter:blur(6px);
-}
-
-/* 🛡️ REAL-TIME HUMAN FACE DETECTOR BADGE */
-.face-detector-badge{
-  position:absolute;left:8px;bottom:8px;z-index:8;
-  display:inline-flex;align-items:center;gap:5px;padding:5px 9px;
-  border-radius:7px;font-size:10px;font-weight:800;pointer-events:none;
-  box-shadow:0 4px 12px rgba(0,0,0,.5);backdrop-filter:blur(6px);
-  transition:all .3s ease;
-}
-.face-missing{
-  background:rgba(239,68,68,.9);color:#fff;border:1.5px solid #ef4444;
-}
-.face-ok{
-  background:rgba(34,197,94,.9);color:#fff;border:1.5px solid #22c55e;
-}
-.face-pulse-dot{
-  width:6px;height:6px;border-radius:50%;background:#fff;
 }
 
 .search-overlay{
@@ -190,15 +172,11 @@ video{
 .btn:active:not(:disabled){transform:scale(.98)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 
-/* START BUTTON WITH LOCK STATE */
+/* START / NEXT BUTTON */
 .btn-loop{
-  flex:1.5;background:linear-gradient(135deg,var(--blue),var(--blue2));
-  box-shadow:0 6px 20px rgba(37,99,235,.3);transition:all .3s ease;
+  flex:1.6;background:linear-gradient(135deg,var(--blue),var(--blue2));
+  box-shadow:0 6px 20px rgba(37,99,235,.3);
 }
-.btn-loop.locked{
-  background:#334155;box-shadow:none;border-color:rgba(255,255,255,.1);
-}
-
 .btn-stop{flex:1;background:linear-gradient(135deg,#dc2626,#ef4444)}
 .btn-toggle{flex:1;background:rgba(255,255,255,.07)}
 .btn-flip{display:none;flex:1;background:linear-gradient(135deg,#7c3aed,#8b5cf6)}
@@ -254,20 +232,7 @@ video{
 }
 .dup-btn:active{transform:scale(.97)}
 
-/* ⚠️ WARNING TOAST BANNER */
-#faceWarningToast{
-  position:fixed;top:75px;left:50%;transform:translateX(-50%);z-index:99999;
-  display:none;padding:12px 22px;border-radius:12px;background:rgba(220,38,38,.98);
-  border:2px solid #fff;color:#fff;font-weight:900;font-size:13px;
-  box-shadow:0 8px 30px rgba(0,0,0,.7);animation:shakeToast .4s ease;text-align:center;
-}
-@keyframes shakeToast{
-  0%,100%{transform:translateX(-50%)}
-  25%{transform:translateX(-55%)}
-  75%{transform:translateX(-45%)}
-}
-
-/* 📱 MOBILE VIEW ONLY: DOON LANG GAGANA ANG HIDE/SHOW AT FLOATING CAMERA */
+/* 📱 MOBILE VIEW ONLY: FLOATING CAMERA (3:4 RATIO - NO ZOOM) */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto;overflow-x:hidden}
   header{min-height:58px;height:auto;padding:8px 10px;gap:6px}
@@ -307,7 +272,6 @@ video{
   }
   #localVideoBox.camera-hidden{display:none !important}
 
-  /* Sa mobile lang lalabas ang hide button */
   #hideLocalBtn{
     position:absolute;top:6px;right:6px;z-index:8;width:24px;height:24px;
     border-radius:50%;background:rgba(0,0,0,.7);color:#fff;border:1px solid rgba(255,255,255,.3);
@@ -338,9 +302,6 @@ video{
 </head>
 
 <body>
-
-<!-- ⚠️ STRICT FACE REQUIRED WARNING BANNER -->
-<div id="faceWarningToast">⚠️ Bawal mag-start! Walang mukha na nakikita sa camera.</div>
 
 <!-- SINGLE TAB LOCKOUT OVERLAY -->
 <div id="duplicateTabOverlay">
@@ -396,17 +357,10 @@ video{
         </div>
       </div>
 
-      <!-- User Floating Camera (With Face Verification Badge) -->
+      <!-- User Floating Camera (Clean Screen - No Badges) -->
       <div class="video-box" id="localVideoBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
         <div class="video-label" id="localLabel">🙂 You</div>
-        
-        <!-- 🛡️ REAL HUMAN FACE DETECTOR BADGE -->
-        <div id="faceStatusBadge" class="face-detector-badge face-missing">
-          <span class="face-pulse-dot"></span>
-          <span id="faceStatusText">❌ No Face</span>
-        </div>
-
         <button id="hideLocalBtn" type="button" title="Hide Camera">✕</button>
       </div>
 
@@ -415,7 +369,7 @@ video{
 
     <!-- Controls Bar -->
     <div class="controls-bar">
-      <button class="btn btn-loop locked" id="loopBtn" type="button">🔒 Need Face</button>
+      <button class="btn btn-loop" id="loopBtn" type="button">▶️ Start</button>
       <button class="btn btn-stop" id="stopBtn" type="button" disabled>⏹️ Stop</button>
       <button class="btn btn-toggle" id="micBtn" type="button">🎙️ Mic On</button>
       <button class="btn btn-toggle" id="camBtn" type="button">📷 Cam On</button>
@@ -431,11 +385,11 @@ video{
     <div class="chat-messages" id="chatMessages">
       <div class="message">
         <div class="message-name">👑 System • Jm Devs</div>
-        <div class="message-text dev-banner"><span class="update-badge">PRO SHIELD ACTIVE</span>
-🚀 <b>MeetLoop v4.6 • Built by Jm Devs</b>
-• 🛡️ <b>Strict Face Verification:</b> Real human face required to start matching!
+        <div class="message-text dev-banner"><span class="update-badge">OMETV TURBO EDITION</span>
+🚀 <b>MeetLoop v5.0 • Built by Jm Devs</b>
+• ⚡ <b>Auto-Next Matching:</b> Seamless skip and auto-find (Exact OmeTV flow).
 • 📷 <b>Natural View:</b> Floating camera with zero zoom crop.
-• 🎙️ <b>Seamless Flip:</b> Microphone stays active during camera flip!
+• 🎙️ <b>Seamless Flip:</b> Microphone stays active during camera flip.
 • 🔒 <b>Single Tab Mode:</b> 1 tab only protected session.</div>
       </div>
     </div>
@@ -451,141 +405,7 @@ video{
 "use strict";
 
 /* =========================================================
-   1. REAL HUMAN FACIAL GEOMETRY & CONTOUR SCANNER
-   (Hindi maloloko ng pader o kisame; 0.5ms ultra-fast)
-========================================================= */
-let isFaceDetected = false;
-let faceCheckInterval = null;
-const faceStatusBadge = document.getElementById("faceStatusBadge");
-const faceStatusText = document.getElementById("faceStatusText");
-const faceWarningToast = document.getElementById("faceWarningToast");
-const loopBtn = document.getElementById("loopBtn");
-
-// Scanner: Sinusuri ang YCbCr human skin tones + facial shadow contrast (mata, ilong, bibig)
-async function scanForHumanFace() {
-  if (connected || !localVideo || localVideo.readyState < 2) return;
-
-  let detected = false;
-
-  // 1. Android/Chrome Native C++ Hardware FaceDetector kung available
-  if ('FaceDetector' in window) {
-    try {
-      const detector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
-      const faces = await detector.detect(localVideo);
-      if (faces && faces.length > 0) {
-        detected = true;
-      }
-    } catch(e) {}
-  }
-
-  // 2. Optical Facial Geometry & Skin-Tone Variance Analysis
-  if (!detected) {
-    try {
-      const canvas = document.createElement("canvas");
-      const width = 64;
-      const height = 48;
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
-      ctx.drawImage(localVideo, 0, 0, width, height);
-
-      const frame = ctx.getImageData(0, 0, width, height);
-      const data = frame.data;
-
-      let centerSkinPixels = 0;
-      let luminanceList = [];
-
-      // Gitnang 60% ng frame kung nasaan ang mukha ng tao
-      const minX = width * 0.2;
-      const maxX = width * 0.8;
-      const minY = height * 0.15;
-      const maxY = height * 0.85;
-
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-          const i = (y * width + x) * 4;
-          const r = data[i];
-          const g = data[i + 1];
-          const b = data[i + 2];
-
-          // YCbCr Conversion (Universal human skin detection sa lahat ng lahi)
-          const Y = 0.299 * r + 0.587 * g + 0.114 * b;
-          const Cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
-          const Cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
-
-          // Human skin tone cluster
-          const isSkin = (Cb >= 75 && Cb <= 135) && (Cr >= 130 && Cr <= 180) && (Y > 35 && Y < 240);
-
-          if (isSkin && x >= minX && x <= maxX && y >= minY && y <= maxY) {
-            centerSkinPixels++;
-            luminanceList.push(Y);
-          }
-        }
-      }
-
-      const totalCenterPixels = (maxX - minX) * (maxY - minY);
-      const skinRatio = centerSkinPixels / totalCenterPixels;
-
-      // Kapag may sapat na skin tone sa gitna (12% hanggang 85%)
-      if (skinRatio >= 0.12 && skinRatio <= 0.88) {
-        // Facial Feature Variance Test: Ang pader o kisame ay may 0 variance.
-        // Ang totoong mukha ng tao ay may anino sa mga mata, ilong, at bibig (mataas ang variance).
-        let sum = 0;
-        for (let l of luminanceList) sum += l;
-        const mean = sum / luminanceList.length;
-        let variance = 0;
-        for (let l of luminanceList) variance += Math.pow(l - mean, 2);
-        variance = variance / luminanceList.length;
-
-        // Kung may sapat na anino ng mata at ilong, 100% TOTOONG TAO!
-        if (variance > 50) {
-          detected = true;
-        }
-      }
-    } catch(e) {}
-  }
-
-  setFaceState(detected);
-}
-
-function setFaceState(detected) {
-  isFaceDetected = detected;
-  if (detected) {
-    faceStatusBadge.className = "face-detector-badge face-ok";
-    faceStatusText.textContent = t("faceOk");
-    if (!searching && !connected) {
-      loopBtn.classList.remove("locked");
-      loopBtn.textContent = t("startLoop");
-    }
-  } else {
-    faceStatusBadge.className = "face-detector-badge face-missing";
-    faceStatusText.textContent = t("noFace");
-    if (!searching && !connected) {
-      loopBtn.classList.add("locked");
-      loopBtn.textContent = t("needFace");
-    }
-  }
-}
-
-function startFaceTrackingEngine() {
-  if (faceCheckInterval) clearInterval(faceCheckInterval);
-  faceCheckInterval = setInterval(scanForHumanFace, 600);
-}
-
-function stopFaceTrackingEngine() {
-  if (faceCheckInterval) clearInterval(faceCheckInterval);
-}
-
-function triggerFaceWarning() {
-  faceWarningToast.textContent = t("faceAlert");
-  faceWarningToast.style.display = "block";
-  setTimeout(() => {
-    faceWarningToast.style.display = "none";
-  }, 3000);
-}
-
-/* =========================================================
-   2. SINGLE TAB PROTECTION SYSTEM
+   1. SINGLE TAB PROTECTION SYSTEM (JM DEVS TAB LOCK)
 ========================================================= */
 const currentTabId = "tab_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
 const tabChannel = window.BroadcastChannel ? new BroadcastChannel("meetloop_single_tab_bus") : null;
@@ -650,7 +470,7 @@ reclaimSessionBtn.addEventListener("click", () => {
 });
 
 /* =========================================================
-   3. MULTI-LANGUAGE TRANSLATIONS (8 LANGUAGES)
+   2. MULTI-LANGUAGE TRANSLATIONS (8 LANGUAGES)
 ========================================================= */
 const translations = {
   en: {
@@ -667,8 +487,7 @@ const translations = {
     disconnected: "Disconnected",
     stopped: "Stopped",
     strangerLeft: "Stranger left",
-    startLoop: "🔄 Start Loop",
-    needFace: "🔒 Need Face",
+    start: "▶️ Start",
     next: "⏭️ Next",
     stop: "⏹️ Stop",
     micOn: "🎙️ Mic On",
@@ -677,9 +496,6 @@ const translations = {
     camOff: "🚫 Cam Off",
     flip: "🔄 Flip",
     showCam: "Show Cam",
-    noFace: "❌ No Face",
-    faceOk: "✅ Face OK",
-    faceAlert: "⚠️ Face required! Please face the camera to start matching.",
     chatHeader: "💬 Live Chat",
     inputPlaceholder: "Type a message...",
     send: "Send",
@@ -700,8 +516,7 @@ const translations = {
     disconnected: "Naputol",
     stopped: "Tinigil",
     strangerLeft: "Umalis ang kausap",
-    startLoop: "🔄 Simulan ang Loop",
-    needFace: "🔒 Itapat ang Mukha",
+    start: "▶️ Simulan",
     next: "⏭️ Kasunod",
     stop: "⏹️ Itigil",
     micOn: "🎙️ Mic Bukas",
@@ -710,9 +525,6 @@ const translations = {
     camOff: "🚫 Cam Naka-off",
     flip: "🔄 Iikot",
     showCam: "Ipakita Cam",
-    noFace: "❌ Walang Mukha",
-    faceOk: "✅ May Mukha Na",
-    faceAlert: "⚠️ Bawal mag-start! Walang taong nakikita sa camera.",
     chatHeader: "💬 Usapan",
     inputPlaceholder: "Mag-type ng mensahe...",
     send: "Ipadala",
@@ -733,8 +545,7 @@ const translations = {
     disconnected: "Desconectado",
     stopped: "Detenido",
     strangerLeft: "El extraño se fue",
-    startLoop: "🔄 Iniciar Loop",
-    needFace: "🔒 Falta Rostro",
+    start: "▶️ Iniciar",
     next: "⏭️ Siguiente",
     stop: "⏹️ Detener",
     micOn: "🎙️ Mic Encendido",
@@ -743,9 +554,6 @@ const translations = {
     camOff: "🚫 Cámara Apagada",
     flip: "🔄 Girar",
     showCam: "Mostrar Cámara",
-    noFace: "❌ Sin rostro",
-    faceOk: "✅ Rostro OK",
-    faceAlert: "⚠️ ¡Se requiere un rostro humano para comenzar!",
     chatHeader: "💬 Chat en vivo",
     inputPlaceholder: "Escribe un mensaje...",
     send: "Enviar",
@@ -766,8 +574,7 @@ const translations = {
     disconnected: "切断されました",
     stopped: "停止",
     strangerLeft: "相手が退出しました",
-    startLoop: "🔄 ループ開始",
-    needFace: "🔒 顔が必要",
+    start: "▶️ 開始",
     next: "⏭️ 次へ",
     stop: "⏹️ 停止",
     micOn: "🎙️ マイクON",
@@ -776,9 +583,6 @@ const translations = {
     camOff: "🚫 カメラOFF",
     flip: "🔄 反転",
     showCam: "カメラ表示",
-    noFace: "❌ 顔未検出",
-    faceOk: "✅ 顔確認済",
-    faceAlert: "⚠️ 開始するにはカメラに顔を映してください！",
     chatHeader: "💬 ライブチャット",
     inputPlaceholder: "メッセージを入力...",
     send: "送信",
@@ -799,8 +603,7 @@ const translations = {
     disconnected: "연결 끊김",
     stopped: "정지됨",
     strangerLeft: "상대방이 나갔습니다",
-    startLoop: "🔄 시작",
-    needFace: "🔒 얼굴 필요",
+    start: "▶️ 시작",
     next: "⏭️ 다음",
     stop: "⏹️ 중지",
     micOn: "🎙️ 마이크 켬",
@@ -809,9 +612,6 @@ const translations = {
     camOff: "🚫 카메라 끔",
     flip: "🔄 전환",
     showCam: "카메라 보기",
-    noFace: "❌ 얼굴 없음",
-    faceOk: "✅ 얼굴 감지됨",
-    faceAlert: "⚠️ 대화를 시작하려면 사람 얼굴이 필요합니다!",
     chatHeader: "💬 실시간 채팅",
     inputPlaceholder: "메시지를 입력하세요...",
     send: "전송",
@@ -832,8 +632,7 @@ const translations = {
     disconnected: "已断开",
     stopped: "已停止",
     strangerLeft: "对方已离开",
-    startLoop: "🔄 开始匹配",
-    needFace: "🔒 需要露脸",
+    start: "▶️ 开始",
     next: "⏭️ 下一个",
     stop: "⏹️ 停止",
     micOn: "🎙️ 麦克风开",
@@ -842,9 +641,6 @@ const translations = {
     camOff: "🚫 摄像头关",
     flip: "🔄 翻转",
     showCam: "显示镜头",
-    noFace: "❌ 未检测到人脸",
-    faceOk: "✅ 人脸正常",
-    faceAlert: "⚠️ 开始匹配前必须在镜头前露脸！",
     chatHeader: "💬 实时聊天",
     inputPlaceholder: "输入消息...",
     send: "发送",
@@ -865,8 +661,7 @@ const translations = {
     disconnected: "Déconnecté",
     stopped: "Arrêté",
     strangerLeft: "L'inconnu est parti",
-    startLoop: "🔄 Démarrer",
-    needFace: "🔒 Visage requis",
+    start: "▶️ Démarrer",
     next: "⏭️ Suivant",
     stop: "⏹️ Arrêter",
     micOn: "🎙️ Micro Activé",
@@ -875,9 +670,6 @@ const translations = {
     camOff: "🚫 Caméra Coupée",
     flip: "🔄 Tourner",
     showCam: "Afficher Cam",
-    noFace: "❌ Aucun visage",
-    faceOk: "✅ Visage OK",
-    faceAlert: "⚠️ Visage humain requis pour démarrer !",
     chatHeader: "💬 Chat en direct",
     inputPlaceholder: "Tapez un message...",
     send: "Envoyer",
@@ -898,8 +690,7 @@ const translations = {
     disconnected: "Terputus",
     stopped: "Berhenti",
     strangerLeft: "Partner telah keluar",
-    startLoop: "🔄 Mulai Loop",
-    needFace: "🔒 Butuh Wajah",
+    start: "▶️ Mulai",
     next: "⏭️ Lanjut",
     stop: "⏹️ Berhenti",
     micOn: "🎙️ Mic Nyala",
@@ -908,9 +699,6 @@ const translations = {
     camOff: "🚫 Kamera Mati",
     flip: "🔄 Putar",
     showCam: "Tampilkan Cam",
-    noFace: "❌ Wajah Tidak Ada",
-    faceOk: "✅ Wajah Terdeteksi",
-    faceAlert: "⚠️ Dilarang mulai tanpa wajah manusia di depan kamera!",
     chatHeader: "💬 Obrolan Langsung",
     inputPlaceholder: "Ketik pesan...",
     send: "Kirim",
@@ -937,24 +725,18 @@ function updateUILanguage() {
   if (!connected && !searching) {
     statusBadge.textContent = t("ready");
     remoteStatus.textContent = t("waiting");
-    loopBtn.textContent = isFaceDetected ? t("startLoop") : t("needFace");
-  } else if (connected) {
-    statusBadge.textContent = t("connected");
-    remoteStatus.textContent = t("live");
+    loopBtn.textContent = t("start");
+  } else {
     loopBtn.textContent = t("next");
-  } else if (searching) {
-    statusBadge.textContent = t("searching");
-    remoteStatus.textContent = t("searching");
   }
 
   stopBtn.textContent = t("stop");
   flipBtn.textContent = t("flip");
-  setFaceState(isFaceDetected);
   updateMediaButtons();
 }
 
 /* =========================================================
-   4. WEBRTC ENGINE (20GB STANDARD RELAY + GOOGLE STUN)
+   3. WEBRTC ENGINE (20GB STANDARD RELAY + GOOGLE STUN)
 ========================================================= */
 const socket = io({
   transports: ["websocket", "polling"],
@@ -967,6 +749,7 @@ const hideLocalBtn = document.getElementById("hideLocalBtn");
 const showLocalBtn = document.getElementById("showLocalBtn");
 const remoteVideo = document.getElementById("remoteVideo");
 const remoteAudio = document.getElementById("remoteAudio");
+const loopBtn = document.getElementById("loopBtn");
 const stopBtn = document.getElementById("stopBtn");
 const micBtn = document.getElementById("micBtn");
 const camBtn = document.getElementById("camBtn");
@@ -1072,7 +855,7 @@ function stopCallTimer() {
 }
 
 /* =========================================================
-   5. NATURAL WIDE CAMERA (NO ZOOM CROP, ULTRA-SMOOTH)
+   4. NATURAL WIDE CAMERA (NO ZOOM CROP, ULTRA-SMOOTH)
 ========================================================= */
 async function startMedia() {
   if (localStream && localStream.active) return true;
@@ -1094,10 +877,6 @@ async function startMedia() {
     localVideo.srcObject = localStream;
     await localVideo.play().catch(() => {});
     updateMediaButtons();
-
-    // Simulan ang human face detector engine
-    startFaceTrackingEngine();
-
     return true;
   } catch (error) {
     console.error("Camera/Mic Error:", error);
@@ -1185,8 +964,6 @@ async function flipCamera() {
         await audioSender.replaceTrack(newAudioTrack);
       }
     }
-    
-    if (!connected) startFaceTrackingEngine();
   } catch(err) {
     console.error("Flip Camera error:", err);
   }
@@ -1208,7 +985,7 @@ function stopAllRemoteMedia() {
 }
 
 /* =========================================================
-   6. ZERO-DELAY SIGNALING (<80ms REAL-TIME)
+   5. ZERO-DELAY SIGNALING (<80ms REAL-TIME)
 ========================================================= */
 function setupDataChannel(channel) {
   dataChannel = channel;
@@ -1225,12 +1002,7 @@ function handleConnected() {
   remoteStatus.textContent = t("live");
   loopBtn.disabled = false;
   stopBtn.disabled = false;
-  loopBtn.classList.remove("locked");
   loopBtn.textContent = t("next");
-  
-  // Hihinto ang detector kapag connected na para 100% ng CPU ay sa video call
-  stopFaceTrackingEngine();
-  
   startCallTimer();
 }
 
@@ -1361,23 +1133,17 @@ function closePeerConnection() {
 }
 
 /* =========================================================
-   7. STRICT FACE LOCK: HINDI MAG-SSTART PAG WALANG MUKHA
+   6. 🔥 TRUE OMETV SEAMLESS "START / NEXT" SYSTEM
 ========================================================= */
 async function startLoop() {
   if (stopping || isTabTerminated) return;
 
-  // I-verify muna ang mukha
-  await scanForHumanFace();
-  if (!isFaceDetected) {
-    triggerFaceWarning();
-    return; // Hihinto agad dito! Hindi mag-ssearch o mag-co-connect!
-  }
-  
   primeAudioElements();
 
   const ok = await startMedia();
   if (!ok) return;
 
+  // I-reset ang dating tawag para maghanap agad ng susunod (Instant Next!)
   stopCallTimer();
   closePeerConnection();
   stopAllRemoteMedia();
@@ -1389,7 +1155,9 @@ async function startLoop() {
   remoteStatus.textContent = t("searching");
   statusBadge.textContent = t("searching");
 
-  loopBtn.disabled = true;
+  // Palaging 'Next' ang label kapag naghahanap o nasa tawag
+  loopBtn.textContent = t("next");
+  loopBtn.disabled = false;
   stopBtn.disabled = false;
 
   socket.emit("skip");
@@ -1412,16 +1180,13 @@ function stopSession() {
 
   loopBtn.disabled = false;
   stopBtn.disabled = true;
-  loopBtn.textContent = isFaceDetected ? t("startLoop") : t("needFace");
-
-  // Ibalik ang face detector kapag nag-stop
-  startFaceTrackingEngine();
+  loopBtn.textContent = t("start");
 
   setTimeout(() => { stopping = false; }, 200);
 }
 
 /* =========================================================
-   8. SOCKET EVENTS
+   7. SOCKET EVENTS (AUTO-NEXT ON DISCONNECT TULAD NG OMETV)
 ========================================================= */
 socket.on("connect", () => {
   if (!connected && !searching) statusBadge.textContent = t("ready");
@@ -1451,26 +1216,18 @@ socket.on("signal", async data => {
   else if (data.type === "candidate") await handleCandidate(data.candidate);
 });
 
+// 🔥 OMETV AUTO-NEXT: Kapag nag-skip ang kausap mo, kusang mag-hahanap agad ng bago!
 socket.on("partner-disconnected", () => {
-  connected = false;
-  searching = false;
-  stopCallTimer();
-  closePeerConnection();
-  stopAllRemoteMedia();
-  hideSearch();
-  remoteStatus.textContent = t("strangerLeft");
-  statusBadge.textContent = t("ready");
-  loopBtn.disabled = false;
-  stopBtn.disabled = true;
-  loopBtn.textContent = isFaceDetected ? t("startLoop") : t("needFace");
   addMessage("System", t("strangerLeft"));
-
-  // Ibalik ang face scanner
-  startFaceTrackingEngine();
+  
+  if (!stopping) {
+    // Awtomatikong mag-start ng search sa susunod na stranger!
+    startLoop();
+  }
 });
 
 /* =========================================================
-   9. CHAT SYSTEM
+   8. CHAT SYSTEM
 ========================================================= */
 function sendMessage() {
   const text = chatInput.value.trim();
@@ -1499,7 +1256,7 @@ function escapeHTML(str) {
 }
 
 /* =========================================================
-   10. EVENT LISTENERS
+   9. EVENT LISTENERS
 ========================================================= */
 hideLocalBtn.addEventListener("click", (e) => {
   e.stopPropagation();
