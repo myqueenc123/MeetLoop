@@ -34,28 +34,16 @@
 }
 html,body{width:100%;height:100%}
 
-/* 🌌 BLURRED MEETLOOP BACKGROUND PICTURE LAYER */
+/* 🌌 MALINAW AT CRISP NA BACKGROUND (WALANG BLUR) */
 body{
-  position:relative;
   font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   color:var(--text);
-  background-color:var(--bg);
+  background: 
+    linear-gradient(135deg, rgba(7, 11, 20, 0.55), rgba(15, 23, 42, 0.65)),
+    url('meetloop-bg.png') center/cover no-repeat fixed;
+  background-color: var(--bg);
   overflow:hidden;
   -webkit-font-smoothing:antialiased;
-}
-
-/* Pseudo-element para sa custom blurred wallpaper */
-body::before{
-  content:"";
-  position:fixed;
-  inset:-20px; /* Pampatago sa blur edges */
-  background:
-    linear-gradient(135deg, rgba(7,11,20,.72), rgba(15,23,42,.78)),
-    url('meetloop-bg.png') center/cover no-repeat;
-  filter:blur(8px) brightness(0.9);
-  transform:scale(1.04);
-  z-index:-1;
-  pointer-events:none;
 }
 
 button,input,select{font:inherit}
@@ -68,10 +56,10 @@ header{
   justify-content:space-between;
   gap:12px;
   padding:0 20px;
-  background:rgba(15,23,42,.82);
+  background:rgba(15,23,42,.88);
   border-bottom:1px solid var(--border);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
   position:relative;
   z-index:20;
 }
@@ -180,7 +168,7 @@ video{
 /* 🚩 REPORT BUTTON */
 #reportStrangerBtn{
   position:absolute;top:10px;right:10px;z-index:5;padding:6px 12px;
-  border-radius:8px;border:1px solid rgba(239,68,68,.6);background:rgba(220,38,38,.8);
+  border-radius:8px;border:1px solid rgba(239,68,68,.6);background:rgba(220,38,38,.85);
   color:#fff;font-size:11px;font-weight:800;cursor:pointer;
   box-shadow:0 4px 14px rgba(220,38,38,.4);transition:all .2s;
 }
@@ -247,19 +235,17 @@ video{
 #chatInput:focus{border-color:rgba(59,130,246,.7)}
 #sendBtn{min-width:64px;border:0;border-radius:9px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue2));cursor:pointer;font-size:12px;font-weight:800}
 
-/* 🔞 18+ RULES MODAL OVERLAY */
+/* 🔞 18+ RULES MODAL OVERLAY (MALINAW ANG BACKGROUND, WALANG BLUR) */
 #rulesModalOverlay{
   position:fixed;inset:0;z-index:999999;
-  background:radial-gradient(circle at center, rgba(15,23,42,.75), rgba(7,11,20,.95));
-  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  background:rgba(3,7,18,.75);
   display:flex;align-items:center;justify-content:center;padding:20px;
 }
 .rules-modal-box{
-  max-width:440px;width:100%;padding:34px 28px;text-align:center;
-  background:rgba(15,23,42,.85);border:1px solid rgba(255,255,255,.18);
-  border-radius:24px;box-shadow:0 20px 60px rgba(0,0,0,.85), 0 0 35px rgba(37,99,235,.25);
-  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-  animation:modalPop .3s ease;
+  max-width:440px;width:100%;padding:32px 26px;text-align:center;
+  background:#0f172a;border:1.5px solid rgba(255,255,255,.18);
+  border-radius:24px;box-shadow:0 20px 60px rgba(0,0,0,.9);
+  animation:modalPop .25s ease;
 }
 .rules-badge-18{
   display:inline-block;padding:4px 12px;border-radius:999px;
@@ -571,7 +557,7 @@ Violators will be banned</div>
 "use strict";
 
 /* =========================================================
-   1. 18+ RULES & OMETV BAN SYSTEM
+   1. 18+ RULES & PERMISSION TIMING FIX
 ========================================================= */
 const rulesModalOverlay = document.getElementById("rulesModalOverlay");
 const acceptRulesBtn = document.getElementById("acceptRulesBtn");
@@ -617,13 +603,18 @@ function runBanCountdown(banUntil) {
 
 checkBanStatus();
 
+// 🔥 TIMING FIX: Kung nag-agree na dati, buksan ang media agad.
+// Kung bago pa lang, WAG MUNA buksan ang camera para walang annoying alert sa taas!
 if (localStorage.getItem("meetloop_18_agreed") === "true") {
   rulesModalOverlay.style.display = "none";
+  startMedia();
 }
 
 acceptRulesBtn.addEventListener("click", () => {
   localStorage.setItem("meetloop_18_agreed", "true");
   rulesModalOverlay.style.display = "none";
+  // 🔥 Dito pa lang hihingin ang Camera/Mic permission pagka-pindot ng I Agree!
+  startMedia();
 });
 
 // OMETV REPORT SYSTEM
@@ -1382,7 +1373,6 @@ function setupDataChannel(channel) {
   channel.onmessage = (e) => {
     try {
       const parsed = JSON.parse(e.data);
-      // PANG-RECEIVE NG STRIKE REPORT MULA SA KAUSAP
       if (parsed && parsed.type === "REPORT_STRIKE") {
         handleIncomingReport();
         return;
@@ -1625,7 +1615,6 @@ socket.on("signal", async data => {
   else if (data.type === "candidate") await handleCandidate(data.candidate);
 });
 
-// Auto-Next kapag nag-leave ang kausap
 socket.on("partner-disconnected", () => {
   addMessage("System", t("strangerLeft"));
   
@@ -1711,7 +1700,6 @@ languageSelect.addEventListener("change", (e) => {
 
 // Initial Setup
 updateUILanguage();
-startMedia();
 </script>
 </body>
 </html>
