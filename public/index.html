@@ -26,7 +26,6 @@
   --blue:#2563eb;
   --blue2:#3b82f6;
   --red:#ef4444;
-  --green:#22c55e;
   --purple:#8b5cf6;
   --cyan:#06b6d4;
   --pink:#ec4899;
@@ -132,9 +131,11 @@ video{
 #localVideo.mirrored{transform:scaleX(-1)}
 #localVideo.unmirrored{transform:scaleX(1)}
 
-/* 🚫 TANGGAL ANG HIDE BUTTON SA PC */
-#hideLocalBtn, #showLocalBtn {
-  display: none !important;
+/* 🚫 DESKTOP VIEW (PC): TANGGAL ANG LAHAT NG HIDE/SHOW BUTTONS */
+@media (min-width: 851px) {
+  #hideLocalBtn, #showLocalBtn {
+    display: none !important;
+  }
 }
 
 .video-label{
@@ -232,7 +233,7 @@ video{
 }
 .dup-btn:active{transform:scale(.97)}
 
-/* 📱 MOBILE VIEW ONLY: FLOATING CAMERA (3:4 RATIO - NO ZOOM) */
+/* 📱 MOBILE VIEW: FLOATING CAMERA (3:4 RATIO - NO ZOOM) */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto;overflow-x:hidden}
   header{min-height:58px;height:auto;padding:8px 10px;gap:6px}
@@ -269,20 +270,25 @@ video{
     border:2px solid rgba(255,255,255,.9);
     box-shadow:0 8px 24px rgba(0,0,0,.6);
     border-radius:13px;
+    transition:transform .2s ease, opacity .2s ease;
   }
   #localVideoBox.camera-hidden{display:none !important}
 
+  /* BUTTONS SA MOBILE */
   #hideLocalBtn{
     position:absolute;top:6px;right:6px;z-index:8;width:24px;height:24px;
     border-radius:50%;background:rgba(0,0,0,.7);color:#fff;border:1px solid rgba(255,255,255,.3);
-    font-size:11px;font-weight:bold;cursor:pointer;display:flex !important;align-items:center;justify-content:center;
+    font-size:11px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;
   }
   #showLocalBtn{
-    position:absolute;right:12px;bottom:12px;z-index:9;display:none;
+    position:absolute;right:12px;bottom:12px;z-index:30;display:none;
     align-items:center;gap:6px;padding:8px 14px;border-radius:999px;
-    background:rgba(15,23,42,.92);border:1px solid rgba(59,130,246,.5);
+    background:rgba(15,23,42,.95);border:1.5px solid #3b82f6;
     color:#fff;font-size:11px;font-weight:800;cursor:pointer;
-    box-shadow:0 0 15px rgba(59,130,246,.4);backdrop-filter:blur(8px);
+    box-shadow:0 4px 20px rgba(0,0,0,.7);backdrop-filter:blur(8px);
+  }
+  #showLocalBtn.btn-visible{
+    display:flex !important;
   }
 
   .video-label{left:7px;top:7px;padding:4px 7px;font-size:10px}
@@ -364,6 +370,7 @@ video{
         <button id="hideLocalBtn" type="button" title="Hide Camera">✕</button>
       </div>
 
+      <!-- 👁️ FLOATING RESTORE BUTTON KAPAG NAKA-HIDE -->
       <button id="showLocalBtn" type="button">👁️ <span id="showLocalText">Show Cam</span></button>
     </div>
 
@@ -389,7 +396,7 @@ video{
 🚀 <b>MeetLoop v5.0 • Built by Jm Devs</b>
 • ⚡ <b>Auto-Next Matching:</b> Seamless skip and auto-find (Exact OmeTV flow).
 • 📷 <b>Natural View:</b> Floating camera with zero zoom crop.
-• 🎙️ <b>Seamless Flip:</b> Microphone stays active during camera flip.
+• 👁️ <b>Hide/Show Toggle:</b> 100% working camera hide & restore!
 • 🔒 <b>Single Tab Mode:</b> 1 tab only protected session.</div>
       </div>
     </div>
@@ -910,40 +917,34 @@ function toggleCam() {
 }
 
 /* =========================================================
-   FLIP CAMERA: HINDI NA MAPUPUTOL ANG MIC
+   HARDWARE-SAFE FLIP CAMERA (ZERO FAIL, ZERO MIC LOSS)
 ========================================================= */
 async function flipCamera() {
   if (!localStream) return;
+  flipBtn.disabled = true;
+
+  const oldVideoTrack = localStream.getVideoTracks()[0];
+  const currentAudioTrack = localStream.getAudioTracks()[0];
+
   currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
 
   try {
-    const newStream = await navigator.mediaDevices.getUserMedia({
+    if (oldVideoTrack) {
+      oldVideoTrack.stop();
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia({
       video: {
-        facingMode: currentFacingMode,
+        facingMode: { ideal: currentFacingMode },
         width: { ideal: 640 },
-        height: { ideal: 480 },
-        frameRate: { ideal: 30 }
-      },
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true
+        height: { ideal: 480 }
       }
     });
 
-    const newVideoTrack = newStream.getVideoTracks()[0];
-    const newAudioTrack = newStream.getAudioTracks()[0];
+    const newVideoTrack = stream.getVideoTracks()[0];
 
-    const oldVideoTrack = localStream.getVideoTracks()[0];
-    const oldAudioTrack = localStream.getAudioTracks()[0];
-
-    const wasMuted = oldAudioTrack ? !oldAudioTrack.enabled : false;
-    if (newAudioTrack && wasMuted) newAudioTrack.enabled = false;
-
-    if (oldVideoTrack) oldVideoTrack.stop();
-    if (oldAudioTrack) oldAudioTrack.stop();
-
-    localStream = newStream;
+    if (oldVideoTrack) localStream.removeTrack(oldVideoTrack);
+    localStream.addTrack(newVideoTrack);
     localVideo.srcObject = localStream;
 
     if (currentFacingMode === "user") {
@@ -953,19 +954,21 @@ async function flipCamera() {
     }
 
     if (peerConnection) {
-      const senders = peerConnection.getSenders();
-      const videoSender = senders.find(s => s.track && s.track.kind === "video");
-      const audioSender = senders.find(s => s.track && s.track.kind === "audio");
-
-      if (videoSender && newVideoTrack) {
+      const videoSender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
+      if (videoSender) {
         await videoSender.replaceTrack(newVideoTrack);
       }
-      if (audioSender && newAudioTrack) {
-        await audioSender.replaceTrack(newAudioTrack);
-      }
+    }
+
+    if (currentAudioTrack) {
+      currentAudioTrack.enabled = true;
     }
   } catch(err) {
-    console.error("Flip Camera error:", err);
+    console.error("Flip Camera Error:", err);
+    currentFacingMode = "user";
+    startMedia();
+  } finally {
+    flipBtn.disabled = false;
   }
 }
 
@@ -1143,7 +1146,7 @@ async function startLoop() {
   const ok = await startMedia();
   if (!ok) return;
 
-  // I-reset ang dating tawag para maghanap agad ng susunod (Instant Next!)
+  // I-reset ang dating tawag para maghanap agad ng susunod
   stopCallTimer();
   closePeerConnection();
   stopAllRemoteMedia();
@@ -1155,7 +1158,7 @@ async function startLoop() {
   remoteStatus.textContent = t("searching");
   statusBadge.textContent = t("searching");
 
-  // Palaging 'Next' ang label kapag naghahanap o nasa tawag
+  // Palaging 'Next' kapag naghahanap o nasa tawag
   loopBtn.textContent = t("next");
   loopBtn.disabled = false;
   stopBtn.disabled = false;
@@ -1186,7 +1189,7 @@ function stopSession() {
 }
 
 /* =========================================================
-   7. SOCKET EVENTS (AUTO-NEXT ON DISCONNECT TULAD NG OMETV)
+   7. SOCKET EVENTS (AUTO-NEXT ON DISCONNECT)
 ========================================================= */
 socket.on("connect", () => {
   if (!connected && !searching) statusBadge.textContent = t("ready");
@@ -1216,12 +1219,11 @@ socket.on("signal", async data => {
   else if (data.type === "candidate") await handleCandidate(data.candidate);
 });
 
-// 🔥 OMETV AUTO-NEXT: Kapag nag-skip ang kausap mo, kusang mag-hahanap agad ng bago!
+// Auto-Next kapag nag-skip o nag-leave ang kausap mo
 socket.on("partner-disconnected", () => {
   addMessage("System", t("strangerLeft"));
   
   if (!stopping) {
-    // Awtomatikong mag-start ng search sa susunod na stranger!
     startLoop();
   }
 });
@@ -1256,18 +1258,18 @@ function escapeHTML(str) {
 }
 
 /* =========================================================
-   9. EVENT LISTENERS
+   9. EVENT LISTENERS (100% WORKING HIDE & RESTORE)
 ========================================================= */
 hideLocalBtn.addEventListener("click", (e) => {
   e.stopPropagation();
   localVideoBox.classList.add("camera-hidden");
-  showLocalBtn.style.display = "flex";
+  showLocalBtn.classList.add("btn-visible");
 });
 
 showLocalBtn.addEventListener("click", (e) => {
   e.stopPropagation();
   localVideoBox.classList.remove("camera-hidden");
-  showLocalBtn.style.display = "none";
+  showLocalBtn.classList.remove("btn-visible");
 });
 
 loopBtn.addEventListener("click", startLoop);
