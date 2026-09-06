@@ -113,26 +113,27 @@ select option{background:#0f172a;color:#fff}
 .videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:10px}
 .video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#000;border:1px solid var(--border);border-radius:18px;box-shadow:0 12px 35px rgba(0,0,0,.45);transition:all .25s ease}
 
-/* 🔥 ULTRA HD CRYSTAL CLEAR VIDEO RENDERING */
+/* OmeTV-style Uncropped Natural Video Display */
 video{
   display:block;
   width:100%;
   height:100%;
   object-fit:cover;
+  object-position:center center;
   background:#000;
   border:0;
   outline:0;
   image-rendering:-webkit-optimize-contrast;
   image-rendering:crisp-edges;
-  filter:contrast(104%) brightness(102%) saturate(105%);
+  filter:contrast(103%) brightness(102%);
 }
 #localVideo{transform:scaleX(-1)}
 
 /* Hide/Show camera controls */
 #hideLocalBtn{
-  position:absolute;top:8px;right:8px;z-index:8;width:28px;height:28px;
-  border-radius:50%;background:rgba(0,0,0,.68);color:#fff;border:1px solid rgba(255,255,255,.25);
-  font-size:12px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  position:absolute;top:6px;right:6px;z-index:8;width:26px;height:26px;
+  border-radius:50%;background:rgba(0,0,0,.68);color:#fff;border:1px solid rgba(255,255,255,.3);
+  font-size:11px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:all .2s;backdrop-filter:blur(6px);
 }
 #hideLocalBtn:hover{background:rgba(239,68,68,.9);transform:scale(1.05)}
@@ -212,6 +213,31 @@ video{
 #chatInput:focus{border-color:rgba(59,130,246,.7)}
 #sendBtn{min-width:66px;border:0;border-radius:10px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue2));cursor:pointer;font-size:12px;font-weight:800}
 
+/* SINGLE TAB TAKEOVER MODAL */
+#duplicateTabOverlay{
+  position:fixed;inset:0;z-index:999999;
+  background:radial-gradient(circle at center,rgba(15,23,42,.98),#030712);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.duplicate-box{
+  max-width:420px;width:100%;padding:32px 24px;text-align:center;
+  background:rgba(17,24,39,.9);border:1px solid rgba(239,68,68,.3);
+  border-radius:24px;box-shadow:0 0 50px rgba(239,68,68,.25);
+  animation:timerPulse 2s infinite;
+}
+.dup-icon{font-size:48px;margin-bottom:12px}
+.dup-title{font-size:19px;font-weight:900;color:#fecaca;margin-bottom:8px}
+.dup-desc{font-size:13px;color:#cbd5e1;line-height:1.5;margin-bottom:20px}
+.dup-btn{
+  width:100%;min-height:48px;font-size:14px;font-weight:900;
+  border-radius:12px;border:0;cursor:pointer;color:#fff;
+  background:linear-gradient(135deg,#2563eb,#3b82f6);
+  box-shadow:0 6px 20px rgba(37,99,235,.4);transition:transform .12s;
+}
+.dup-btn:active{transform:scale(.97)}
+
+/* 🔥 OMETV MOBILE LAYOUT: TANGGAL ZOOM SA CAMERA */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto;overflow-x:hidden}
   header{min-height:58px;height:auto;padding:8px 10px;gap:6px}
@@ -226,9 +252,22 @@ video{
   .main-container{height:auto;min-height:calc(100dvh - 58px);display:flex;flex-direction:column;gap:8px;padding:8px}
   .video-wrapper{width:100%;flex:none;gap:8px}
   .videos-grid{position:relative;width:100%;height:min(55dvh,540px);min-height:280px;display:block}
-  .video-box{position:absolute;border-radius:14px}
+  .video-box{position:absolute;border-radius:16px}
   .video-box:first-child{inset:0;width:100%;height:100%}
-  #localVideoBox{right:10px;bottom:10px;width:32%;height:32%;z-index:6;border:2px solid rgba(255,255,255,.9);box-shadow:0 8px 24px rgba(0,0,0,.6)}
+
+  /* OMETV ASPECT RATIO: 3/4 Natural Ratio (Kita buong mukha at balikat, hindi zoomed in) */
+  #localVideoBox{
+    right:10px;
+    bottom:10px;
+    width:28vw;
+    max-width:125px;
+    aspect-ratio:3 / 4;
+    height:auto;
+    z-index:6;
+    border:2.5px solid rgba(255,255,255,.9);
+    box-shadow:0 8px 24px rgba(0,0,0,.65);
+    border-radius:14px;
+  }
   #localVideoBox.camera-hidden{display:none !important}
   .video-label{left:7px;top:7px;padding:4px 7px;font-size:10px}
   .status{left:7px;bottom:7px;padding:4px 7px;font-size:9px}
@@ -245,11 +284,21 @@ video{
 </head>
 
 <body>
+
+<!-- SINGLE TAB LOCKOUT OVERLAY -->
+<div id="duplicateTabOverlay">
+  <div class="duplicate-box">
+    <div class="dup-icon">⚠️</div>
+    <div class="dup-title">MeetLoop Open in Another Tab</div>
+    <div class="dup-desc">Bawal ang dalawang tab nang sabay para iwas lag at conflict sa camera. <b>Itinigil ang session sa tab na ito ni Jm Devs.</b></div>
+    <button class="dup-btn" id="reclaimSessionBtn" type="button">⚡ Gamitin Dito (Use Here)</button>
+  </div>
+</div>
+
 <header>
   <div class="brand">
     <span class="brand-icon">🔄</span>
     <span>MeetLoop</span>
-    <!-- MAANGAS NA JM DEVS BADGE -->
     <span class="jm-dev-badge">⚡ by Jm Devs</span>
   </div>
   <div class="header-right">
@@ -289,7 +338,7 @@ video{
         </div>
       </div>
 
-      <!-- Local Camera (Puwede i-hide gamit ang ✕) -->
+      <!-- Local Camera (3:4 OmeTV Ratio, Hindi Zoomed In) -->
       <div class="video-box" id="localVideoBox">
         <video id="localVideo" autoplay muted playsinline webkit-playsinline></video>
         <div class="video-label" id="localLabel">🙂 You</div>
@@ -318,10 +367,10 @@ video{
         <div class="message-name">👑 System • Jm Devs</div>
         <div class="message-text dev-banner"><span class="update-badge">PRO VERIFIED</span>
 🚀 <b>MeetLoop v3.0 • Built by Jm Devs</b>
-• 💎 <b>Ultra HD Video:</b> Hardware H.264 engine active (Clear & sharp).
+• 📷 <b>OmeTV View:</b> Natural wide-angle FOV (No more zoomed-in crop).
+• 💎 <b>Ultra HD Video:</b> Hardware H.264 engine active.
 • 🔊 <b>Auto Audio:</b> Zero delay crystal-clear mobile voice.
-• 🙈 <b>Camera Toggle:</b> Tap '✕' anytime to hide/show your video.
-• 🌐 <b>8 Languages:</b> Global chat ready!</div>
+• 🔒 <b>Single Tab Mode:</b> 1 tab only protected session.</div>
       </div>
     </div>
     <div class="chat-input-area">
@@ -336,7 +385,72 @@ video{
 "use strict";
 
 /* =========================================================
-   1. MULTI-LANGUAGE TRANSLATIONS (8 LANGUAGES)
+   1. SINGLE TAB PROTECTION SYSTEM (JM DEVS TAB LOCK)
+========================================================= */
+const currentTabId = "tab_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+const tabChannel = window.BroadcastChannel ? new BroadcastChannel("meetloop_single_tab_bus") : null;
+const duplicateTabOverlay = document.getElementById("duplicateTabOverlay");
+const reclaimSessionBtn = document.getElementById("reclaimSessionBtn");
+let isTabTerminated = false;
+
+function broadcastTabActive() {
+  if (tabChannel) {
+    tabChannel.postMessage({ type: "NEW_SESSION_OPENED", tabId: currentTabId });
+  }
+  try {
+    localStorage.setItem("meetloop_active_tab_id", JSON.stringify({ tabId: currentTabId, time: Date.now() }));
+  } catch(e) {}
+}
+
+function terminateThisOldTab() {
+  if (isTabTerminated) return;
+  isTabTerminated = true;
+
+  try { window.close(); } catch(e){}
+
+  try {
+    stopSession();
+    if (localStream) {
+      localStream.getTracks().forEach(t => t.stop());
+      localStream = null;
+    }
+    socket.disconnect();
+  } catch(e){}
+
+  duplicateTabOverlay.style.display = "flex";
+}
+
+if (tabChannel) {
+  tabChannel.onmessage = (event) => {
+    if (event.data && event.data.type === "NEW_SESSION_OPENED" && event.data.tabId !== currentTabId) {
+      terminateThisOldTab();
+    }
+  };
+}
+
+window.addEventListener("storage", (e) => {
+  if (e.key === "meetloop_active_tab_id" && e.newValue) {
+    try {
+      const data = JSON.parse(e.newValue);
+      if (data && data.tabId !== currentTabId) {
+        terminateThisOldTab();
+      }
+    } catch(err){}
+  }
+});
+
+broadcastTabActive();
+
+reclaimSessionBtn.addEventListener("click", () => {
+  duplicateTabOverlay.style.display = "none";
+  isTabTerminated = false;
+  broadcastTabActive();
+  socket.connect();
+  startMedia();
+});
+
+/* =========================================================
+   2. MULTI-LANGUAGE TRANSLATIONS (8 LANGUAGES)
 ========================================================= */
 const translations = {
   en: {
@@ -607,7 +721,7 @@ function updateUILanguage() {
 }
 
 /* =========================================================
-   2. DOM & WEBRTC SETUP (JM DEVS PRO ENGINE)
+   3. WEBRTC SETUP (JM DEVS PRO ENGINE)
 ========================================================= */
 const socket = io({
   transports: ["websocket", "polling"],
@@ -637,7 +751,7 @@ const languageSelect = document.getElementById("languageSelect");
 const callTimer = document.getElementById("callTimer");
 const callTimerValue = document.getElementById("callTimerValue");
 
-// METERED TURN CREDENTIALS + FREE GOOGLE STUN PRIORITY
+// METERED CREDENTIALS + FREE GOOGLE STUN PRIORITY
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
@@ -680,7 +794,7 @@ let currentFacingMode = "user";
 let callTimerInterval = null;
 let callStartTime = null;
 
-// Silent Audio Unlock
+// Background Audio Unlock
 function primeAudioElements() {
   remoteAudio.muted = false;
   remoteAudio.volume = 1.0;
@@ -726,19 +840,17 @@ function stopCallTimer() {
 }
 
 /* =========================================================
-   3. ULTRA-HD VIDEO CAPTURE (1080p/720p ADAPTIVE)
+   4. OMETV-STYLE NATURAL WIDE CAMERA (NO SENSOR ZOOM CROP)
 ========================================================= */
 async function startMedia() {
   if (localStream) return true;
   try {
-    // Dynamic Resolution: Sakto sa Mobile Portrait o Landscape para hindi ma-stretch o mag-blur
-    const isPortrait = window.innerHeight > window.innerWidth;
+    // Standard ideal without restrictive min/max limits: Ginagamit ang natural wide-angle selfie camera
     localStream = await navigator.mediaDevices.getUserMedia({
       video: { 
         facingMode: currentFacingMode,
-        width: { min: 720, ideal: isPortrait ? 1080 : 1920 },
-        height: { min: 720, ideal: isPortrait ? 1920 : 1080 },
-        frameRate: { ideal: 30, max: 60 }
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
       },
       audio: {
         echoCancellation: true,
@@ -796,10 +908,10 @@ async function applyHDEncodingParameters(pc) {
       if (!params.encodings || params.encodings.length === 0) {
         params.encodings = [{}];
       }
-      params.encodings[0].scaleResolutionDownBy = 1.0; // Bawal magbawas ng pixels
-      params.encodings[0].maxBitrate = 2500000; // 2.5 Mbps Crystal Clear
+      params.encodings[0].scaleResolutionDownBy = 1.0;
+      params.encodings[0].maxBitrate = 2500000;
       params.encodings[0].maxFramerate = 30;
-      params.degradationPreference = "maintain-resolution"; // Huwag i-blur ang screen
+      params.degradationPreference = "maintain-resolution";
       await sender.setParameters(params);
     }
   } catch (err) {
@@ -863,7 +975,7 @@ function stopAllRemoteMedia() {
 }
 
 /* =========================================================
-   4. WEBRTC SIGNALING & HIGH-BITRATE NEGOTIATION
+   5. WEBRTC SIGNALING
 ========================================================= */
 function setupDataChannel(channel) {
   dataChannel = channel;
@@ -1019,10 +1131,10 @@ function closePeerConnection() {
 }
 
 /* =========================================================
-   5. LOOP ACTIONS
+   6. LOOP ACTIONS
 ========================================================= */
 async function startLoop() {
-  if (stopping) return;
+  if (stopping || isTabTerminated) return;
   
   primeAudioElements();
 
@@ -1069,7 +1181,7 @@ function stopSession() {
 }
 
 /* =========================================================
-   6. SOCKET EVENTS
+   7. SOCKET EVENTS
 ========================================================= */
 socket.on("connect", () => {
   if (!connected && !searching) statusBadge.textContent = t("ready");
@@ -1115,7 +1227,7 @@ socket.on("partner-disconnected", () => {
 });
 
 /* =========================================================
-   7. CHAT SYSTEM
+   8. CHAT SYSTEM
 ========================================================= */
 function sendMessage() {
   const text = chatInput.value.trim();
@@ -1144,7 +1256,7 @@ function escapeHTML(str) {
 }
 
 /* =========================================================
-   8. EVENT LISTENERS
+   9. EVENT LISTENERS
 ========================================================= */
 // Hide sariling camera (✕)
 hideLocalBtn.addEventListener("click", (e) => {
