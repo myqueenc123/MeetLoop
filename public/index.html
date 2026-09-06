@@ -48,9 +48,7 @@ body{
 button,input,select{font:inherit}
 button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
-/* =========================================================
-   🚀 WELCOME HOMEPAGE PORTAL
-========================================================= */
+/* WELCOME HOMEPAGE PORTAL */
 #welcomePortal{
   position:fixed;inset:0;z-index:999999;
   display:flex;align-items:center;justify-content:center;padding:20px;
@@ -61,10 +59,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   transition:opacity .35s ease, visibility .35s ease;
 }
 #welcomePortal.portal-hidden{
-  display:none !important;
-  opacity:0 !important;
-  visibility:hidden !important;
-  pointer-events:none !important;
+  display:none !important;opacity:0 !important;visibility:hidden !important;pointer-events:none !important;
 }
 .portal-card{
   max-width:460px;width:100%;padding:38px 28px;text-align:center;
@@ -100,9 +95,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .portal-open-btn:hover{filter:brightness(1.15);transform:translateY(-2px)}
 .portal-open-btn:active{transform:scale(.98)}
 
-/* =========================================================
-   🌀 OMETV-STYLE CLEAN LOADING SCREEN
-========================================================= */
+/* LOADING SCREEN */
 #ometvLoader{
   position:fixed;inset:0;z-index:999998;
   display:none;align-items:center;justify-content:center;
@@ -127,9 +120,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .loader-progress-bar{width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg, #3b82f6, #ec4899);box-shadow:0 0 10px rgba(236,72,153,.7);transition:width .2s ease-out}
 .loader-info-row{display:flex;justify-content:space-between;width:100%;font-size:11px;font-weight:700;color:#94a3b8}
 
-/* =========================================================
-   HEADER & NAVBAR
-========================================================= */
+/* HEADER */
 header{
   height:64px;display:flex;align-items:center;justify-content:space-between;
   gap:12px;padding:0 20px;background:rgba(15,23,42,.85);border-bottom:1px solid var(--border);
@@ -164,9 +155,7 @@ select option{background:#0f172a;color:#fff}
 #callTimer.active .timer-dot{background:var(--red);animation:timerPulse 1.5s infinite}
 @keyframes timerPulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}70%{box-shadow:0 0 0 7px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
 
-/* =========================================================
-   MAIN VIDEO ARENA
-========================================================= */
+/* MAIN ARENA */
 .main-container{width:100%;height:calc(100vh - 64px);display:flex;gap:12px;padding:12px}
 .video-wrapper{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px}
 .videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:10px}
@@ -220,7 +209,7 @@ video{
 #searchText{color:#e2e8f0;font-size:13px;font-weight:800}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* CONTROLS BAR */
+/* CONTROLS */
 .controls-bar{display:flex;gap:7px;padding:2px}
 .btn{
   min-height:46px;padding:10px 14px;border:1px solid rgba(255,255,255,.06);
@@ -240,7 +229,7 @@ video{
 .btn-toggle{flex:1;background:rgba(255,255,255,.07)}
 .btn-flip{display:none;flex:1;background:linear-gradient(135deg,#7c3aed,#8b5cf6)}
 
-/* CHAT SIDEBAR */
+/* CHAT */
 .chat-wrapper{
   width:320px;max-width:320px;min-height:0;display:flex;flex-direction:column;
   overflow:hidden;background:rgba(15,23,42,.85);border:1px solid var(--border);
@@ -266,7 +255,7 @@ video{
 #chatInput{flex:1;min-width:0;min-height:40px;padding:9px 11px;background:rgba(2,6,23,.64);color:#fff;border:1px solid var(--border-strong);border-radius:9px;outline:none;font-size:12px}
 #sendBtn{min-width:64px;border:0;border-radius:9px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--blue2));cursor:pointer;font-size:12px;font-weight:800}
 
-/* REPORT REASONS MODAL */
+/* REPORT MODAL */
 #reportModalOverlay{
   position:fixed;inset:0;z-index:999999;
   background:rgba(3,7,18,.85);backdrop-filter:blur(14px);
@@ -284,7 +273,7 @@ video{
 }
 .report-opt:hover{background:rgba(239,68,68,.2);border-color:#ef4444}
 
-/* OMETV 1-HOUR BAN OVERLAY */
+/* BAN MODAL */
 #bannedOverlay{
   position:fixed;inset:0;z-index:9999999;
   background:radial-gradient(circle at center,rgba(40,0,0,.98),#0a0000);
@@ -296,6 +285,24 @@ video{
 }
 .ban-clock-container{
   background:rgba(0,0,0,.7);padding:16px;border-radius:16px;border:1px solid rgba(239,68,68,.4);margin:16px 0;
+}
+
+/* SINGLE TAB TAKEOVER */
+#duplicateTabOverlay{
+  position:fixed;inset:0;z-index:999999;
+  background:radial-gradient(circle at center,rgba(15,23,42,.98),#030712);
+  backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;padding:20px;
+}
+.duplicate-box{
+  max-width:420px;width:100%;padding:30px 22px;text-align:center;
+  background:rgba(17,24,39,.9);border:1px solid rgba(239,68,68,.3);border-radius:22px;
+}
+.dup-icon{font-size:36px;margin-bottom:8px}
+.dup-title{font-size:18px;font-weight:900;color:#fff;margin-bottom:8px}
+.dup-desc{font-size:12px;color:#94a3b8;line-height:1.5;margin-bottom:16px}
+.dup-btn{
+  width:100%;min-height:44px;border-radius:10px;border:0;color:#fff;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));font-weight:800;cursor:pointer;
 }
 
 /* STRICT FACE WARNING */
@@ -315,7 +322,7 @@ video{
   cursor:pointer;color:#fff;background:linear-gradient(135deg,#2563eb,#3b82f6);
 }
 
-/* MOBILE VIEW */
+/* MOBILE */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto;overflow-x:hidden}
   header{min-height:58px;height:auto;padding:8px 10px;gap:6px}
@@ -379,7 +386,7 @@ video{
   <div class="portal-card">
     <div class="portal-logo-ring">🔄</div>
     <h1 class="portal-title">MeetLoop</h1>
-    <div class="portal-subtitle">Random Video Chat (OmeTV Moderation)</div>
+    <div class="portal-subtitle">Random Video Chat</div>
 
     <ul class="portal-rules-box">
       <li>🔞 <b>18+ Only:</b> Bawal ang menor de edad.</li>
@@ -395,7 +402,7 @@ video{
   </div>
 </div>
 
-<!-- OMETV LOADING SCREEN -->
+<!-- LOADING SCREEN -->
 <div id="ometvLoader">
   <div class="loader-content">
     <div class="ometv-radar-box">
@@ -430,7 +437,7 @@ video{
   </div>
 </div>
 
-<!-- OMETV 1-HOUR BAN OVERLAY -->
+<!-- 1-HOUR BAN OVERLAY -->
 <div id="bannedOverlay">
   <div class="banned-box">
     <div id="secretUnbanIcon" style="font-size:50px;margin-bottom:10px;cursor:pointer;user-select:none">🚫</div>
@@ -449,6 +456,16 @@ video{
   </div>
 </div>
 
+<!-- SINGLE TAB OVERLAY -->
+<div id="duplicateTabOverlay">
+  <div class="duplicate-box">
+    <div class="dup-icon">⚠️</div>
+    <div class="dup-title" id="dupTitle">MeetLoop Open in Another Tab</div>
+    <div class="dup-desc" id="dupDesc">Bawal ang dalawang tab nang sabay para iwas lag at conflict sa camera. <b>Session paused in this tab.</b></div>
+    <button class="dup-btn" id="reclaimSessionBtn" type="button">⚡ Gamitin Dito (Use Here)</button>
+  </div>
+</div>
+
 <!-- STRICT FACE WARNING -->
 <div id="faceModalOverlay">
   <div class="face-modal-card">
@@ -459,7 +476,7 @@ video{
   </div>
 </div>
 
-<!-- APP HEADER -->
+<!-- HEADER -->
 <header>
   <div class="brand">
     <span class="brand-icon">🔄</span>
@@ -559,7 +576,7 @@ video{
 "use strict";
 
 /* =========================================================
-   1. GLOBAL VARIABLES & TRANSLATIONS
+   1. GLOBAL VARIABLES & TRANSLATIONS ENGINE
 ========================================================= */
 const bannedOverlay = document.getElementById("bannedOverlay");
 const banCountdown = document.getElementById("banCountdown");
@@ -567,6 +584,9 @@ const banReasonLabel = document.getElementById("banReasonLabel");
 const reportStrangerBtn = document.getElementById("reportStrangerBtn");
 const reportModalOverlay = document.getElementById("reportModalOverlay");
 const secretUnbanIcon = document.getElementById("secretUnbanIcon");
+
+const duplicateTabOverlay = document.getElementById("duplicateTabOverlay");
+const reclaimSessionBtn = document.getElementById("reclaimSessionBtn");
 
 const localVideo = document.getElementById("localVideo");
 const localVideoBox = document.getElementById("localVideoBox");
@@ -595,14 +615,10 @@ const callTimer = document.getElementById("callTimer");
 const callTimerValue = document.getElementById("callTimerValue");
 const languageSelect = document.getElementById("languageSelect");
 
-/* =========================================================
-   🔥 METERED TURN/STUN CREDENTIALS (INILAGAY DITO)
-========================================================= */
+/* METERED TURN/STUN CONFIGURATION */
 const rtcConfig = {
   iceServers: [
-    {
-      urls: "stun:stun.relay.metered.ca:80"
-    },
+    { urls: "stun:stun.relay.metered.ca:80" },
     {
       urls: "turn:standard.relay.metered.ca:80",
       username: "0974f7094bbb79185dd1d4ce",
@@ -623,12 +639,8 @@ const rtcConfig = {
       username: "0974f7094bbb79185dd1d4ce",
       credential: "jqFOtepU3tMVTfEX"
     },
-    {
-      urls: "stun:stun.l.google.com:19302"
-    },
-    {
-      urls: "stun:stun1.l.google.com:19302"
-    }
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" }
   ]
 };
 
@@ -650,12 +662,77 @@ let currentFacingMode = "user";
 let callTimerInterval = null;
 let callStartTime = null;
 let banTimerInterval = null;
-let hasReportedCurrentStranger = false; // Isang beses lang kada stranger!
+let hasReportedCurrentStranger = false;
+let isTabTerminated = false;
 
+/* 8-LANGUAGE TRANSLATION MATRIX */
 const translations = {
-  en: { online:"Online:", ready:"Ready", stranger:"👤 Stranger", you:"🙂 You", waiting:"Waiting...", searching:"Searching...", finding:"Finding someone...", connected:"Connected", live:"Live", disconnected:"Disconnected", stopped:"Stopped", strangerLeft:"Stranger left", start:"▶️ Start", next:"⏭️ Next", stop:"⏹️ Stop", micOn:"🎙️ Mic On", micOff:"🔇 Mic Off", camOn:"📷 Cam On", camOff:"🚫 Cam Off", flip:"🔄 Flip", showCam:"Show Cam", chatHeader:"💬 Live Chat", inputPlaceholder:"Type a message...", send:"Send" },
-  tl: { online:"Online:", ready:"Handa", stranger:"👤 Kausap", you:"🙂 Ikaw", waiting:"Naghihintay...", searching:"Naghahanap...", finding:"Naghahanap ng makakausap...", connected:"Konektado", live:"Live", disconnected:"Naputol", stopped:"Tinigil", strangerLeft:"Umalis ang kausap", start:"▶️ Simulan", next:"⏭️ Kasunod", stop:"⏹️ Itigil", micOn:"🎙️ Mic Bukas", micOff:"🔇 Mic Naka-off", camOn:"📷 Cam Bukas", camOff:"🚫 Cam Naka-off", flip:"🔄 Iikot", showCam:"Ipakita Cam", chatHeader:"💬 Usapan", inputPlaceholder:"Mag-type ng mensahe...", send:"Ipadala" }
+  en: {
+    online: "Online:", ready: "Ready", stranger: "👤 Stranger", you: "🙂 You",
+    waiting: "Waiting...", searching: "Searching...", finding: "Finding someone...",
+    connected: "Connected", live: "Live", disconnected: "Disconnected", stopped: "Stopped",
+    strangerLeft: "Stranger left", start: "▶️ Start", next: "⏭️ Next", stop: "⏹️ Stop",
+    micOn: "🎙️ Mic On", micOff: "🔇 Mic Off", camOn: "📷 Cam On", camOff: "🚫 Cam Off",
+    flip: "🔄 Flip", showCam: "Show Cam", chatHeader: "💬 Live Chat", inputPlaceholder: "Type a message...", send: "Send"
+  },
+  tl: {
+    online: "Online:", ready: "Handa", stranger: "👤 Kausap", you: "🙂 Ikaw",
+    waiting: "Naghihintay...", searching: "Naghahanap...", finding: "Naghahanap ng makakausap...",
+    connected: "Konektado", live: "Live", disconnected: "Naputol", stopped: "Tinigil",
+    strangerLeft: "Umalis ang kausap", start: "▶️ Simulan", next: "⏭️ Kasunod", stop: "⏹️ Itigil",
+    micOn: "🎙️ Mic Bukas", micOff: "🔇 Mic Naka-off", camOn: "📷 Cam Bukas", camOff: "🚫 Cam Naka-off",
+    flip: "🔄 Iikot", showCam: "Ipakita Cam", chatHeader: "💬 Usapan", inputPlaceholder: "Mag-type ng mensahe...", send: "Ipadala"
+  },
+  es: {
+    online: "En línea:", ready: "Listo", stranger: "👤 Extraño", you: "🙂 Tú",
+    waiting: "Esperando...", searching: "Buscando...", finding: "Buscando a alguien...",
+    connected: "Conectado", live: "En vivo", disconnected: "Desconectado", stopped: "Detenido",
+    strangerLeft: "El extraño se fue", start: "▶️ Iniciar", next: "⏭️ Siguiente", stop: "⏹️ Detener",
+    micOn: "🎙️ Mic Encendido", micOff: "🔇 Mic Apagado", camOn: "📷 Cámara Encendida", camOff: "🚫 Cámara Apagada",
+    flip: "🔄 Girar", showCam: "Mostrar Cámara", chatHeader: "💬 Chat en vivo", inputPlaceholder: "Escribe un mensaje...", send: "Enviar"
+  },
+  ja: {
+    online: "オンライン:", ready: "準備完了", stranger: "👤 相手", you: "🙂 あなた",
+    waiting: "待機中...", searching: "検索中...", finding: "相手を探しています...",
+    connected: "接続完了", live: "ライブ", disconnected: "切断", stopped: "停止",
+    strangerLeft: "相手が退出しました", start: "▶️ 開始", next: "⏭️ 次へ", stop: "⏹️ 停止",
+    micOn: "🎙️ マイクON", micOff: "🔇 マイクOFF", camOn: "📷 カメラON", camOff: "🚫 カメラOFF",
+    flip: "🔄 反転", showCam: "カメラ表示", chatHeader: "💬 ライブチャット", inputPlaceholder: "メッセージを入力...", send: "送信"
+  },
+  ko: {
+    online: "온라인:", ready: "준비됨", stranger: "👤 상대방", you: "🙂 나",
+    waiting: "대기 중...", searching: "검색 중...", finding: "대화 상대를 찾는 중...",
+    connected: "연결됨", live: "라이브", disconnected: "연결 끊김", stopped: "정지됨",
+    strangerLeft: "상대방이 나갔습니다", start: "▶️ 시작", next: "⏭️ 다음", stop: "⏹️ 중지",
+    micOn: "🎙️ 마이크 켬", micOff: "🔇 마이크 끔", camOn: "📷 카메라 켬", camOff: "🚫 카메라 끔",
+    flip: "🔄 전환", showCam: "카메라 보기", chatHeader: "💬 실시간 채팅", inputPlaceholder: "메시지를 입력하세요...", send: "전송"
+  },
+  zh: {
+    online: "在线:", ready: "就绪", stranger: "👤 陌生人", you: "🙂 你",
+    waiting: "等待中...", searching: "寻找中...", finding: "正在寻找聊天对象...",
+    connected: "已连接", live: "直播中", disconnected: "已断开", stopped: "已停止",
+    strangerLeft: "对方已离开", start: "▶️ 开始", next: "⏭️ 下一个", stop: "⏹️ 停止",
+    micOn: "🎙️ 麦克风开", micOff: "🔇 麦克风关", camOn: "📷 摄像头开", camOff: "🚫 摄像头关",
+    flip: "🔄 翻转", showCam: "显示镜头", chatHeader: "💬 实时聊天", inputPlaceholder: "输入消息...", send: "发送"
+  },
+  fr: {
+    online: "En ligne:", ready: "Prêt", stranger: "👤 Inconnu", you: "🙂 Vous",
+    waiting: "En attente...", searching: "Recherche...", finding: "Recherche de quelqu'un...",
+    connected: "Connecté", live: "En direct", disconnected: "Déconnecté", stopped: "Arrêté",
+    strangerLeft: "L'inconnu est parti", start: "▶️ Démarrer", next: "⏭️ Suivant", stop: "⏹️ Arrêter",
+    micOn: "🎙️ Micro Activé", micOff: "🔇 Micro Coupé", camOn: "📷 Caméra Activée", camOff: "🚫 Caméra Coupée",
+    flip: "🔄 Tourner", showCam: "Afficher Cam", chatHeader: "💬 Chat en direct", inputPlaceholder: "Tapez un message...", send: "Envoyer"
+  },
+  id: {
+    online: "Online:", ready: "Siap", stranger: "👤 Orang Lain", you: "🙂 Anda",
+    waiting: "Menunggu...", searching: "Mencari...", finding: "Mencari seseorang...",
+    connected: "Terhubung", live: "Live", disconnected: "Terputus", stopped: "Berhenti",
+    strangerLeft: "Partner telah keluar", start: "▶️ Mulai", next: "⏭️ Lanjut", stop: "⏹️ Berhenti",
+    micOn: "🎙️ Mic Nyala", micOff: "🔇 Mic Mati", camOn: "📷 Kamera Nyala", camOff: "🚫 Kamera Mati",
+    flip: "🔄 Putar", showCam: "Tampilkan Cam", chatHeader: "💬 Obrolan Langsung", inputPlaceholder: "Ketik pesan...", send: "Kirim"
+  }
 };
+
 let currentLang = localStorage.getItem("meetloop_lang") || "en";
 function t(k){ return translations[currentLang]?.[k] || translations["en"]?.[k] || ""; }
 
@@ -667,6 +744,7 @@ function updateUILanguage() {
   chatInput.placeholder = t("inputPlaceholder");
   sendBtn.textContent = t("send");
   document.getElementById("showLocalText").textContent = t("showCam");
+  
   if (!connected && !searching) {
     statusBadge.textContent = t("ready");
     remoteStatus.textContent = t("waiting");
@@ -680,7 +758,67 @@ function updateUILanguage() {
 }
 
 /* =========================================================
-   2. 1-HOUR BAN SYSTEM (OMETV ENGINE)
+   2. SINGLE TAB / MULTI-TAB CONTROLLER
+========================================================= */
+const currentTabId = "tab_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+const tabChannel = window.BroadcastChannel ? new BroadcastChannel("meetloop_single_tab_bus") : null;
+
+function broadcastTabActive() {
+  if (tabChannel) {
+    tabChannel.postMessage({ type: "NEW_SESSION_OPENED", tabId: currentTabId });
+  }
+  try {
+    localStorage.setItem("meetloop_active_tab_id", JSON.stringify({ tabId: currentTabId, time: Date.now() }));
+  } catch(e) {}
+}
+
+function terminateThisOldTab() {
+  if (isTabTerminated) return;
+  isTabTerminated = true;
+
+  try {
+    stopSession();
+    if (localStream) {
+      localStream.getTracks().forEach(t => t.stop());
+      localStream = null;
+    }
+    if (socket) socket.disconnect();
+  } catch(e){}
+
+  duplicateTabOverlay.style.display = "flex";
+}
+
+if (tabChannel) {
+  tabChannel.onmessage = (event) => {
+    if (event.data && event.data.type === "NEW_SESSION_OPENED" && event.data.tabId !== currentTabId) {
+      terminateThisOldTab();
+    }
+  };
+}
+
+window.addEventListener("storage", (e) => {
+  if (e.key === "meetloop_active_tab_id" && e.newValue) {
+    try {
+      const data = JSON.parse(e.newValue);
+      if (data && data.tabId !== currentTabId) {
+        terminateThisOldTab();
+      }
+    } catch(err){}
+  }
+});
+
+broadcastTabActive();
+
+reclaimSessionBtn.addEventListener("click", () => {
+  duplicateTabOverlay.style.display = "none";
+  isTabTerminated = false;
+  broadcastTabActive();
+  if (socket) socket.connect();
+  startMedia();
+});
+
+/* =========================================================
+   3. 1-HOUR BAN SYSTEM (OMETV ENGINE)
 ========================================================= */
 function checkBanStatus() {
   const banUntil = parseInt(localStorage.getItem("meetloop_ban_until") || "0");
@@ -731,7 +869,7 @@ function triggerInstantOneHourBan(reason) {
 checkBanStatus();
 
 /* =========================================================
-   3. REPORT HANDLER (ONE REPORT PER PAIR LIMIT)
+   4. REPORT HANDLER (ONE REPORT PER PAIR)
 ========================================================= */
 reportStrangerBtn.addEventListener("click", () => {
   if (!connected) return;
@@ -755,21 +893,18 @@ function submitReport(reason) {
     return;
   }
 
-  // I-lock agad ang report button
   hasReportedCurrentStranger = true;
   reportStrangerBtn.disabled = true;
   reportStrangerBtn.style.opacity = "0.5";
   reportStrangerBtn.style.cursor = "not-allowed";
   reportStrangerBtn.textContent = "✓ Reported";
 
-  // Ipadala sa kausap via DataChannel
   if (dataChannel && dataChannel.readyState === "open") {
     try {
       dataChannel.send(JSON.stringify({ type: "REPORT_STRIKE", reason: reason }));
     } catch(e) {}
   }
 
-  // Ipadala sa server
   if (socket) {
     socket.emit("report-user", { reason: reason });
   }
@@ -781,14 +916,12 @@ function submitReport(reason) {
 }
 
 function handleIncomingReport(reason) {
-  // CRITICAL OFFENSE: Automatic 1-Hour Ban Agad!
   if (reason.includes("Hubad") || reason.includes("Nudity") || reason.includes("Menor")) {
     alert(`🚨 INSTANT 1-HOUR BAN: Na-report ka sa hindi pinapahintulutang gawi (${reason})!`);
     triggerInstantOneHourBan(`Kritikal na Paglabag: ${reason}`);
     return;
   }
 
-  // Minor reports: 2 Strikes = 1-Hour Ban
   let strikes = parseInt(localStorage.getItem("meetloop_strikes") || "0") + 1;
   localStorage.setItem("meetloop_strikes", strikes.toString());
 
@@ -801,7 +934,6 @@ function handleIncomingReport(reason) {
   }
 }
 
-// Secret Unban clicker (3 clicks sa icon)
 let banClickCount = 0;
 secretUnbanIcon.addEventListener("click", () => {
   banClickCount++;
@@ -815,7 +947,7 @@ secretUnbanIcon.addEventListener("click", () => {
 });
 
 /* =========================================================
-   4. INTRO PORTAL
+   5. INTRO PORTAL
 ========================================================= */
 window.enterMeetLoop = function() {
   sessionStorage.setItem("meetloop_session_active", "true");
@@ -867,7 +999,7 @@ window.enterMeetLoop = function() {
 };
 
 /* =========================================================
-   5. STRICT HUMAN FACE DETECTION
+   6. STRICT HUMAN FACE DETECTION
 ========================================================= */
 async function verifyStrictHumanFace() {
   if (!localVideo) return false;
@@ -917,7 +1049,7 @@ document.getElementById("closeFaceModalBtn").addEventListener("click", () => {
 });
 
 /* =========================================================
-   6. CAMERA HARDWARE CONTROLLER (NO CRASH)
+   7. CAMERA CONTROLLER
 ========================================================= */
 async function startMedia() {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live')) {
@@ -1025,7 +1157,7 @@ function stopAllRemoteMedia() {
 }
 
 /* =========================================================
-   7. WEBRTC ENGINE (METERED ENABLED)
+   8. WEBRTC ENGINE
 ========================================================= */
 function showSearch(text) {
   searchText.textContent = text;
@@ -1125,7 +1257,7 @@ function createPeer(initiator) {
 
 function setupDataChannel(ch) {
   dataChannel = ch;
-  ch.onopen = () => addMessage("System", "Chat connected.");
+  ch.onopen = () => addMessage("System", t("chatConnected") || "Chat connected.");
   ch.onmessage = (e) => {
     try {
       const parsed = JSON.parse(e.data);
@@ -1195,16 +1327,16 @@ function closePeerConnection() {
 }
 
 /* =========================================================
-   8. MATCHING LOOP
+   9. MATCHING LOOP
 ========================================================= */
 async function startLoop() {
-  if (stopping) return;
+  if (stopping || isTabTerminated) return;
   if (checkBanStatus()) return;
 
   const ok = await startMedia();
   if (!ok) return;
 
-  showSearch("Verifying face...");
+  showSearch(t("verifying") || "Verifying face...");
   const faceVerified = await verifyStrictHumanFace();
   if (!faceVerified) {
     hideSearch();
@@ -1252,14 +1384,14 @@ function stopSession() {
 }
 
 /* =========================================================
-   9. SOCKET EVENTS
+   10. SOCKET EVENTS
 ========================================================= */
 if (socket) {
   socket.on("online-count", count => { onlineCount.textContent = count; });
   
   socket.on("waiting", () => {
     searching = true;
-    showSearch("Waiting for partner...");
+    showSearch(t("waitingPartner") || "Waiting for partner...");
     remoteStatus.textContent = t("waiting");
   });
 
@@ -1291,7 +1423,7 @@ if (socket) {
 }
 
 /* =========================================================
-   10. CHAT SYSTEM & UI EVENTS
+   11. CHAT SYSTEM & UI EVENTS
 ========================================================= */
 function sendMessage() {
   const txt = chatInput.value.trim();
@@ -1351,7 +1483,7 @@ languageSelect.addEventListener("change", (e) => {
   updateUILanguage();
 });
 
-// Init UI
+// Initial UI Setup
 updateUILanguage();
 </script>
 </body>
