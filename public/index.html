@@ -16,6 +16,10 @@
 
 <title>MeetLoop - Powered by Jm Devs</title>
 
+<!-- 🎯 REAL HUMAN FACE DETECTION LIBRARIES -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tracking.js/1.1.3/tracking-min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tracking.js/1.1.3/data/face-min.js"></script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -118,7 +122,7 @@ select option{background:#0f172a;color:#fff}
 .videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:10px}
 .video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#030712;border:1px solid var(--border);border-radius:16px;box-shadow:0 10px 35px rgba(0,0,0,.35)}
 
-/* OMETV NATURAL OPTICAL VIDEO */
+/* NATURAL OPTICAL VIDEO */
 video{
   display:block;
   width:100%;
@@ -163,19 +167,19 @@ video{
   backdrop-filter:blur(6px);
 }
 
-/* 🛡️ REAL-TIME ZERO-LAG FACE BADGE */
+/* 🛡️ REAL HUMAN FACE DETECTOR BADGE */
 .face-detector-badge{
   position:absolute;left:8px;bottom:8px;z-index:8;
-  display:inline-flex;align-items:center;gap:5px;padding:4px 8px;
-  border-radius:6px;font-size:10px;font-weight:800;pointer-events:none;
+  display:inline-flex;align-items:center;gap:5px;padding:5px 9px;
+  border-radius:7px;font-size:10px;font-weight:800;pointer-events:none;
   box-shadow:0 4px 12px rgba(0,0,0,.5);backdrop-filter:blur(6px);
   transition:all .3s ease;
 }
 .face-missing{
-  background:rgba(239,68,68,.85);color:#fff;border:1px solid rgba(239,68,68,1);
+  background:rgba(239,68,68,.9);color:#fff;border:1.5px solid #ef4444;
 }
 .face-ok{
-  background:rgba(34,197,94,.85);color:#fff;border:1px solid rgba(34,197,94,1);
+  background:rgba(34,197,94,.9);color:#fff;border:1.5px solid #22c55e;
 }
 .face-pulse-dot{
   width:6px;height:6px;border-radius:50%;background:#fff;
@@ -202,7 +206,16 @@ video{
 .btn:hover:not(:disabled){filter:brightness(1.15)}
 .btn:active:not(:disabled){transform:scale(.98)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
-.btn-loop{flex:1.5;background:linear-gradient(135deg,var(--blue),var(--blue2));box-shadow:0 6px 20px rgba(37,99,235,.3)}
+
+/* START BUTTON WITH LOCK STATE */
+.btn-loop{
+  flex:1.5;background:linear-gradient(135deg,var(--blue),var(--blue2));
+  box-shadow:0 6px 20px rgba(37,99,235,.3);transition:all .3s ease;
+}
+.btn-loop.locked{
+  background:#334155;box-shadow:none;border-color:rgba(255,255,255,.1);
+}
+
 .btn-stop{flex:1;background:linear-gradient(135deg,#dc2626,#ef4444)}
 .btn-toggle{flex:1;background:rgba(255,255,255,.07)}
 .btn-flip{display:none;flex:1;background:linear-gradient(135deg,#7c3aed,#8b5cf6)}
@@ -258,12 +271,17 @@ video{
 }
 .dup-btn:active{transform:scale(.97)}
 
-/* FLOATING TOAST WARNING */
+/* ⚠️ WARNING TOAST BANNER */
 #faceWarningToast{
-  position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:9999;
-  display:none;padding:10px 18px;border-radius:10px;background:rgba(239,68,68,.95);
-  color:#fff;font-weight:800;font-size:12px;box-shadow:0 6px 20px rgba(0,0,0,.5);
-  animation:timerPulse 1.5s infinite;text-align:center;
+  position:fixed;top:75px;left:50%;transform:translateX(-50%);z-index:99999;
+  display:none;padding:12px 22px;border-radius:12px;background:rgba(220,38,38,.98);
+  border:2px solid #fff;color:#fff;font-weight:900;font-size:13px;
+  box-shadow:0 8px 30px rgba(0,0,0,.7);animation:shakeToast .4s ease;text-align:center;
+}
+@keyframes shakeToast{
+  0%,100%{transform:translateX(-50%)}
+  25%{transform:translateX(-55%)}
+  75%{transform:translateX(-45%)}
 }
 
 /* MOBILE: FULLSCREEN STRANGER + FLOATING LOCAL CAMERA (3:4 RATIO - NO ZOOM) */
@@ -291,7 +309,7 @@ video{
   .video-box{position:absolute;border-radius:14px}
   .video-box:first-child{inset:0;width:100%;height:100%}
 
-  /* FLOATING USER CAMERA (3:4 Natural View - No Zoom Crop) */
+  /* FLOATING USER CAMERA */
   #localVideoBox{
     right:10px;
     bottom:10px;
@@ -323,8 +341,8 @@ video{
 
 <body>
 
-<!-- WARNING TOAST -->
-<div id="faceWarningToast">⚠️ Paki-harap ang iyong mukha sa camera para makapag-start!</div>
+<!-- ⚠️ STRICT FACE REQUIRED WARNING BANNER -->
+<div id="faceWarningToast">⚠️ Bawal mag-start! Walang mukha na nakikita sa camera.</div>
 
 <!-- SINGLE TAB LOCKOUT OVERLAY -->
 <div id="duplicateTabOverlay">
@@ -385,7 +403,7 @@ video{
         <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
         <div class="video-label" id="localLabel">🙂 You</div>
         
-        <!-- 🛡️ ZERO-LAG FACE STATUS BADGE -->
+        <!-- 🛡️ REAL HUMAN FACE DETECTOR BADGE -->
         <div id="faceStatusBadge" class="face-detector-badge face-missing">
           <span class="face-pulse-dot"></span>
           <span id="faceStatusText">❌ No Face</span>
@@ -399,7 +417,7 @@ video{
 
     <!-- Controls Bar -->
     <div class="controls-bar">
-      <button class="btn btn-loop" id="loopBtn" type="button">🔄 Start Loop</button>
+      <button class="btn btn-loop locked" id="loopBtn" type="button">🔒 Need Face</button>
       <button class="btn btn-stop" id="stopBtn" type="button" disabled>⏹️ Stop</button>
       <button class="btn btn-toggle" id="micBtn" type="button">🎙️ Mic On</button>
       <button class="btn btn-toggle" id="camBtn" type="button">📷 Cam On</button>
@@ -415,11 +433,11 @@ video{
     <div class="chat-messages" id="chatMessages">
       <div class="message">
         <div class="message-name">👑 System • Jm Devs</div>
-        <div class="message-text dev-banner"><span class="update-badge">ZERO-LAG TURBO ACTIVE</span>
-🚀 <b>MeetLoop v4.0 • Built by Jm Devs</b>
-• ⚡ <b>Zero-Lag & Zero-Delay:</b> Instant real-time video stream (<80ms).
-• 🛡️ <b>Smart Face Lock:</b> Face required before matching starts.
+        <div class="message-text dev-banner"><span class="update-badge">AI FACE SHIELD</span>
+🚀 <b>MeetLoop v4.5 • Built by Jm Devs</b>
+• 🛡️ <b>Strict Face Lock:</b> Real human face required to start matching!
 • 📷 <b>OmeTV View:</b> Floating camera with zero zoom crop.
+• 🎙️ <b>Mobile Flip Fix:</b> Microphone stays active when flipping camera!
 • 🔒 <b>Single Tab Mode:</b> 1 tab only protected session.</div>
       </div>
     </div>
@@ -435,69 +453,89 @@ video{
 "use strict";
 
 /* =========================================================
-   1. ZERO-LAG ULTRA-LIGHT FACE SCANNER (NO CPU/GPU HIJACK)
+   1. REAL HUMAN FACE DETECTOR (VIOLA-JONES / HAAR CASCADE)
 ========================================================= */
 let isFaceDetected = false;
 let faceCheckInterval = null;
+let trackingTask = null;
 const faceStatusBadge = document.getElementById("faceStatusBadge");
 const faceStatusText = document.getElementById("faceStatusText");
 const faceWarningToast = document.getElementById("faceWarningToast");
+const loopBtn = document.getElementById("loopBtn");
 
-// Native C++ hardware scanner (0% CPU, no TensorFlow lag)
-async function scanForFace() {
-  if (!localVideo || localVideo.readyState < 2 || connected) return;
+// Initialize Tracking.js for human faces
+let tracker = null;
+if (window.tracking && window.tracking.ObjectTracker) {
+  tracker = new tracking.ObjectTracker('face');
+  tracker.setInitialScale(4);
+  tracker.setStepSize(2);
+  tracker.setEdgesDensity(0.1);
 
-  let detected = false;
-
-  // 1. Android/Chrome Native C++ FaceDetector
-  if ('FaceDetector' in window) {
-    try {
-      const nativeDetector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
-      const faces = await nativeDetector.detect(localVideo);
-      if (faces.length > 0) detected = true;
-    } catch(e) {}
-  }
-
-  // 2. Micro-Canvas Optical Centroid Scanner (<0.5ms execution time)
-  if (!detected) {
-    try {
-      const canvas = document.createElement("canvas");
-      canvas.width = 32; canvas.height = 24;
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
-      ctx.drawImage(localVideo, 0, 0, 32, 24);
-      const data = ctx.getImageData(0, 0, 32, 24).data;
-      
-      let brightCount = 0;
-      let totalLuma = 0;
-      const pixels = data.length / 4;
-
-      for (let i = 0; i < data.length; i += 4) {
-        const luma = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
-        totalLuma += luma;
-        // Check for natural human skin/face contrast variance
-        if (luma > 40 && luma < 225) brightCount++;
-      }
-
-      const avgLuma = totalLuma / pixels;
-      // Kapag may sapat na dynamic contrast at hindi purong itim/takip
-      if (brightCount > pixels * 0.45 && avgLuma > 30 && avgLuma < 235) {
-        detected = true;
-      }
-    } catch(e) {}
-  }
-
-  isFaceDetected = detected;
-  updateFaceUI(detected);
+  tracker.on('track', function(event) {
+    if (connected) return; // Wag patakbuhin kapag connected na para zero lag!
+    if (!event.data || event.data.length === 0) {
+      setFaceState(false);
+    } else {
+      setFaceState(true);
+    }
+  });
 }
 
-function updateFaceUI(detected) {
+// Fallback Face Scanner gamit ang Native Android Chrome FaceDetector
+async function checkFaceManual() {
+  if (connected || !localVideo || localVideo.readyState < 2) return;
+
+  if ('FaceDetector' in window) {
+    try {
+      const detector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
+      const faces = await detector.detect(localVideo);
+      if (faces && faces.length > 0) {
+        setFaceState(true);
+        return;
+      } else {
+        setFaceState(false);
+        return;
+      }
+    } catch(e) {}
+  }
+}
+
+function setFaceState(detected) {
+  isFaceDetected = detected;
   if (detected) {
     faceStatusBadge.className = "face-detector-badge face-ok";
     faceStatusText.textContent = t("faceOk");
+    if (!searching && !connected) {
+      loopBtn.classList.remove("locked");
+      loopBtn.textContent = t("startLoop");
+    }
   } else {
     faceStatusBadge.className = "face-detector-badge face-missing";
     faceStatusText.textContent = t("noFace");
+    if (!searching && !connected) {
+      loopBtn.classList.add("locked");
+      loopBtn.textContent = t("needFace");
+    }
   }
+}
+
+function startFaceTrackingEngine() {
+  setFaceState(false);
+  if (tracker && !trackingTask && localVideo) {
+    try {
+      trackingTask = tracking.track('#localVideo', tracker);
+    } catch(e) {}
+  }
+  if (faceCheckInterval) clearInterval(faceCheckInterval);
+  faceCheckInterval = setInterval(checkFaceManual, 800);
+}
+
+function stopFaceTrackingEngine() {
+  if (trackingTask) {
+    try { trackingTask.stop(); } catch(e){}
+    trackingTask = null;
+  }
+  if (faceCheckInterval) clearInterval(faceCheckInterval);
 }
 
 function triggerFaceWarning() {
@@ -505,7 +543,7 @@ function triggerFaceWarning() {
   faceWarningToast.style.display = "block";
   setTimeout(() => {
     faceWarningToast.style.display = "none";
-  }, 2500);
+  }, 3000);
 }
 
 /* =========================================================
@@ -592,6 +630,7 @@ const translations = {
     stopped: "Stopped",
     strangerLeft: "Stranger left",
     startLoop: "🔄 Start Loop",
+    needFace: "🔒 Need Face",
     next: "⏭️ Next",
     stop: "⏹️ Stop",
     micOn: "🎙️ Mic On",
@@ -602,7 +641,7 @@ const translations = {
     showCam: "Show Cam",
     noFace: "❌ No Face",
     faceOk: "✅ Face OK",
-    faceAlert: "⚠️ Face required to start matching!",
+    faceAlert: "⚠️ Face required! Please face the camera to start matching.",
     chatHeader: "💬 Live Chat",
     inputPlaceholder: "Type a message...",
     send: "Send",
@@ -624,6 +663,7 @@ const translations = {
     stopped: "Tinigil",
     strangerLeft: "Umalis ang kausap",
     startLoop: "🔄 Simulan ang Loop",
+    needFace: "🔒 Itapat ang Mukha",
     next: "⏭️ Kasunod",
     stop: "⏹️ Itigil",
     micOn: "🎙️ Mic Bukas",
@@ -634,7 +674,7 @@ const translations = {
     showCam: "Ipakita Cam",
     noFace: "❌ Walang Mukha",
     faceOk: "✅ May Mukha Na",
-    faceAlert: "⚠️ Bawal mag-start hangga't walang mukha sa camera!",
+    faceAlert: "⚠️ Bawal mag-start! Walang taong nakikita sa camera.",
     chatHeader: "💬 Usapan",
     inputPlaceholder: "Mag-type ng mensahe...",
     send: "Ipadala",
@@ -656,6 +696,7 @@ const translations = {
     stopped: "Detenido",
     strangerLeft: "El extraño se fue",
     startLoop: "🔄 Iniciar Loop",
+    needFace: "🔒 Falta Rostro",
     next: "⏭️ Siguiente",
     stop: "⏹️ Detener",
     micOn: "🎙️ Mic Encendido",
@@ -666,7 +707,7 @@ const translations = {
     showCam: "Mostrar Cámara",
     noFace: "❌ Sin rostro",
     faceOk: "✅ Rostro OK",
-    faceAlert: "⚠️ ¡Se requiere rostro para comenzar!",
+    faceAlert: "⚠️ ¡Se requiere un rostro humano para comenzar!",
     chatHeader: "💬 Chat en vivo",
     inputPlaceholder: "Escribe un mensaje...",
     send: "Enviar",
@@ -688,6 +729,7 @@ const translations = {
     stopped: "停止",
     strangerLeft: "相手が退出しました",
     startLoop: "🔄 ループ開始",
+    needFace: "🔒 顔が必要",
     next: "⏭️ 次へ",
     stop: "⏹️ 停止",
     micOn: "🎙️ マイクON",
@@ -720,6 +762,7 @@ const translations = {
     stopped: "정지됨",
     strangerLeft: "상대방이 나갔습니다",
     startLoop: "🔄 시작",
+    needFace: "🔒 얼굴 필요",
     next: "⏭️ 다음",
     stop: "⏹️ 중지",
     micOn: "🎙️ 마이크 켬",
@@ -730,7 +773,7 @@ const translations = {
     showCam: "카메라 보기",
     noFace: "❌ 얼굴 없음",
     faceOk: "✅ 얼굴 감지됨",
-    faceAlert: "⚠️ 대화를 시작하려면 얼굴을 보여주세요!",
+    faceAlert: "⚠️ 대화를 시작하려면 사람 얼굴이 필요합니다!",
     chatHeader: "💬 실시간 채팅",
     inputPlaceholder: "메시지를 입력하세요...",
     send: "전송",
@@ -752,6 +795,7 @@ const translations = {
     stopped: "已停止",
     strangerLeft: "对方已离开",
     startLoop: "🔄 开始匹配",
+    needFace: "🔒 需要露脸",
     next: "⏭️ 下一个",
     stop: "⏹️ 停止",
     micOn: "🎙️ 麦克风开",
@@ -762,7 +806,7 @@ const translations = {
     showCam: "显示镜头",
     noFace: "❌ 未检测到人脸",
     faceOk: "✅ 人脸正常",
-    faceAlert: "⚠️ 开始前请将脸部对准摄像头！",
+    faceAlert: "⚠️ 开始匹配前必须在镜头前露脸！",
     chatHeader: "💬 实时聊天",
     inputPlaceholder: "输入消息...",
     send: "发送",
@@ -784,6 +828,7 @@ const translations = {
     stopped: "Arrêté",
     strangerLeft: "L'inconnu est parti",
     startLoop: "🔄 Démarrer",
+    needFace: "🔒 Visage requis",
     next: "⏭️ Suivant",
     stop: "⏹️ Arrêter",
     micOn: "🎙️ Micro Activé",
@@ -794,7 +839,7 @@ const translations = {
     showCam: "Afficher Cam",
     noFace: "❌ Aucun visage",
     faceOk: "✅ Visage OK",
-    faceAlert: "⚠️ Visage requis pour démarrer !",
+    faceAlert: "⚠️ Visage humain requis pour démarrer !",
     chatHeader: "💬 Chat en direct",
     inputPlaceholder: "Tapez un message...",
     send: "Envoyer",
@@ -816,6 +861,7 @@ const translations = {
     stopped: "Berhenti",
     strangerLeft: "Partner telah keluar",
     startLoop: "🔄 Mulai Loop",
+    needFace: "🔒 Butuh Wajah",
     next: "⏭️ Lanjut",
     stop: "⏹️ Berhenti",
     micOn: "🎙️ Mic Nyala",
@@ -826,7 +872,7 @@ const translations = {
     showCam: "Tampilkan Cam",
     noFace: "❌ Wajah Tidak Ada",
     faceOk: "✅ Wajah Terdeteksi",
-    faceAlert: "⚠️ Wajah diperlukan untuk memulai obrolan!",
+    faceAlert: "⚠️ Dilarang mulai tanpa wajah manusia di depan kamera!",
     chatHeader: "💬 Obrolan Langsung",
     inputPlaceholder: "Ketik pesan...",
     send: "Kirim",
@@ -853,7 +899,7 @@ function updateUILanguage() {
   if (!connected && !searching) {
     statusBadge.textContent = t("ready");
     remoteStatus.textContent = t("waiting");
-    loopBtn.textContent = t("startLoop");
+    loopBtn.textContent = isFaceDetected ? t("startLoop") : t("needFace");
   } else if (connected) {
     statusBadge.textContent = t("connected");
     remoteStatus.textContent = t("live");
@@ -865,7 +911,7 @@ function updateUILanguage() {
 
   stopBtn.textContent = t("stop");
   flipBtn.textContent = t("flip");
-  updateFaceUI(isFaceDetected);
+  setFaceState(isFaceDetected);
   updateMediaButtons();
 }
 
@@ -883,7 +929,6 @@ const hideLocalBtn = document.getElementById("hideLocalBtn");
 const showLocalBtn = document.getElementById("showLocalBtn");
 const remoteVideo = document.getElementById("remoteVideo");
 const remoteAudio = document.getElementById("remoteAudio");
-const loopBtn = document.getElementById("loopBtn");
 const stopBtn = document.getElementById("stopBtn");
 const micBtn = document.getElementById("micBtn");
 const camBtn = document.getElementById("camBtn");
@@ -994,7 +1039,6 @@ function stopCallTimer() {
 async function startMedia() {
   if (localStream && localStream.active) return true;
   try {
-    // 640x480 standard wide-angle sensor, 0% CPU overhead, 30 FPS smooth
     localStream = await navigator.mediaDevices.getUserMedia({
       video: { 
         facingMode: currentFacingMode,
@@ -1013,9 +1057,8 @@ async function startMedia() {
     await localVideo.play().catch(() => {});
     updateMediaButtons();
 
-    // Simulan ang zero-lag face scan (hinihinto kapag naka-connect na sa call)
-    if (faceCheckInterval) clearInterval(faceCheckInterval);
-    faceCheckInterval = setInterval(scanForFace, 1000);
+    // Simulan ang human face detector engine
+    startFaceTrackingEngine();
 
     return true;
   } catch (error) {
@@ -1050,31 +1093,44 @@ function toggleCam() {
 }
 
 /* =========================================================
-   FLIP CAMERA: HINDI NA MAPUPUTOL ANG MIC
+   🔥 FIXED MOBILE FLIP: SABAY ANG BAGONG MIC & CAM
 ========================================================= */
 async function flipCamera() {
   if (!localStream) return;
   currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
 
   try {
-    const newVideoStream = await navigator.mediaDevices.getUserMedia({
+    // Kukuha ng bagong Video AT bagong Audio para sa mobile front/back mic switch
+    const newStream = await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: currentFacingMode,
         width: { ideal: 640 },
         height: { ideal: 480 },
         frameRate: { ideal: 30 }
+      },
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
       }
     });
 
-    const newVideoTrack = newVideoStream.getVideoTracks()[0];
+    const newVideoTrack = newStream.getVideoTracks()[0];
+    const newAudioTrack = newStream.getAudioTracks()[0];
+
     const oldVideoTrack = localStream.getVideoTracks()[0];
+    const oldAudioTrack = localStream.getAudioTracks()[0];
 
-    if (oldVideoTrack) {
-      oldVideoTrack.stop();
-      localStream.removeTrack(oldVideoTrack);
-    }
+    // Panatilihin ang mute setting kung naka-mute si user
+    const wasMuted = oldAudioTrack ? !oldAudioTrack.enabled : false;
+    if (newAudioTrack && wasMuted) newAudioTrack.enabled = false;
 
-    localStream.addTrack(newVideoTrack);
+    // Patayin ang lumang hardware tracks
+    if (oldVideoTrack) oldVideoTrack.stop();
+    if (oldAudioTrack) oldAudioTrack.stop();
+
+    // Palitan ang localStream
+    localStream = newStream;
     localVideo.srcObject = localStream;
 
     if (currentFacingMode === "user") {
@@ -1083,12 +1139,22 @@ async function flipCamera() {
       localVideo.className = "unmirrored";
     }
 
+    // 🔥 I-REPLACE ANG VIDEO AT AUDIO SA WEBRTC SABAY PARA HINDI MAMATAY ANG BOSES!
     if (peerConnection) {
-      const videoSender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
-      if (videoSender) {
+      const senders = peerConnection.getSenders();
+      const videoSender = senders.find(s => s.track && s.track.kind === "video");
+      const audioSender = senders.find(s => s.track && s.track.kind === "audio");
+
+      if (videoSender && newVideoTrack) {
         await videoSender.replaceTrack(newVideoTrack);
       }
+      if (audioSender && newAudioTrack) {
+        await audioSender.replaceTrack(newAudioTrack);
+      }
     }
+    
+    // I-restart ang face tracker kung idle
+    if (!connected) startFaceTrackingEngine();
   } catch(err) {
     console.error("Flip Camera error:", err);
   }
@@ -1127,10 +1193,11 @@ function handleConnected() {
   remoteStatus.textContent = t("live");
   loopBtn.disabled = false;
   stopBtn.disabled = false;
+  loopBtn.classList.remove("locked");
   loopBtn.textContent = t("next");
   
-  // Hihinto ang face scan kapag connected na para 100% smooth ang video stream!
-  if (faceCheckInterval) clearInterval(faceCheckInterval);
+  // Hihinto ang detector kapag connected na para 100% ng CPU ay sa video call
+  stopFaceTrackingEngine();
   
   startCallTimer();
 }
@@ -1262,16 +1329,15 @@ function closePeerConnection() {
 }
 
 /* =========================================================
-   7. LOOP ACTIONS (WITH ZERO-LAG FACE GUARD)
+   7. STRICT FACE LOCK: HINDI MAG-SSTART PAG WALANG MUKHA
 ========================================================= */
 async function startLoop() {
   if (stopping || isTabTerminated) return;
 
-  // I-verify muna ang mukha bago mag-start
-  await scanForFace();
+  // 🛡️ STRICT HUMAN FACE VALIDATION: BAWAL MAG-START PAG WALANG MUKHA!
   if (!isFaceDetected) {
     triggerFaceWarning();
-    return;
+    return; // Hihinto agad dito! Hindi mag-ssearch o mag-co-connect!
   }
   
   primeAudioElements();
@@ -1313,11 +1379,10 @@ function stopSession() {
 
   loopBtn.disabled = false;
   stopBtn.disabled = true;
-  loopBtn.textContent = t("startLoop");
+  loopBtn.textContent = isFaceDetected ? t("startLoop") : t("needFace");
 
-  // Ibalik ang face scan kapag idle
-  if (faceCheckInterval) clearInterval(faceCheckInterval);
-  faceCheckInterval = setInterval(scanForFace, 1000);
+  // Ibalik ang face detector kapag nag-stop
+  startFaceTrackingEngine();
 
   setTimeout(() => { stopping = false; }, 200);
 }
@@ -1364,12 +1429,11 @@ socket.on("partner-disconnected", () => {
   statusBadge.textContent = t("ready");
   loopBtn.disabled = false;
   stopBtn.disabled = true;
-  loopBtn.textContent = t("startLoop");
+  loopBtn.textContent = isFaceDetected ? t("startLoop") : t("needFace");
   addMessage("System", t("strangerLeft"));
 
-  // Ibalik ang face scan
-  if (faceCheckInterval) clearInterval(faceCheckInterval);
-  faceCheckInterval = setInterval(scanForFace, 1000);
+  // Ibalik ang face scanner
+  startFaceTrackingEngine();
 });
 
 /* =========================================================
