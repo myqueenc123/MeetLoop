@@ -102,6 +102,67 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .portal-open-btn:active{transform:scale(.98)}
 
 /* =========================================================
+   🌀 OMETV-STYLE APP LOADING SCREEN
+========================================================= */
+#ometvLoader{
+  position:fixed;inset:0;z-index:999998;
+  display:none;align-items:center;justify-content:center;
+  background:radial-gradient(circle at center, #0e1726 0%, #050811 100%);
+  flex-direction:column;padding:24px;
+  transition:opacity .45s ease, visibility .45s ease;
+}
+.loader-content{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  max-width:340px;width:100%;
+}
+.ometv-radar-box{
+  position:relative;width:95px;height:95px;
+  display:flex;align-items:center;justify-content:center;margin-bottom:24px;
+}
+.ometv-radar-ring{
+  position:absolute;inset:0;border-radius:50%;
+  border:2px solid rgba(59,130,246,.4);
+  animation:radarPulse 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+.ometv-radar-ring:nth-child(2){
+  animation-delay:.6s;
+}
+@keyframes radarPulse{
+  0%{transform:scale(0.8);opacity:1}
+  100%{transform:scale(1.7);opacity:0}
+}
+.ometv-loader-logo{
+  width:64px;height:64px;border-radius:20px;
+  background:linear-gradient(135deg,#3b82f6,#ec4899);
+  display:flex;align-items:center;justify-content:center;font-size:32px;
+  box-shadow:0 0 28px rgba(59,130,246,.6);
+  z-index:2;animation:logoSpinFloat 3s ease-in-out infinite;
+}
+@keyframes logoSpinFloat{
+  0%,100%{transform:translateY(0) scale(1)}
+  50%{transform:translateY(-5px) scale(1.04)}
+}
+.loader-app-name{
+  font-size:24px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:4px;
+}
+.loader-dev-badge{
+  font-size:10px;font-weight:800;color:#38bdf8;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:30px;
+}
+.loader-progress-track{
+  width:100%;height:6px;background:rgba(255,255,255,.09);border-radius:999px;
+  overflow:hidden;position:relative;margin-bottom:14px;border:1px solid rgba(255,255,255,.05);
+}
+.loader-progress-bar{
+  width:0%;height:100%;border-radius:999px;
+  background:linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+  box-shadow:0 0 14px rgba(236,72,153,.8);
+  transition:width .25s ease-out;
+}
+.loader-status-text{
+  font-size:12px;font-weight:700;color:#94a3b8;min-height:18px;letter-spacing:.3px;
+}
+
+/* =========================================================
    HEADER & NAVBAR
 ========================================================= */
 header{
@@ -202,7 +263,7 @@ video{
 #searchText{color:#e2e8f0;font-size:13px;font-weight:800}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* CONTROLS BAR */
+/* CONTROLS BAR (No Light Button) */
 .controls-bar{display:flex;gap:7px;padding:2px}
 .btn{
   min-height:46px;padding:10px 14px;border:1px solid rgba(255,255,255,.06);
@@ -358,7 +419,6 @@ video{
   .video-label{left:7px;top:7px;padding:4px 7px;font-size:10px}
   .status{left:7px;bottom:7px;padding:4px 7px;font-size:9px}
 
-  /* 5-button balanced mobile grid */
   .controls-bar{width:100%;display:grid;grid-template-columns:repeat(6,1fr);gap:5px;padding:0}
   .btn{width:100%;min-height:44px;padding:6px 4px;border-radius:9px;font-size:11px}
   .btn-loop{grid-column:span 4}
@@ -377,7 +437,7 @@ video{
 <body>
 
 <!-- =========================================================
-     🚀 WELCOME HOMEPAGE PORTAL
+     🚀 WELCOME HOMEPAGE PORTAL (LANDING SCREEN)
 ========================================================= -->
 <div id="welcomePortal">
   <div class="portal-card">
@@ -397,6 +457,28 @@ video{
       <span>🔓 OPEN MEETLOOP</span>
       <span style="font-size:18px">➔</span>
     </button>
+  </div>
+</div>
+
+<!-- =========================================================
+     🌀 OMETV-STYLE REALISTIC LOADING SCREEN
+========================================================= -->
+<div id="ometvLoader">
+  <div class="loader-content">
+    <div class="ometv-radar-box">
+      <div class="ometv-radar-ring"></div>
+      <div class="ometv-radar-ring"></div>
+      <div class="ometv-loader-logo">🔄</div>
+    </div>
+    
+    <div class="loader-app-name">MeetLoop</div>
+    <div class="loader-dev-badge">⚡ POWERED BY JM DEVS</div>
+
+    <div class="loader-progress-track">
+      <div class="loader-progress-bar" id="loaderProgressBar"></div>
+    </div>
+    
+    <div class="loader-status-text" id="loaderStatusText">Connecting to server...</div>
   </div>
 </div>
 
@@ -523,7 +605,7 @@ video{
       <button id="showLocalBtn" type="button">👁️ <span id="showLocalText">Show Cam</span></button>
     </div>
 
-    <!-- Controls Bar (No Light Button) -->
+    <!-- Controls Bar -->
     <div class="controls-bar">
       <button class="btn btn-loop" id="loopBtn" type="button">▶️ Start</button>
       <button class="btn btn-stop" id="stopBtn" type="button" disabled>⏹️ Stop</button>
@@ -562,15 +644,26 @@ Violators will be banned</div>
 "use strict";
 
 /* =========================================================
-   TOP-LEVEL DEFENSIVE "OPEN" HANDLER
+   🚀 OMETV-STYLE INTRO LOADING HANDLER
 ========================================================= */
 window.enterMeetLoop = function() {
   const portal = document.getElementById("welcomePortal");
+  const loader = document.getElementById("ometvLoader");
+  const pBar = document.getElementById("loaderProgressBar");
+  const sText = document.getElementById("loaderStatusText");
+
+  // Itago ang landing portal
   if (portal) {
     portal.classList.add("portal-hidden");
     portal.style.display = "none";
   }
 
+  // Ipakita ang OmeTV Loading Screen
+  if (loader) {
+    loader.style.display = "flex";
+  }
+
+  // Ligtas na i-unlock ang audio
   try {
     const ra = document.getElementById("remoteAudio");
     if (ra) {
@@ -579,7 +672,37 @@ window.enterMeetLoop = function() {
     }
   } catch(e) {}
 
-  startMedia().catch(e => console.warn(e));
+  // Simulan ang camera habang naglo-load
+  const mediaPromise = startMedia().catch(e => console.warn(e));
+
+  // Sequence ng Loading Animation
+  pBar.style.width = "25%";
+  sText.textContent = "Connecting to network...";
+
+  setTimeout(() => {
+    pBar.style.width = "55%";
+    sText.textContent = "Initializing camera & audio hardware...";
+  }, 450);
+
+  setTimeout(() => {
+    pBar.style.width = "85%";
+    sText.textContent = "Applying security & community protection...";
+  }, 950);
+
+  setTimeout(async () => {
+    pBar.style.width = "100%";
+    sText.textContent = "Ready! Welcome to MeetLoop.";
+    await mediaPromise;
+
+    setTimeout(() => {
+      if (loader) {
+        loader.style.opacity = "0";
+        setTimeout(() => {
+          loader.style.display = "none";
+        }, 450);
+      }
+    }, 350);
+  }, 1450);
 };
 
 /* =========================================================
@@ -702,7 +825,6 @@ closeFaceModalBtn.addEventListener("click", () => {
   faceModalOverlay.style.display = "none";
 });
 
-// Helper: Siguraduhing may picture/frames na ang video bago i-check
 async function ensureVideoReady(video, maxWaitMs = 1200) {
   const start = Date.now();
   while ((video.readyState < 2 || video.videoWidth === 0) && (Date.now() - start < maxWaitMs)) {
@@ -735,7 +857,7 @@ async function verifyStrictHumanFace() {
     }
   }
 
-  // 2. Adaptive Vision Fallback Engine (Liwanag, Kulay, at Human Contrast)
+  // 2. Adaptive Vision Fallback Engine
   try {
     const canvas = document.createElement("canvas");
     canvas.width = 72;
@@ -754,15 +876,11 @@ async function verifyStrictHumanFace() {
       const y = 0.299 * r + 0.587 * g + 0.114 * b;
       totalLuma += y;
 
-      // YCbCr color space conversion
       const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
       const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
 
-      // Malawak at makatotohanang skin-tone range para sa lahat ng kulay ng tao
       if (cb >= 70 && cb <= 140 && cr >= 125 && cr <= 185 && y >= 25 && y <= 245) {
         skinToneMatches++;
-        
-        // Check kung nasa gitna ng screen (karaniwang pwesto ng mukha)
         const pixelIdx = i / 4;
         const x = pixelIdx % 72;
         const yCoord = Math.floor(pixelIdx / 72);
@@ -773,11 +891,8 @@ async function verifyStrictHumanFace() {
     }
 
     const avgLuma = totalLuma / totalPixels;
-
-    // Sobrang dilim (takip ang cam) o sobrang puti (tinutok sa ilaw)
     if (avgLuma < 15 || avgLuma > 248) return false;
 
-    // May sapat na balat at mukha sa gitna ng camera
     const overallRatio = skinToneMatches / totalPixels;
     if (overallRatio >= 0.06 || centerSkinPixels >= 40) {
       return true;
@@ -785,7 +900,6 @@ async function verifyStrictHumanFace() {
 
     return false;
   } catch(e) {
-    // Kung sakaling magka-canvas error, payagan ang video para hindi ma-stuck ang user
     return true;
   }
 }
