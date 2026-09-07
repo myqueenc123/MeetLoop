@@ -316,7 +316,7 @@ video{
 }
 
 /* =========================================================
-   💰 GCASH QR CODE & AUTO-VERIFY POPUP (NEW & IMPROVED)
+   💰 GCASH QR CODE & AUTO-VERIFY POPUP
 ========================================================= */
 #gcashModalOverlay{
   position:fixed;inset:0;z-index:99999999;
@@ -342,15 +342,19 @@ video{
 .gcash-ref-input{
   width:100%;height:42px;border:1.5px solid #cbd5e1;border-radius:10px;
   padding:0 12px;font-size:13px;font-weight:700;color:#0f172a;outline:none;
-  margin-bottom:10px;text-align:center;letter-spacing:1px;
+  margin-bottom:6px;text-align:center;letter-spacing:1px;
 }
 .gcash-ref-input:focus{border-color:#007dfe}
+.gcash-error-hint{
+  color:#dc2626;font-size:11px;font-weight:700;text-align:left;margin-bottom:10px;display:none;
+}
 .gcash-submit-btn{
   width:100%;height:44px;border-radius:12px;background:#007dfe;
   color:#fff;font-size:13px;font-weight:900;border:0;cursor:pointer;
   box-shadow:0 4px 14px rgba(0,125,254,.4);transition:filter .15s;
 }
 .gcash-submit-btn:hover{filter:brightness(1.1)}
+.gcash-submit-btn:disabled{opacity:0.6;cursor:not-allowed}
 .gcash-close-btn{
   width:100%;height:38px;border-radius:12px;background:rgba(255,255,255,.15);
   border:1px solid rgba(255,255,255,.3);color:#fff;font-weight:800;font-size:12px;cursor:pointer;margin-top:6px;
@@ -537,7 +541,7 @@ video{
 
 <!-- =========================================================
    🛑 EXACT OMETV WHITE BANNED SCREEN (WITH STRANGER EVIDENCE)
-========================================================= -->
+========================================================= */
 <div id="bannedOverlay">
   <div class="ometv-ban-card">
     <div class="ban-top-row">
@@ -588,7 +592,6 @@ video{
     <div style="font-size:12px;opacity:0.9;margin-top:2px">MeetLoopPH • InstaPay QR</div>
 
     <div class="gcash-qr-box">
-      <!-- Direct render ng bagong InstaPay QR code image -->
       <svg class="gcash-qr-image" viewBox="0 0 200 200">
         <image href="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020101021226540015ph.com.gcash0111+6392084800000208MeetLoop520460145303608540520.005802PH5910MeetLoopPH6011Philippines6304" width="200" height="200"/>
       </svg>
@@ -596,7 +599,8 @@ video{
       <div class="gcash-price-tag">₱ 20.00</div>
       
       <label class="gcash-input-label">Enter GCash Reference No. (Resibo):</label>
-      <input type="text" id="gcashRefInput" class="gcash-ref-input" placeholder="e.g. 1002938475812" maxlength="18" autocomplete="off">
+      <input type="text" id="gcashRefInput" class="gcash-ref-input" placeholder="e.g. 1002938475812" maxlength="16" autocomplete="off" inputmode="numeric">
+      <div id="gcashErrorHint" class="gcash-error-hint"></div>
       
       <button class="gcash-submit-btn" id="verifyGcashBtn" type="button" onclick="verifyGcashPayment()">
         ⚡ Verify &amp; Unban Now
@@ -625,7 +629,7 @@ video{
   </div>
 </div>
 
-<!-- HEADER (WITH RESTORED VISIBLE LOGO) -->
+<!-- HEADER -->
 <header>
   <div class="brand">
     <svg class="brand-icon-svg" viewBox="0 0 100 100">
@@ -703,7 +707,7 @@ video{
       </div>
 
       <button id="showLocalBtn" type="button">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="13" r="3"/></svg>
         <span id="showLocalText">Show Cam</span>
       </button>
     </div>
@@ -775,6 +779,7 @@ const banSnapshotCanvas = document.getElementById("banSnapshotCanvas");
 const adminUnbanId = document.getElementById("adminUnbanId");
 const gcashModalOverlay = document.getElementById("gcashModalOverlay");
 const gcashRefInput = document.getElementById("gcashRefInput");
+const gcashErrorHint = document.getElementById("gcashErrorHint");
 const verifyGcashBtn = document.getElementById("verifyGcashBtn");
 const reportStrangerBtn = document.getElementById("reportStrangerBtn");
 const reportModalOverlay = document.getElementById("reportModalOverlay");
@@ -994,12 +999,12 @@ reclaimSessionBtn.addEventListener("click", () => {
   duplicateTabOverlay.style.display = "none";
   isTabTerminated = false;
   broadcastTabActive();
-  if (socket) socket.connect();
+  if (socket && !socket.connected) socket.connect();
   startMedia();
 });
 
 /* =========================================================
-   3. OMETV EXACT EVIDENCE SNAPSHOT (LITRATO NG KAUSAP/STRANGER)
+   3. OMETV EXACT EVIDENCE SNAPSHOT & ANTI-CHEAT UNBAN
 ========================================================= */
 function trackStrangerLastFrame() {
   if (remoteVideo && remoteVideo.videoWidth > 0 && remoteVideo.readyState >= 2) {
@@ -1009,14 +1014,14 @@ function trackStrangerLastFrame() {
     } catch(e) {}
   }
 }
-setInterval(trackStrangerLastFrame, 200);
+setInterval(trackStrangerLastFrame, 250);
 
 function renderStrangerEvidenceSnapshot() {
   try {
     const ctx = banSnapshotCanvas.getContext("2d");
     ctx.clearRect(0, 0, 125, 125);
 
-    if (lastPartnerFrameCanvas.width > 0) {
+    if (lastPartnerFrameCanvas && lastPartnerFrameCanvas.width > 0) {
       ctx.drawImage(lastPartnerFrameCanvas, 0, 0, 125, 125);
     } else {
       ctx.fillStyle = "#cbd5e1";
@@ -1050,33 +1055,38 @@ function runBanCountdown(banUntil, reasonText = "irrelevant image") {
     
     if (diff <= 0) {
       clearInterval(banTimerInterval);
+      banTimerInterval = null;
       bannedOverlay.style.display = "none";
       isServerBanned = false;
-      alert("Your 1-hour IP suspension has ended. Reconnecting...");
+      alert("Your suspension has ended. Reconnecting...");
       location.reload();
     }
   }, 1000);
 }
 
 function openGcashModal() {
-  gcashModalOverlay.style.display = "flex";
+  gcashErrorHint.style.display = "none";
   gcashRefInput.value = "";
+  gcashModalOverlay.style.display = "flex";
   gcashRefInput.focus();
 }
 function closeGcashModal() {
   gcashModalOverlay.style.display = "none";
 }
 
-/* AUTOMATED GCASH UNBAN VERIFICATION REQUEST */
+/* SECURE GCASH UNBAN VERIFICATION */
 async function verifyGcashPayment() {
   const ref = gcashRefInput.value.trim();
-  if (!ref) {
-    alert("Please enter the Reference Number from your GCash receipt.");
+  gcashErrorHint.style.display = "none";
+
+  if (!/^\d{10,16}$/.test(ref)) {
+    gcashErrorHint.textContent = "Please enter a valid 10-16 digit GCash Reference Number.";
+    gcashErrorHint.style.display = "block";
     return;
   }
 
   verifyGcashBtn.disabled = true;
-  verifyGcashBtn.textContent = "Verifying Payment...";
+  verifyGcashBtn.textContent = "Verifying with server...";
 
   try {
     const res = await fetch("/api/verify-gcash-unban", {
@@ -1088,32 +1098,49 @@ async function verifyGcashPayment() {
     const data = await res.json();
 
     if (data.success) {
-      alert("✅ Payment Confirmed! Your IP has been UNBANNED. Enjoy chatting!");
+      alert("✅ Payment Confirmed! Your IP has been UNBANNED.");
       closeGcashModal();
       bannedOverlay.style.display = "none";
+      isServerBanned = false;
+      if (banTimerInterval) clearInterval(banTimerInterval);
       location.reload();
     } else {
-      alert("❌ " + (data.message || "Invalid reference number. Please check your GCash receipt."));
+      gcashErrorHint.textContent = data.message || "Reference number not found or payment not yet received.";
+      gcashErrorHint.style.display = "block";
     }
   } catch(e) {
-    alert("❌ Error verifying payment. Please ensure you sent ₱20 to the GCash QR code.");
+    gcashErrorHint.textContent = "Verification error. Ensure you sent ₱20 and server is running.";
+    gcashErrorHint.style.display = "block";
   } finally {
     verifyGcashBtn.disabled = false;
     verifyGcashBtn.textContent = "⚡ Verify & Unban Now";
   }
 }
 
-// Secret unban: 3 clicks sa ID number sa baba
+// 🔐 Admin Key Authenticated Unban (Hindi na libreng 3-clicks lang)
 let adminClickCount = 0;
 adminUnbanId.addEventListener("click", () => {
   adminClickCount++;
   if (adminClickCount >= 3) {
     adminClickCount = 0;
-    if (socket) socket.emit("admin-secret-unban");
-    fetch("/admin/unban-my-ip").catch(() => {});
-    alert("Admin: Account Unbanned!");
-    bannedOverlay.style.display = "none";
-    location.reload();
+    const adminKey = prompt("Enter Admin Passcode:");
+    if (adminKey) {
+      fetch("/admin/unban-my-ip", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminKey })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          alert("Admin authorized: Account unbanned!");
+          location.reload();
+        } else {
+          alert("Unauthorized passcode.");
+        }
+      })
+      .catch(() => alert("Admin server error."));
+    }
   }
 });
 
@@ -1121,7 +1148,7 @@ if (socket) {
   socket.on("connect_error", (err) => {
     if (err.message && err.message.startsWith("IP_BANNED:")) {
       const parts = err.message.split(":");
-      const banUntil = parseInt(parts[1]);
+      const banUntil = parseInt(parts[1], 10);
       const reason = decodeURIComponent(parts[2] || "irrelevant image");
       runBanCountdown(banUntil, reason);
     }
@@ -1792,13 +1819,7 @@ function sendMessage() {
   const txt = chatInput.value.trim();
   if (!txt) return;
 
-  if (txt === "/unban") {
-    if (socket) socket.emit("admin-secret-unban");
-    fetch("/admin/unban-my-ip").catch(() => {});
-    alert("System: IP Unbanned.");
-    location.reload();
-    return;
-  }
+  // Inalis ang /unban cheat command
 
   if (!dataChannel || dataChannel.readyState !== "open") return;
   dataChannel.send(txt);
