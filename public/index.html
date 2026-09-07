@@ -5,10 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#070b14">
 
-<!-- TAB BAR LOGO / FAVICON (MEETLOOPCHAT VECTOR) -->
+<!-- TAB BAR LOGO / FAVICON -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='tabG1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2393c5fd'/%3E%3Cstop offset='45%25' stop-color='%23a855f7'/%3E%3Cstop offset='100%25' stop-color='%23c084fc'/%3E%3C/linearGradient%3E%3ClinearGradient id='tabG2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2338bdf8'/%3E%3Cstop offset='60%25' stop-color='%2306b6d4'/%3E%3Cstop offset='100%25' stop-color='%232dd4bf'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='%23070b14'/%3E%3Cpath d='M40 20 C25.6 20 14 31.6 14 46 C14 53.5 17.2 60.2 22.4 65 L18 78 L31.5 73.5 C34.1 74.5 37 75 40 75 C47.5 75 54.2 71.8 59 66.6 C55.5 67.5 51.8 68 48 68 C35.8 68 26 58.2 26 46 C26 36.8 31.6 28.9 39.7 25.5 C39.8 23.7 40 21.8 40 20 Z' fill='url(%23tabG1)'/%3E%3Cpath d='M60 22 C47.8 22 38 31.8 38 44 C38 49.5 40 54.5 43.4 58.4 C46.8 53.6 52.5 50.4 59 50.4 C69.5 50.4 78 58.9 78 69.4 C78 70.3 77.9 71.1 77.8 72 C83 67.8 86.4 61.3 86.4 54 C86.4 39.6 74.8 22 60 22 Z' fill='url(%23tabG2)'/%3E%3C/svg%3E">
 
-<!-- ANTI-CACHE -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -26,6 +25,7 @@
   --blue2:#3b82f6;
   --red:#ef4444;
   --purple:#8b5cf6;
+  --cyan:#06b6d4;
   --text:#f8fafc;
   --muted:#94a3b8;
 }
@@ -42,9 +42,7 @@ body{
 button,input,select{font:inherit}
 button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
-/* =========================================================
-   🚀 WELCOME HOMEPAGE PORTAL
-========================================================= */
+/* WELCOME HOMEPAGE PORTAL */
 #welcomePortal{
   position:fixed;inset:0;z-index:999999;
   display:flex;align-items:center;justify-content:center;padding:20px;
@@ -80,9 +78,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .portal-open-btn:hover{filter:brightness(1.1)}
 .portal-open-btn:active{transform:scale(.98)}
 
-/* =========================================================
-   🌀 MEETLOOP CLEAN LOADING SCREEN
-========================================================= */
+/* LOADING SCREEN */
 #meetloopLoader{
   position:fixed;inset:0;z-index:999998;
   display:none;align-items:center;justify-content:center;
@@ -98,9 +94,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .loader-progress-bar{width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg, #3b82f6, #2dd4bf);transition:width .15s ease-out}
 .loader-info-row{display:flex;justify-content:space-between;width:100%;font-size:11px;font-weight:700;color:#94a3b8}
 
-/* =========================================================
-   HEADER & NAVBAR (FIXED WITH GLOWING LOGO)
-========================================================= */
+/* HEADER */
 header{
   height:60px;display:flex;align-items:center;justify-content:space-between;
   gap:12px;padding:0 16px;background:#0f172a;border-bottom:1px solid var(--border);
@@ -138,9 +132,7 @@ select option{background:#0f172a;color:#fff}
 #callTimer.active{color:#fecaca;background:#450a0a;border-color:#ef4444}
 #callTimer.active .timer-dot{background:var(--red)}
 
-/* =========================================================
-   MAIN VIDEO ARENA
-========================================================= */
+/* MAIN ARENA */
 .main-container{width:100%;height:calc(100vh - 60px);display:flex;gap:10px;padding:10px}
 .video-wrapper{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:8px}
 .videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:8px}
@@ -153,7 +145,7 @@ video{
   -webkit-transform:translateZ(0);
 }
 
-/* OMETV 1-SECOND ANTI-FLASH VIDEO BLUR */
+/* 1-SEC BLUR TRANSITION */
 #remoteVideo.remote-blur{
   filter: blur(28px) brightness(0.9);
   -webkit-filter: blur(28px) brightness(0.9);
@@ -206,7 +198,7 @@ video{
 #searchText{color:#e2e8f0;font-size:12px;font-weight:800}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* CONTROLS BAR (MODERN SVG ICONS) */
+/* CONTROLS */
 .controls-bar{display:flex;gap:6px}
 .btn{
   min-height:44px;padding:8px 14px;border:1px solid rgba(255,255,255,.08);
@@ -258,16 +250,18 @@ video{
 }
 .report-opt:active{background:#dc2626}
 
-/* OMETV CLEAN BANNED SCREEN */
+/* =========================================================
+   🛑 EXACT OMETV WHITE BANNED SCREEN WITH GCASH
+========================================================= */
 #bannedOverlay{
   position:fixed;inset:0;z-index:9999999;
   background:rgba(0,0,0,.88);
   display:none;align-items:center;justify-content:center;padding:16px;
 }
 .ometv-ban-card{
-  max-width:520px;width:100%;padding:32px 36px 24px;
+  max-width:480px;width:100%;padding:28px 24px 20px;
   background:#ffffff;border-radius:18px;color:#1e293b;
-  box-shadow:0 25px 60px rgba(0,0,0,.8);
+  box-shadow:0 25px 60px rgba(0,0,0,.85);
   font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
   animation:cardPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -275,41 +269,65 @@ video{
   from{transform:scale(0.95);opacity:0}
   to{transform:scale(1);opacity:1}
 }
-.ban-top-row{display:flex;gap:20px;align-items:flex-start;margin-bottom:28px}
+.ban-top-row{display:flex;gap:18px;align-items:flex-start;margin-bottom:20px}
 .ban-snapshot-box{
-  width:125px;height:125px;border-radius:10px;overflow:hidden;
+  width:120px;height:120px;border-radius:10px;overflow:hidden;
   background:#000;position:relative;flex-shrink:0;border:1.5px solid #cbd5e1;
 }
-.ban-snapshot-box canvas{width:100%;height:100%;object-fit:cover;filter:blur(8px)}
+.ban-snapshot-box canvas{width:100%;height:100%;object-fit:cover;filter:blur(6px)}
 .ban-snapshot-watermark{
-  position:absolute;top:6px;left:6px;background:rgba(0,0,0,.65);
+  position:absolute;top:6px;left:6px;background:rgba(0,0,0,.7);
   color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:4px;
 }
 .ban-details-col{display:flex;flex-direction:column;gap:6px;padding-top:4px;text-align:left}
-.ban-title-text{font-size:20px;font-weight:800;color:#ea580c;letter-spacing:-0.2px}
+.ban-title-text{font-size:22px;font-weight:800;color:#ea580c;letter-spacing:-0.2px}
 .ban-reason-row{font-size:14px;color:#334155;font-weight:600}
 .ban-reason-link{color:#0284c7;text-decoration:underline;cursor:pointer}
-.ban-desc-text{font-size:14px;color:#334155;text-align:center;margin-bottom:24px;line-height:1.45}
-.ban-btn-paypal{
-  width:100%;height:46px;border-radius:24px;background:#ffc439;
-  border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  margin-bottom:12px;transition:filter .15s;
-}
-.ban-btn-paypal:hover{filter:brightness(0.97)}
-.ban-btn-card{
-  width:100%;height:46px;border-radius:24px;background:#2c2e2f;
-  color:#fff;font-size:14px;font-weight:700;border:0;cursor:pointer;
+.ban-desc-text{font-size:14px;color:#334155;text-align:center;margin-bottom:18px;line-height:1.45}
+
+/* GCASH ACTION BUTTON */
+.ban-btn-gcash{
+  width:100%;height:48px;border-radius:24px;background:#007dfe;
+  color:#fff;font-size:15px;font-weight:800;border:0;cursor:pointer;
   display:flex;align-items:center;justify-content:center;gap:10px;
-  margin-bottom:16px;transition:filter .15s;
+  margin-bottom:14px;transition:filter .15s;
+  box-shadow:0 6px 18px rgba(0,125,254,.35);
 }
-.ban-btn-card:hover{filter:brightness(1.15)}
+.ban-btn-gcash:hover{filter:brightness(1.08)}
+.ban-btn-gcash:active{transform:scale(.98)}
+
 .ban-footer-row{
   display:flex;align-items:center;justify-content:space-between;
-  font-size:11px;color:#64748b;padding-top:8px;
+  font-size:11px;color:#64748b;padding-top:6px;
 }
 .ban-support-link{color:#0284c7;text-decoration:underline;cursor:pointer}
 .ban-countdown-pill{
   background:#fee2e2;color:#dc2626;font-weight:800;padding:2px 8px;border-radius:999px;font-size:11px;
+}
+
+/* =========================================================
+   💰 GCASH QR CODE PAYMENT MODAL
+========================================================= */
+#gcashModalOverlay{
+  position:fixed;inset:0;z-index:99999999;
+  background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;padding:16px;
+}
+.gcash-modal-card{
+  max-width:340px;width:100%;padding:22px 18px;text-align:center;
+  background:#007dfe;border-radius:20px;color:#fff;box-shadow:0 20px 50px rgba(0,0,0,.9);
+}
+.gcash-qr-box{
+  background:#fff;border-radius:16px;padding:16px;margin:14px 0;color:#1e293b;
+}
+.gcash-qr-box img{
+  width:100%;max-width:220px;height:auto;border-radius:8px;display:block;margin:0 auto 10px;
+}
+.gcash-price-tag{
+  font-size:24px;font-weight:900;color:#007dfe;margin-top:6px;
+}
+.gcash-close-btn{
+  width:100%;height:40px;border-radius:12px;background:rgba(255,255,255,.2);
+  border:1px solid rgba(255,255,255,.4);color:#fff;font-weight:800;font-size:13px;cursor:pointer;
 }
 
 /* SINGLE TAB TAKEOVER */
@@ -393,12 +411,12 @@ video{
   .chat-messages{padding:8px}
   .chat-input-area{padding:6px}
 
-  .ometv-ban-card{padding:24px 20px 18px}
-  .ban-top-row{gap:14px;margin-bottom:18px}
-  .ban-snapshot-box{width:90px;height:90px}
-  .ban-title-text{font-size:17px}
+  .ometv-ban-card{padding:20px 18px 16px}
+  .ban-top-row{gap:12px;margin-bottom:14px}
+  .ban-snapshot-box{width:86px;height:86px}
+  .ban-title-text{font-size:18px}
   .ban-reason-row{font-size:12px}
-  .ban-desc-text{font-size:12px;margin-bottom:16px}
+  .ban-desc-text{font-size:12px;margin-bottom:14px}
 }
 </style>
 </head>
@@ -408,7 +426,6 @@ video{
 <!-- WELCOME PORTAL -->
 <div id="welcomePortal">
   <div class="portal-card">
-    <!-- MEETLOOPCHAT GLOWING LOGO -->
     <svg class="portal-logo-svg" viewBox="0 0 100 100">
       <defs>
         <linearGradient id="pLogoG1" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -488,12 +505,15 @@ video{
   </div>
 </div>
 
-<!-- OMETV EXACT SUSPENSION CARD -->
+<!-- =========================================================
+   🛑 EXACT OMETV WHITE BANNED SCREEN (WITH GCASH)
+========================================================= */
+-->
 <div id="bannedOverlay">
   <div class="ometv-ban-card">
     <div class="ban-top-row">
       <div class="ban-snapshot-box">
-        <canvas id="banSnapshotCanvas" width="125" height="125"></canvas>
+        <canvas id="banSnapshotCanvas" width="120" height="120"></canvas>
         <div class="ban-snapshot-watermark">MeetloopChat</div>
       </div>
       <div class="ban-details-col">
@@ -505,20 +525,13 @@ video{
     </div>
 
     <div class="ban-desc-text">
-      You can return to the chat immediately by paying for unban.
+      You can return to the chat immediately by paying for unban via <b>GCash</b>.
     </div>
 
-    <button class="ban-btn-paypal" type="button" onclick="alert('Payment processor checkout integration.')">
-      <svg width="78" height="20" viewBox="0 0 101 32" fill="none">
-        <path d="M12.28 4.22H4.14C3.65 4.22 3.23 4.58 3.16 5.06L0.22 23.64C0.17 23.97 0.42 24.26 0.76 24.26H4.66C5.15 24.26 5.57 23.9 5.64 23.42L6.64 17.08C6.71 16.6 7.13 16.24 7.62 16.24H10.1C15.17 16.24 18.23 13.68 18.99 8.87C19.34 6.7 18.89 5.3 17.7 4.51C16.34 3.6 14.28 4.22 12.28 4.22Z" fill="#003087"/>
-        <path d="M36.19 10.37H32.29C32 10.37 31.75 10.53 31.63 10.79L26.06 18.88L23.77 11.23C23.67 10.72 23.23 10.37 22.71 10.37H18.88C18.44 10.37 18.12 10.8 18.26 11.22L22.61 24.28L18.49 30.08C18.21 30.47 18.49 31.02 18.97 31.02H22.87C23.16 31.02 23.41 30.86 23.53 30.6L36.72 11.28C37 10.88 36.71 10.37 36.19 10.37Z" fill="#0079C1"/>
-        <path d="M10.1 8.87C9.66 11.66 7.55 11.66 5.48 11.66L4.23 19.57H7.62C8.11 19.57 8.53 19.21 8.6 18.73L9.36 13.92C9.43 13.44 9.85 13.08 10.34 13.08H11.21C14.7 13.08 17.04 11.64 17.65 7.76C17.9 6.2 17.66 4.96 16.89 4.19C16.48 5.76 15.11 8.87 10.1 8.87Z" fill="#00457C"/>
-      </svg>
-    </button>
-
-    <button class="ban-btn-card" type="button" onclick="alert('Card checkout integration.')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="3"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-      <span>Debit or Credit Card</span>
+    <!-- GCASH BUTTON (REPLACED PAYPAL & CARDS) -->
+    <button class="ban-btn-gcash" type="button" onclick="openGcashModal()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#fff"/><path d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm-1 12H9v-2h2v2zm0-4H9V8h2v4zm4 4h-2v-2h2v2zm0-4h-2V8h2v4z" fill="#007dfe"/></svg>
+      <span>Pay with GCash (₱20.00)</span>
     </button>
 
     <div class="ban-footer-row">
@@ -528,6 +541,25 @@ video{
         <span style="font-family:monospace;margin-left:8px;cursor:pointer" id="adminUnbanId">ID: 167214235</span>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- =========================================================
+   💰 GCASH QR CODE PAYMENT POPUP
+========================================================= -->
+<div id="gcashModalOverlay">
+  <div class="gcash-modal-card">
+    <div style="font-size:20px;font-weight:900;letter-spacing:.5px">GCash InstaPay</div>
+    <div style="font-size:12px;opacity:0.9;margin-top:2px">MeetLoopPH • JE***Y T.</div>
+
+    <div class="gcash-qr-box">
+      <!-- High-Accuracy Generated SVG QR Code (Transfer to MeetLoopPH) -->
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020101021226540015ph.com.gcash0111+6392084800000208MeetLoop520460145303608540520.005802PH5910MeetLoopPH6011Philippines6304" alt="GCash QR Code">
+      <div style="font-size:11px;font-weight:700;color:#64748b">Scan using GCash App to Unban</div>
+      <div class="gcash-price-tag">₱ 20.00</div>
+    </div>
+
+    <button class="gcash-close-btn" type="button" onclick="closeGcashModal()">Close (Bumalik)</button>
   </div>
 </div>
 
@@ -549,9 +581,7 @@ video{
   </div>
 </div>
 
-<!-- =========================================================
-   HEADER (NOW FULLY RESTORED WITH VISIBLE LOGO)
-========================================================= -->
+<!-- HEADER -->
 <header>
   <div class="brand">
     <svg class="brand-icon-svg" viewBox="0 0 100 100">
@@ -698,6 +728,7 @@ const banReasonText = document.getElementById("banReasonText");
 const banCountdownPill = document.getElementById("banCountdownPill");
 const banSnapshotCanvas = document.getElementById("banSnapshotCanvas");
 const adminUnbanId = document.getElementById("adminUnbanId");
+const gcashModalOverlay = document.getElementById("gcashModalOverlay");
 const reportStrangerBtn = document.getElementById("reportStrangerBtn");
 const reportModalOverlay = document.getElementById("reportModalOverlay");
 
@@ -800,7 +831,6 @@ const translations = {
     micOn: "Mic On", micOff: "Mic Off", camOn: "Cam On", camOff: "Cam Off",
     flip: "Flip", showCam: "Show Cam", chatHeader: "Live Chat", inputPlaceholder: "Type a message...", send: "Send",
     chatConnected: "Chat connected.", reportedNotice: "Reported",
-    reportedSuccess: "Report submitted. Connecting to next stranger...",
     alreadyReported: "You have already reported this user.",
     warningModalTitle: "Human Face Required",
     warningModalDesc: "Starting without a real human face is strictly prohibited. Please look directly at the camera.",
@@ -818,7 +848,6 @@ const translations = {
     micOn: "Mic Bukas", micOff: "Mic Off", camOn: "Cam Bukas", camOff: "Cam Off",
     flip: "Iikot", showCam: "Ipakita Cam", chatHeader: "Usapan", inputPlaceholder: "Mag-type ng mensahe...", send: "Ipadala",
     chatConnected: "Konektado na ang chat.", reportedNotice: "Na-report na",
-    reportedSuccess: "Na-report na. Nililipat ka na sa kasunod...",
     alreadyReported: "Nai-report mo na ang user na ito.",
     warningModalTitle: "Kailangan ng Mukha ng Tao",
     warningModalDesc: "Bawal mag-start nang walang totoong mukha ng tao. Paki-itapat nang maayos ang mukha sa camera.",
@@ -919,16 +948,25 @@ reclaimSessionBtn.addEventListener("click", () => {
 });
 
 /* =========================================================
-   3. OMETV BANNED CARD ENGINE & SNAPSHOT CAPTURE
+   3. OMETV BANNED CARD ENGINE & REAL EVIDENCE SNAPSHOT
 ========================================================= */
 function captureBanSnapshot() {
   try {
     const ctx = banSnapshotCanvas.getContext("2d");
+    // Kinukunan ng litrato ang lumabag na tao nang may totoong image
     if (localVideo && localVideo.videoWidth > 0) {
       ctx.drawImage(localVideo, 0, 0, banSnapshotCanvas.width, banSnapshotCanvas.height);
     } else {
+      // Fallback silhouette
       ctx.fillStyle = "#1e293b";
       ctx.fillRect(0, 0, banSnapshotCanvas.width, banSnapshotCanvas.height);
+      ctx.fillStyle = "#38bdf8";
+      ctx.beginPath();
+      ctx.arc(60, 48, 24, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(60, 105, 38, 0, Math.PI, true);
+      ctx.fill();
     }
   } catch(e) {}
 }
@@ -958,7 +996,14 @@ function runBanCountdown(banUntil, reasonText = "irrelevant image") {
   }, 1000);
 }
 
-// Secret unban: 3 clicks sa ID number
+function openGcashModal() {
+  gcashModalOverlay.style.display = "flex";
+}
+function closeGcashModal() {
+  gcashModalOverlay.style.display = "none";
+}
+
+// Secret unban: 3 clicks sa ID number sa baba
 let adminClickCount = 0;
 adminUnbanId.addEventListener("click", () => {
   adminClickCount++;
@@ -1060,6 +1105,7 @@ function closeReportModal() {
   reportModalOverlay.style.display = "none";
 }
 
+// KAPAG IKAW ANG NAG-REPORT, HINDI KA MABA-BAN!
 function submitReport(reason) {
   closeReportModal();
   if (!connected) return;
@@ -1071,9 +1117,11 @@ function submitReport(reason) {
   const isGenuineViolation = inspectRemoteStreamViolation(reason);
 
   if (socket) {
+    // Ang targetPartner lang ang bibilangin sa backend!
     socket.emit("report-user", { reason: reason, verified: isGenuineViolation });
   }
 
+  // Instant OmeTV smooth skip transition
   setTimeout(() => {
     startLoop();
   }, 180);
