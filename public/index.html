@@ -87,7 +87,7 @@ video{
   pointer-events:none;
 }
 
-/* STANDBY CENTER (MeetLoop Logo + Online Count) */
+/* STANDBY CENTER */
 .standby-center{
   position:absolute;inset:0;z-index:3;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -113,7 +113,7 @@ video{
 }
 #standbyUsers{color:#fff;font-weight:900}
 
-/* ================= OMETV SEARCHING CARD (OVER MOVING NOISE) ================= */
+/* SEARCHING LOADER (Over Moving Noise) */
 .search-loader{
   position:absolute;inset:0;z-index:4;display:none;
   align-items:center;justify-content:center;
@@ -330,7 +330,9 @@ video{
   background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:14px;
   padding:12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;
 }
-.gcash-qr-img{width:150px;height:150px;display:block;border-radius:6px;object-fit:contain}
+.gcash-qr-img{
+  width:160px;height:160px;display:block;border-radius:6px;object-fit:contain;
+}
 .gcash-ref-input{
   width:100%;height:42px;padding:0 12px;background:#ffffff;
   border:2px solid #bfdbfe;border-radius:10px;color:#0f172a;
@@ -463,7 +465,8 @@ video{
       </div>
 
       <div class="gcash-qr-box">
-        <canvas id="qrCodeCanvas" width="150" height="150" class="gcash-qr-img"></canvas>
+        <!-- Exact New InstaPay QR Code -->
+        <canvas id="qrCodeCanvas" width="160" height="160" class="gcash-qr-img"></canvas>
         <div style="font-size:11px;color:#475569;font-weight:700" id="lblScanText">
           Scan QR via GCash, pay clearance fee, and enter the 13-Digit Ref No.
         </div>
@@ -713,7 +716,6 @@ let connected = false;
 let currentFacingMode = "user";
 let banInterval = null;
 let blurTimer = null;
-let lastCapturedFrame = null;
 let pendingCandidates = [];
 
 /* ================= 4. AUTHENTIC OMETV TV STATIC GENERATOR ================= */
@@ -740,35 +742,37 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 5. INSTAPAY QR ================= */
+/* ================= 5. RENDER THE NEW INSTAPAY QR CODE ================= */
 function renderInstaPayQR() {
   const qrCanvas = document.getElementById("qrCodeCanvas");
   if (!qrCanvas) return;
   const ctx = qrCanvas.getContext("2d");
   const img = new Image();
   img.crossOrigin = "anonymous";
-  img.onload = () => ctx.drawImage(img, 0, 0, 150, 150);
-  img.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2";
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, 160, 160);
+  };
+  // Fallback high-res InstaPay QR API
+  img.src = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2";
 }
 renderInstaPayQR();
 
-/* ================= 6. VIOLATION SNAPSHOT ================= */
-function captureFrameToStorage() {
+/* ================= 6. VIOLATION SNAPSHOT RECORDER ================= */
+// Kinukunan ang STRANGER FEED (remoteVideo) para mukha ng kausap ang ma-screenshot
+function capturePartnerSnapshot() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
   const ctx = canvas.getContext("2d");
 
   if (remoteVideo && remoteVideo.videoWidth > 0) {
     ctx.drawImage(remoteVideo, 0, 0, 180, 180);
-    lastCapturedFrame = canvas.toDataURL("image/jpeg", 0.7);
-    localStorage.setItem("meetloop_snap", lastCapturedFrame);
+    return canvas.toDataURL("image/jpeg", 0.75);
   } else if (localVideo && localVideo.videoWidth > 0) {
     ctx.drawImage(localVideo, 0, 0, 180, 180);
-    lastCapturedFrame = canvas.toDataURL("image/jpeg", 0.7);
-    localStorage.setItem("meetloop_snap", lastCapturedFrame);
+    return canvas.toDataURL("image/jpeg", 0.75);
   }
+  return null;
 }
-setInterval(() => { if (connected) captureFrameToStorage(); }, 3000);
 
 /* ================= 7. BAN ENGINE ================= */
 async function checkActiveBan() {
@@ -802,13 +806,15 @@ async function checkActiveBan() {
 function runBanCountdown(banUntil, reason = "Policy Violation", customSnap = null) {
   stopSession();
 
-  const snapData = customSnap || lastCapturedFrame || localStorage.getItem("meetloop_snap");
+  const snapData = customSnap || localStorage.getItem("meetloop_snap");
   localStorage.setItem("meetloop_banned_until", banUntil);
   localStorage.setItem("meetloop_banned_reason", reason);
+  if (snapData) localStorage.setItem("meetloop_snap", snapData);
   saveBanToDB(banUntil, reason, snapData);
 
   document.getElementById("banReasonLabel").textContent = reason;
   
+  // I-render ang litrato ng kausap sa loob ng violation box
   const banCanvas = document.getElementById("banCanvas");
   const ctx = banCanvas.getContext("2d");
   if (snapData) {
@@ -858,7 +864,7 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 8. STRICT GCASH UNBAN VERIFIER ================= */
+/* ================= 8. STRICT SERVER-SIDE GCASH VERIFIER ================= */
 function verifyGCashTransaction() {
   const refInput = document.getElementById("gcashRefInput");
   const status = document.getElementById("gcashRefStatus");
@@ -1072,7 +1078,6 @@ async function createPeer(initiator) {
       searchLoader.style.display = "none";
       reportBtn.disabled = false;
       releaseBlur();
-      setTimeout(captureFrameToStorage, 1000);
     } else if (peerConnection?.connectionState === "disconnected" || peerConnection?.connectionState === "failed") {
       triggerStartNext();
     }
@@ -1279,11 +1284,11 @@ flipBtn.addEventListener("click", async () => {
   }
 });
 
+// REPORT BUTTON: Kinukunan ang partner camera feed at ipapadala sa server
 reportBtn.addEventListener("click", () => {
   if (!connected) return;
-  captureFrameToStorage();
-  const snap = lastCapturedFrame || localStorage.getItem("meetloop_snap");
-  if (socket) socket.emit("report-user", { reason: "Policy Violation", snapshot: snap });
+  const partnerSnap = capturePartnerSnapshot();
+  if (socket) socket.emit("report-user", { reason: "Policy Violation", snapshot: partnerSnap });
   reportBtn.disabled = true;
   triggerStartNext();
 });
