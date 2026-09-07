@@ -58,7 +58,7 @@ header{
   position:relative;flex:1;min-height:0;display:flex;gap:10px;
 }
 .cam-box{
-  position:relative;flex:1;min-width:0;min-height:0;background:#050811;
+  position:relative;flex:1;min-width:0;min-height:0;background:#030712;
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
@@ -66,18 +66,29 @@ video{
   width:100%;height:100%;
   object-fit:cover;
   object-position:center;
-  background:#050811;display:block;
+  background:#030712;display:block;
 }
 
-/* ================= ANIMATED MOVING TV STATIC CANVAS ================= */
+/* ================= AUTHENTIC OMETV TV STATIC NOISE WITH SCANLINES ================= */
+.crt-screen-wrapper{
+  position:absolute;inset:0;z-index:2;
+  overflow:hidden;background:#050811;
+  pointer-events:none;
+}
 #crtStaticCanvas{
   position:absolute;inset:0;width:100%;height:100%;
-  z-index:2;opacity:0.42;
-  filter:contrast(180%) brightness(85%);
-  pointer-events:none;display:block;
+  opacity:0.35;filter:contrast(200%) brightness(95%);
+  display:block;
+}
+/* Authentic CRT TV Scanline & Vignette Effect */
+.crt-overlay-vignette{
+  position:absolute;inset:0;
+  background:radial-gradient(circle, rgba(0,0,0,0) 50%, rgba(0,0,0,0.85) 100%),
+             repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1.5px, transparent 1.5px, transparent 3px);
+  pointer-events:none;
 }
 
-/* STANDBY CENTER (MeetLoop Logo + User Count) */
+/* STANDBY CENTER (MeetLoop Logo + Online Count) */
 .standby-center{
   position:absolute;inset:0;z-index:3;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -374,14 +385,8 @@ video{
   <div class="portal-box">
     <svg class="portal-logo-svg" viewBox="0 0 100 100">
       <defs>
-        <linearGradient id="pG1" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#38bdf8"/>
-          <stop offset="100%" stop-color="#2563eb"/>
-        </linearGradient>
-        <linearGradient id="pG2" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#a855f7"/>
-          <stop offset="100%" stop-color="#ec4899"/>
-        </linearGradient>
+        <linearGradient id="pG1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#2563eb"/></linearGradient>
+        <linearGradient id="pG2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#ec4899"/></linearGradient>
       </defs>
       <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z" fill="url(#pG1)"/>
       <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z" fill="url(#pG2)"/>
@@ -501,15 +506,18 @@ video{
 <div class="stage-container">
   <div class="stream-arena">
     <div class="video-grid">
-      <!-- REMOTE / STRANGER BOX -->
+      <!-- STRANGER BOX -->
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" class="remote-blur" autoplay playsinline webkit-playsinline></video>
         <audio id="remoteAudio" autoplay playsinline></audio>
 
-        <!-- VISIBLE ANIMATED TV STATIC NOISE CANVAS -->
-        <canvas id="crtStaticCanvas"></canvas>
+        <!-- AUTHENTIC OMETV CRT SCREEN WRAPPER -->
+        <div class="crt-screen-wrapper" id="crtWrapper">
+          <canvas id="crtStaticCanvas"></canvas>
+          <div class="crt-overlay-vignette"></div>
+        </div>
 
-        <!-- STANDBY VIEW (Logo + Online count) -->
+        <!-- STANDBY VIEW (Logo + Online Count) -->
         <div id="standbyCenter" class="standby-center">
           <svg class="standby-logo" viewBox="0 0 100 100">
             <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z" fill="#38bdf8"/>
@@ -523,7 +531,7 @@ video{
           </div>
         </div>
 
-        <!-- OMETV STYLE SEARCHING CARD (Over moving TV static) -->
+        <!-- OMETV SEARCHING CARD (Over Moving Noise) -->
         <div class="search-loader" id="searchLoader">
           <div class="search-card">
             <div class="search-spinner"></div>
@@ -674,6 +682,7 @@ try {
   }
 } catch(e){}
 
+const crtWrapper = document.getElementById("crtWrapper");
 const crtStaticCanvas = document.getElementById("crtStaticCanvas");
 const standbyCenter = document.getElementById("standbyCenter");
 const searchLoader = document.getElementById("searchLoader");
@@ -710,19 +719,20 @@ let blurTimer = null;
 let lastCapturedFrame = null;
 let pendingCandidates = [];
 
-/* ================= 4. REAL VISIBLE TV STATIC GENERATOR ================= */
+/* ================= 4. AUTHENTIC OMETV TV STATIC GENERATOR ================= */
 function runTVStatic() {
   if (!crtStaticCanvas) return;
   const ctx = crtStaticCanvas.getContext("2d");
-  const w = (crtStaticCanvas.width = 180);
-  const h = (crtStaticCanvas.height = 140);
+  const w = (crtStaticCanvas.width = 240);
+  const h = (crtStaticCanvas.height = 180);
   const imgData = ctx.createImageData(w, h);
   const buffer = new Uint32Array(imgData.data.buffer);
   const len = buffer.length;
 
   function noise() {
-    if (crtStaticCanvas && crtStaticCanvas.style.display !== "none") {
+    if (crtWrapper && crtWrapper.style.display !== "none") {
       for (let i = 0; i < len; i++) {
+        // Authentic TV Phosphor Noise Generation (Grayscale with full alpha)
         const gray = (Math.random() * 255) | 0;
         buffer[i] = (255 << 24) | (gray << 16) | (gray << 8) | gray;
       }
@@ -934,7 +944,7 @@ async function verifyGCashTransaction() {
   }, 2000);
 }
 
-/* ================= 9. ROBUST CAMERA & WEBRTC ENGINE ================= */
+/* ================= 9. WEBRTC ENGINE (100% RELIABLE) ================= */
 async function startMedia() {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live')) {
     if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
@@ -994,8 +1004,8 @@ async function triggerStartNext() {
 
   mainActionBtn.disabled = true;
 
-  // TV Static + Loading Spinner habang naghahanap
-  crtStaticCanvas.style.display = "block";
+  // Active TV Static + Searching Loader
+  crtWrapper.style.display = "block";
   standbyCenter.style.display = "none";
   searchLoader.style.display = "flex";
   enableBlur();
@@ -1016,7 +1026,7 @@ function stopSession() {
   searching = false;
   connected = false;
 
-  crtStaticCanvas.style.display = "block";
+  crtWrapper.style.display = "block";
   standbyCenter.style.display = "flex";
   searchLoader.style.display = "none";
   enableBlur();
@@ -1030,12 +1040,17 @@ function stopSession() {
   stopBtn.disabled = true;
 }
 
+// Robust STUN/TURN configuration
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
     { urls: "stun:stun1.l.google.com:19302" },
     { urls: "stun:stun2.l.google.com:19302" },
-    { urls: "stun:stun.relay.metered.ca:80" }
+    {
+      urls: "turn:standard.relay.metered.ca:80",
+      username: "0974f7094bbb79185dd1d4ce",
+      credential: "jqFOtepU3tMVTfEX"
+    }
   ]
 };
 
@@ -1045,7 +1060,7 @@ async function createPeer(initiator) {
 
   peerConnection = new RTCPeerConnection(rtcConfig);
 
-  // Idagdag ang local tracks bago mag-create ng offer/answer
+  // Add all local tracks
   if (localStream) {
     localStream.getTracks().forEach(track => {
       peerConnection.addTrack(track, localStream);
@@ -1059,8 +1074,8 @@ async function createPeer(initiator) {
   };
 
   peerConnection.ontrack = (e) => {
-    // Matagumpay na natanggap ang video stream ng kausap!
-    crtStaticCanvas.style.display = "none";
+    // Matagumpay na natanggap ang live video ng stranger!
+    crtWrapper.style.display = "none";
     standbyCenter.style.display = "none";
     searchLoader.style.display = "none";
     remoteStatus.textContent = "Live";
@@ -1080,7 +1095,7 @@ async function createPeer(initiator) {
     if (peerConnection?.connectionState === "connected") {
       connected = true;
       searching = false;
-      crtStaticCanvas.style.display = "none";
+      crtWrapper.style.display = "none";
       standbyCenter.style.display = "none";
       searchLoader.style.display = "none";
       reportBtn.disabled = false;
@@ -1185,7 +1200,7 @@ if (socket) {
   socket.on("waiting", () => {
     searching = true;
     enableBlur();
-    crtStaticCanvas.style.display = "block";
+    crtWrapper.style.display = "block";
     standbyCenter.style.display = "none";
     searchLoader.style.display = "flex";
     remoteStatus.textContent = "Waiting...";
@@ -1203,7 +1218,6 @@ if (socket) {
         if (!peerConnection) await createPeer(false);
         await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
         
-        // Ilagay ang mga naipong ICE Candidates
         while (pendingCandidates.length > 0) {
           const cand = pendingCandidates.shift();
           await peerConnection.addIceCandidate(cand).catch(()=>{});
