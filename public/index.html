@@ -2,513 +2,374 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#070b14">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0e17">
 
-<!-- TAB BAR LOGO / FAVICON -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='tabG1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2393c5fd'/%3E%3Cstop offset='45%25' stop-color='%23a855f7'/%3E%3Cstop offset='100%25' stop-color='%23c084fc'/%3E%3C/linearGradient%3E%3ClinearGradient id='tabG2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2338bdf8'/%3E%3Cstop offset='60%25' stop-color='%2306b6d4'/%3E%3Cstop offset='100%25' stop-color='%232dd4bf'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='%23070b14'/%3E%3Cpath d='M40 20 C25.6 20 14 31.6 14 46 C14 53.5 17.2 60.2 22.4 65 L18 78 L31.5 73.5 C34.1 74.5 37 75 40 75 C47.5 75 54.2 71.8 59 66.6 C55.5 67.5 51.8 68 48 68 C35.8 68 26 58.2 26 46 C26 36.8 31.6 28.9 39.7 25.5 C39.8 23.7 40 21.8 40 20 Z' fill='url(%23tabG1)'/%3E%3Cpath d='M60 22 C47.8 22 38 31.8 38 44 C38 49.5 40 54.5 43.4 58.4 C46.8 53.6 52.5 50.4 59 50.4 C69.5 50.4 78 58.9 78 69.4 C78 70.3 77.9 71.1 77.8 72 C83 67.8 86.4 61.3 86.4 54 C86.4 39.6 74.8 22 60 22 Z' fill='url(%23tabG2)'/%3E%3C/svg%3E">
+<!-- MEETLOOP OFFICIAL TAB FAVICON -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='tabG1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2338bdf8'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3ClinearGradient id='tabG2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23a855f7'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='%230a0e17'/%3E%3Cpath d='M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z' fill='url(%23tabG1)'/%3E%3Cpath d='M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z' fill='url(%23tabG2)'/%3E%3C/svg%3E">
 
-<!-- ANTI-CACHE -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>MeetloopChat</title>
+<title>MeetLoop - Random Video Chat</title>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 :root{
-  --bg:#070b14;
-  --panel:#0f172a;
-  --border:rgba(255,255,255,.09);
-  --border-strong:rgba(255,255,255,.16);
-  --blue:#2563eb;
-  --blue2:#3b82f6;
+  --bg-dark:#0a0e17;
+  --panel-dark:#111827;
+  --panel-border:#1f293d;
+  --blue:#0084ff;
+  --blue-hover:#0073e6;
   --red:#ef4444;
-  --purple:#8b5cf6;
-  --cyan:#06b6d4;
-  --text:#f8fafc;
-  --muted:#94a3b8;
-}
-html,body{width:100%;height:100%}
-
-body{
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  color:var(--text);
-  background:#070b14;
-  overflow:hidden;
-  -webkit-font-smoothing:antialiased;
+  --green:#22c55e;
+  --text-main:#f9fafb;
+  --text-muted:#9ca3af;
 }
 
+html,body{width:100%;height:100%;background:var(--bg-dark);color:var(--text-main);overflow:hidden;-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit}
 button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
-/* WELCOME HOMEPAGE PORTAL */
-#welcomePortal{
-  position:fixed;inset:0;z-index:999999;
-  display:flex;align-items:center;justify-content:center;padding:20px;
-  background:#070b14;
-  transition:opacity .25s ease, visibility .25s ease;
-}
-#welcomePortal.portal-hidden{
-  display:none !important;opacity:0 !important;visibility:hidden !important;pointer-events:none !important;
-}
-.portal-card{
-  max-width:460px;width:100%;padding:38px 28px;text-align:center;
-  background:#0f172a;border:1.5px solid rgba(255,255,255,.12);
-  border-radius:24px;box-shadow:0 15px 40px rgba(0,0,0,.8);
-}
-.portal-logo-svg{
-  width:78px;height:78px;margin:0 auto 16px;display:block;
-  filter:drop-shadow(0 0 16px rgba(56,189,248,.45));
-}
-.portal-title{font-size:30px;font-weight:900;letter-spacing:.3px;margin-bottom:6px;color:#fff}
-.portal-subtitle{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:20px}
-.portal-rules-box{
-  text-align:left;font-size:12px;color:#cbd5e1;line-height:1.7;margin-bottom:24px;
-  background:#1e293b;padding:14px 18px;border-radius:15px;border:1px solid rgba(255,255,255,.08);
-}
-.portal-rules-box li{margin-bottom:6px}
-.portal-open-btn{
-  width:100%;min-height:52px;font-size:15px;font-weight:800;letter-spacing:.4px;
-  border-radius:14px;border:0;cursor:pointer;color:#fff;
-  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  transition:filter .15s;
-}
-.portal-open-btn:hover{filter:brightness(1.1)}
-.portal-open-btn:active{transform:scale(.98)}
-
-/* LOADING SCREEN */
-#meetloopLoader{
-  position:fixed;inset:0;z-index:999998;
-  display:none;align-items:center;justify-content:center;
-  background:#070b14;flex-direction:column;padding:24px;
-}
-.loader-content{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:300px;width:100%}
-.loader-logo-svg{
-  width:68px;height:68px;margin-bottom:20px;
-  filter:drop-shadow(0 0 18px rgba(56,189,248,.5));
-}
-.loader-app-name{font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:18px}
-.loader-progress-track{width:100%;height:5px;background:#1e293b;border-radius:999px;overflow:hidden;position:relative;margin-bottom:12px}
-.loader-progress-bar{width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg, #3b82f6, #2dd4bf);transition:width .15s ease-out}
-.loader-info-row{display:flex;justify-content:space-between;width:100%;font-size:11px;font-weight:700;color:#94a3b8}
-
-/* HEADER */
+/* HEADER OMETV STYLE */
 header{
-  height:60px;display:flex;align-items:center;justify-content:space-between;
-  gap:12px;padding:0 16px;background:#0f172a;border-bottom:1px solid var(--border);
+  height:54px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;background:#0d131f;border-bottom:1px solid var(--panel-border);
   position:relative;z-index:20;
 }
-.brand{
-  display:flex;align-items:center;gap:10px;font-size:19px;font-weight:900;
-  white-space:nowrap;color:#fff;user-select:none;
-}
-.brand-icon-svg{
-  width:36px;height:36px;display:block;flex-shrink:0;
-  filter:drop-shadow(0 0 10px rgba(56,189,248,.45));
-}
-.header-right{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
-.badge{
-  min-height:32px;display:inline-flex;align-items:center;justify-content:center;
-  padding:6px 10px;border-radius:999px;background:#1e293b;
-  border:1px solid var(--border);font-size:11px;font-weight:700;white-space:nowrap;
-}
-.online-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;margin-right:6px}
-.online{color:#86efac}
-#statusBadge{color:#cbd5e1}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;user-select:none;cursor:pointer}
+.brand-logo{width:32px;height:32px;flex-shrink:0}
+.brand-text{font-size:20px;font-weight:900;letter-spacing:-0.5px;color:#fff}
+.brand-text span{color:#38bdf8}
 
-select{
-  min-height:32px;padding:5px 10px;color:#fff;background:#1e293b;
-  border:1px solid var(--border-strong);border-radius:8px;outline:none;cursor:pointer;
-  font-weight:700;font-size:11px;
+.header-meta{display:flex;align-items:center;gap:10px}
+.badge-online{
+  display:flex;align-items:center;gap:6px;background:#1e293b;
+  padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;color:#94a3b8;
+  border:1px solid rgba(255,255,255,.07);
 }
-select option{background:#0f172a;color:#fff}
+.online-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+.badge-online span.count{color:#fff;font-weight:800}
 
-#callTimer{gap:6px}
-.timer-dot{width:6px;height:6px;border-radius:50%;background:#64748b;flex:0 0 auto}
-.timer-label{color:#94a3b8;font-size:9px;font-weight:900;letter-spacing:.8px}
-.timer-time{min-width:48px;font-size:11px;font-weight:900;font-variant-numeric:tabular-nums}
-#callTimer.active{color:#fecaca;background:#450a0a;border-color:#ef4444}
-#callTimer.active .timer-dot{background:var(--red)}
+.lang-select{
+  background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.1);
+  padding:5px 10px;border-radius:8px;font-size:12px;font-weight:700;outline:none;cursor:pointer;
+}
 
-/* MAIN ARENA */
-.main-container{width:100%;height:calc(100vh - 60px);display:flex;gap:10px;padding:10px}
-.video-wrapper{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:8px}
-.videos-grid{position:relative;flex:1;min-height:0;display:flex;gap:8px}
-.video-box{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;background:#000;border:1px solid var(--border);border-radius:14px}
+/* MAIN CHAT STAGE */
+.stage-container{
+  width:100%;height:calc(100vh - 54px);display:flex;gap:10px;padding:10px;
+}
+.stream-arena{
+  flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px;
+}
+.video-grid{
+  position:relative;flex:1;min-height:0;display:flex;gap:10px;
+}
+.cam-box{
+  position:relative;flex:1;min-width:0;min-height:0;background:#000;
+  border-radius:12px;overflow:hidden;border:1px solid var(--panel-border);
+}
 
 video{
-  display:block;width:100%;height:100%;object-fit:cover;object-position:center center;
-  background:#000;border:0;outline:0;
-  transform:translateZ(0);
-  -webkit-transform:translateZ(0);
+  width:100%;height:100%;object-fit:cover;object-position:center;
+  background:#000;display:block;
 }
 
-/* =========================================================
-   📺 MEETLOOP STANDBY SCREEN (TRANSPARENT LOGO + STATIC NOISE)
-========================================================= */
-#ometvStandby{
+/* OMETV CRT STANDBY & STATIC NOISE */
+#standbyScreen{
   position:absolute;inset:0;z-index:2;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:#070b14;overflow:hidden;user-select:none;
+  background:#070b12;overflow:hidden;user-select:none;
 }
-#staticCanvas{
-  position:absolute;inset:0;width:100%;height:100%;opacity:0.40;
+#crtStaticCanvas{
+  position:absolute;inset:0;width:100%;height:100%;opacity:0.35;
   filter:contrast(160%) brightness(85%);
 }
-.meetloop-center-brand{
+.standby-center{
   position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;text-align:center;
-  pointer-events:none;
 }
-.meetloop-dynamic-logo{
-  width:160px;height:160px;display:block;margin-bottom:12px;
-  filter:drop-shadow(0 0 24px rgba(56,189,248,.65)) drop-shadow(0 0 45px rgba(168,85,247,.45));
+.standby-logo{
+  width:130px;height:130px;margin-bottom:12px;
+  filter:drop-shadow(0 0 25px rgba(56,189,248,.5));
   animation:floatLogo 3s ease-in-out infinite alternate;
 }
-@keyframes floatLogo{
-  from{transform:translateY(0px) scale(1)}
-  to{transform:translateY(-6px) scale(1.02)}
-}
-.meetloop-dynamic-title{
-  font-size:32px;font-weight:900;letter-spacing:.6px;color:#ffffff;
-  text-shadow:0 3px 12px rgba(0,0,0,.9);margin-bottom:8px;
-}
-.ometv-online-text{
-  display:flex;align-items:center;gap:6px;
-  font-size:13px;font-weight:800;color:#cbd5e1;text-shadow:0 2px 8px rgba(0,0,0,.9);
-  background:rgba(15,23,42,.75);padding:4px 12px;border-radius:999px;
-  border:1px solid rgba(255,255,255,.1);
-}
-.ometv-online-dot{
-  width:8px;height:8px;border-radius:50%;background:#22c55e;
-  box-shadow:0 0 8px #22c55e;
+@keyframes floatLogo{from{transform:translateY(0)}to{transform:translateY(-6px)}}
+
+.standby-title{font-size:32px;font-weight:900;letter-spacing:-0.5px;color:#fff;margin-bottom:6px}
+.standby-online-tag{
+  background:rgba(15,23,42,0.85);border:1px solid rgba(255,255,255,.1);
+  padding:5px 14px;border-radius:20px;font-size:13px;font-weight:800;color:#cbd5e1;
+  display:flex;align-items:center;gap:7px;box-shadow:0 4px 15px rgba(0,0,0,.5);
 }
 
-/* 🔊 BOTTOM VOLUME CONTROL BAR */
-.ometv-bottom-bar{
-  position:absolute;bottom:0;left:0;right:0;height:36px;
-  background:linear-gradient(to top, rgba(0,0,0,.95), transparent);
+/* OMETV REMOTE AUDIO CONTROL BAR */
+.remote-audio-bar{
+  position:absolute;bottom:0;left:0;right:0;height:40px;
+  background:linear-gradient(to top, rgba(0,0,0,.9), transparent);
   display:flex;align-items:center;gap:12px;padding:0 16px;z-index:5;
 }
-.ometv-speaker-icon{
-  width:18px;height:18px;fill:#cbd5e1;cursor:pointer;transition:transform .1s;flex-shrink:0;
+.audio-speaker-btn{
+  width:20px;height:20px;fill:#cbd5e1;cursor:pointer;flex-shrink:0;transition:transform .1s;
 }
-.ometv-speaker-icon:hover{transform:scale(1.1);fill:#fff}
-.ometv-volume-slider{
+.audio-speaker-btn:hover{transform:scale(1.1);fill:#fff}
+.audio-slider{
   flex:1;height:5px;-webkit-appearance:none;appearance:none;background:#334155;border-radius:999px;outline:none;cursor:pointer;
 }
-.ometv-volume-slider::-webkit-slider-thumb{
+.audio-slider::-webkit-slider-thumb{
   -webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:#38bdf8;cursor:pointer;
-  box-shadow:0 0 8px rgba(56,189,248,.8);
 }
 
-/* 1-SEC BLUR TRANSITION */
+/* 1-SEC INSTANT PROTECTION BLUR TRANSITION */
 #remoteVideo.remote-blur{
-  filter: blur(28px) brightness(0.9);
-  -webkit-filter: blur(28px) brightness(0.9);
-  transition: none;
+  filter:blur(30px) brightness(0.9);
+  -webkit-filter:blur(30px) brightness(0.9);
+  transition:none;
 }
 #remoteVideo.remote-clear{
-  filter: blur(0px) brightness(1.0);
-  -webkit-filter: blur(0px) brightness(1.0);
-  transition: filter 0.6s ease-out, -webkit-filter 0.6s ease-out;
+  filter:blur(0px) brightness(1.0);
+  -webkit-filter:blur(0px) brightness(1.0);
+  transition:filter 0.5s ease-out, -webkit-filter 0.5s ease-out;
 }
 
-#localVideo.mirrored{transform:scaleX(-1) translateZ(0)}
-#localVideo.unmirrored{transform:scaleX(1) translateZ(0)}
+#localVideo.mirrored{transform:scaleX(-1)}
+#localVideo.unmirrored{transform:scaleX(1)}
 
-#camOffOverlay{
-  position:absolute;inset:0;background:#080c14;color:#94a3b8;
-  display:none;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-  font-size:12px;font-weight:800;z-index:3;
-}
-
-@media (min-width: 851px) {
-  #hideLocalBtn, #showLocalBtn, #flipBtn { 
-    display: none !important; 
-  }
+#camOffCover{
+  position:absolute;inset:0;background:#090d16;display:none;
+  flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  color:var(--text-muted);font-size:13px;font-weight:700;z-index:3;
 }
 
-.video-label{
-  position:absolute;left:10px;top:10px;z-index:4;padding:4px 8px;
-  background:rgba(0,0,0,.75);border:1px solid rgba(255,255,255,.12);
-  border-radius:6px;font-size:10px;font-weight:800;pointer-events:none;
+.cam-tag{
+  position:absolute;top:12px;left:12px;z-index:4;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(4px);
+  padding:4px 10px;border-radius:6px;font-size:11px;font-weight:800;color:#fff;
+  border:1px solid rgba(255,255,255,.1);pointer-events:none;
 }
-.status{
-  position:absolute;left:10px;bottom:42px;z-index:4;padding:4px 8px;
-  background:rgba(0,0,0,.75);border:1px solid rgba(255,255,255,.12);
-  border-radius:6px;color:#e2e8f0;font-size:10px;font-weight:700;pointer-events:none;
+.cam-status-pill{
+  position:absolute;bottom:46px;left:12px;z-index:4;
+  background:rgba(0,0,0,.75);padding:4px 10px;border-radius:6px;
+  font-size:11px;font-weight:700;color:#cbd5e1;pointer-events:none;
 }
 
-#reportStrangerBtn{
-  position:absolute;top:10px;right:10px;z-index:5;padding:6px 12px;
-  border-radius:7px;border:0;background:#dc2626;color:#fff;
-  font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px;
+#reportBtn{
+  position:absolute;top:12px;right:12px;z-index:5;
+  background:#dc2626;color:#fff;border:0;border-radius:8px;
+  padding:6px 12px;font-size:11px;font-weight:800;cursor:pointer;
+  display:flex;align-items:center;gap:6px;transition:opacity .15s;
 }
-#reportStrangerBtn svg{width:14px;height:14px}
-#reportStrangerBtn:disabled{background:#475569;cursor:not-allowed}
+#reportBtn:disabled{opacity:.4;cursor:not-allowed}
 
-.search-overlay{
-  position:absolute;inset:0;z-index:10;display:none;align-items:center;
-  justify-content:center;background:#020617;
+/* SEARCHING OVERLAY */
+.search-loader{
+  position:absolute;inset:0;z-index:10;display:none;
+  align-items:center;justify-content:center;background:#050811;
 }
-.search-box{min-width:220px;padding:22px;text-align:center;background:#0f172a;border:1px solid rgba(255,255,255,.12);border-radius:16px}
-.spinner{width:36px;height:36px;margin:0 auto 12px;border:3px solid rgba(255,255,255,.1);border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite}
-#searchText{color:#e2e8f0;font-size:13px;font-weight:800}
+.search-card{
+  background:#0f172a;border:1px solid rgba(255,255,255,.1);
+  padding:24px 30px;border-radius:18px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.6);
+}
+.search-spinner{
+  width:40px;height:40px;margin:0 auto 14px;
+  border:3.5px solid rgba(255,255,255,.15);border-top-color:#38bdf8;
+  border-radius:50%;animation:spin .75s linear infinite;
+}
 @keyframes spin{to{transform:rotate(360deg)}}
+.search-text{font-size:14px;font-weight:800;color:#e2e8f0}
 
-/* CONTROLS */
-.controls-bar{display:flex;gap:6px}
-.btn{
-  min-height:44px;padding:8px 14px;border:1px solid rgba(255,255,255,.08);
-  border-radius:10px;color:#fff;background:#0f172a;cursor:pointer;font-size:12px;
-  font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;
-  user-select:none;transition:filter .15s, transform .12s;
+/* OMETV CONTROL BUTTONS BAR */
+.controls-panel{
+  display:flex;gap:8px;height:52px;
 }
-.btn svg{width:16px;height:16px;flex-shrink:0}
-.btn:active:not(:disabled){transform:scale(.98)}
-.btn:disabled{opacity:.45;cursor:not-allowed}
+.ctrl-btn{
+  border:0;border-radius:12px;color:#fff;font-size:14px;font-weight:800;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:filter .15s, transform .1s;user-select:none;
+}
+.ctrl-btn:active:not(:disabled){transform:scale(.98)}
+.ctrl-btn:disabled{opacity:.45;cursor:not-allowed}
 
-.btn-loop{flex:2;background:linear-gradient(135deg,var(--blue),var(--blue2))}
+.btn-start-next{flex:2;background:linear-gradient(135deg,#0284c7,#2563eb)}
 .btn-stop{flex:1;background:#dc2626}
-.btn-toggle{flex:1;background:#1e293b}
-.btn-flip{background:#581c87}
+.btn-sec{flex:1;background:#1e293b;border:1px solid rgba(255,255,255,.08)}
+.btn-flip{background:#6b21a8}
 
-/* CHAT */
-.chat-wrapper{
-  width:310px;max-width:310px;min-height:0;display:flex;flex-direction:column;
-  overflow:hidden;background:#0f172a;border:1px solid var(--border);border-radius:14px;
+/* CHAT SIDEBAR */
+.chat-arena{
+  width:320px;max-width:320px;display:flex;flex-direction:column;
+  background:var(--panel-dark);border:1px solid var(--panel-border);border-radius:12px;overflow:hidden;
 }
-.chat-header{padding:12px;border-bottom:1px solid var(--border);font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:space-between}
-.chat-messages{flex:1;min-height:0;padding:10px;overflow-y:auto;overscroll-behavior:contain}
-.message{margin-bottom:10px;word-break:break-word}
-.message-name{margin-bottom:3px;color:var(--muted);font-size:9px;font-weight:800}
-.message-text{
-  display:inline-block;max-width:96%;padding:8px 11px;color:#f8fafc;
-  background:#1e293b;border-radius:8px;font-size:11px;line-height:1.45;white-space:pre-wrap;
+.chat-head{
+  padding:14px 16px;border-bottom:1px solid var(--panel-border);
+  display:flex;align-items:center;justify-content:space-between;
 }
-.meetloop-rules-card{background:#1e1b4b;border:1px solid #4338ca;line-height:1.5;font-size:11px}
-.rules-badge-tag{display:inline-block;background:#dc2626;color:#fff;font-weight:900;font-size:9px;padding:2px 6px;border-radius:5px;margin-bottom:4px}
-.chat-input-area{display:flex;gap:6px;padding:8px;border-top:1px solid var(--border)}
-#chatInput{flex:1;min-width:0;min-height:38px;padding:8px 10px;background:#020617;color:#fff;border:1px solid var(--border-strong);border-radius:8px;outline:none;font-size:11px}
-#sendBtn{min-width:60px;border:0;border-radius:8px;color:#fff;background:var(--blue);cursor:pointer;font-size:11px;font-weight:800}
+.chat-head-title{font-size:13px;font-weight:900;letter-spacing:-0.2px}
+.chat-stream{
+  flex:1;min-height:0;padding:12px;overflow-y:auto;overscroll-behavior:contain;
+}
+.chat-msg{margin-bottom:12px;word-break:break-word}
+.chat-author{font-size:10px;font-weight:800;color:var(--text-muted);margin-bottom:3px}
+.chat-bubble{
+  display:inline-block;max-width:96%;padding:9px 13px;
+  background:#1e293b;border-radius:10px;font-size:12px;line-height:1.45;color:#f8fafc;
+}
+.chat-rules-card{background:#1e1b4b;border:1px solid #4338ca;font-size:11.5px;line-height:1.55}
+.chat-rules-badge{background:#dc2626;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:4px;margin-bottom:6px;display:inline-block}
 
-/* REPORT MODAL */
-#reportModalOverlay{
-  position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.85);
-  display:none;align-items:center;justify-content:center;padding:16px;
+.chat-foot{
+  display:flex;gap:8px;padding:10px;border-top:1px solid var(--panel-border);
 }
-.report-modal-box{
-  max-width:380px;width:100%;padding:24px 20px;text-align:center;
-  background:#0f172a;border:1px solid #ef4444;border-radius:20px;
+.chat-input{
+  flex:1;min-width:0;height:42px;padding:0 14px;background:#070b14;
+  border:1px solid var(--panel-border);border-radius:10px;color:#fff;outline:none;font-size:12px;
 }
-.report-reasons{display:flex;flex-direction:column;gap:7px;margin:16px 0;text-align:left}
-.report-opt{
-  padding:10px 12px;border-radius:8px;background:#1e293b;
-  border:1px solid rgba(255,255,255,.08);color:#f8fafc;font-size:11px;font-weight:700;cursor:pointer;
+.chat-send-btn{
+  width:68px;height:42px;border:0;border-radius:10px;background:#2563eb;
+  color:#fff;font-size:12px;font-weight:800;cursor:pointer;
 }
-.report-opt:active{background:#dc2626}
 
 /* =========================================================
-   🛑 EXACT OMETV WHITE BANNED SCREEN
+   MODALS & POPUPS
 ========================================================= */
-#bannedOverlay{
-  position:fixed;inset:0;z-index:9999999;
-  background:rgba(0,0,0,.88);
+/* WELCOME PORTAL */
+#welcomePortal{
+  position:fixed;inset:0;z-index:999999;
+  display:flex;align-items:center;justify-content:center;padding:16px;
+  background:#070b12;transition:opacity .2s;
+}
+#welcomePortal.hidden{display:none !important}
+.portal-box{
+  max-width:440px;width:100%;padding:32px 24px;text-align:center;
+  background:#111827;border-radius:24px;border:1.5px solid rgba(255,255,255,.1);
+  box-shadow:0 25px 60px rgba(0,0,0,.9);
+}
+.portal-icon{width:76px;height:76px;margin:0 auto 16px;display:block}
+.portal-rules{
+  text-align:left;font-size:12px;color:#cbd5e1;line-height:1.7;margin:20px 0;
+  background:#1f293d;padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,.08);
+}
+.portal-btn{
+  width:100%;height:50px;border-radius:14px;border:0;background:linear-gradient(135deg,#0284c7,#2563eb);
+  color:#fff;font-size:15px;font-weight:800;cursor:pointer;
+}
+
+/* EXACT OMETV WHITE BANNED SCREEN */
+#banOverlay{
+  position:fixed;inset:0;z-index:9999999;background:rgba(0,0,0,.88);
   display:none;align-items:center;justify-content:center;padding:16px;
 }
 .ometv-ban-card{
-  max-width:480px;width:100%;padding:28px 24px 20px;
+  max-width:470px;width:100%;padding:28px 24px 20px;
   background:#ffffff;border-radius:18px;color:#1e293b;
-  box-shadow:0 25px 60px rgba(0,0,0,.85);
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
-  animation:cardPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow:0 25px 60px rgba(0,0,0,.9);
 }
-@keyframes cardPop{
-  from{transform:scale(0.95);opacity:0}
-  to{transform:scale(1);opacity:1}
+.ban-top{display:flex;gap:18px;margin-bottom:18px}
+.ban-snap-frame{
+  width:120px;height:120px;border-radius:10px;overflow:hidden;
+  position:relative;background:#000;border:1.5px solid #cbd5e1;flex-shrink:0;
 }
-.ban-top-row{display:flex;gap:18px;align-items:flex-start;margin-bottom:20px}
-.ban-snapshot-box{
-  width:125px;height:125px;border-radius:10px;overflow:hidden;
-  background:#000;position:relative;flex-shrink:0;border:1.5px solid #cbd5e1;
+.ban-snap-frame canvas{width:100%;height:100%;object-fit:cover;filter:blur(6px)}
+.ban-snap-brand{
+  position:absolute;top:6px;left:6px;display:flex;align-items:center;gap:4px;
+  background:rgba(0,0,0,.75);padding:3px 6px;border-radius:4px;color:#fff;font-size:9px;font-weight:900;
 }
-.ban-snapshot-box canvas{
-  width:100%;height:100%;object-fit:cover;
-  filter:blur(6px);
-  -webkit-filter:blur(6px);
+.ban-info{display:flex;flex-direction:column;gap:6px;padding-top:4px}
+.ban-title{font-size:22px;font-weight:800;color:#ea580c}
+.ban-reason{font-size:14px;color:#334155;font-weight:600}
+.ban-reason span{color:#0284c7;text-decoration:underline;cursor:pointer}
+.ban-description{font-size:14px;color:#334155;text-align:center;margin-bottom:18px}
+.ban-gcash-btn{
+  width:100%;height:48px;border-radius:24px;border:0;background:#007dfe;
+  color:#fff;font-size:15px;font-weight:800;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px;
 }
-.ban-snapshot-watermark{
-  position:absolute;top:6px;left:6px;
-  display:flex;align-items:center;gap:4px;
-  background:rgba(0,0,0,.7);padding:2px 6px;border-radius:4px;
+.ban-bottom-row{
+  display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b;
 }
-.ban-snapshot-watermark svg{width:14px;height:14px}
-.ban-snapshot-watermark span{color:#fff;font-size:9px;font-weight:900}
+.ban-timer-chip{background:#fee2e2;color:#dc2626;font-weight:800;padding:2px 8px;border-radius:12px}
 
-.ban-details-col{display:flex;flex-direction:column;gap:6px;padding-top:4px;text-align:left}
-.ban-title-text{font-size:22px;font-weight:800;color:#ea580c;letter-spacing:-0.2px}
-.ban-reason-row{font-size:14px;color:#334155;font-weight:600}
-.ban-reason-link{color:#0284c7;text-decoration:underline;cursor:pointer}
-.ban-desc-text{font-size:14px;color:#334155;text-align:center;margin-bottom:18px;line-height:1.45}
-
-.ban-btn-gcash{
-  width:100%;height:48px;border-radius:24px;background:#007dfe;
-  color:#fff;font-size:15px;font-weight:800;border:0;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  margin-bottom:14px;transition:filter .15s;
-  box-shadow:0 6px 18px rgba(0,125,254,.35);
+/* GCASH INSTAPAY MODAL */
+#gcashModal{
+  position:fixed;inset:0;z-index:99999999;background:rgba(0,0,0,.88);
+  display:none;align-items:center;justify-content:center;padding:16px;
 }
-.ban-btn-gcash:hover{filter:brightness(1.08)}
-.ban-btn-gcash:active{transform:scale(.98)}
-
-.ban-footer-row{
-  display:flex;align-items:center;justify-content:space-between;
-  font-size:11px;color:#64748b;padding-top:6px;
+.gcash-card{
+  max-width:340px;width:100%;padding:22px 18px;text-align:center;
+  background:#007dfe;border-radius:22px;color:#fff;
 }
-.ban-support-link{color:#0284c7;text-decoration:underline;cursor:pointer}
-.ban-countdown-pill{
-  background:#fee2e2;color:#dc2626;font-weight:800;padding:2px 8px;border-radius:999px;font-size:11px;
-}
-
-/* =========================================================
-   💰 GCASH QR CODE & VERIFICATION MODAL
-========================================================= */
-#gcashModalOverlay{
-  position:fixed;inset:0;z-index:99999999;
-  background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;padding:16px;
-}
-.gcash-modal-card{
-  max-width:350px;width:100%;padding:22px 18px;text-align:center;
-  background:#007dfe;border-radius:22px;color:#fff;box-shadow:0 25px 60px rgba(0,0,0,.9);
-}
-.gcash-qr-box{
+.gcash-white-area{
   background:#fff;border-radius:16px;padding:16px;margin:12px 0;color:#1e293b;
 }
-.gcash-qr-image{
-  width:100%;max-width:200px;height:auto;border-radius:10px;display:block;margin:0 auto 10px;
-  border:1px solid #e2e8f0;
-}
-.gcash-price-tag{
-  font-size:26px;font-weight:900;color:#007dfe;margin:4px 0 10px;
-}
-.gcash-input-label{
-  font-size:11px;font-weight:800;color:#334155;text-align:left;display:block;margin-bottom:4px;
-}
-.gcash-ref-input{
+.gcash-qr-preview{width:100%;max-width:190px;height:auto;margin:0 auto 10px;display:block}
+.gcash-amount{font-size:26px;font-weight:900;color:#007dfe;margin-bottom:10px}
+.gcash-input{
   width:100%;height:42px;border:1.5px solid #cbd5e1;border-radius:10px;
-  padding:0 12px;font-size:13px;font-weight:700;color:#0f172a;outline:none;
-  margin-bottom:6px;text-align:center;letter-spacing:1px;
+  padding:0 12px;font-size:13px;font-weight:800;text-align:center;margin-bottom:8px;outline:none;
 }
-.gcash-ref-input:focus{border-color:#007dfe}
-.gcash-error-hint{
-  color:#dc2626;font-size:11px;font-weight:700;text-align:left;margin-bottom:10px;display:none;
+.gcash-verify-btn{
+  width:100%;height:44px;border-radius:10px;border:0;background:#007dfe;color:#fff;
+  font-size:13px;font-weight:900;cursor:pointer;
 }
-.gcash-submit-btn{
-  width:100%;height:44px;border-radius:12px;background:#007dfe;
-  color:#fff;font-size:13px;font-weight:900;border:0;cursor:pointer;
-  box-shadow:0 4px 14px rgba(0,125,254,.4);transition:filter .15s;
-}
-.gcash-submit-btn:hover{filter:brightness(1.1)}
-.gcash-submit-btn:disabled{opacity:0.6;cursor:not-allowed}
-.gcash-close-btn{
-  width:100%;height:38px;border-radius:12px;background:rgba(255,255,255,.15);
+.gcash-cancel-btn{
+  width:100%;height:38px;border-radius:10px;background:rgba(255,255,255,.15);
   border:1px solid rgba(255,255,255,.3);color:#fff;font-weight:800;font-size:12px;cursor:pointer;margin-top:6px;
 }
 
-/* SINGLE TAB TAKEOVER */
+/* HUMAN FACE & REPORT MODALS */
+.basic-modal{
+  position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.85);
+  display:none;align-items:center;justify-content:center;padding:16px;
+}
+.basic-modal-card{
+  max-width:380px;width:100%;padding:24px 20px;text-align:center;
+  background:#111827;border-radius:20px;border:1px solid rgba(255,255,255,.1);
+}
+
+/* SINGLE TAB TAKEOVER MODAL */
 #duplicateTabOverlay{
   position:fixed;inset:0;z-index:999999;background:#070b14;
   display:none;align-items:center;justify-content:center;padding:16px;
 }
-.duplicate-box{
-  max-width:400px;width:100%;padding:26px 20px;text-align:center;
-  background:#0f172a;border:1px solid rgba(239,68,68,.3);border-radius:20px;
-}
-.dup-title{font-size:17px;font-weight:900;color:#fff;margin-bottom:6px}
-.dup-desc{font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:14px}
-.dup-btn{
-  width:100%;min-height:42px;border-radius:9px;border:0;color:#fff;
-  background:var(--blue);font-weight:800;cursor:pointer;
-}
 
-/* STRICT LIVE FACE WARNING */
-#faceModalOverlay{
-  position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.85);
-  display:none;align-items:center;justify-content:center;padding:16px;
-}
-.face-modal-card{
-  max-width:380px;width:100%;padding:26px 22px;text-align:center;
-  background:#0f172a;border:1px solid #ef4444;border-radius:20px;
-}
-.face-modal-title{font-size:16px;font-weight:900;color:#fecaca;margin-bottom:6px}
-.face-modal-desc{font-size:11px;color:#cbd5e1;line-height:1.6;margin-bottom:16px}
-.face-modal-btn{
-  width:100%;min-height:44px;font-size:13px;font-weight:900;border-radius:10px;border:0;
-  cursor:pointer;color:#fff;background:var(--blue);
-}
-
-/* MOBILE VIEW */
+/* MOBILE RESPONSIVE STYLING */
 @media (max-width:850px){
-  body{height:100dvh;overflow-y:auto;overflow-x:hidden}
-  header{min-height:54px;height:auto;padding:6px 10px;gap:4px}
-  .brand{font-size:16px;gap:6px}
-  .brand-icon-svg{width:28px;height:28px}
-  .header-right{gap:4px;flex-wrap:wrap}
-  .badge{min-height:26px;padding:3px 6px;font-size:10px}
-  .timer-label{display:none}
-  .timer-time{min-width:44px;font-size:10px}
-  select{min-height:26px;padding:3px 5px;font-size:10px}
-  .main-container{height:auto;min-height:calc(100dvh - 54px);display:flex;flex-direction:column;gap:6px;padding:6px}
-  .video-wrapper{width:100%;flex:none;gap:6px}
+  header{height:50px;padding:0 12px}
+  .brand-text{font-size:18px}
+  .stage-container{flex-direction:column;height:calc(100vh - 50px);padding:6px;gap:6px}
+  .video-grid{height:min(50dvh,480px);flex:none;position:relative}
+  .cam-box:first-child{inset:0;position:absolute;width:100%;height:100%}
 
-  .videos-grid{position:relative;width:100%;height:min(52dvh,500px);min-height:280px;display:block}
-  .video-box{position:absolute;border-radius:12px}
-  .video-box:first-child{inset:0;width:100%;height:100%}
-
-  #localVideoBox{
-    right:8px;bottom:8px;width:28vw;max-width:115px;aspect-ratio:3 / 4;
-    height:auto;z-index:6;border:1.5px solid rgba(255,255,255,.9);
-    border-radius:11px;
+  #localCamBox{
+    position:absolute;right:8px;bottom:8px;width:28vw;max-width:115px;aspect-ratio:3/4;
+    height:auto;z-index:6;border:2px solid rgba(255,255,255,.9);border-radius:10px;
   }
-  #localVideoBox.camera-hidden{display:none !important}
-
+  #localCamBox.hidden-cam{display:none !important}
+  
   #hideLocalBtn{
     position:absolute;top:4px;right:4px;z-index:8;width:22px;height:22px;
-    border-radius:50%;background:rgba(0,0,0,.75);color:#fff;border:1px solid rgba(255,255,255,.3);
-    font-size:10px;font-weight:bold;cursor:pointer;display:flex !important;align-items:center;justify-content:center;
+    border-radius:50%;background:rgba(0,0,0,.7);color:#fff;border:0;
+    font-size:10px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;
   }
   #showLocalBtn{
     position:absolute;right:10px;bottom:10px;z-index:30;display:none;
     align-items:center;gap:5px;padding:6px 12px;border-radius:999px;
-    background:#0f172a;border:1px solid #3b82f6;color:#fff;font-size:10px;font-weight:800;
+    background:#1e293b;border:1px solid #38bdf8;color:#fff;font-size:10px;font-weight:800;
   }
-  #showLocalBtn.btn-visible{display:flex !important}
+  #showLocalBtn.visible{display:flex !important}
 
-  .controls-bar{width:100%;display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
-  .btn{width:100%;min-height:42px;padding:4px;border-radius:8px;font-size:11px}
-  .btn-loop{grid-column:span 4}
+  .controls-panel{height:46px;display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+  .ctrl-btn{font-size:12px;border-radius:8px}
+  .btn-start-next{grid-column:span 4}
   .btn-stop{grid-column:span 2}
-  .btn-toggle{grid-column:span 2}
-  
-  #flipBtn{
-    display:flex !important;
-    grid-column:span 2;
-  }
+  .btn-sec{grid-column:span 2}
+  #flipBtn{grid-column:span 2;display:flex !important}
 
-  .chat-wrapper{width:100%;max-width:none;height:230px;min-height:230px;border-radius:12px}
-  .chat-header{padding:8px 10px;font-size:11px}
-  .chat-messages{padding:8px}
-  .chat-input-area{padding:6px}
-
-  .ometv-ban-card{padding:20px 18px 16px}
-  .ban-top-row{gap:12px;margin-bottom:14px}
-  .ban-snapshot-box{width:90px;height:90px}
-  .ban-title-text{font-size:18px}
-  .ban-reason-row{font-size:12px}
-  .ban-desc-text{font-size:12px;margin-bottom:14px}
+  .chat-arena{width:100%;max-width:none;flex:1;min-height:180px;border-radius:10px}
+}
+@media (min-width:851px){
+  #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 }
 </style>
 </head>
@@ -517,345 +378,213 @@ video{
 
 <!-- WELCOME PORTAL -->
 <div id="welcomePortal">
-  <div class="portal-card">
-    <svg class="portal-logo-svg" viewBox="0 0 100 100">
+  <div class="portal-box">
+    <svg class="portal-icon" viewBox="0 0 100 100">
       <defs>
-        <linearGradient id="pLogoG1" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#93c5fd"/>
-          <stop offset="45%" stop-color="#a855f7"/>
-          <stop offset="100%" stop-color="#c084fc"/>
-        </linearGradient>
-        <linearGradient id="pLogoG2" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id="pG1" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stop-color="#38bdf8"/>
-          <stop offset="60%" stop-color="#06b6d4"/>
-          <stop offset="100%" stop-color="#2dd4bf"/>
+          <stop offset="100%" stop-color="#2563eb"/>
+        </linearGradient>
+        <linearGradient id="pG2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#a855f7"/>
+          <stop offset="100%" stop-color="#ec4899"/>
         </linearGradient>
       </defs>
-      <path d="M40 20 C25.6 20 14 31.6 14 46 C14 53.5 17.2 60.2 22.4 65 L18 78 L31.5 73.5 C34.1 74.5 37 75 40 75 C47.5 75 54.2 71.8 59 66.6 C55.5 67.5 51.8 68 48 68 C35.8 68 26 58.2 26 46 C26 36.8 31.6 28.9 39.7 25.5 C39.8 23.7 40 21.8 40 20 Z" fill="url(#pLogoG1)"/>
-      <path d="M60 22 C47.8 22 38 31.8 38 44 C38 49.5 40 54.5 43.4 58.4 C46.8 53.6 52.5 50.4 59 50.4 C69.5 50.4 78 58.9 78 69.4 C78 70.3 77.9 71.1 77.8 72 C83 67.8 86.4 61.3 86.4 54 C86.4 39.6 74.8 22 60 22 Z" fill="url(#pLogoG2)"/>
+      <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z" fill="url(#pG1)"/>
+      <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z" fill="url(#pG2)"/>
     </svg>
 
-    <h1 class="portal-title">MeetloopChat</h1>
-    <div class="portal-subtitle">Random Video Chat</div>
+    <h1 style="font-size:26px;font-weight:900;color:#fff">MeetLoop</h1>
+    <p style="font-size:13px;color:var(--text-muted);font-weight:700;margin-top:4px">Random Video Chat</p>
 
-    <ul class="portal-rules-box">
-      <li><b>18+ Only:</b> Minors are strictly prohibited.</li>
-      <li><b>Zero Tolerance:</b> Nudity, sexual acts, or harassment are forbidden.</li>
-      <li><b>Live Face Only:</b> Walls, ceilings, or covered cameras are not allowed.</li>
-      <li><b>Instant Shield:</b> 1-Sec protection blur on every stranger switch.</li>
+    <ul class="portal-rules">
+      <li><b>18+ Required:</b> Minors are strictly prohibited.</li>
+      <li><b>Zero Tolerance:</b> Nudity, obscene behavior, and harassment are banned.</li>
+      <li><b>Human Face Only:</b> Look directly at the camera. Walls/ceilings are banned.</li>
+      <li><b>Instant Blur Shield:</b> Safe transition on every stranger switch.</li>
     </ul>
 
-    <button class="portal-open-btn" id="openPortalBtn" type="button" onclick="enterMeetLoop()">
-      <span>OPEN MEETLOOPCHAT</span>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-    </button>
+    <button class="portal-btn" onclick="enterMeetLoop()">START CHATTING</button>
   </div>
 </div>
 
-<!-- MEETLOOP CLEAN LOADING SCREEN -->
-<div id="meetloopLoader">
-  <div class="loader-content">
-    <svg class="loader-logo-svg" viewBox="0 0 100 100">
-      <defs>
-        <linearGradient id="loadG1" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#93c5fd"/>
-          <stop offset="45%" stop-color="#a855f7"/>
-          <stop offset="100%" stop-color="#c084fc"/>
-        </linearGradient>
-        <linearGradient id="loadG2" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#38bdf8"/>
-          <stop offset="60%" stop-color="#06b6d4"/>
-          <stop offset="100%" stop-color="#2dd4bf"/>
-        </linearGradient>
-      </defs>
-      <path d="M40 20 C25.6 20 14 31.6 14 46 C14 53.5 17.2 60.2 22.4 65 L18 78 L31.5 73.5 C34.1 74.5 37 75 40 75 C47.5 75 54.2 71.8 59 66.6 C55.5 67.5 51.8 68 48 68 C35.8 68 26 58.2 26 46 C26 36.8 31.6 28.9 39.7 25.5 C39.8 23.7 40 21.8 40 20 Z" fill="url(#loadG1)"/>
-      <path d="M60 22 C47.8 22 38 31.8 38 44 C38 49.5 40 54.5 43.4 58.4 C46.8 53.6 52.5 50.4 59 50.4 C69.5 50.4 78 58.9 78 69.4 C78 70.3 77.9 71.1 77.8 72 C83 67.8 86.4 61.3 86.4 54 C86.4 39.6 74.8 22 60 22 Z" fill="url(#loadG2)"/>
-    </svg>
-    <div class="loader-app-name">MeetloopChat</div>
-    <div class="loader-progress-track">
-      <div class="loader-progress-bar" id="loaderProgressBar"></div>
-    </div>
-    <div class="loader-info-row">
-      <span id="loaderStatusText">Connecting...</span>
-      <span id="loaderPercent">0%</span>
-    </div>
+<!-- SINGLE TAB DUPLICATE OVERLAY -->
+<div id="duplicateTabOverlay">
+  <div class="basic-modal-card">
+    <div style="font-size:17px;font-weight:900;color:#fff;margin-bottom:6px">MeetLoop Open in Another Tab</div>
+    <div style="font-size:12px;color:#94a3b8;line-height:1.5;margin-bottom:14px">Multiple tabs at the same time are not allowed. Session paused in this tab.</div>
+    <button class="ctrl-btn btn-start-next" style="width:100%" id="reclaimSessionBtn" type="button">Use Here</button>
   </div>
 </div>
 
-<!-- REPORT REASONS MODAL -->
-<div id="reportModalOverlay">
-  <div class="report-modal-box">
-    <h3 style="font-size:16px;font-weight:900;color:#fecaca;margin-bottom:6px">Report Stranger</h3>
-    <p style="font-size:11px;color:#94a3b8">Select reason for reporting (Evidence will be verified):</p>
-    <div class="report-reasons">
-      <div class="report-opt" onclick="submitReport('irrelevant image')">Irrelevant image (Wall, Ceiling, Fake Camera)</div>
-      <div class="report-opt" onclick="submitReport('nudity / sexual acts')">Nudity or Sexual Acts</div>
-      <div class="report-opt" onclick="submitReport('underage person')">Underage Person (&lt;18 Years Old)</div>
-      <div class="report-opt" onclick="submitReport('harassment / vulgarity')">Vulgar Language, Hate Speech, or Harassment</div>
-    </div>
-    <button class="btn btn-stop" style="width:100%" onclick="closeReportModal()">Cancel</button>
-  </div>
-</div>
-
-<!-- =========================================================
-   🛑 EXACT OMETV WHITE BANNED SCREEN
-========================================================= */
-<div id="bannedOverlay">
+<!-- EXACT OMETV WHITE BANNED SCREEN -->
+<div id="banOverlay">
   <div class="ometv-ban-card">
-    <div class="ban-top-row">
-      <div class="ban-snapshot-box">
-        <canvas id="banSnapshotCanvas" width="125" height="125"></canvas>
-        <div class="ban-snapshot-watermark">
-          <svg viewBox="0 0 100 100">
-            <path d="M40 20 C25.6 20 14 31.6 14 46 C14 53.5 17.2 60.2 22.4 65 L18 78 L31.5 73.5 C34.1 74.5 37 75 40 75 C47.5 75 54.2 71.8 59 66.6 C55.5 67.5 51.8 68 48 68 C35.8 68 26 58.2 26 46 C26 36.8 31.6 28.9 39.7 25.5 C39.8 23.7 40 21.8 40 20 Z" fill="#93c5fd"/>
-            <path d="M60 22 C47.8 22 38 31.8 38 44 C38 49.5 40 54.5 43.4 58.4 C46.8 53.6 52.5 50.4 59 50.4 C69.5 50.4 78 58.9 78 69.4 C78 70.3 77.9 71.1 77.8 72 C83 67.8 86.4 61.3 86.4 54 C86.4 39.6 74.8 22 60 22 Z" fill="#38bdf8"/>
-          </svg>
-          <span>MeetloopChat</span>
-        </div>
+    <div class="ban-top">
+      <div class="ban-snap-frame">
+        <canvas id="banCanvas" width="120" height="120"></canvas>
+        <div class="ban-snap-brand">MeetLoop</div>
       </div>
-      <div class="ban-details-col">
-        <div class="ban-title-text">You're banned</div>
-        <div class="ban-reason-row">
-          Reason: <span class="ban-reason-link" id="banReasonText">irrelevant image</span>
-        </div>
+      <div class="ban-info">
+        <div class="ban-title">You're banned</div>
+        <div class="ban-reason">Reason: <span id="banReasonLabel">irrelevant image</span></div>
       </div>
     </div>
 
-    <div class="ban-desc-text">
+    <div class="ban-description">
       You can return to the chat immediately by paying for unban via <b>GCash</b>.
     </div>
 
-    <button class="ban-btn-gcash" type="button" onclick="openGcashModal()">
+    <button class="ban-gcash-btn" onclick="openGcashModal()">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#fff"/><path d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm-1 12H9v-2h2v2zm0-4H9V8h2v4zm4 4h-2v-2h2v2zm0-4h-2V8h2v4z" fill="#007dfe"/></svg>
       <span>Pay with GCash (₱20.00)</span>
     </button>
 
-    <div class="ban-footer-row">
-      <span class="ban-support-link" onclick="location.href='mailto:support@meetloopchat.com'">support@meetloopchat.com</span>
+    <div class="ban-bottom-row">
+      <span>support@meetloopchat.com</span>
       <div>
-        <span class="ban-countdown-pill" id="banCountdownPill">59:59</span>
-        <span style="font-family:monospace;margin-left:8px;cursor:pointer" id="adminUnbanId">ID: 167214235</span>
+        <span class="ban-timer-chip" id="banCountdown">59:59</span>
+        <span style="font-family:monospace;margin-left:8px;cursor:pointer" id="adminUnbanId">ID: 000000000</span>
       </div>
     </div>
   </div>
 </div>
 
-<!-- =========================================================
-   💰 GCASH QR CODE & VERIFICATION MODAL
-========================================================= -->
-<div id="gcashModalOverlay">
-  <div class="gcash-modal-card">
-    <div style="font-size:20px;font-weight:900;letter-spacing:.3px">GCash InstaPay</div>
-    <div style="font-size:12px;opacity:0.9;margin-top:2px">MeetLoopPH • InstaPay QR</div>
+<!-- GCASH MODAL -->
+<div id="gcashModal">
+  <div class="gcash-card">
+    <div style="font-size:18px;font-weight:900">GCash InstaPay</div>
+    <div style="font-size:11px;opacity:0.9;margin-top:2px">MeetLoopPH • Instant Unban</div>
 
-    <div class="gcash-qr-box">
-      <svg class="gcash-qr-image" viewBox="0 0 200 200">
+    <div class="gcash-white-area">
+      <svg class="gcash-qr-preview" viewBox="0 0 200 200">
         <image href="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020101021226540015ph.com.gcash0111+6392084800000208MeetLoop520460145303608540520.005802PH5910MeetLoopPH6011Philippines6304" width="200" height="200"/>
       </svg>
-      
-      <div class="gcash-price-tag">₱ 20.00</div>
-      
-      <label class="gcash-input-label">Enter GCash Reference No. (Resibo):</label>
-      <input type="text" id="gcashRefInput" class="gcash-ref-input" placeholder="e.g. 1002938475812" maxlength="16" autocomplete="off" inputmode="numeric">
-      <div id="gcashErrorHint" class="gcash-error-hint"></div>
-      
-      <button class="gcash-submit-btn" id="verifyGcashBtn" type="button" onclick="verifyGcashPayment()">
-        ⚡ Verify &amp; Unban Now
-      </button>
+      <div class="gcash-amount">₱20.00</div>
+      <input type="text" id="gcashRef" class="gcash-input" placeholder="GCash Reference No." maxlength="16" inputmode="numeric">
+      <div id="gcashHint" style="display:none;color:#dc2626;font-size:11px;font-weight:700;margin-bottom:8px"></div>
+      <button class="gcash-verify-btn" id="gcashVerifyBtn" onclick="verifyGcashPayment()">Verify Payment</button>
     </div>
 
-    <button class="gcash-close-btn" type="button" onclick="closeGcashModal()">Close (Bumalik)</button>
+    <button class="gcash-cancel-btn" onclick="closeGcashModal()">Back</button>
   </div>
 </div>
 
-<!-- SINGLE TAB OVERLAY -->
-<div id="duplicateTabOverlay">
-  <div class="duplicate-box">
-    <div class="dup-title" id="dupTitle">MeetloopChat Open in Another Tab</div>
-    <div class="dup-desc" id="dupDesc">Running multiple tabs at the same time is not allowed. <b>Session paused in this tab.</b></div>
-    <button class="dup-btn" id="reclaimSessionBtn" type="button">Use Here</button>
-  </div>
-</div>
-
-<!-- STRICT LIVE FACE WARNING -->
-<div id="faceModalOverlay">
-  <div class="face-modal-card">
-    <div class="face-modal-title" id="faceModalTitle">Human Face Required</div>
-    <div class="face-modal-desc" id="faceModalDesc">Real live person required. Photos, screens, walls, or covering the camera will not pass.</div>
-    <button class="face-modal-btn" id="closeFaceModalBtn" type="button">OK, I will face the camera</button>
+<!-- HUMAN FACE WARNING MODAL -->
+<div id="faceModal" class="basic-modal">
+  <div class="basic-modal-card">
+    <div style="color:#ef4444;font-size:16px;font-weight:900;margin-bottom:6px">Face Required</div>
+    <div style="color:#cbd5e1;font-size:12px;line-height:1.5;margin-bottom:16px">Point your camera at your face. Covered cameras, ceilings, or static photos are strictly prohibited.</div>
+    <button class="ctrl-btn btn-start-next" style="width:100%" onclick="document.getElementById('faceModal').style.display='none'">I Understand</button>
   </div>
 </div>
 
 <!-- HEADER -->
 <header>
   <div class="brand">
-    <svg class="brand-icon-svg" viewBox="0 0 100 100">
-      <defs>
-        <linearGradient id="headerLogoG1" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#93c5fd"/>
-          <stop offset="45%" stop-color="#a855f7"/>
-          <stop offset="100%" stop-color="#c084fc"/>
-        </linearGradient>
-        <linearGradient id="headerLogoG2" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#38bdf8"/>
-          <stop offset="60%" stop-color="#06b6d4"/>
-          <stop offset="100%" stop-color="#2dd4bf"/>
-        </linearGradient>
-      </defs>
-      <path d="M40 20 C25.6 20 14 31.6 14 46 C14 53.5 17.2 60.2 22.4 65 L18 78 L31.5 73.5 C34.1 74.5 37 75 40 75 C47.5 75 54.2 71.8 59 66.6 C55.5 67.5 51.8 68 48 68 C35.8 68 26 58.2 26 46 C26 36.8 31.6 28.9 39.7 25.5 C39.8 23.7 40 21.8 40 20 Z" fill="url(#headerLogoG1)"/>
-      <path d="M60 22 C47.8 22 38 31.8 38 44 C38 49.5 40 54.5 43.4 58.4 C46.8 53.6 52.5 50.4 59 50.4 C69.5 50.4 78 58.9 78 69.4 C78 70.3 77.9 71.1 77.8 72 C83 67.8 86.4 61.3 86.4 54 C86.4 39.6 74.8 22 60 22 Z" fill="url(#headerLogoG2)"/>
+    <svg class="brand-logo" viewBox="0 0 100 100">
+      <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z" fill="#38bdf8"/>
+      <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z" fill="#a855f7"/>
     </svg>
-    <span>MeetloopChat</span>
+    <div class="brand-text">Meet<span>Loop</span></div>
   </div>
-  <div class="header-right">
-    <div class="badge online"><span class="online-dot"></span><span id="onlineLabel">Online:</span>&nbsp;<span id="onlineCount">0</span></div>
-    <div class="badge" id="statusBadge">Ready</div>
-    <div class="badge" id="callTimer">
-      <span class="timer-dot"></span>
-      <span class="timer-label">LIVE</span>
-      <span class="timer-time" id="callTimerValue">00:00</span>
-    </div>
-    <select id="languageSelect">
-      <option value="en" selected>English (US)</option>
-      <option value="tl">Tagalog (PH)</option>
-      <option value="es">Español (ES)</option>
-      <option value="ja">日本語 (JA)</option>
-      <option value="ko">한국어 (KO)</option>
-      <option value="zh">中文 (ZH)</option>
-      <option value="fr">Français (FR)</option>
-      <option value="id">Bahasa Indonesia</option>
+
+  <div class="header-meta">
+    <div class="badge-online"><span class="online-dot"></span>Online: <span class="count" id="onlineCounter">270,658</span></div>
+    <select id="languageSelect" class="lang-select">
+      <option value="en" selected>English</option>
+      <option value="tl">Tagalog</option>
     </select>
   </div>
 </header>
 
-<!-- MAIN ARENA -->
-<div class="main-container">
-  <div class="video-wrapper">
-    <div class="videos-grid">
-      <!-- Stranger Main Screen -->
-      <div class="video-box" id="remoteVideoBox">
+<!-- MAIN STAGE -->
+<div class="stage-container">
+  <div class="stream-arena">
+    <div class="video-grid">
+      <!-- Stranger Box -->
+      <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" class="remote-blur" autoplay playsinline webkit-playsinline></video>
         <audio id="remoteAudio" autoplay playsinline></audio>
 
-        <!-- 📺 MEETLOOP STANDBY SCREEN (TRANSPARENT LOGO + STATIC NOISE) -->
-        <div id="ometvStandby">
-          <canvas id="staticCanvas"></canvas>
-          <div class="meetloop-center-brand">
-            <!-- Interlocking Chatloop Logo (Invisible Background) -->
-            <svg class="meetloop-dynamic-logo" viewBox="0 0 100 100">
-              <defs>
-                <linearGradient id="standbyG1" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#93c5fd"/>
-                  <stop offset="45%" stop-color="#a855f7"/>
-                  <stop offset="100%" stop-color="#c084fc"/>
-                </linearGradient>
-                <linearGradient id="standbyG2" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#38bdf8"/>
-                  <stop offset="60%" stop-color="#06b6d4"/>
-                  <stop offset="100%" stop-color="#2dd4bf"/>
-                </linearGradient>
-              </defs>
-              <path d="M40 20 C25.6 20 14 31.6 14 46 C14 53.5 17.2 60.2 22.4 65 L18 78 L31.5 73.5 C34.1 74.5 37 75 40 75 C47.5 75 54.2 71.8 59 66.6 C55.5 67.5 51.8 68 48 68 C35.8 68 26 58.2 26 46 C26 36.8 31.6 28.9 39.7 25.5 C39.8 23.7 40 21.8 40 20 Z" fill="url(#standbyG1)"/>
-              <path d="M60 22 C47.8 22 38 31.8 38 44 C38 49.5 40 54.5 43.4 58.4 C46.8 53.6 52.5 50.4 59 50.4 C69.5 50.4 78 58.9 78 69.4 C78 70.3 77.9 71.1 77.8 72 C83 67.8 86.4 61.3 86.4 54 C86.4 39.6 74.8 22 60 22 Z" fill="url(#standbyG2)"/>
+        <!-- OmeTV Standby Screen -->
+        <div id="standbyScreen">
+          <canvas id="crtStaticCanvas"></canvas>
+          <div class="standby-center">
+            <svg class="standby-logo" viewBox="0 0 100 100">
+              <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z" fill="#38bdf8"/>
+              <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z" fill="#a855f7"/>
             </svg>
-            <div class="meetloop-dynamic-title">MeetloopChat</div>
-            <div class="ometv-online-text">
-              <span class="ometv-online-dot"></span>
-              <span id="standbyOnlineCount">270,658</span> users online
+            <div class="standby-title">MeetLoop</div>
+            <div class="standby-online-tag">
+              <span class="online-dot"></span>
+              <span id="standbyUsers">270,658</span> users online
             </div>
           </div>
         </div>
 
-        <!-- 🔊 BOTTOM VOLUME CONTROL BAR -->
-        <div class="ometv-bottom-bar">
-          <svg class="ometv-speaker-icon" id="speakerIcon" viewBox="0 0 24 24">
+        <!-- Volume Bar -->
+        <div class="remote-audio-bar">
+          <svg class="audio-speaker-btn" id="speakerIcon" viewBox="0 0 24 24">
             <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
           </svg>
-          <input type="range" class="ometv-volume-slider" id="volumeSlider" min="0" max="1" step="0.05" value="1">
+          <input type="range" class="audio-slider" id="audioSlider" min="0" max="1" step="0.05" value="1">
         </div>
 
-        <div class="video-label" id="remoteLabel">Stranger</div>
-        
-        <button id="reportStrangerBtn" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></svg>
-          <span>Report</span>
-        </button>
-        
-        <div class="status" id="remoteStatus">Waiting...</div>
-        <div class="search-overlay" id="searchOverlay">
-          <div class="search-box">
-            <div class="spinner"></div>
-            <div id="searchText">Finding someone...</div>
+        <div class="cam-tag" id="remoteTag">Stranger</div>
+        <button id="reportBtn" type="button">Report</button>
+        <div class="cam-status-pill" id="remoteStatus">Waiting...</div>
+
+        <!-- Search Overlay -->
+        <div class="search-loader" id="searchOverlay">
+          <div class="search-card">
+            <div class="search-spinner"></div>
+            <div class="search-text" id="searchText">Looking for someone...</div>
           </div>
         </div>
       </div>
 
-      <!-- User Camera -->
-      <div class="video-box" id="localVideoBox">
+      <!-- User Local Box -->
+      <div class="cam-box" id="localCamBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
-        <div id="camOffOverlay">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l22 22M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34m-7.72-2.06a4 4 0 1 1-5.56-5.56"/></svg>
-          <div style="margin-top:6px">Camera Off</div>
-        </div>
-        <div class="video-label" id="localLabel">You</div>
+        <div id="camOffCover">Camera Off</div>
+        <div class="cam-tag" id="localTag">You</div>
         <button id="hideLocalBtn" type="button">✕</button>
       </div>
 
-      <button id="showLocalBtn" type="button">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="13" r="3"/></svg>
-        <span id="showLocalText">Show Cam</span>
-      </button>
+      <button id="showLocalBtn" type="button">Show Cam</button>
     </div>
 
-    <!-- CONTROLS BAR -->
-    <div class="controls-bar">
-      <button class="btn btn-loop" id="loopBtn" type="button">
-        <svg id="loopBtnIcon" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        <span id="loopBtnText">Start</span>
-      </button>
-
-      <button class="btn btn-stop" id="stopBtn" type="button" disabled>
-        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
-        <span>Stop</span>
-      </button>
-
-      <button class="btn btn-toggle" id="micBtn" type="button">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
-        <span id="micBtnText">Mic On</span>
-      </button>
-
-      <button class="btn btn-toggle" id="camBtn" type="button">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        <span id="camBtnText">Cam On</span>
-      </button>
-
-      <!-- Flip Button: Only on Mobile -->
-      <button class="btn btn-flip" id="flipBtn" type="button">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 10c0-4.418-3.582-8-8-8s-8 3.582-8 8c0 2.21 0.895 4.21 2.343 5.657l-2.343 2.343h6v-6l-2.05 2.05c-1.196-1.196-1.95-2.85-1.95-4.05 0-3.314 2.686-6 6-6s6 2.686 6 6c0 1.2-0.754 2.854-1.95 4.05l1.414 1.414c1.64-1.64 2.536-3.834 2.536-5.464z"/></svg>
-        <span>Flip</span>
-      </button>
+    <!-- OmeTV Controls -->
+    <div class="controls-panel">
+      <button class="ctrl-btn btn-start-next" id="mainActionBtn" type="button">Start</button>
+      <button class="ctrl-btn btn-stop" id="stopBtn" type="button" disabled>Stop</button>
+      <button class="ctrl-btn btn-sec" id="micBtn" type="button">Mic On</button>
+      <button class="ctrl-btn btn-sec" id="camBtn" type="button">Cam On</button>
+      <button class="ctrl-btn btn-flip" id="flipBtn" type="button">Flip</button>
     </div>
   </div>
 
-  <!-- Chat -->
-  <div class="chat-wrapper">
-    <div class="chat-header">
-      <span id="chatHeader">Live Chat</span>
-      <span style="font-size:10px;color:var(--muted);font-weight:700">MeetloopChat</span>
+  <!-- Chat Arena -->
+  <div class="chat-arena">
+    <div class="chat-head">
+      <span class="chat-head-title">Live Chat</span>
+      <span style="font-size:10px;color:var(--text-muted);font-weight:700">MeetLoop</span>
     </div>
-    <div class="chat-messages" id="chatMessages">
-      <div class="message">
-        <div class="message-name">MeetloopChat Rules</div>
-        <div class="message-text meetloop-rules-card"><span class="rules-badge-tag">18+ RULES</span>
-<b>Welcome to MeetloopChat.</b>
-• 18+ Only. Zero tolerance for nudity, sexual acts, or harassment.
-• Live Human Face required. No photos or covered cameras.
-• Violations result in an immediate suspension.</div>
+    <div class="chat-stream" id="chatStream">
+      <div class="chat-msg">
+        <div class="chat-author">MeetLoop System</div>
+        <div class="chat-bubble chat-rules-card">
+          <span class="chat-rules-badge">RULES</span><br>
+          <b>Welcome to MeetLoop.</b><br>
+          • 18+ only. Nudity, obscene behavior, or spam are strictly banned.<br>
+          • Real face required. Point camera towards you.
+        </div>
       </div>
     </div>
-    <div class="chat-input-area">
-      <input id="chatInput" type="text" placeholder="Type a message..." maxlength="300" autocomplete="off">
-      <button id="sendBtn" type="button">Send</button>
+    <div class="chat-foot">
+      <input type="text" id="chatInput" class="chat-input" placeholder="Type a message..." maxlength="250" autocomplete="off">
+      <button type="button" class="chat-send-btn" id="sendBtn">Send</button>
     </div>
   </div>
 </div>
@@ -865,376 +594,66 @@ video{
 "use strict";
 
 /* =========================================================
-   PERSISTENT DEVICE & NUMERIC USER IDENTIFIER (FIXED ID)
+   USER IDENTIFIER & STATE
 ========================================================= */
-let myDeviceId = localStorage.getItem("meetloop_device_id");
-if (!myDeviceId) {
-  myDeviceId = "dev_" + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
-  localStorage.setItem("meetloop_device_id", myDeviceId);
-}
+let myDeviceId = localStorage.getItem("meetloop_device_id") || "dev_" + Math.random().toString(36).substr(2, 9);
+localStorage.setItem("meetloop_device_id", myDeviceId);
 
-let myNumericUserId = localStorage.getItem("meetloop_user_numeric_id");
-if (!myNumericUserId) {
-  myNumericUserId = Math.floor(100000000 + Math.random() * 900000000).toString();
-  localStorage.setItem("meetloop_user_numeric_id", myNumericUserId);
-}
+let myNumericUserId = localStorage.getItem("meetloop_user_numeric_id") || Math.floor(100000000 + Math.random() * 900000000).toString();
+localStorage.setItem("meetloop_user_numeric_id", myNumericUserId);
+document.getElementById("userNumericId").textContent = "ID: " + myNumericUserId;
 
-/* =========================================================
-   1. GLOBAL VARIABLES & TRANSLATIONS
-========================================================= */
-const bannedOverlay = document.getElementById("bannedOverlay");
-const banReasonText = document.getElementById("banReasonText");
-const banCountdownPill = document.getElementById("banCountdownPill");
-const banSnapshotCanvas = document.getElementById("banSnapshotCanvas");
-const adminUnbanId = document.getElementById("adminUnbanId");
-const gcashModalOverlay = document.getElementById("gcashModalOverlay");
-const gcashRefInput = document.getElementById("gcashRefInput");
-const gcashErrorHint = document.getElementById("gcashErrorHint");
-const verifyGcashBtn = document.getElementById("verifyGcashBtn");
-const reportStrangerBtn = document.getElementById("reportStrangerBtn");
-const reportModalOverlay = document.getElementById("reportModalOverlay");
-
-const duplicateTabOverlay = document.getElementById("duplicateTabOverlay");
-const reclaimSessionBtn = document.getElementById("reclaimSessionBtn");
-
-const localVideo = document.getElementById("localVideo");
-const localVideoBox = document.getElementById("localVideoBox");
-const camOffOverlay = document.getElementById("camOffOverlay");
-const hideLocalBtn = document.getElementById("hideLocalBtn");
-const showLocalBtn = document.getElementById("showLocalBtn");
-
+const standbyScreen = document.getElementById("standbyScreen");
+const crtStaticCanvas = document.getElementById("crtStaticCanvas");
 const remoteVideo = document.getElementById("remoteVideo");
 const remoteAudio = document.getElementById("remoteAudio");
-const loopBtn = document.getElementById("loopBtn");
-const loopBtnText = document.getElementById("loopBtnText");
-const stopBtn = document.getElementById("stopBtn");
-const micBtn = document.getElementById("micBtn");
-const micBtnText = document.getElementById("micBtnText");
-const camBtn = document.getElementById("camBtn");
-const camBtnText = document.getElementById("camBtnText");
-const flipBtn = document.getElementById("flipBtn");
+const localVideo = document.getElementById("localVideo");
+const localCamBox = document.getElementById("localCamBox");
+const camOffCover = document.getElementById("camOffCover");
 
 const searchOverlay = document.getElementById("searchOverlay");
 const searchText = document.getElementById("searchText");
 const remoteStatus = document.getElementById("remoteStatus");
-const onlineCount = document.getElementById("onlineCount");
-const standbyOnlineCount = document.getElementById("standbyOnlineCount");
-const statusBadge = document.getElementById("statusBadge");
+const mainActionBtn = document.getElementById("mainActionBtn");
+const stopBtn = document.getElementById("stopBtn");
+const micBtn = document.getElementById("micBtn");
+const camBtn = document.getElementById("camBtn");
+const flipBtn = document.getElementById("flipBtn");
+const reportBtn = document.getElementById("reportBtn");
 
+const chatStream = document.getElementById("chatStream");
 const chatInput = document.getElementById("chatInput");
-const chatMessages = document.getElementById("chatMessages");
 const sendBtn = document.getElementById("sendBtn");
-const callTimer = document.getElementById("callTimer");
-const callTimerValue = document.getElementById("callTimerValue");
-const languageSelect = document.getElementById("languageSelect");
 
-const ometvStandby = document.getElementById("ometvStandby");
-const staticCanvas = document.getElementById("staticCanvas");
-const volumeSlider = document.getElementById("volumeSlider");
+const audioSlider = document.getElementById("audioSlider");
 const speakerIcon = document.getElementById("speakerIcon");
-
-adminUnbanId.textContent = "ID: " + myNumericUserId;
-
-/* =========================================================
-   📺 TV STATIC NOISE GENERATOR (REALISTIC CRT NOISE)
-========================================================= */
-let staticAnimation = null;
-function runTVStaticEffect() {
-  if (!staticCanvas) return;
-  const ctx = staticCanvas.getContext("2d");
-  const w = (staticCanvas.width = 160);
-  const h = (staticCanvas.height = 120);
-
-  function renderNoise() {
-    if (ometvStandby.style.display === "none") return;
-    const imgData = ctx.createImageData(w, h);
-    const buffer = new Uint32Array(imgData.data.buffer);
-    const len = buffer.length;
-    for (let i = 0; i < len; i++) {
-      buffer[i] = ((255 * Math.random()) | 0) << 24;
-    }
-    ctx.putImageData(imgData, 0, 0);
-    staticAnimation = requestAnimationFrame(renderNoise);
-  }
-  renderNoise();
-}
-runTVStaticEffect();
-
-// Volume Controller
-volumeSlider.addEventListener("input", (e) => {
-  const val = parseFloat(e.target.value);
-  if (remoteAudio) remoteAudio.volume = val;
-  if (remoteVideo) remoteVideo.volume = val;
-});
-speakerIcon.addEventListener("click", () => {
-  if (volumeSlider.value > 0) {
-    volumeSlider.value = 0;
-    if (remoteAudio) remoteAudio.volume = 0;
-    if (remoteVideo) remoteVideo.volume = 0;
-  } else {
-    volumeSlider.value = 1;
-    if (remoteAudio) remoteAudio.volume = 1;
-    if (remoteVideo) remoteVideo.volume = 1;
-  }
-});
-
-const rtcConfig = {
-  iceServers: [
-    { urls: "stun:stun.relay.metered.ca:80" },
-    {
-      urls: "turn:standard.relay.metered.ca:80",
-      username: "0974f7094bbb79185dd1d4ce",
-      credential: "jqFOtepU3tMVTfEX"
-    },
-    {
-      urls: "turn:standard.relay.metered.ca:443",
-      username: "0974f7094bbb79185dd1d4ce",
-      credential: "jqFOtepU3tMVTfEX"
-    },
-    { urls: "stun:stun.l.google.com:19302" }
-  ]
-};
+const onlineCounter = document.getElementById("onlineCounter");
+const standbyUsers = document.getElementById("standbyUsers");
 
 let socket = null;
 try {
   if (typeof io !== "undefined") {
-    socket = io({ 
-      transports: ["websocket", "polling"], 
-      reconnection: true,
-      query: { deviceId: myDeviceId }
-    });
+    socket = io({ transports: ["websocket", "polling"], query: { deviceId: myDeviceId } });
   }
-} catch(e) {}
+} catch(e){}
 
 let localStream = null;
 let peerConnection = null;
 let dataChannel = null;
-let pendingIceCandidates = [];
 let searching = false;
 let connected = false;
-let stopping = false;
 let inCooldown = false;
 let currentFacingMode = "user";
-let callTimerInterval = null;
-let callStartTime = null;
-let banTimerInterval = null;
-let hasReportedCurrentStranger = false;
+let banInterval = null;
+let blurTimer = null;
 let isTabTerminated = false;
-let isServerBanned = false;
-let blurRemovalTimeout = null;
 
-let lastPartnerFrameCanvas = document.createElement("canvas");
-lastPartnerFrameCanvas.width = 125;
-lastPartnerFrameCanvas.height = 125;
-
-let currentLang = localStorage.getItem("meetloop_lang") || "en";
-
-const translations = {
-  en: {
-    online: "Online:", ready: "Ready", stranger: "Stranger", you: "You",
-    waiting: "Waiting...", searching: "Searching...", finding: "Finding someone...",
-    waitingPartner: "Waiting for partner...",
-    connected: "Connected", live: "Live", disconnected: "Disconnected", stopped: "Stopped",
-    strangerLeft: "Stranger left", start: "Start", next: "Next", stop: "Stop",
-    micOn: "Mic On", micOff: "Mic Off", camOn: "Cam On", camOff: "Cam Off",
-    flip: "Flip", showCam: "Show Cam", chatHeader: "Live Chat", inputPlaceholder: "Type a message...", send: "Send",
-    chatConnected: "Chat connected.", reportedNotice: "Reported",
-    alreadyReported: "You have already reported this user.",
-    warningModalTitle: "Real Live Face Required",
-    warningModalDesc: "Walls, ceilings, photos, screens, or static cameras are strictly forbidden. Look directly at the camera and move naturally.",
-    warningModalBtn: "I understand",
-    dupTitle: "MeetloopChat Open in Another Tab",
-    dupDesc: "Running multiple tabs at the same time is not allowed. Session paused in this tab.",
-    dupBtn: "Use Here"
-  },
-  tl: {
-    online: "Online:", ready: "Handa", stranger: "Kausap", you: "Ikaw",
-    waiting: "Naghihintay...", searching: "Naghahanap...", finding: "Naghahanap ng makakausap...",
-    waitingPartner: "Naghihintay ng partner...",
-    connected: "Konektado", live: "Live", disconnected: "Naputol", stopped: "Tinigil",
-    strangerLeft: "Umalis ang kausap", start: "Simulan", next: "Kasunod", stop: "Itigil",
-    micOn: "Mic Bukas", micOff: "Mic Off", camOn: "Cam Bukas", camOff: "Cam Off",
-    flip: "Iikot", showCam: "Ipakita Cam", chatHeader: "Usapan", inputPlaceholder: "Mag-type ng mensahe...", send: "Ipadala",
-    chatConnected: "Konektado na ang chat.", reportedNotice: "Na-report na",
-    alreadyReported: "Nai-report mo na ang user na ito.",
-    warningModalTitle: "Kailangan ng Tunay na Tao",
-    warningModalDesc: "Bawal ang dingding, kisame, litrato, o camera na walang tao. Itapat ang mukha at kumilos nang natural.",
-    warningModalBtn: "Naiintindihan ko",
-    dupTitle: "Bukas ang MeetloopChat sa Ibang Tab",
-    dupDesc: "Bawal ang dalawang tab nang sabay. Naka-pause muna ang session dito.",
-    dupBtn: "Gamitin Dito"
-  }
-};
-
-function t(k){ return translations[currentLang]?.[k] || translations["en"]?.[k] || ""; }
-
-function updateUILanguage() {
-  document.getElementById("onlineLabel").textContent = t("online");
-  document.getElementById("remoteLabel").textContent = t("stranger");
-  document.getElementById("localLabel").textContent = t("you");
-  document.getElementById("chatHeader").textContent = t("chatHeader");
-  chatInput.placeholder = t("inputPlaceholder");
-  sendBtn.textContent = t("send");
-  document.getElementById("showLocalText").textContent = t("showCam");
-
-  document.getElementById("faceModalTitle").textContent = t("warningModalTitle");
-  document.getElementById("faceModalDesc").textContent = t("warningModalDesc");
-  document.getElementById("closeFaceModalBtn").textContent = t("warningModalBtn");
-
-  document.getElementById("dupTitle").textContent = t("dupTitle");
-  document.getElementById("dupDesc").textContent = t("dupDesc");
-  document.getElementById("reclaimSessionBtn").textContent = t("dupBtn");
-
-  if (!connected && !searching) {
-    statusBadge.textContent = t("ready");
-    remoteStatus.textContent = t("waiting");
-    loopBtnText.textContent = t("start");
-  } else {
-    loopBtnText.textContent = t("next");
-  }
-  updateMediaButtons();
-}
+let lastPartnerCanvas = document.createElement("canvas");
+lastPartnerCanvas.width = 120;
+lastPartnerCanvas.height = 120;
 
 /* =========================================================
-   2. ANTI-CHEAT MULTI-LAYER LIVE FACE DETECTOR
-========================================================= */
-async function ensureVideoReady(video, maxWaitMs = 1200) {
-  const start = Date.now();
-  while ((video.readyState < 2 || video.videoWidth === 0) && (Date.now() - start < maxWaitMs)) {
-    await new Promise(r => setTimeout(r, 50));
-  }
-  return video.readyState >= 2 && video.videoWidth > 0;
-}
-
-async function verifyStrictHumanFace() {
-  if (!localVideo) return false;
-  
-  const isReady = await ensureVideoReady(localVideo);
-  if (!isReady) return false;
-
-  const vTrack = localStream?.getVideoTracks()[0];
-  if (!vTrack || !vTrack.enabled || vTrack.readyState !== 'live') {
-    return false;
-  }
-
-  const W = 64; 
-  const H = 48;
-  const canvas = document.createElement("canvas");
-  canvas.width = W; 
-  canvas.height = H;
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-
-  ctx.drawImage(localVideo, 0, 0, W, H);
-  const frame1 = ctx.getImageData(0, 0, W, H).data;
-
-  await new Promise(r => setTimeout(r, 150));
-  ctx.drawImage(localVideo, 0, 0, W, H);
-  const frame2 = ctx.getImageData(0, 0, W, H).data;
-
-  let skinPixels = 0;
-  let centerSkin = 0;
-  let totalLuma = 0;
-  let motionDiff = 0;
-  let edgeComplexity = 0;
-  const totalSampled = (W * H);
-
-  for (let i = 0; i < frame1.length; i += 4) {
-    const r = frame1[i];
-    const g = frame1[i+1];
-    const b = frame1[i+2];
-
-    const y = 0.299 * r + 0.587 * g + 0.114 * b;
-    totalLuma += y;
-
-    const diff = Math.abs(r - frame2[i]) + Math.abs(g - frame2[i+1]) + Math.abs(b - frame2[i+2]);
-    motionDiff += diff;
-
-    if (i % 8 === 0 && i > 4) {
-      edgeComplexity += Math.abs(y - (0.299 * frame1[i-4] + 0.587 * frame1[i-3] + 0.114 * frame1[i-2]));
-    }
-
-    const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
-    const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
-
-    if (cb >= 77 && cb <= 130 && cr >= 133 && cr <= 175 && y >= 35 && y <= 230) {
-      skinPixels++;
-      const pIdx = i / 4;
-      const x = pIdx % W;
-      const yCoord = Math.floor(pIdx / W);
-      if (x >= W * 0.25 && x <= W * 0.75 && yCoord >= H * 0.15 && yCoord <= H * 0.85) {
-        centerSkin++;
-      }
-    }
-  }
-
-  const avgLuma = totalLuma / totalSampled;
-  const skinRatio = skinPixels / totalSampled;
-  const avgMotion = motionDiff / totalSampled;
-  const avgComplexity = edgeComplexity / (totalSampled / 2);
-
-  if (avgLuma < 25 || avgLuma > 235) return false;
-  if (avgComplexity < 2.5) return false;
-  if (skinRatio < 0.10 || skinRatio > 0.80 || centerSkin < (totalSampled * 0.06)) return false;
-  if (avgMotion < 0.25) return false;
-
-  return true;
-}
-
-/* =========================================================
-   3. SILENT BACKGROUND COOLDOWN SHIELD
-========================================================= */
-async function startSearchWithCooldown() {
-  if (inCooldown || stopping || isTabTerminated || isServerBanned) return;
-
-  const ok = await startMedia();
-  if (!ok) return;
-
-  inCooldown = true;
-  loopBtn.disabled = true;
-  stopBtn.disabled = false;
-
-  ometvStandby.style.display = "none";
-  showSearch(t("finding"));
-
-  await new Promise(r => setTimeout(r, 1200));
-
-  const isHuman = await verifyStrictHumanFace();
-  if (!isHuman) {
-    inCooldown = false;
-    hideSearch();
-    ometvStandby.style.display = "flex";
-    runTVStaticEffect();
-    loopBtn.disabled = false;
-    document.getElementById("faceModalOverlay").style.display = "flex";
-    return;
-  }
-
-  inCooldown = false;
-  startLoopMatching();
-}
-
-function startLoopMatching() {
-  ometvStandby.style.display = "none";
-  enableRemoteBlur();
-  stopCallTimer();
-  closePeerConnection();
-  stopAllRemoteMedia();
-
-  connected = false;
-  searching = true;
-
-  showSearch(t("finding"));
-  remoteStatus.textContent = t("searching");
-  statusBadge.textContent = t("searching");
-  loopBtnText.textContent = t("next");
-  loopBtn.disabled = false;
-  stopBtn.disabled = false;
-
-  if (socket) socket.emit("skip");
-}
-
-/* =========================================================
-   4. SINGLE TAB CONTROLLER
+   SINGLE TAB CONTROLLER
 ========================================================= */
 const currentTabId = "tab_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
 const tabChannel = window.BroadcastChannel ? new BroadcastChannel("meetloop_single_tab_bus") : null;
@@ -1257,7 +676,7 @@ function terminateThisOldTab() {
     }
     if (socket) socket.disconnect();
   } catch(e){}
-  duplicateTabOverlay.style.display = "flex";
+  document.getElementById("duplicateTabOverlay").style.display = "flex";
 }
 
 if (tabChannel) {
@@ -1272,14 +691,16 @@ window.addEventListener("storage", (e) => {
   if (e.key === "meetloop_active_tab_id" && e.newValue) {
     try {
       const data = JSON.parse(e.newValue);
-      if (data && data.tabId !== currentTabId) terminateThisOldTab();
+      if (data && data.tabId !== currentTabId && (Date.now() - data.time < 5000)) {
+        terminateThisOldTab();
+      }
     } catch(err){}
   }
 });
 broadcastTabActive();
 
-reclaimSessionBtn.addEventListener("click", () => {
-  duplicateTabOverlay.style.display = "none";
+document.getElementById("reclaimSessionBtn").addEventListener("click", () => {
+  document.getElementById("duplicateTabOverlay").style.display = "none";
   isTabTerminated = false;
   broadcastTabActive();
   if (socket && !socket.connected) socket.connect();
@@ -1287,431 +708,192 @@ reclaimSessionBtn.addEventListener("click", () => {
 });
 
 /* =========================================================
-   5. PERSISTENT EVIDENCE SNAPSHOT & BAN RESTORE
+   OMETV TV STATIC NOISE
 ========================================================= */
-function trackStrangerLastFrame() {
-  if (remoteVideo && remoteVideo.videoWidth > 0 && remoteVideo.readyState >= 2) {
-    try {
-      const ctx = lastPartnerFrameCanvas.getContext("2d");
-      ctx.drawImage(remoteVideo, 0, 0, 125, 125);
-      const currentData = lastPartnerFrameCanvas.toDataURL("image/jpeg", 0.7);
-      localStorage.setItem("meetloop_last_frame", currentData);
-    } catch(e) {}
+function runTVStatic() {
+  if (!crtStaticCanvas) return;
+  const ctx = crtStaticCanvas.getContext("2d");
+  const w = (crtStaticCanvas.width = 160);
+  const h = (crtStaticCanvas.height = 120);
+
+  function noise() {
+    if (standbyScreen.style.display === "none") return;
+    const imgData = ctx.createImageData(w, h);
+    const buf = new Uint32Array(imgData.data.buffer);
+    for (let i = 0; i < buf.length; i++) buf[i] = ((255 * Math.random()) | 0) << 24;
+    ctx.putImageData(imgData, 0, 0);
+    requestAnimationFrame(noise);
   }
+  noise();
 }
-setInterval(trackStrangerLastFrame, 250);
+runTVStatic();
 
-function renderStrangerEvidenceSnapshot() {
-  try {
-    const ctx = banSnapshotCanvas.getContext("2d");
-    ctx.clearRect(0, 0, 125, 125);
-
-    const savedBanSnap = localStorage.getItem("meetloop_ban_snapshot") || localStorage.getItem("meetloop_last_frame");
-
-    if (savedBanSnap) {
-      const img = new Image();
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0, 125, 125);
-      };
-      img.src = savedBanSnap;
-    } else if (lastPartnerFrameCanvas && lastPartnerFrameCanvas.width > 0) {
-      ctx.drawImage(lastPartnerFrameCanvas, 0, 0, 125, 125);
-    } else {
-      ctx.fillStyle = "#cbd5e1";
-      ctx.fillRect(0, 0, 125, 125);
-      ctx.fillStyle = "#475569";
-      ctx.beginPath();
-      ctx.arc(62, 50, 26, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(62, 110, 42, 0, Math.PI, true);
-      ctx.fill();
-    }
-  } catch(e) {}
-}
-
-function runBanCountdown(banUntil, reasonText = "irrelevant image") {
-  isServerBanned = true;
-  stopSession();
-
-  const activeSnap = localStorage.getItem("meetloop_last_frame");
-  if (activeSnap) {
-    localStorage.setItem("meetloop_ban_snapshot", activeSnap);
-  }
-
-  localStorage.setItem("meetloop_ban_until", banUntil);
-  localStorage.setItem("meetloop_ban_reason", reasonText);
-
-  renderStrangerEvidenceSnapshot();
-  banReasonText.textContent = reasonText;
-  bannedOverlay.style.display = "flex";
-
-  if (banTimerInterval) clearInterval(banTimerInterval);
-  banTimerInterval = setInterval(() => {
-    const diff = Math.max(0, Math.floor((banUntil - Date.now()) / 1000));
-    const m = String(Math.floor(diff / 60)).padStart(2, '0');
-    const s = String(diff % 60).padStart(2, '0');
-    banCountdownPill.textContent = `${m}:${s}`;
-    
-    if (diff <= 0) {
-      clearInterval(banTimerInterval);
-      banTimerInterval = null;
-      bannedOverlay.style.display = "none";
-      isServerBanned = false;
-      localStorage.removeItem("meetloop_ban_until");
-      localStorage.removeItem("meetloop_ban_reason");
-      localStorage.removeItem("meetloop_ban_snapshot");
-      alert("Your suspension has ended. Reconnecting...");
-      location.reload();
-    }
-  }, 1000);
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-  const cachedBanUntil = parseInt(localStorage.getItem("meetloop_ban_until"), 10);
-  const cachedReason = localStorage.getItem("meetloop_ban_reason") || "irrelevant image";
-
-  if (cachedBanUntil && cachedBanUntil > Date.now()) {
-    runBanCountdown(cachedBanUntil, cachedReason);
-  }
+audioSlider.addEventListener("input", (e) => {
+  const v = parseFloat(e.target.value);
+  if (remoteAudio) remoteAudio.volume = v;
+  if (remoteVideo) remoteVideo.volume = v;
 });
-
-function openGcashModal() {
-  gcashErrorHint.style.display = "none";
-  gcashRefInput.value = "";
-  gcashModalOverlay.style.display = "flex";
-  gcashRefInput.focus();
-}
-function closeGcashModal() {
-  gcashModalOverlay.style.display = "none";
-}
-
-async function verifyGcashPayment() {
-  const ref = gcashRefInput.value.trim();
-  gcashErrorHint.style.display = "none";
-
-  if (!/^\d{10,16}$/.test(ref)) {
-    gcashErrorHint.textContent = "Please enter a valid 10-16 digit GCash Reference Number.";
-    gcashErrorHint.style.display = "block";
-    return;
-  }
-
-  verifyGcashBtn.disabled = true;
-  verifyGcashBtn.textContent = "Verifying with server...";
-
-  try {
-    const res = await fetch("/api/verify-gcash-unban", {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "x-device-id": myDeviceId
-      },
-      body: JSON.stringify({ refNumber: ref })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      alert("✅ Payment Confirmed! Your account has been UNBANNED.");
-      closeGcashModal();
-      bannedOverlay.style.display = "none";
-      isServerBanned = false;
-      localStorage.removeItem("meetloop_ban_until");
-      localStorage.removeItem("meetloop_ban_reason");
-      localStorage.removeItem("meetloop_ban_snapshot");
-      if (banTimerInterval) clearInterval(banTimerInterval);
-      location.reload();
-    } else {
-      gcashErrorHint.textContent = data.message || "Reference number not found or payment not yet received.";
-      gcashErrorHint.style.display = "block";
-    }
-  } catch(e) {
-    gcashErrorHint.textContent = "Verification error. Server is unreachable.";
-    gcashErrorHint.style.display = "block";
-  } finally {
-    verifyGcashBtn.disabled = false;
-    verifyGcashBtn.textContent = "⚡ Verify & Unban Now";
-  }
-}
-
-// 🔐 Admin Passcode Trigger
-let adminClickCount = 0;
-adminUnbanId.addEventListener("click", () => {
-  adminClickCount++;
-  if (adminClickCount >= 3) {
-    adminClickCount = 0;
-    const adminKey = prompt("Enter Admin Passcode:");
-    if (adminKey) {
-      fetch("/admin/unban-my-ip", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "x-device-id": myDeviceId
-        },
-        body: JSON.stringify({ adminKey })
-      })
-      .then(r => r.json())
-      .then(data => {
-        if (data.success) {
-          alert("Admin authorized: Account unbanned!");
-          localStorage.removeItem("meetloop_ban_until");
-          localStorage.removeItem("meetloop_ban_reason");
-          localStorage.removeItem("meetloop_ban_snapshot");
-          location.reload();
-        } else {
-          alert("Unauthorized passcode.");
-        }
-      })
-      .catch(() => alert("Admin server error."));
-    }
-  }
+speakerIcon.addEventListener("click", () => {
+  const v = audioSlider.value > 0 ? 0 : 1;
+  audioSlider.value = v;
+  if (remoteAudio) remoteAudio.volume = v;
+  if (remoteVideo) remoteVideo.volume = v;
 });
-
-if (socket) {
-  socket.on("connect_error", (err) => {
-    if (err.message && err.message.startsWith("IP_BANNED:")) {
-      const parts = err.message.split(":");
-      const banUntil = parseInt(parts[1], 10);
-      const reason = decodeURIComponent(parts[2] || "irrelevant image");
-      runBanCountdown(banUntil, reason);
-    }
-  });
-
-  socket.on("ip-banned", (data) => {
-    runBanCountdown(data.banUntil, data.reason || "irrelevant image");
-  });
-}
 
 /* =========================================================
-   6. CAMERA ENGINE
+   CAMERA & SENSOR VERIFICATION
 ========================================================= */
-let availableVideoDevices = [];
-let currentDeviceId = null;
-
-async function refreshVideoDevices() {
-  try {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    availableVideoDevices = devices.filter(d => d.kind === 'videoinput');
-  } catch(e) {
-    availableVideoDevices = [];
-  }
-}
-
 async function startMedia(specificDeviceId = null) {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live') && !specificDeviceId) {
-    if (localVideo.srcObject !== localStream) {
-      localVideo.srcObject = localStream;
-      localVideo.muted = true;
-    }
-    camOffOverlay.style.display = "none";
-    localVideo.style.opacity = "1";
-    await localVideo.play().catch(() => {});
-    updateMediaButtons();
+    if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
+    camOffCover.style.display = "none";
+    try { await localVideo.play(); } catch(e){}
     return true;
   }
 
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 850;
-  
-  let videoConstraints = {
-    width: isMobile ? { ideal: 640 } : { ideal: 1280 },
-    height: isMobile ? { ideal: 480 } : { ideal: 720 },
-    frameRate: { ideal: 30, max: 30 }
+  const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent) || window.innerWidth <= 850;
+  const constraints = {
+    video: specificDeviceId ? { deviceId: { exact: specificDeviceId } } : {
+      width: isMobile ? { ideal: 640 } : { ideal: 1280 },
+      height: isMobile ? { ideal: 480 } : { ideal: 720 },
+      facingMode: { ideal: currentFacingMode }
+    },
+    audio: { echoCancellation: true, noiseSuppression: true }
   };
 
-  if (specificDeviceId) {
-    videoConstraints.deviceId = { exact: specificDeviceId };
-  } else {
-    videoConstraints.facingMode = { ideal: currentFacingMode };
-  }
-
   try {
-    const newStream = await navigator.mediaDevices.getUserMedia({
-      video: videoConstraints,
-      audio: localStream && localStream.getAudioTracks().length > 0 ? false : {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true
-      }
-    });
-
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
     if (localStream) {
-      const newVideoTrack = newStream.getVideoTracks()[0];
-      const oldVideoTrack = localStream.getVideoTracks()[0];
-      if (oldVideoTrack) {
-        oldVideoTrack.stop();
-        localStream.removeTrack(oldVideoTrack);
-      }
-      localStream.addTrack(newVideoTrack);
+      const newVTrack = stream.getVideoTracks()[0];
+      const oldVTrack = localStream.getVideoTracks()[0];
+      if (oldVTrack) { oldVTrack.stop(); localStream.removeTrack(oldVTrack); }
+      if (newVTrack) localStream.addTrack(newVTrack);
     } else {
-      localStream = newStream;
-    }
-
-    const vTrack = localStream.getVideoTracks()[0];
-    if (vTrack) {
-      const settings = vTrack.getSettings ? vTrack.getSettings() : {};
-      currentDeviceId = settings.deviceId || null;
-      if (settings.facingMode) currentFacingMode = settings.facingMode;
+      localStream = stream;
     }
 
     localVideo.srcObject = localStream;
-    localVideo.muted = true;
     localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
-    camOffOverlay.style.display = "none";
-    localVideo.style.opacity = "1";
-    await localVideo.play().catch(() => {});
-
-    await refreshVideoDevices();
-    updateMediaButtons();
+    camOffCover.style.display = "none";
+    try { await localVideo.play(); } catch(e){}
     return true;
   } catch(err) {
     try {
       localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       localVideo.srcObject = localStream;
-      localVideo.muted = true;
-      camOffOverlay.style.display = "none";
-      await localVideo.play().catch(() => {});
-      updateMediaButtons();
+      camOffCover.style.display = "none";
+      try { await localVideo.play(); } catch(e){}
       return true;
     } catch(e) {
-      camOffOverlay.style.display = "flex";
+      camOffCover.style.display = "flex";
       return false;
     }
   }
 }
 
-function updateMediaButtons() {
-  if (!localStream) return;
-  const a = localStream.getAudioTracks()[0];
-  const v = localStream.getVideoTracks()[0];
-  if (a) micBtnText.textContent = a.enabled ? t("micOn") : t("micOff");
-  if (v) camBtnText.textContent = v.enabled ? t("camOn") : t("camOff");
-}
+async function verifyCameraSensor() {
+  if (!localVideo || localVideo.videoWidth === 0) return true;
+  const W = 64, H = 48;
+  const canvas = document.createElement("canvas");
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-function toggleMic() {
-  const a = localStream?.getAudioTracks()[0];
-  if (a) { a.enabled = !a.enabled; updateMediaButtons(); }
-}
+  ctx.drawImage(localVideo, 0, 0, W, H);
+  const data = ctx.getImageData(0, 0, W, H).data;
 
-function toggleCam() {
-  const v = localStream?.getVideoTracks()[0];
-  if (!v) return;
-  v.enabled = !v.enabled;
-  updateMediaButtons();
-  localVideo.style.opacity = v.enabled ? "1" : "0";
-  camOffOverlay.style.display = v.enabled ? "none" : "flex";
-}
-
-async function flipCamera() {
-  if (!localStream) return;
-  flipBtn.disabled = true;
-  flipBtn.style.opacity = "0.5";
-
-  await refreshVideoDevices();
-
-  if (availableVideoDevices.length > 1 && currentDeviceId) {
-    const currentIndex = availableVideoDevices.findIndex(d => d.deviceId === currentDeviceId);
-    const nextDevice = availableVideoDevices[(currentIndex + 1) % availableVideoDevices.length];
-    
-    const oldTrack = localStream.getVideoTracks()[0];
-    if (oldTrack) oldTrack.stop();
-
-    currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
-    await startMedia(nextDevice.deviceId);
-  } else {
-    const oldTrack = localStream.getVideoTracks()[0];
-    if (oldTrack) oldTrack.stop();
-
-    currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
-    await startMedia(null);
+  let totalLuma = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    totalLuma += 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
   }
-
-  if (peerConnection && localStream) {
-    const newVTrack = localStream.getVideoTracks()[0];
-    const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
-    if (sender && newVTrack) await sender.replaceTrack(newVTrack);
-  }
-
-  flipBtn.disabled = false;
-  flipBtn.style.opacity = "1";
-}
-
-function stopAllRemoteMedia() {
-  if (remoteVideo.srcObject) {
-    try { remoteVideo.srcObject.getTracks().forEach(t => t.stop()); } catch(e){}
-    remoteVideo.srcObject = null;
-  }
-  if (remoteAudio.srcObject) {
-    try { remoteAudio.srcObject.getTracks().forEach(t => t.stop()); } catch(e){}
-    remoteAudio.srcObject = null;
-  }
+  const avg = totalLuma / (W * H);
+  return avg > 15 && avg < 245;
 }
 
 /* =========================================================
-   7. WEBRTC ENGINE & UI CONTROLLER
+   1-SECOND PROTECTION BLUR
 ========================================================= */
-function enableRemoteBlur() {
-  if (blurRemovalTimeout) clearTimeout(blurRemovalTimeout);
+function enableBlur() {
+  if (blurTimer) clearTimeout(blurTimer);
   remoteVideo.classList.remove("remote-clear");
   remoteVideo.classList.add("remote-blur");
 }
-
-function scheduleRemoveRemoteBlur() {
-  if (blurRemovalTimeout) clearTimeout(blurRemovalTimeout);
-  blurRemovalTimeout = setTimeout(() => {
+function releaseBlur() {
+  if (blurTimer) clearTimeout(blurTimer);
+  blurTimer = setTimeout(() => {
     remoteVideo.classList.remove("remote-blur");
     remoteVideo.classList.add("remote-clear");
   }, 1000);
 }
 
-function showSearch(text) {
-  searchText.textContent = text;
+/* =========================================================
+   SEARCH & WEBRTC ENGINE
+========================================================= */
+async function triggerStartNext() {
+  if (inCooldown || isTabTerminated) return;
+  const ok = await startMedia();
+  if (!ok) return;
+
+  inCooldown = true;
+  mainActionBtn.disabled = true;
+
+  standbyScreen.style.display = "none";
   searchOverlay.style.display = "flex";
-}
-function hideSearch() { searchOverlay.style.display = "none"; }
 
-function formatCallTime(s) {
-  const m = Math.floor(s / 60);
-  const sec = s % 60;
-  return String(m).padStart(2, "0") + ":" + String(sec).padStart(2, "0");
-}
-function updateCallTimer() {
-  if (!callStartTime) return;
-  const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
-  callTimerValue.textContent = formatCallTime(elapsed);
-}
-function startCallTimer() {
-  stopCallTimer();
-  callStartTime = Date.now();
-  callTimer.classList.add("active");
-  callTimerInterval = setInterval(updateCallTimer, 1000);
-}
-function stopCallTimer() {
-  if (callTimerInterval) clearInterval(callTimerInterval);
-  callTimerInterval = null;
-  callStartTime = null;
-  callTimer.classList.remove("active");
-  callTimerValue.textContent = "00:00";
-}
+  const pass = await verifyCameraSensor();
+  if (!pass) {
+    inCooldown = false;
+    searchOverlay.style.display = "none";
+    standbyScreen.style.display = "flex";
+    runTVStatic();
+    mainActionBtn.disabled = false;
+    document.getElementById("faceModal").style.display = "flex";
+    return;
+  }
 
-function handleConnected() {
-  if (connected) return;
-  connected = true;
-  searching = false;
+  inCooldown = false;
+  enableBlur();
+  closePeerConnection();
 
-  ometvStandby.style.display = "none";
-  hasReportedCurrentStranger = false;
-  reportStrangerBtn.disabled = false;
-  reportStrangerBtn.style.opacity = "1";
-
-  hideSearch();
-  statusBadge.textContent = t("connected");
-  remoteStatus.textContent = t("live");
-  loopBtn.disabled = false;
+  connected = false;
+  searching = true;
+  remoteStatus.textContent = "Searching...";
+  mainActionBtn.textContent = "Next";
+  mainActionBtn.disabled = false;
   stopBtn.disabled = false;
-  loopBtnText.textContent = t("next");
-  startCallTimer();
-  scheduleRemoveRemoteBlur();
+
+  if (socket && socket.connected) socket.emit("skip");
 }
+
+function stopSession() {
+  searching = false;
+  connected = false;
+  inCooldown = false;
+
+  standbyScreen.style.display = "flex";
+  runTVStatic();
+  enableBlur();
+
+  if (socket) socket.emit("stop-search");
+  closePeerConnection();
+
+  searchOverlay.style.display = "none";
+  remoteStatus.textContent = "Stopped";
+  mainActionBtn.textContent = "Start";
+  mainActionBtn.disabled = false;
+  stopBtn.disabled = true;
+}
+
+const rtcConfig = {
+  iceServers: [
+    { urls: "stun:stun.relay.metered.ca:80" },
+    {
+      urls: "turn:standard.relay.metered.ca:80",
+      username: "0974f7094bbb79185dd1d4ce",
+      credential: "jqFOtepU3tMVTfEX"
+    },
+    { urls: "stun:stun.l.google.com:19302" }
+  ]
+};
 
 function createPeer(initiator) {
   closePeerConnection();
@@ -1726,9 +908,9 @@ function createPeer(initiator) {
   };
 
   peerConnection.ontrack = (e) => {
-    ometvStandby.style.display = "none";
-    hideSearch();
-    remoteStatus.textContent = t("live");
+    standbyScreen.style.display = "none";
+    searchOverlay.style.display = "none";
+    remoteStatus.textContent = "Live";
     const stream = (e.streams && e.streams[0]) ? e.streams[0] : null;
 
     if (stream) {
@@ -1740,19 +922,28 @@ function createPeer(initiator) {
       if (!remoteAudio.srcObject) remoteAudio.srcObject = new MediaStream();
       remoteAudio.srcObject.addTrack(e.track);
     }
-    remoteVideo.play().catch(() => {});
-    remoteAudio.play().catch(() => {});
+    remoteVideo.play().catch(()=>{});
+    remoteAudio.play().catch(()=>{});
   };
 
   peerConnection.onconnectionstatechange = () => {
-    if (peerConnection?.connectionState === "connected") handleConnected();
-    else if (peerConnection?.connectionState === "disconnected") remoteStatus.textContent = t("disconnected");
+    if (peerConnection?.connectionState === "connected") {
+      connected = true;
+      searching = false;
+      standbyScreen.style.display = "none";
+      searchOverlay.style.display = "none";
+      reportBtn.disabled = false;
+      releaseBlur();
+    }
   };
 
   if (initiator) {
     dataChannel = peerConnection.createDataChannel("chat");
     setupDataChannel(dataChannel);
-    createOffer();
+    peerConnection.createOffer().then(o => {
+      peerConnection.setLocalDescription(o);
+      socket.emit("signal", { type: "offer", offer: o });
+    });
   } else {
     peerConnection.ondatachannel = (e) => setupDataChannel(e.channel);
   }
@@ -1760,263 +951,269 @@ function createPeer(initiator) {
 
 function setupDataChannel(ch) {
   dataChannel = ch;
-  ch.onopen = () => addMessage("System", t("chatConnected"));
-  ch.onmessage = (e) => addMessage("Stranger", e.data);
-}
-
-async function createOffer() {
-  try {
-    const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
-    if (socket) socket.emit("signal", { type: "offer", offer: peerConnection.localDescription });
-  } catch(e){}
-}
-
-async function handleOffer(offer) {
-  if (!peerConnection) createPeer(false);
-  try {
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-    while (pendingIceCandidates.length > 0) {
-      await peerConnection.addIceCandidate(pendingIceCandidates.shift());
-    }
-    const ans = await peerConnection.createAnswer();
-    await peerConnection.setLocalDescription(ans);
-    if (socket) socket.emit("signal", { type: "answer", answer: peerConnection.localDescription });
-  } catch(e){}
-}
-
-async function handleAnswer(ans) {
-  try {
-    if (peerConnection && peerConnection.signalingState === "have-local-offer") {
-      await peerConnection.setRemoteDescription(new RTCSessionDescription(ans));
-      while (pendingIceCandidates.length > 0) {
-        await peerConnection.addIceCandidate(pendingIceCandidates.shift());
-      }
-    }
-  } catch(e){}
-}
-
-async function handleCandidate(cand) {
-  try {
-    const ice = new RTCIceCandidate(cand);
-    if (peerConnection && peerConnection.remoteDescription && peerConnection.remoteDescription.type) {
-      await peerConnection.addIceCandidate(ice);
-    } else {
-      pendingIceCandidates.push(ice);
-    }
-  } catch(e){}
+  ch.onmessage = (e) => addChatMessage("Stranger", e.data);
 }
 
 function closePeerConnection() {
-  if (dataChannel) { try { dataChannel.close(); } catch(e){} dataChannel = null; }
+  if (dataChannel) { try{ dataChannel.close(); }catch(e){} dataChannel = null; }
   if (peerConnection) {
     try {
       peerConnection.ontrack = null;
       peerConnection.onicecandidate = null;
       peerConnection.close();
-    } catch(e){}
+    }catch(e){}
     peerConnection = null;
   }
-  pendingIceCandidates = [];
-}
-
-function stopSession() {
-  stopping = true;
-  searching = false;
-  connected = false;
-  inCooldown = false;
-
-  // Ibalik ang standby screen na may umiilaw na Meetloop logo
-  ometvStandby.style.display = "flex";
-  runTVStaticEffect();
-
-  enableRemoteBlur();
-  stopCallTimer();
-  if (socket) socket.emit("stop-search");
-
-  closePeerConnection();
-  stopAllRemoteMedia();
-
-  hideSearch();
-  remoteStatus.textContent = t("stopped");
-  statusBadge.textContent = t("ready");
-
-  loopBtn.disabled = false;
-  stopBtn.disabled = true;
-  loopBtnText.textContent = t("start");
-
-  setTimeout(() => { stopping = false; }, 200);
+  if (remoteVideo.srcObject) {
+    try { remoteVideo.srcObject.getTracks().forEach(t=>t.stop()); }catch(e){}
+    remoteVideo.srcObject = null;
+  }
+  if (remoteAudio.srcObject) {
+    try { remoteAudio.srcObject.getTracks().forEach(t=>t.stop()); }catch(e){}
+    remoteAudio.srcObject = null;
+  }
 }
 
 /* =========================================================
-   8. SOCKET & PORTAL EVENTS
+   SOCKET LISTENERS
 ========================================================= */
 if (socket) {
-  socket.on("online-count", count => { 
-    onlineCount.textContent = count; 
-    const displayNum = Math.max(count, 270658);
-    standbyOnlineCount.textContent = displayNum.toLocaleString();
+  socket.on("online-count", count => {
+    const c = Math.max(count, 270658).toLocaleString();
+    onlineCounter.textContent = c;
+    standbyUsers.textContent = c;
   });
 
   socket.on("waiting", () => {
     searching = true;
-    enableRemoteBlur();
-    ometvStandby.style.display = "none";
-    showSearch(t("waitingPartner"));
-    remoteStatus.textContent = t("waiting");
+    enableBlur();
+    standbyScreen.style.display = "none";
+    searchOverlay.style.display = "flex";
+    remoteStatus.textContent = "Waiting...";
   });
 
   socket.on("match", data => {
     searching = false;
-    ometvStandby.style.display = "none";
-    enableRemoteBlur();
+    standbyScreen.style.display = "none";
+    enableBlur();
     createPeer(Boolean(data?.initiator));
   });
 
   socket.on("signal", async data => {
-    if (data.type === "offer") await handleOffer(data.offer);
-    else if (data.type === "answer") await handleAnswer(data.answer);
-    else if (data.type === "candidate") await handleCandidate(data.candidate);
+    if (data.type === "offer") {
+      if (!peerConnection) createPeer(false);
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+      const ans = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(ans);
+      socket.emit("signal", { type: "answer", answer: ans });
+    } else if (data.type === "answer" && peerConnection) {
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+    } else if (data.type === "candidate" && peerConnection) {
+      await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+    }
   });
 
   socket.on("partner-disconnected", () => {
-    addMessage("System", t("strangerLeft"));
-    if (!stopping) startSearchWithCooldown();
+    addChatMessage("System", "Stranger disconnected.");
+    triggerStartNext();
+  });
+
+  socket.on("ip-banned", data => {
+    runBanCountdown(data.banUntil, data.reason);
   });
 }
 
-window.enterMeetLoop = function() {
-  sessionStorage.setItem("meetloop_session_active", "true");
+/* =========================================================
+   BAN SCREEN & EVIDENCE
+========================================================= */
+function recordPartnerFrame() {
+  if (remoteVideo && remoteVideo.videoWidth > 0) {
+    const ctx = lastPartnerCanvas.getContext("2d");
+    ctx.drawImage(remoteVideo, 0, 0, 120, 120);
+    localStorage.setItem("meetloop_snap", lastPartnerCanvas.toDataURL("image/jpeg", 0.6));
+  }
+}
+setInterval(recordPartnerFrame, 350);
 
-  const portal = document.getElementById("welcomePortal");
-  const loader = document.getElementById("meetloopLoader");
-  const pBar = document.getElementById("loaderProgressBar");
-  const pNum = document.getElementById("loaderPercent");
-  const sText = document.getElementById("loaderStatusText");
+function runBanCountdown(banUntil, reason = "irrelevant image") {
+  stopSession();
+  localStorage.setItem("meetloop_banned_until", banUntil);
+  localStorage.setItem("meetloop_banned_reason", reason);
 
-  if (portal) portal.classList.add("portal-hidden");
-  if (loader) loader.style.display = "flex";
+  document.getElementById("banReasonLabel").textContent = reason;
+  const banCanvas = document.getElementById("banCanvas");
+  const ctx = banCanvas.getContext("2d");
+  const saved = localStorage.getItem("meetloop_snap");
+
+  if (saved) {
+    const img = new Image();
+    img.onload = () => ctx.drawImage(img, 0, 0, 120, 120);
+    img.src = saved;
+  } else {
+    ctx.fillStyle = "#cbd5e1"; ctx.fillRect(0,0,120,120);
+  }
+
+  document.getElementById("banOverlay").style.display = "flex";
+
+  if (banInterval) clearInterval(banInterval);
+  banInterval = setInterval(() => {
+    const rem = Math.max(0, Math.floor((banUntil - Date.now()) / 1000));
+    const m = String(Math.floor(rem / 60)).padStart(2, '0');
+    const s = String(rem % 60).padStart(2, '0');
+    document.getElementById("banCountdown").textContent = `${m}:${s}`;
+    if (rem <= 0) {
+      clearInterval(banInterval);
+      localStorage.removeItem("meetloop_banned_until");
+      location.reload();
+    }
+  }, 1000);
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  const cachedBan = parseInt(localStorage.getItem("meetloop_banned_until"), 10);
+  if (cachedBan && cachedBan > Date.now()) {
+    runBanCountdown(cachedBan, localStorage.getItem("meetloop_banned_reason") || "irrelevant image");
+  }
+});
+
+function openGcashModal(){ document.getElementById("gcashModal").style.display = "flex"; }
+function closeGcashModal(){ document.getElementById("gcashModal").style.display = "none"; }
+
+async function verifyGcashPayment() {
+  const ref = document.getElementById("gcashRef").value.trim();
+  const hint = document.getElementById("gcashHint");
+  hint.style.display = "none";
+
+  if (!/^\d{10,16}$/.test(ref)) {
+    hint.textContent = "Enter a valid 10-16 digit Reference Number.";
+    hint.style.display = "block";
+    return;
+  }
+
+  const btn = document.getElementById("gcashVerifyBtn");
+  btn.disabled = true;
+  btn.textContent = "Verifying...";
 
   try {
-    if (remoteAudio) { remoteAudio.muted = false; remoteAudio.volume = 1.0; }
-  } catch(e) {}
-
-  const mediaPromise = startMedia();
-
-  let progress = 0;
-  const progressInterval = setInterval(() => {
-    progress += Math.floor(Math.random() * 18) + 14;
-    if (progress >= 100) {
-      progress = 100;
-      clearInterval(progressInterval);
+    const r = await fetch("/api/verify-gcash-unban", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-device-id": myDeviceId },
+      body: JSON.stringify({ refNumber: ref })
+    });
+    const d = await r.json();
+    if (d.success) {
+      alert("Account Unbanned!");
+      localStorage.removeItem("meetloop_banned_until");
+      location.reload();
+    } else {
+      hint.textContent = d.message || "Payment not found.";
+      hint.style.display = "block";
     }
-    pBar.style.width = progress + "%";
-    pNum.textContent = progress + "%";
-    if (progress < 40) sText.textContent = "Connecting to server...";
-    else if (progress < 80) sText.textContent = "Checking camera & sensors...";
-    else sText.textContent = "Ready!";
-  }, 80);
+  } catch(e) {
+    hint.textContent = "Server connection error.";
+    hint.style.display = "block";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Verify Payment";
+  }
+}
 
-  setTimeout(async () => {
-    await mediaPromise;
-    clearInterval(progressInterval);
-    pBar.style.width = "100%";
-    pNum.textContent = "100%";
-    sText.textContent = "Ready!";
-
-    setTimeout(() => {
-      if (loader) {
-        loader.style.opacity = "0";
-        setTimeout(() => { loader.style.display = "none"; }, 250);
-      }
-    }, 150);
-  }, 800);
-};
+// Admin Unban Quick Trigger
+let adminClicks = 0;
+document.getElementById("adminUnbanId").addEventListener("click", () => {
+  adminClicks++;
+  if (adminClicks >= 3) {
+    adminClicks = 0;
+    const adminKey = prompt("Enter Admin Passcode:");
+    if (adminKey) {
+      fetch("/admin/unban-my-ip", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-device-id": myDeviceId },
+        body: JSON.stringify({ adminKey })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          alert("Admin Authorized: Account Unbanned!");
+          localStorage.removeItem("meetloop_banned_until");
+          location.reload();
+        } else {
+          alert("Unauthorized.");
+        }
+      })
+      .catch(() => alert("Server error."));
+    }
+  }
+});
 
 /* =========================================================
-   9. MESSAGING & BUTTON ATTACHMENTS
+   UI HELPERS & CHAT
 ========================================================= */
-function sendMessage() {
-  const txt = chatInput.value.trim();
-  if (!txt) return;
+function addChatMessage(author, msg) {
+  const div = document.createElement("div");
+  div.className = "chat-msg";
+  div.innerHTML = `<div class="chat-author">${author}</div><div class="chat-bubble">${msg.replace(/[&<>'"]/g, "")}</div>`;
+  chatStream.appendChild(div);
+  chatStream.scrollTop = chatStream.scrollHeight;
+}
 
-  if (!dataChannel || dataChannel.readyState !== "open") return;
-  dataChannel.send(txt);
-  addMessage("You", txt);
+function sendChat() {
+  const val = chatInput.value.trim();
+  if (!val || !dataChannel || dataChannel.readyState !== "open") return;
+  dataChannel.send(val);
+  addChatMessage("You", val);
   chatInput.value = "";
 }
 
-function addMessage(name, text) {
-  const msg = document.createElement("div");
-  msg.className = "message";
-  msg.innerHTML = `<div class="message-name">${name}</div><div class="message-text">${escapeHTML(text)}</div>`;
-  chatMessages.appendChild(msg);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
+window.enterMeetLoop = function() {
+  document.getElementById("welcomePortal").classList.add("hidden");
+  startMedia();
+};
 
-function escapeHTML(str) {
-  return str.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t));
-}
-
-reportStrangerBtn.addEventListener("click", () => {
-  if (!connected) return;
-  if (hasReportedCurrentStranger) {
-    alert(t("alreadyReported"));
-    return;
-  }
-  reportModalOverlay.style.display = "flex";
-});
-
-function closeReportModal() {
-  reportModalOverlay.style.display = "none";
-}
-
-function submitReport(reason) {
-  closeReportModal();
-  if (!connected) return;
-
-  hasReportedCurrentStranger = true;
-  reportStrangerBtn.disabled = true;
-  reportStrangerBtn.style.opacity = "0.5";
-
-  trackStrangerLastFrame();
-  if (socket) socket.emit("report-user", { reason: reason, verified: true });
-
-  setTimeout(() => { startSearchWithCooldown(); }, 200);
-}
-
-document.getElementById("closeFaceModalBtn").addEventListener("click", () => {
-  document.getElementById("faceModalOverlay").style.display = "none";
-});
-
-loopBtn.addEventListener("click", startSearchWithCooldown);
+mainActionBtn.addEventListener("click", triggerStartNext);
 stopBtn.addEventListener("click", stopSession);
-micBtn.addEventListener("click", toggleMic);
-camBtn.addEventListener("click", toggleCam);
-flipBtn.addEventListener("click", flipCamera);
-sendBtn.addEventListener("click", sendMessage);
-chatInput.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); sendMessage(); } });
+sendBtn.addEventListener("click", sendChat);
+chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") sendChat(); });
 
-hideLocalBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  localVideoBox.classList.add("camera-hidden");
-  showLocalBtn.classList.add("btn-visible");
+micBtn.addEventListener("click", () => {
+  const t = localStream?.getAudioTracks()[0];
+  if (t) { t.enabled = !t.enabled; micBtn.textContent = t.enabled ? "Mic On" : "Mic Off"; }
+});
+camBtn.addEventListener("click", () => {
+  const t = localStream?.getVideoTracks()[0];
+  if (t) {
+    t.enabled = !t.enabled;
+    camBtn.textContent = t.enabled ? "Cam On" : "Cam Off";
+    camOffCover.style.display = t.enabled ? "none" : "flex";
+  }
+});
+flipBtn.addEventListener("click", async () => {
+  currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+  const oldTrack = localStream?.getVideoTracks()[0];
+  if (oldTrack) oldTrack.stop();
+  await startMedia();
+  if (peerConnection && localStream) {
+    const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
+    if (sender) sender.replaceTrack(localStream.getVideoTracks()[0]);
+  }
 });
 
-showLocalBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  localVideoBox.classList.remove("camera-hidden");
-  showLocalBtn.classList.remove("btn-visible");
+reportBtn.addEventListener("click", () => {
+  if (!connected) return;
+  recordPartnerFrame();
+  if (socket) socket.emit("report-user", { reason: "irrelevant image", verified: true });
+  reportBtn.disabled = true;
+  triggerStartNext();
 });
 
-languageSelect.value = currentLang;
-languageSelect.addEventListener("change", (e) => {
-  currentLang = e.target.value;
-  localStorage.setItem("meetloop_lang", currentLang);
-  updateUILanguage();
+document.getElementById("hideLocalBtn").addEventListener("click", () => {
+  localCamBox.classList.add("hidden-cam");
+  document.getElementById("showLocalBtn").classList.add("visible");
 });
-
-updateUILanguage();
+document.getElementById("showLocalBtn").addEventListener("click", () => {
+  localCamBox.classList.remove("hidden-cam");
+  document.getElementById("showLocalBtn").classList.remove("visible");
+});
 </script>
 </body>
 </html>
