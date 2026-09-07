@@ -1,5 +1,6 @@
 /**
- * MeetLoop - Official Production Server Backend (Render Certified)
+ * MeetLoop - Production Server Backend (Render Certified)
+ * Features: Auto Partner Snapshot Ban, GCash Gateway & WebRTC Signaling
  */
 
 const express = require("express");
@@ -21,11 +22,10 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 3000;
 
-// Serve public directory
+// Serve static assets
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
-// Root entry point
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
@@ -38,17 +38,11 @@ function validateGCashReference(ref) {
   if (!ref || typeof ref !== "string") return false;
   const cleanRef = ref.trim().replace(/\s+/g, "");
 
-  // 1. Dapat eksaktong 13 numeric digits
   if (!/^\d{13}$/.test(cleanRef)) return false;
-
-  // 2. Bawal ang repeated / sequential numbers
   if (/^(\d)\1{12}$/.test(cleanRef)) return false;
   if ("0123456789012345".includes(cleanRef) || "9876543210987".includes(cleanRef)) return false;
-
-  // 3. Bawal gamitin ulit
   if (usedGcashReferences.has(cleanRef)) return false;
 
-  // 4. InstaPay Mod10 Algorithm & Master Codes Check
   let sum = 0;
   for (let i = 0; i < cleanRef.length; i++) {
     let digit = parseInt(cleanRef[i], 10);
@@ -111,13 +105,13 @@ function matchUsers() {
   }
 }
 
-/* ================= SOCKET.IO EVENTS ================= */
+/* ================= SOCKET EVENTS ================= */
 io.on("connection", (socket) => {
   const hardwareId = socket.handshake.query.hardwareId || socket.handshake.query.deviceId;
 
   io.emit("online-count", io.engine.clientsCount);
 
-  // Check ban upon connect
+  // Check ban upon connection (kasama ang violation picture)
   const banInfo = checkDeviceBan(hardwareId);
   if (banInfo) {
     socket.emit("ip-banned", {
@@ -155,7 +149,7 @@ io.on("connection", (socket) => {
     matchUsers();
   });
 
-  // SIGNALING
+  // WebRTC SIGNALING
   socket.on("signal", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -166,14 +160,16 @@ io.on("connection", (socket) => {
     }
   });
 
-  // REPORT USER
+  // REPORT USER: Ang mukha ng nirereport ang maba-ban at magiging snapshot picture niya
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
       const partner = io.sockets.sockets.get(partnerId);
       if (partner) {
         const partnerHw = partner.handshake.query.hardwareId;
-        const record = banDevice(partnerHw, data.reason || "Policy Violation", data.snapshot);
+        const snapshot = data.snapshot || null;
+
+        const record = banDevice(partnerHw, data.reason || "Policy Violation", snapshot);
 
         partner.emit("ip-banned", {
           banUntil: record.banUntil,
@@ -240,9 +236,6 @@ io.on("connection", (socket) => {
   });
 });
 
-/* ================= BIND TO 0.0.0.0 FOR RENDER ================= */
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`================================================`);
 });
