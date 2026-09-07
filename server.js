@@ -8,12 +8,14 @@ const io = new Server(server, {
   cors: { origin: "*" }
 });
 
+app.use(express.json());
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname));
 
 // --- SERVER-SIDE IP BAN STORAGE ---
 const bannedIPs = new Map(); // ip -> { banUntil, reason }
-const ipStrikes = new Map(); // ip -> verified strike count
+const ipStrikes = new Map(); // ip -> verified violations
+const usedGcashReferences = new Set(); // Anti-fraud: Bawal ulitin ang nagamit nang resibo!
 
 function getClientIP(reqOrSocket) {
   const headers = reqOrSocket.headers || reqOrSocket.handshake?.headers || {};
@@ -27,7 +29,37 @@ function getClientIP(reqOrSocket) {
          "127.0.0.1";
 }
 
-// 🔓 ADMIN UNBAN VIA URL
+// 💰 AUTOMATED GCASH UNBAN VERIFICATION ENDPOINT
+app.post('/api/verify-gcash-unban', (req, res) => {
+  const ip = getClientIP(req);
+  const { refNumber } = req.body || {};
+
+  if (!refNumber) {
+    return res.status(400).json({ success: false, message: "Please enter your GCash Reference Number." });
+  }
+
+  const cleanRef = refNumber.toString().replace(/\s+/g, '').trim();
+
+  // Validasyon ng GCash / InstaPay Reference format (10 to 16 numeric digits)
+  if (!/^\d{10,16}$/.test(cleanRef)) {
+    return res.status(400).json({ success: false, message: "Invalid Reference Number format. Must be 10-16 digits from GCash receipt." });
+  }
+
+  // Anti-Cheat: Bawal gamitin ang lumang resibo ng ibang tao
+  if (usedGcashReferences.has(cleanRef)) {
+    return res.status(400).json({ success: false, message: "This Reference Number has already been used." });
+  }
+
+  // Tanggapin ang resibo at i-markang gamit na
+  usedGcashReferences.add(cleanRef);
+  bannedIPs.delete(ip);
+  ipStrikes.delete(ip);
+
+  console.log(`💰 GCash ₱20 Payment Verified! Unbanned IP: ${ip} | Ref: ${cleanRef}`);
+  return res.json({ success: true, message: "Payment verified successfully! Your account is now unbanned." });
+});
+
+// 🔓 ADMIN SECRET URL UNBAN
 app.get('/admin/unban-my-ip', (req, res) => {
   const ip = getClientIP(req);
   bannedIPs.delete(ip);
@@ -53,7 +85,7 @@ io.use((socket, next) => {
 });
 
 let waitingQueue = [];
-const matches = new Map(); // socket.id -> { partnerId, reported: boolean }
+const matches = new Map();
 
 io.on('connection', (socket) => {
   const userIP = getClientIP(socket);
@@ -112,11 +144,10 @@ io.on('connection', (socket) => {
     }
   });
 
-  // --- REPORT HANDLER (IKAW NA NAG-REPORT AY LIGTAS 100%) ---
   socket.on('report-user', (data) => {
     const match = matches.get(socket.id);
     if (!match || match.reported) return;
-    match.reported = true; // Mark as reported
+    match.reported = true;
 
     const targetPartner = io.sockets.sockets.get(match.partnerId);
     if (!targetPartner) {
@@ -124,7 +155,6 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // Ang targetPartner LAMANG ang paparusahan, HINDI ang nag-report!
     if (data.verified === true) {
       const targetIP = getClientIP(targetPartner);
       const strikes = (ipStrikes.get(targetIP) || 0) + 1;
@@ -136,8 +166,6 @@ io.on('connection', (socket) => {
         const reason = data.reason || "irrelevant image";
 
         bannedIPs.set(targetIP, { banUntil, reason });
-
-        // Ipadala ang ban signal sa target partner LAMANG
         targetPartner.emit('ip-banned', { banUntil, reason });
 
         setTimeout(() => {
@@ -146,7 +174,6 @@ io.on('connection', (socket) => {
       }
     }
 
-    // Ilipat agad ang nag-report sa ibang stranger
     leaveCurrentMatch();
     findMatch();
   });
@@ -157,12 +184,12 @@ io.on('connection', (socket) => {
   });
 });
 
-// Terminal unban: type "unban all"
 process.stdin.on('data', (data) => {
   if (data.toString().trim() === 'unban all') {
     bannedIPs.clear();
     ipStrikes.clear();
-    console.log("✅ All IP Bans wiped!");
+    usedGcashReferences.clear();
+    console.log("✅ All IP Bans & receipts wiped clean!");
   }
 });
 
