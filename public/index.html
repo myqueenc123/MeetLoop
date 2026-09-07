@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#070b14">
 
-<!-- TAB BAR LOGO / FAVICON -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%233b82f6'/%3E%3Cstop offset='50%25' stop-color='%238b5cf6'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='%23070b14'/%3E%3Cpath d='M32 12 A20 20 0 0 1 52 32 A20 20 0 0 1 34 52' fill='none' stroke='url(%23g)' stroke-width='6' stroke-linecap='round'/%3E%3Cpolygon points='34,58 30,49 40,49' fill='%23ec4899'/%3E%3Cpath d='M32 52 A20 20 0 0 1 12 32 A20 20 0 0 1 30 12' fill='none' stroke='url(%23g)' stroke-width='6' stroke-linecap='round'/%3E%3Cpolygon points='30,6 34,15 24,15' fill='%233b82f6'/%3E%3Ccircle cx='32' cy='32' r='7' fill='url(%23g)'/%3E%3C/svg%3E">
+<!-- TAB BAR LOGO / FAVICON (MEETLOOPCHAT VECTOR) -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2360a5fa'/%3E%3Cstop offset='100%25' stop-color='%23a855f7'/%3E%3C/linearGradient%3E%3ClinearGradient id='g2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2322d3ee'/%3E%3Cstop offset='100%25' stop-color='%233b82f6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='24' fill='%23070b14'/%3E%3Cpath d='M40 22 C26 22 15 33 15 47 C15 54 18 60 23 65 L20 78 L33 72 C35 73 38 73 40 73 C54 73 65 62 65 48 C65 34 54 22 40 22 Z' fill='none' stroke='url(%23g1)' stroke-width='11' stroke-linejoin='round'/%3E%3Cpath d='M60 27 C50 27 42 33 39 41 C42 41 45 42 48 43 C50 38 55 35 60 35 C68 35 74 41 74 49 C74 57 68 63 60 63 C57 63 54 62 52 60 C50 63 47 66 44 68 C48 70 54 72 60 72 C73 72 83 62 83 49 C83 37 73 27 60 27 Z' fill='url(%23g2)'/%3E%3C/svg%3E">
 
 <!-- ANTI-CACHE -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>MeetLoop</title>
+<title>MeetloopChat</title>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -26,6 +26,7 @@
   --blue2:#3b82f6;
   --red:#ef4444;
   --purple:#8b5cf6;
+  --cyan:#06b6d4;
   --text:#f8fafc;
   --muted:#94a3b8;
 }
@@ -55,16 +56,15 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   display:none !important;opacity:0 !important;visibility:hidden !important;pointer-events:none !important;
 }
 .portal-card{
-  max-width:460px;width:100%;padding:36px 26px;text-align:center;
+  max-width:460px;width:100%;padding:38px 28px;text-align:center;
   background:#0f172a;border:1.5px solid rgba(255,255,255,.12);
   border-radius:24px;box-shadow:0 15px 40px rgba(0,0,0,.8);
 }
-.portal-logo-ring{
-  width:64px;height:64px;margin:0 auto 16px;border-radius:20px;
-  background:linear-gradient(135deg,#3b82f6,#ec4899);
-  display:flex;align-items:center;justify-content:center;font-size:32px;
+.portal-logo-svg{
+  width:72px;height:72px;margin:0 auto 16px;display:block;
+  filter:drop-shadow(0 0 16px rgba(59,130,246,.45));
 }
-.portal-title{font-size:30px;font-weight:900;letter-spacing:.5px;margin-bottom:6px;color:#fff}
+.portal-title{font-size:30px;font-weight:900;letter-spacing:.3px;margin-bottom:6px;color:#fff}
 .portal-subtitle{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:20px}
 .portal-rules-box{
   text-align:left;font-size:12px;color:#cbd5e1;line-height:1.7;margin-bottom:24px;
@@ -72,11 +72,13 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 }
 .portal-rules-box li{margin-bottom:6px}
 .portal-open-btn{
-  width:100%;min-height:52px;font-size:16px;font-weight:900;
+  width:100%;min-height:52px;font-size:15px;font-weight:800;letter-spacing:.4px;
   border-radius:14px;border:0;cursor:pointer;color:#fff;
-  background:linear-gradient(135deg,#2563eb,#ec4899);
+  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
   display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:filter .15s;
 }
+.portal-open-btn:hover{filter:brightness(1.1)}
 .portal-open-btn:active{transform:scale(.98)}
 
 /* =========================================================
@@ -88,14 +90,13 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   background:#070b14;flex-direction:column;padding:24px;
 }
 .loader-content{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:300px;width:100%}
-.meetloop-radar-box{position:relative;width:80px;height:80px;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
-.meetloop-loader-logo{
-  width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,#3b82f6,#ec4899);
-  display:flex;align-items:center;justify-content:center;font-size:28px;z-index:2;
+.loader-logo-svg{
+  width:64px;height:64px;margin-bottom:20px;
+  filter:drop-shadow(0 0 18px rgba(34,211,238,.45));
 }
 .loader-app-name{font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:18px}
 .loader-progress-track{width:100%;height:5px;background:#1e293b;border-radius:999px;overflow:hidden;position:relative;margin-bottom:12px}
-.loader-progress-bar{width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg, #3b82f6, #ec4899);transition:width .15s ease-out}
+.loader-progress-bar{width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg, #3b82f6, #22d3ee);transition:width .15s ease-out}
 .loader-info-row{display:flex;justify-content:space-between;width:100%;font-size:11px;font-weight:700;color:#94a3b8}
 
 /* =========================================================
@@ -106,17 +107,15 @@ header{
   gap:12px;padding:0 16px;background:#0f172a;border-bottom:1px solid var(--border);
   position:relative;z-index:20;
 }
-.brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:900;white-space:nowrap}
-.brand-icon{
-  width:34px;height:34px;display:flex;align-items:center;justify-content:center;
-  border-radius:10px;background:linear-gradient(135deg,#3b82f6,#ec4899);
-}
+.brand{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:900;white-space:nowrap;color:#fff}
+.brand-icon-svg{width:32px;height:32px;display:block}
 .header-right{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
 .badge{
   min-height:32px;display:inline-flex;align-items:center;justify-content:center;
   padding:6px 10px;border-radius:999px;background:#1e293b;
   border:1px solid var(--border);font-size:11px;font-weight:700;white-space:nowrap;
 }
+.online-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;margin-right:6px}
 .online{color:#86efac}
 #statusBadge{color:#cbd5e1}
 
@@ -135,7 +134,7 @@ select option{background:#0f172a;color:#fff}
 #callTimer.active .timer-dot{background:var(--red)}
 
 /* =========================================================
-   MAIN VIDEO ARENA WITH OMETV 1-SEC BLUR TRANSITION
+   MAIN VIDEO ARENA
 ========================================================= */
 .main-container{width:100%;height:calc(100vh - 60px);display:flex;gap:10px;padding:10px}
 .video-wrapper{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:8px}
@@ -186,9 +185,9 @@ video{
 }
 
 #reportStrangerBtn{
-  position:absolute;top:10px;right:10px;z-index:5;padding:5px 10px;
+  position:absolute;top:10px;right:10px;z-index:5;padding:6px 12px;
   border-radius:7px;border:0;background:#dc2626;color:#fff;
-  font-size:11px;font-weight:800;cursor:pointer;
+  font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px;
 }
 #reportStrangerBtn:disabled{background:#475569;cursor:not-allowed}
 
@@ -201,21 +200,24 @@ video{
 #searchText{color:#e2e8f0;font-size:12px;font-weight:800}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* CONTROLS BAR */
+/* =========================================================
+   CLEAN MODERN CONTROLS (ZERO EMOJIS, CLEAN SVG ICONS)
+========================================================= */
 .controls-bar{display:flex;gap:6px}
 .btn{
-  min-height:44px;padding:8px 12px;border:1px solid rgba(255,255,255,.08);
+  min-height:44px;padding:8px 14px;border:1px solid rgba(255,255,255,.08);
   border-radius:10px;color:#fff;background:#0f172a;cursor:pointer;font-size:12px;
-  font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;
-  user-select:none;
+  font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;
+  user-select:none;transition:filter .15s, transform .12s;
 }
+.btn svg{width:16px;height:16px;fill:currentColor;flex-shrink:0}
 .btn:active:not(:disabled){transform:scale(.98)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 
 .btn-loop{flex:1.8;background:linear-gradient(135deg,var(--blue),var(--blue2))}
 .btn-stop{flex:1;background:#dc2626}
 .btn-toggle{flex:1;background:#1e293b}
-.btn-flip{display:flex;flex:1;background:#6b21a8}
+.btn-flip{display:flex;flex:1;background:#581c87}
 
 /* CHAT */
 .chat-wrapper{
@@ -236,7 +238,7 @@ video{
 #chatInput{flex:1;min-width:0;min-height:38px;padding:8px 10px;background:#020617;color:#fff;border:1px solid var(--border-strong);border-radius:8px;outline:none;font-size:11px}
 #sendBtn{min-width:60px;border:0;border-radius:8px;color:#fff;background:var(--blue);cursor:pointer;font-size:11px;font-weight:800}
 
-/* REPORT REASONS MODAL */
+/* REPORT MODAL */
 #reportModalOverlay{
   position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.85);
   display:none;align-items:center;justify-content:center;padding:16px;
@@ -252,9 +254,7 @@ video{
 }
 .report-opt:active{background:#dc2626}
 
-/* =========================================================
-   🛑 EXACT OMETV CLEAN BANNED SCREEN (BASE SA PICTURE MO)
-========================================================= */
+/* OMETV CLEAN BANNED SCREEN */
 #bannedOverlay{
   position:fixed;inset:0;z-index:9999999;
   background:rgba(0,0,0,.88);
@@ -271,35 +271,21 @@ video{
   from{transform:scale(0.95);opacity:0}
   to{transform:scale(1);opacity:1}
 }
-.ban-top-row{
-  display:flex;gap:20px;align-items:flex-start;margin-bottom:28px;
-}
+.ban-top-row{display:flex;gap:20px;align-items:flex-start;margin-bottom:28px}
 .ban-snapshot-box{
   width:125px;height:125px;border-radius:10px;overflow:hidden;
   background:#000;position:relative;flex-shrink:0;border:1.5px solid #cbd5e1;
 }
-.ban-snapshot-box img, .ban-snapshot-box canvas{
-  width:100%;height:100%;object-fit:cover;filter:blur(8px);
-}
+.ban-snapshot-box canvas{width:100%;height:100%;object-fit:cover;filter:blur(8px)}
 .ban-snapshot-watermark{
   position:absolute;top:6px;left:6px;background:rgba(0,0,0,.65);
   color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:4px;
 }
-.ban-details-col{
-  display:flex;flex-direction:column;gap:6px;padding-top:4px;text-align:left;
-}
-.ban-title-text{
-  font-size:20px;font-weight:800;color:#ea580c;letter-spacing:-0.2px;
-}
-.ban-reason-row{
-  font-size:14px;color:#334155;font-weight:600;
-}
-.ban-reason-link{
-  color:#0284c7;text-decoration:underline;cursor:pointer;
-}
-.ban-desc-text{
-  font-size:14px;color:#334155;text-align:center;margin-bottom:24px;line-height:1.45;
-}
+.ban-details-col{display:flex;flex-direction:column;gap:6px;padding-top:4px;text-align:left}
+.ban-title-text{font-size:20px;font-weight:800;color:#ea580c;letter-spacing:-0.2px}
+.ban-reason-row{font-size:14px;color:#334155;font-weight:600}
+.ban-reason-link{color:#0284c7;text-decoration:underline;cursor:pointer}
+.ban-desc-text{font-size:14px;color:#334155;text-align:center;margin-bottom:24px;line-height:1.45}
 .ban-btn-paypal{
   width:100%;height:46px;border-radius:24px;background:#ffc439;
   border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;
@@ -317,9 +303,7 @@ video{
   display:flex;align-items:center;justify-content:space-between;
   font-size:11px;color:#64748b;padding-top:8px;
 }
-.ban-support-link{
-  color:#0284c7;text-decoration:underline;cursor:pointer;
-}
+.ban-support-link{color:#0284c7;text-decoration:underline;cursor:pointer}
 .ban-countdown-pill{
   background:#fee2e2;color:#dc2626;font-weight:800;padding:2px 8px;border-radius:999px;font-size:11px;
 }
@@ -333,7 +317,6 @@ video{
   max-width:400px;width:100%;padding:26px 20px;text-align:center;
   background:#0f172a;border:1px solid rgba(239,68,68,.3);border-radius:20px;
 }
-.dup-icon{font-size:32px;margin-bottom:6px}
 .dup-title{font-size:17px;font-weight:900;color:#fff;margin-bottom:6px}
 .dup-desc{font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:14px}
 .dup-btn{
@@ -350,7 +333,6 @@ video{
   max-width:380px;width:100%;padding:26px 22px;text-align:center;
   background:#0f172a;border:1px solid #ef4444;border-radius:20px;
 }
-.face-modal-icon{font-size:34px;margin-bottom:6px}
 .face-modal-title{font-size:16px;font-weight:900;color:#fecaca;margin-bottom:6px}
 .face-modal-desc{font-size:11px;color:#cbd5e1;line-height:1.6;margin-bottom:16px}
 .face-modal-btn{
@@ -363,7 +345,7 @@ video{
   body{height:100dvh;overflow-y:auto;overflow-x:hidden}
   header{min-height:54px;height:auto;padding:6px 10px;gap:4px}
   .brand{font-size:16px;gap:6px}
-  .brand-icon{width:28px;height:28px;border-radius:8px}
+  .brand-icon-svg{width:26px;height:26px}
   .header-right{gap:4px;flex-wrap:wrap}
   .badge{min-height:26px;padding:3px 6px;font-size:10px}
   .timer-label{display:none}
@@ -419,23 +401,40 @@ video{
 
 <body>
 
-<!-- WELCOME PORTAL -->
+<!-- =========================================================
+   🚀 WELCOME HOMEPAGE PORTAL
+========================================================= -->
 <div id="welcomePortal">
   <div class="portal-card">
-    <div class="portal-logo-ring">🔄</div>
-    <h1 class="portal-title">MeetLoop</h1>
+    <!-- MEETLOOPCHAT LOGO SVG -->
+    <svg class="portal-logo-svg" viewBox="0 0 100 100">
+      <defs>
+        <linearGradient id="pLogoG1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#60a5fa"/>
+          <stop offset="100%" stop-color="#a855f7"/>
+        </linearGradient>
+        <linearGradient id="pLogoG2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#22d3ee"/>
+          <stop offset="100%" stop-color="#3b82f6"/>
+        </linearGradient>
+      </defs>
+      <path d="M40 22 C26 22 15 33 15 47 C15 54 18 60 23 65 L20 78 L33 72 C35 73 38 73 40 73 C54 73 65 62 65 48 C65 34 54 22 40 22 Z" fill="none" stroke="url(#pLogoG1)" stroke-width="11" stroke-linejoin="round"/>
+      <path d="M60 27 C50 27 42 33 39 41 C42 41 45 42 48 43 C50 38 55 35 60 35 C68 35 74 41 74 49 C74 57 68 63 60 63 C57 63 54 62 52 60 C50 63 47 66 44 68 C48 70 54 72 60 72 C73 72 83 62 83 49 C83 37 73 27 60 27 Z" fill="url(#pLogoG2)"/>
+    </svg>
+
+    <h1 class="portal-title">MeetloopChat</h1>
     <div class="portal-subtitle">Random Video Chat</div>
 
     <ul class="portal-rules-box">
-      <li>🔞 <b>18+ Only:</b> Minors are strictly prohibited.</li>
-      <li>🚫 <b>Zero Tolerance:</b> Nudity, sexual acts, or harassment are forbidden.</li>
-      <li>📷 <b>Live Face Only:</b> Walls, ceilings, or covered cameras are not allowed.</li>
-      <li>⚡ <b>1-Sec Shield:</b> Automatic video blur on each transition.</li>
+      <li><b>18+ Only:</b> Minors are strictly prohibited.</li>
+      <li><b>Zero Tolerance:</b> Nudity, sexual acts, or harassment are forbidden.</li>
+      <li><b>Live Face Only:</b> Walls, ceilings, or covered cameras are not allowed.</li>
+      <li><b>Instant Shield:</b> 1-Sec protection blur on every stranger switch.</li>
     </ul>
 
     <button class="portal-open-btn" id="openPortalBtn" type="button" onclick="enterMeetLoop()">
-      <span>🔓 OPEN MEETLOOP</span>
-      <span style="font-size:16px">➔</span>
+      <span>OPEN MEETLOOPCHAT</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </button>
   </div>
 </div>
@@ -443,10 +442,11 @@ video{
 <!-- MEETLOOP CLEAN LOADING SCREEN -->
 <div id="meetloopLoader">
   <div class="loader-content">
-    <div class="meetloop-radar-box">
-      <div class="meetloop-loader-logo">🔄</div>
-    </div>
-    <div class="loader-app-name">MeetLoop</div>
+    <svg class="loader-logo-svg" viewBox="0 0 100 100">
+      <path d="M40 22 C26 22 15 33 15 47 C15 54 18 60 23 65 L20 78 L33 72 C35 73 38 73 40 73 C54 73 65 62 65 48 C65 34 54 22 40 22 Z" fill="none" stroke="url(#pLogoG1)" stroke-width="11" stroke-linejoin="round"/>
+      <path d="M60 27 C50 27 42 33 39 41 C42 41 45 42 48 43 C50 38 55 35 60 35 C68 35 74 41 74 49 C74 57 68 63 60 63 C57 63 54 62 52 60 C50 63 47 66 44 68 C48 70 54 72 60 72 C73 72 83 62 83 49 C83 37 73 27 60 27 Z" fill="url(#pLogoG2)"/>
+    </svg>
+    <div class="loader-app-name">MeetloopChat</div>
     <div class="loader-progress-track">
       <div class="loader-progress-bar" id="loaderProgressBar"></div>
     </div>
@@ -460,28 +460,25 @@ video{
 <!-- REPORT REASONS MODAL -->
 <div id="reportModalOverlay">
   <div class="report-modal-box">
-    <div style="font-size:32px;margin-bottom:6px">🚩</div>
     <h3 style="font-size:16px;font-weight:900;color:#fecaca;margin-bottom:6px">Report Stranger</h3>
     <p style="font-size:11px;color:#94a3b8">Select reason for reporting (Evidence will be verified):</p>
     <div class="report-reasons">
-      <div class="report-opt" onclick="submitReport('irrelevant image')">📵 Irrelevant image (Wall, Ceiling, Fake Camera)</div>
-      <div class="report-opt" onclick="submitReport('nudity / sexual acts')">🔞 Nudity or Sexual Acts</div>
-      <div class="report-opt" onclick="submitReport('underage person')">👶 Underage Person (&lt;18 Years Old)</div>
-      <div class="report-opt" onclick="submitReport('harassment / vulgarity')">🤬 Vulgar Language, Hate Speech, or Harassment</div>
+      <div class="report-opt" onclick="submitReport('irrelevant image')">Irrelevant image (Wall, Ceiling, Fake Camera)</div>
+      <div class="report-opt" onclick="submitReport('nudity / sexual acts')">Nudity or Sexual Acts</div>
+      <div class="report-opt" onclick="submitReport('underage person')">Underage Person (&lt;18 Years Old)</div>
+      <div class="report-opt" onclick="submitReport('harassment / vulgarity')">Vulgar Language, Hate Speech, or Harassment</div>
     </div>
     <button class="btn btn-stop" style="width:100%" onclick="closeReportModal()">Cancel</button>
   </div>
 </div>
 
-<!-- =========================================================
-   🛑 EXACT OMETV CLEAN BANNED SCREEN (BASE SA PICTURE MO)
-========================================================= -->
+<!-- OMETV EXACT SUSPENSION CARD -->
 <div id="bannedOverlay">
   <div class="ometv-ban-card">
     <div class="ban-top-row">
       <div class="ban-snapshot-box">
         <canvas id="banSnapshotCanvas" width="125" height="125"></canvas>
-        <div class="ban-snapshot-watermark">MeetLoop</div>
+        <div class="ban-snapshot-watermark">MeetloopChat</div>
       </div>
       <div class="ban-details-col">
         <div class="ban-title-text">You're banned</div>
@@ -495,7 +492,6 @@ video{
       You can return to the chat immediately by paying for unban.
     </div>
 
-    <!-- PayPal Yellow Pill Button -->
     <button class="ban-btn-paypal" type="button" onclick="alert('Payment processor checkout integration.')">
       <svg width="78" height="20" viewBox="0 0 101 32" fill="none">
         <path d="M12.28 4.22H4.14C3.65 4.22 3.23 4.58 3.16 5.06L0.22 23.64C0.17 23.97 0.42 24.26 0.76 24.26H4.66C5.15 24.26 5.57 23.9 5.64 23.42L6.64 17.08C6.71 16.6 7.13 16.24 7.62 16.24H10.1C15.17 16.24 18.23 13.68 18.99 8.87C19.34 6.7 18.89 5.3 17.7 4.51C16.34 3.6 14.28 4.22 12.28 4.22Z" fill="#003087"/>
@@ -504,14 +500,13 @@ video{
       </svg>
     </button>
 
-    <!-- Black Debit or Credit Card Button -->
     <button class="ban-btn-card" type="button" onclick="alert('Card checkout integration.')">
-      <span>💳</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="3"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
       <span>Debit or Credit Card</span>
     </button>
 
     <div class="ban-footer-row">
-      <span class="ban-support-link" onclick="location.href='mailto:contact@meetloop.live'">contact@meetloop.live</span>
+      <span class="ban-support-link" onclick="location.href='mailto:support@meetloopchat.com'">support@meetloopchat.com</span>
       <div>
         <span class="ban-countdown-pill" id="banCountdownPill">59:59</span>
         <span style="font-family:monospace;margin-left:8px;cursor:pointer" id="adminUnbanId">ID: 167214235</span>
@@ -523,17 +518,15 @@ video{
 <!-- SINGLE TAB OVERLAY -->
 <div id="duplicateTabOverlay">
   <div class="duplicate-box">
-    <div class="dup-icon">⚠️</div>
-    <div class="dup-title" id="dupTitle">MeetLoop Open in Another Tab</div>
+    <div class="dup-title" id="dupTitle">MeetloopChat Open in Another Tab</div>
     <div class="dup-desc" id="dupDesc">Running multiple tabs at the same time is not allowed. <b>Session paused in this tab.</b></div>
-    <button class="dup-btn" id="reclaimSessionBtn" type="button">⚡ Use Here</button>
+    <button class="dup-btn" id="reclaimSessionBtn" type="button">Use Here</button>
   </div>
 </div>
 
 <!-- STRICT FACE WARNING -->
 <div id="faceModalOverlay">
   <div class="face-modal-card">
-    <div class="face-modal-icon">👤</div>
     <div class="face-modal-title" id="faceModalTitle">Human Face Required</div>
     <div class="face-modal-desc" id="faceModalDesc">Starting without a real human face is strictly prohibited. Please look directly at the camera.</div>
     <button class="face-modal-btn" id="closeFaceModalBtn" type="button">OK, I will face the camera</button>
@@ -543,11 +536,14 @@ video{
 <!-- HEADER -->
 <header>
   <div class="brand">
-    <span class="brand-icon">🔄</span>
-    <span>MeetLoop</span>
+    <svg class="brand-icon-svg" viewBox="0 0 100 100">
+      <path d="M40 22 C26 22 15 33 15 47 C15 54 18 60 23 65 L20 78 L33 72 C35 73 38 73 40 73 C54 73 65 62 65 48 C65 34 54 22 40 22 Z" fill="none" stroke="url(#pLogoG1)" stroke-width="11" stroke-linejoin="round"/>
+      <path d="M60 27 C50 27 42 33 39 41 C42 41 45 42 48 43 C50 38 55 35 60 35 C68 35 74 41 74 49 C74 57 68 63 60 63 C57 63 54 62 52 60 C50 63 47 66 44 68 C48 70 54 72 60 72 C73 72 83 62 83 49 C83 37 73 27 60 27 Z" fill="url(#pLogoG2)"/>
+    </svg>
+    <span>MeetloopChat</span>
   </div>
   <div class="header-right">
-    <div class="badge online">🟢 <span id="onlineLabel">Online:</span>&nbsp;<span id="onlineCount">0</span></div>
+    <div class="badge online"><span class="online-dot"></span><span id="onlineLabel">Online:</span>&nbsp;<span id="onlineCount">0</span></div>
     <div class="badge" id="statusBadge">Ready</div>
     <div class="badge" id="callTimer">
       <span class="timer-dot"></span>
@@ -571,13 +567,16 @@ video{
 <div class="main-container">
   <div class="video-wrapper">
     <div class="videos-grid">
-      <!-- Stranger Main Screen (With OmeTV 1-Sec Blur System) -->
+      <!-- Stranger Main Screen -->
       <div class="video-box" id="remoteVideoBox">
         <video id="remoteVideo" class="remote-blur" autoplay playsinline webkit-playsinline></video>
         <audio id="remoteAudio" autoplay playsinline></audio>
-        <div class="video-label" id="remoteLabel">👤 Stranger</div>
+        <div class="video-label" id="remoteLabel">Stranger</div>
         
-        <button id="reportStrangerBtn" type="button">🚩 Report</button>
+        <button id="reportStrangerBtn" type="button">
+          <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></svg>
+          <span>Report</span>
+        </button>
         
         <div class="status" id="remoteStatus">Waiting...</div>
         <div class="search-overlay" id="searchOverlay">
@@ -592,37 +591,66 @@ video{
       <div class="video-box" id="localVideoBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
         <div id="camOffOverlay">
-          <div style="font-size:28px;margin-bottom:4px">📷</div>
-          <div>Camera Off</div>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l22 22M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34m-7.72-2.06a4 4 0 1 1-5.56-5.56"/></svg>
+          <div style="margin-top:6px">Camera Off</div>
         </div>
-        <div class="video-label" id="localLabel">🙂 You</div>
+        <div class="video-label" id="localLabel">You</div>
         <button id="hideLocalBtn" type="button">✕</button>
       </div>
 
-      <button id="showLocalBtn" type="button">👁️ <span id="showLocalText">Show Cam</span></button>
+      <button id="showLocalBtn" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span id="showLocalText">Show Cam</span>
+      </button>
     </div>
 
-    <!-- Controls Bar -->
+    <!-- =========================================================
+       CLEAN CONTROLS BAR (MODERN SVG ICONS, NO EMOJIS)
+    ========================================================= -->
     <div class="controls-bar">
-      <button class="btn btn-loop" id="loopBtn" type="button">▶️ Start</button>
-      <button class="btn btn-stop" id="stopBtn" type="button" disabled>⏹️ Stop</button>
-      <button class="btn btn-toggle" id="micBtn" type="button">🎙️ Mic On</button>
-      <button class="btn btn-toggle" id="camBtn" type="button">📷 Cam On</button>
-      <button class="btn btn-flip" id="flipBtn" type="button">🔄 Flip</button>
+      <!-- Loop/Start Button -->
+      <button class="btn btn-loop" id="loopBtn" type="button">
+        <svg id="loopBtnIcon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span id="loopBtnText">Start</span>
+      </button>
+
+      <!-- Stop Button -->
+      <button class="btn btn-stop" id="stopBtn" type="button" disabled>
+        <svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+        <span>Stop</span>
+      </button>
+
+      <!-- Mic Toggle -->
+      <button class="btn btn-toggle" id="micBtn" type="button">
+        <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
+        <span id="micBtnText">Mic On</span>
+      </button>
+
+      <!-- Cam Toggle -->
+      <button class="btn btn-toggle" id="camBtn" type="button">
+        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span id="camBtnText">Cam On</span>
+      </button>
+
+      <!-- Camera Flip Button -->
+      <button class="btn btn-flip" id="flipBtn" type="button">
+        <svg viewBox="0 0 24 24"><path d="M20 10c0-4.418-3.582-8-8-8s-8 3.582-8 8c0 2.21 0.895 4.21 2.343 5.657l-2.343 2.343h6v-6l-2.05 2.05c-1.196-1.196-1.95-2.85-1.95-4.05 0-3.314 2.686-6 6-6s6 2.686 6 6c0 1.2-0.754 2.854-1.95 4.05l1.414 1.414c1.64-1.64 2.536-3.834 2.536-5.464z"/></svg>
+        <span>Flip</span>
+      </button>
     </div>
   </div>
 
   <!-- Chat -->
   <div class="chat-wrapper">
     <div class="chat-header">
-      <span id="chatHeader">💬 Live Chat</span>
-      <span style="font-size:10px;color:var(--muted);font-weight:700">⚡ MeetLoop</span>
+      <span id="chatHeader">Live Chat</span>
+      <span style="font-size:10px;color:var(--muted);font-weight:700">MeetloopChat</span>
     </div>
     <div class="chat-messages" id="chatMessages">
       <div class="message">
-        <div class="message-name">MeetLoop Guidelines</div>
-        <div class="message-text meetloop-rules-card"><span class="rules-badge-tag">🔞 18+ RULES</span>
-<b>Welcome to MeetLoop.</b>
+        <div class="message-name">MeetloopChat Rules</div>
+        <div class="message-text meetloop-rules-card"><span class="rules-badge-tag">18+ RULES</span>
+<b>Welcome to MeetloopChat.</b>
 • 18+ Only. Zero tolerance for nudity, sexual acts, or harassment.
 • 1-Sec video shield protects against flashes on every skip.
 • Violations result in an immediate suspension.</div>
@@ -662,9 +690,12 @@ const showLocalBtn = document.getElementById("showLocalBtn");
 const remoteVideo = document.getElementById("remoteVideo");
 const remoteAudio = document.getElementById("remoteAudio");
 const loopBtn = document.getElementById("loopBtn");
+const loopBtnText = document.getElementById("loopBtnText");
 const stopBtn = document.getElementById("stopBtn");
 const micBtn = document.getElementById("micBtn");
+const micBtnText = document.getElementById("micBtnText");
 const camBtn = document.getElementById("camBtn");
+const camBtnText = document.getElementById("camBtnText");
 const flipBtn = document.getElementById("flipBtn");
 
 const searchOverlay = document.getElementById("searchOverlay");
@@ -732,48 +763,46 @@ let isTabTerminated = false;
 let isServerBanned = false;
 let blurRemovalTimeout = null;
 
-/* RANDOMIZED SESSION ID FOR OMETV BAN CARD */
 adminUnbanId.textContent = "ID: " + Math.floor(100000000 + Math.random() * 900000000);
 
-/* DEFAULT LANGUAGE: ENGLISH */
 let currentLang = localStorage.getItem("meetloop_lang") || "en";
 
 const translations = {
   en: {
-    online: "Online:", ready: "Ready", stranger: "👤 Stranger", you: "🙂 You",
+    online: "Online:", ready: "Ready", stranger: "Stranger", you: "You",
     waiting: "Waiting...", searching: "Searching...", finding: "Finding someone...",
     verifying: "Verifying face...", waitingPartner: "Waiting for partner...",
     connected: "Connected", live: "Live", disconnected: "Disconnected", stopped: "Stopped",
-    strangerLeft: "Stranger left", start: "▶️ Start", next: "⏭️ Next", stop: "⏹️ Stop",
-    micOn: "🎙️ Mic On", micOff: "🔇 Mic Off", camOn: "📷 Cam On", camOff: "🚫 Cam Off",
-    flip: "🔄 Flip", showCam: "Show Cam", chatHeader: "💬 Live Chat", inputPlaceholder: "Type a message...", send: "Send",
-    chatConnected: "Chat connected.", reportedNotice: "✓ Reported",
-    reportedSuccess: "🚩 Report submitted. Connecting to next stranger...",
+    strangerLeft: "Stranger left", start: "Start", next: "Next", stop: "Stop",
+    micOn: "Mic On", micOff: "Mic Off", camOn: "Cam On", camOff: "Cam Off",
+    flip: "Flip", showCam: "Show Cam", chatHeader: "Live Chat", inputPlaceholder: "Type a message...", send: "Send",
+    chatConnected: "Chat connected.", reportedNotice: "Reported",
+    reportedSuccess: "Report submitted. Connecting to next stranger...",
     alreadyReported: "You have already reported this user.",
     warningModalTitle: "Human Face Required",
     warningModalDesc: "Starting without a real human face is strictly prohibited. Please look directly at the camera.",
     warningModalBtn: "OK, I will face the camera",
-    dupTitle: "MeetLoop Open in Another Tab",
+    dupTitle: "MeetloopChat Open in Another Tab",
     dupDesc: "Running multiple tabs at the same time is not allowed. Session paused in this tab.",
-    dupBtn: "⚡ Use Here"
+    dupBtn: "Use Here"
   },
   tl: {
-    online: "Online:", ready: "Handa", stranger: "👤 Kausap", you: "🙂 Ikaw",
+    online: "Online:", ready: "Handa", stranger: "Kausap", you: "Ikaw",
     waiting: "Naghihintay...", searching: "Naghahanap...", finding: "Naghahanap ng makakausap...",
     verifying: "Sinusuri ang mukha...", waitingPartner: "Naghihintay ng partner...",
     connected: "Konektado", live: "Live", disconnected: "Naputol", stopped: "Tinigil",
-    strangerLeft: "Umalis ang kausap", start: "▶️ Simulan", next: "⏭️ Kasunod", stop: "⏹️ Itigil",
-    micOn: "🎙️ Mic Bukas", micOff: "🔇 Mic Naka-off", camOn: "📷 Cam Bukas", camOff: "🚫 Cam Naka-off",
-    flip: "🔄 Iikot", showCam: "Ipakita Cam", chatHeader: "💬 Usapan", inputPlaceholder: "Mag-type ng mensahe...", send: "Ipadala",
-    chatConnected: "Konektado na ang chat.", reportedNotice: "✓ Na-report na",
-    reportedSuccess: "🚩 Na-report na. Nililipat ka na sa kasunod...",
+    strangerLeft: "Umalis ang kausap", start: "Simulan", next: "Kasunod", stop: "Itigil",
+    micOn: "Mic Bukas", micOff: "Mic Off", camOn: "Cam Bukas", camOff: "Cam Off",
+    flip: "Iikot", showCam: "Ipakita Cam", chatHeader: "Usapan", inputPlaceholder: "Mag-type ng mensahe...", send: "Ipadala",
+    chatConnected: "Konektado na ang chat.", reportedNotice: "Na-report na",
+    reportedSuccess: "Na-report na. Nililipat ka na sa kasunod...",
     alreadyReported: "Nai-report mo na ang user na ito.",
     warningModalTitle: "Kailangan ng Mukha ng Tao",
-    warningModalDesc: "Bawal mag-start nang walang totoong mukha ng tao. Bawal ang pader, kisame, o gamit. Paki-itapat nang maayos ang mukha sa camera.",
+    warningModalDesc: "Bawal mag-start nang walang totoong mukha ng tao. Paki-itapat nang maayos ang mukha sa camera.",
     warningModalBtn: "OK, Itatapat ko",
-    dupTitle: "Bukas ang MeetLoop sa Ibang Tab",
+    dupTitle: "Bukas ang MeetloopChat sa Ibang Tab",
     dupDesc: "Bawal ang dalawang tab nang sabay. Naka-pause muna ang session dito.",
-    dupBtn: "⚡ Gamitin Dito"
+    dupBtn: "Gamitin Dito"
   }
 };
 
@@ -799,12 +828,10 @@ function updateUILanguage() {
   if (!connected && !searching) {
     statusBadge.textContent = t("ready");
     remoteStatus.textContent = t("waiting");
-    loopBtn.textContent = t("start");
+    loopBtnText.textContent = t("start");
   } else {
-    loopBtn.textContent = t("next");
+    loopBtnText.textContent = t("next");
   }
-  stopBtn.textContent = t("stop");
-  flipBtn.textContent = t("flip");
   updateMediaButtons();
 }
 
@@ -908,7 +935,7 @@ function runBanCountdown(banUntil, reasonText = "irrelevant image") {
   }, 1000);
 }
 
-// Secret unban: 3 clicks sa ID number sa card
+// Secret unban: 3 clicks sa ID number
 let adminClickCount = 0;
 adminUnbanId.addEventListener("click", () => {
   adminClickCount++;
@@ -916,7 +943,7 @@ adminUnbanId.addEventListener("click", () => {
     adminClickCount = 0;
     if (socket) socket.emit("admin-secret-unban");
     fetch("/admin/unban-my-ip").catch(() => {});
-    alert("🔓 Admin: Account Unbanned!");
+    alert("Admin: Account Unbanned!");
     bannedOverlay.style.display = "none";
     location.reload();
   }
@@ -948,14 +975,12 @@ function enableRemoteBlur() {
 
 function scheduleRemoveRemoteBlur() {
   if (blurRemovalTimeout) clearTimeout(blurRemovalTimeout);
-  // OmeTV exact timing: 1 second delay bago mawala ang blur
   blurRemovalTimeout = setTimeout(() => {
     remoteVideo.classList.remove("remote-blur");
     remoteVideo.classList.add("remote-clear");
   }, 1000);
 }
 
-/* OmeTV Silent Stream Scanner: Verifies if stranger is breaking rules */
 function inspectRemoteStreamViolation(reason) {
   try {
     if (!remoteVideo || remoteVideo.videoWidth === 0) return true;
@@ -989,9 +1014,9 @@ function inspectRemoteStreamViolation(reason) {
     const skinRatio = skinCount / totalPixels;
     const avgLuma = totalLuma / totalPixels;
 
-    if (skinRatio > 0.65) return true; // Nudity / sexual acts
-    if (avgLuma < 15) return true; // Blank screen
-    if (skinRatio < 0.03 && reason.includes("image")) return true; // Wall / ceiling
+    if (skinRatio > 0.65) return true;
+    if (avgLuma < 15) return true;
+    if (skinRatio < 0.03 && reason.includes("image")) return true;
 
     return false;
   } catch(e) {
@@ -1019,7 +1044,6 @@ function submitReport(reason) {
   hasReportedCurrentStranger = true;
   reportStrangerBtn.disabled = true;
   reportStrangerBtn.style.opacity = "0.5";
-  reportStrangerBtn.textContent = t("reportedNotice");
 
   const isGenuineViolation = inspectRemoteStreamViolation(reason);
 
@@ -1027,7 +1051,6 @@ function submitReport(reason) {
     socket.emit("report-user", { reason: reason, verified: isGenuineViolation });
   }
 
-  // Instant OmeTV skip transition
   setTimeout(() => {
     startLoop();
   }, 180);
@@ -1273,8 +1296,8 @@ function updateMediaButtons() {
   if (!localStream) return;
   const a = localStream.getAudioTracks()[0];
   const v = localStream.getVideoTracks()[0];
-  if (a) micBtn.textContent = a.enabled ? t("micOn") : t("micOff");
-  if (v) camBtn.textContent = v.enabled ? t("camOn") : t("camOff");
+  if (a) micBtnText.textContent = a.enabled ? t("micOn") : t("micOff");
+  if (v) camBtnText.textContent = v.enabled ? t("camOn") : t("camOff");
 }
 
 function toggleMic() {
@@ -1381,17 +1404,15 @@ function handleConnected() {
   reportStrangerBtn.disabled = false;
   reportStrangerBtn.style.opacity = "1";
   reportStrangerBtn.style.cursor = "pointer";
-  reportStrangerBtn.textContent = "🚩 Report";
 
   hideSearch();
   statusBadge.textContent = t("connected");
   remoteStatus.textContent = t("live");
   loopBtn.disabled = false;
   stopBtn.disabled = false;
-  loopBtn.textContent = t("next");
+  loopBtnText.textContent = t("next");
   startCallTimer();
 
-  // Trigger 1-Second anti-flash blur removal
   scheduleRemoveRemoteBlur();
 }
 
@@ -1506,7 +1527,7 @@ function closePeerConnection() {
 }
 
 /* =========================================================
-   9. MATCHING LOOP (AUTO-BLURS ON START & NEXT)
+   9. MATCHING LOOP
 ========================================================= */
 async function startLoop() {
   if (stopping || isTabTerminated || isServerBanned) return;
@@ -1522,9 +1543,7 @@ async function startLoop() {
     return;
   }
 
-  // Activate 1-Sec Blur Shield agad bago lumipat sa bago!
   enableRemoteBlur();
-
   stopCallTimer();
   closePeerConnection();
   stopAllRemoteMedia();
@@ -1535,7 +1554,7 @@ async function startLoop() {
   showSearch(t("finding"));
   remoteStatus.textContent = t("searching");
   statusBadge.textContent = t("searching");
-  loopBtn.textContent = t("next");
+  loopBtnText.textContent = t("next");
   loopBtn.disabled = false;
   stopBtn.disabled = false;
 
@@ -1560,7 +1579,7 @@ function stopSession() {
 
   loopBtn.disabled = false;
   stopBtn.disabled = true;
-  loopBtn.textContent = t("start");
+  loopBtnText.textContent = t("start");
 
   setTimeout(() => { stopping = false; }, 200);
 }
