@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#070b14">
 
 <!-- TAB BAR LOGO / FAVICON (MEETLOOPCHAT VECTOR) -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2360a5fa'/%3E%3Cstop offset='100%25' stop-color='%23a855f7'/%3E%3C/linearGradient%3E%3ClinearGradient id='g2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2322d3ee'/%3E%3Cstop offset='100%25' stop-color='%233b82f6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='24' fill='%23070b14'/%3E%3Cpath d='M40 22 C26 22 15 33 15 47 C15 54 18 60 23 65 L20 78 L33 72 C35 73 38 73 40 73 C54 73 65 62 65 48 C65 34 54 22 40 22 Z' fill='none' stroke='url(%23g1)' stroke-width='11' stroke-linejoin='round'/%3E%3Cpath d='M60 27 C50 27 42 33 39 41 C42 41 45 42 48 43 C50 38 55 35 60 35 C68 35 74 41 74 49 C74 57 68 63 60 63 C57 63 54 62 52 60 C50 63 47 66 44 68 C48 70 54 72 60 72 C73 72 83 62 83 49 C83 37 73 27 60 27 Z' fill='url(%23g2)'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='tabG1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2393c5fd'/%3E%3Cstop offset='45%25' stop-color='%23a855f7'/%3E%3Cstop offset='100%25' stop-color='%23c084fc'/%3E%3C/linearGradient%3E%3ClinearGradient id='tabG2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2338bdf8'/%3E%3Cstop offset='60%25' stop-color='%2306b6d4'/%3E%3Cstop offset='100%25' stop-color='%232dd4bf'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='%23070b14'/%3E%3Cpath d='M40 20 C25.6 20 14 31.6 14 46 C14 53.5 17.2 60.2 22.4 65 L18 78 L31.5 73.5 C34.1 74.5 37 75 40 75 C47.5 75 54.2 71.8 59 66.6 C55.5 67.5 51.8 68 48 68 C35.8 68 26 58.2 26 46 C26 36.8 31.6 28.9 39.7 25.5 C39.8 23.7 40 21.8 40 20 Z' fill='url(%23tabG1)'/%3E%3Cpath d='M60 22 C47.8 22 38 31.8 38 44 C38 49.5 40 54.5 43.4 58.4 C46.8 53.6 52.5 50.4 59 50.4 C69.5 50.4 78 58.9 78 69.4 C78 70.3 77.9 71.1 77.8 72 C83 67.8 86.4 61.3 86.4 54 C86.4 39.6 74.8 22 60 22 Z' fill='url(%23tabG2)'/%3E%3C/svg%3E">
 
 <!-- ANTI-CACHE -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -26,7 +26,6 @@
   --blue2:#3b82f6;
   --red:#ef4444;
   --purple:#8b5cf6;
-  --cyan:#06b6d4;
   --text:#f8fafc;
   --muted:#94a3b8;
 }
@@ -61,8 +60,8 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   border-radius:24px;box-shadow:0 15px 40px rgba(0,0,0,.8);
 }
 .portal-logo-svg{
-  width:72px;height:72px;margin:0 auto 16px;display:block;
-  filter:drop-shadow(0 0 16px rgba(59,130,246,.45));
+  width:78px;height:78px;margin:0 auto 16px;display:block;
+  filter:drop-shadow(0 0 16px rgba(56,189,248,.45));
 }
 .portal-title{font-size:30px;font-weight:900;letter-spacing:.3px;margin-bottom:6px;color:#fff}
 .portal-subtitle{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:20px}
@@ -91,24 +90,30 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 }
 .loader-content{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:300px;width:100%}
 .loader-logo-svg{
-  width:64px;height:64px;margin-bottom:20px;
-  filter:drop-shadow(0 0 18px rgba(34,211,238,.45));
+  width:68px;height:68px;margin-bottom:20px;
+  filter:drop-shadow(0 0 18px rgba(56,189,248,.5));
 }
 .loader-app-name{font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:18px}
 .loader-progress-track{width:100%;height:5px;background:#1e293b;border-radius:999px;overflow:hidden;position:relative;margin-bottom:12px}
-.loader-progress-bar{width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg, #3b82f6, #22d3ee);transition:width .15s ease-out}
+.loader-progress-bar{width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg, #3b82f6, #2dd4bf);transition:width .15s ease-out}
 .loader-info-row{display:flex;justify-content:space-between;width:100%;font-size:11px;font-weight:700;color:#94a3b8}
 
 /* =========================================================
-   HEADER & NAVBAR
+   HEADER & NAVBAR (FIXED WITH GLOWING LOGO)
 ========================================================= */
 header{
   height:60px;display:flex;align-items:center;justify-content:space-between;
   gap:12px;padding:0 16px;background:#0f172a;border-bottom:1px solid var(--border);
   position:relative;z-index:20;
 }
-.brand{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:900;white-space:nowrap;color:#fff}
-.brand-icon-svg{width:32px;height:32px;display:block}
+.brand{
+  display:flex;align-items:center;gap:10px;font-size:19px;font-weight:900;
+  white-space:nowrap;color:#fff;user-select:none;
+}
+.brand-icon-svg{
+  width:36px;height:36px;display:block;flex-shrink:0;
+  filter:drop-shadow(0 0 10px rgba(56,189,248,.45));
+}
 .header-right{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
 .badge{
   min-height:32px;display:inline-flex;align-items:center;justify-content:center;
@@ -189,6 +194,7 @@ video{
   border-radius:7px;border:0;background:#dc2626;color:#fff;
   font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px;
 }
+#reportStrangerBtn svg{width:14px;height:14px;fill:currentColor}
 #reportStrangerBtn:disabled{background:#475569;cursor:not-allowed}
 
 .search-overlay{
@@ -200,9 +206,7 @@ video{
 #searchText{color:#e2e8f0;font-size:12px;font-weight:800}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* =========================================================
-   CLEAN MODERN CONTROLS (ZERO EMOJIS, CLEAN SVG ICONS)
-========================================================= */
+/* CONTROLS BAR (MODERN SVG ICONS) */
 .controls-bar{display:flex;gap:6px}
 .btn{
   min-height:44px;padding:8px 14px;border:1px solid rgba(255,255,255,.08);
@@ -345,7 +349,7 @@ video{
   body{height:100dvh;overflow-y:auto;overflow-x:hidden}
   header{min-height:54px;height:auto;padding:6px 10px;gap:4px}
   .brand{font-size:16px;gap:6px}
-  .brand-icon-svg{width:26px;height:26px}
+  .brand-icon-svg{width:28px;height:28px}
   .header-right{gap:4px;flex-wrap:wrap}
   .badge{min-height:26px;padding:3px 6px;font-size:10px}
   .timer-label{display:none}
@@ -401,25 +405,25 @@ video{
 
 <body>
 
-<!-- =========================================================
-   🚀 WELCOME HOMEPAGE PORTAL
-========================================================= -->
+<!-- WELCOME PORTAL -->
 <div id="welcomePortal">
   <div class="portal-card">
-    <!-- MEETLOOPCHAT LOGO SVG -->
+    <!-- MEETLOOPCHAT GLOWING LOGO -->
     <svg class="portal-logo-svg" viewBox="0 0 100 100">
       <defs>
         <linearGradient id="pLogoG1" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#60a5fa"/>
-          <stop offset="100%" stop-color="#a855f7"/>
+          <stop offset="0%" stop-color="#93c5fd"/>
+          <stop offset="45%" stop-color="#a855f7"/>
+          <stop offset="100%" stop-color="#c084fc"/>
         </linearGradient>
         <linearGradient id="pLogoG2" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#22d3ee"/>
-          <stop offset="100%" stop-color="#3b82f6"/>
+          <stop offset="0%" stop-color="#38bdf8"/>
+          <stop offset="60%" stop-color="#06b6d4"/>
+          <stop offset="100%" stop-color="#2dd4bf"/>
         </linearGradient>
       </defs>
-      <path d="M40 22 C26 22 15 33 15 47 C15 54 18 60 23 65 L20 78 L33 72 C35 73 38 73 40 73 C54 73 65 62 65 48 C65 34 54 22 40 22 Z" fill="none" stroke="url(#pLogoG1)" stroke-width="11" stroke-linejoin="round"/>
-      <path d="M60 27 C50 27 42 33 39 41 C42 41 45 42 48 43 C50 38 55 35 60 35 C68 35 74 41 74 49 C74 57 68 63 60 63 C57 63 54 62 52 60 C50 63 47 66 44 68 C48 70 54 72 60 72 C73 72 83 62 83 49 C83 37 73 27 60 27 Z" fill="url(#pLogoG2)"/>
+      <path d="M40 20 C25.6 20 14 31.6 14 46 C14 53.5 17.2 60.2 22.4 65 L18 78 L31.5 73.5 C34.1 74.5 37 75 40 75 C47.5 75 54.2 71.8 59 66.6 C55.5 67.5 51.8 68 48 68 C35.8 68 26 58.2 26 46 C26 36.8 31.6 28.9 39.7 25.5 C39.8 23.7 40 21.8 40 20 Z" fill="url(#pLogoG1)"/>
+      <path d="M60 22 C47.8 22 38 31.8 38 44 C38 49.5 40 54.5 43.4 58.4 C46.8 53.6 52.5 50.4 59 50.4 C69.5 50.4 78 58.9 78 69.4 C78 70.3 77.9 71.1 77.8 72 C83 67.8 86.4 61.3 86.4 54 C86.4 39.6 74.8 22 60 22 Z" fill="url(#pLogoG2)"/>
     </svg>
 
     <h1 class="portal-title">MeetloopChat</h1>
@@ -443,8 +447,20 @@ video{
 <div id="meetloopLoader">
   <div class="loader-content">
     <svg class="loader-logo-svg" viewBox="0 0 100 100">
-      <path d="M40 22 C26 22 15 33 15 47 C15 54 18 60 23 65 L20 78 L33 72 C35 73 38 73 40 73 C54 73 65 62 65 48 C65 34 54 22 40 22 Z" fill="none" stroke="url(#pLogoG1)" stroke-width="11" stroke-linejoin="round"/>
-      <path d="M60 27 C50 27 42 33 39 41 C42 41 45 42 48 43 C50 38 55 35 60 35 C68 35 74 41 74 49 C74 57 68 63 60 63 C57 63 54 62 52 60 C50 63 47 66 44 68 C48 70 54 72 60 72 C73 72 83 62 83 49 C83 37 73 27 60 27 Z" fill="url(#pLogoG2)"/>
+      <defs>
+        <linearGradient id="loadG1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#93c5fd"/>
+          <stop offset="45%" stop-color="#a855f7"/>
+          <stop offset="100%" stop-color="#c084fc"/>
+        </linearGradient>
+        <linearGradient id="loadG2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#38bdf8"/>
+          <stop offset="60%" stop-color="#06b6d4"/>
+          <stop offset="100%" stop-color="#2dd4bf"/>
+        </linearGradient>
+      </defs>
+      <path d="M40 20 C25.6 20 14 31.6 14 46 C14 53.5 17.2 60.2 22.4 65 L18 78 L31.5 73.5 C34.1 74.5 37 75 40 75 C47.5 75 54.2 71.8 59 66.6 C55.5 67.5 51.8 68 48 68 C35.8 68 26 58.2 26 46 C26 36.8 31.6 28.9 39.7 25.5 C39.8 23.7 40 21.8 40 20 Z" fill="url(#loadG1)"/>
+      <path d="M60 22 C47.8 22 38 31.8 38 44 C38 49.5 40 54.5 43.4 58.4 C46.8 53.6 52.5 50.4 59 50.4 C69.5 50.4 78 58.9 78 69.4 C78 70.3 77.9 71.1 77.8 72 C83 67.8 86.4 61.3 86.4 54 C86.4 39.6 74.8 22 60 22 Z" fill="url(#loadG2)"/>
     </svg>
     <div class="loader-app-name">MeetloopChat</div>
     <div class="loader-progress-track">
@@ -533,12 +549,26 @@ video{
   </div>
 </div>
 
-<!-- HEADER -->
+<!-- =========================================================
+   HEADER (NOW FULLY RESTORED WITH VISIBLE LOGO)
+========================================================= -->
 <header>
   <div class="brand">
     <svg class="brand-icon-svg" viewBox="0 0 100 100">
-      <path d="M40 22 C26 22 15 33 15 47 C15 54 18 60 23 65 L20 78 L33 72 C35 73 38 73 40 73 C54 73 65 62 65 48 C65 34 54 22 40 22 Z" fill="none" stroke="url(#pLogoG1)" stroke-width="11" stroke-linejoin="round"/>
-      <path d="M60 27 C50 27 42 33 39 41 C42 41 45 42 48 43 C50 38 55 35 60 35 C68 35 74 41 74 49 C74 57 68 63 60 63 C57 63 54 62 52 60 C50 63 47 66 44 68 C48 70 54 72 60 72 C73 72 83 62 83 49 C83 37 73 27 60 27 Z" fill="url(#pLogoG2)"/>
+      <defs>
+        <linearGradient id="headerLogoG1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#93c5fd"/>
+          <stop offset="45%" stop-color="#a855f7"/>
+          <stop offset="100%" stop-color="#c084fc"/>
+        </linearGradient>
+        <linearGradient id="headerLogoG2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#38bdf8"/>
+          <stop offset="60%" stop-color="#06b6d4"/>
+          <stop offset="100%" stop-color="#2dd4bf"/>
+        </linearGradient>
+      </defs>
+      <path d="M40 20 C25.6 20 14 31.6 14 46 C14 53.5 17.2 60.2 22.4 65 L18 78 L31.5 73.5 C34.1 74.5 37 75 40 75 C47.5 75 54.2 71.8 59 66.6 C55.5 67.5 51.8 68 48 68 C35.8 68 26 58.2 26 46 C26 36.8 31.6 28.9 39.7 25.5 C39.8 23.7 40 21.8 40 20 Z" fill="url(#headerLogoG1)"/>
+      <path d="M60 22 C47.8 22 38 31.8 38 44 C38 49.5 40 54.5 43.4 58.4 C46.8 53.6 52.5 50.4 59 50.4 C69.5 50.4 78 58.9 78 69.4 C78 70.3 77.9 71.1 77.8 72 C83 67.8 86.4 61.3 86.4 54 C86.4 39.6 74.8 22 60 22 Z" fill="url(#headerLogoG2)"/>
     </svg>
     <span>MeetloopChat</span>
   </div>
@@ -604,35 +634,28 @@ video{
       </button>
     </div>
 
-    <!-- =========================================================
-       CLEAN CONTROLS BAR (MODERN SVG ICONS, NO EMOJIS)
-    ========================================================= -->
+    <!-- CONTROLS BAR -->
     <div class="controls-bar">
-      <!-- Loop/Start Button -->
       <button class="btn btn-loop" id="loopBtn" type="button">
         <svg id="loopBtnIcon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         <span id="loopBtnText">Start</span>
       </button>
 
-      <!-- Stop Button -->
       <button class="btn btn-stop" id="stopBtn" type="button" disabled>
         <svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
         <span>Stop</span>
       </button>
 
-      <!-- Mic Toggle -->
       <button class="btn btn-toggle" id="micBtn" type="button">
         <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
         <span id="micBtnText">Mic On</span>
       </button>
 
-      <!-- Cam Toggle -->
       <button class="btn btn-toggle" id="camBtn" type="button">
         <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
         <span id="camBtnText">Cam On</span>
       </button>
 
-      <!-- Camera Flip Button -->
       <button class="btn btn-flip" id="flipBtn" type="button">
         <svg viewBox="0 0 24 24"><path d="M20 10c0-4.418-3.582-8-8-8s-8 3.582-8 8c0 2.21 0.895 4.21 2.343 5.657l-2.343 2.343h6v-6l-2.05 2.05c-1.196-1.196-1.95-2.85-1.95-4.05 0-3.314 2.686-6 6-6s6 2.686 6 6c0 1.2-0.754 2.854-1.95 4.05l1.414 1.414c1.64-1.64 2.536-3.834 2.536-5.464z"/></svg>
         <span>Flip</span>
