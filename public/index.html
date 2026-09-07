@@ -28,32 +28,35 @@
   --text-muted:#9ca3af;
 }
 
-html,body{width:100%;height:100%;background:var(--bg-dark);color:var(--text-main);overflow:hidden;-webkit-font-smoothing:antialiased}
+html,body{
+  width:100%;height:100%;background:var(--bg-dark);color:var(--text-main);
+  overflow:hidden;-webkit-font-smoothing:antialiased;
+}
 button,input,select{font:inherit}
 button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
 /* HEADER OMETV STYLE */
 header{
-  height:54px;display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;background:#0d131f;border-bottom:1px solid var(--panel-border);
-  position:relative;z-index:20;
+  height:50px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;background:#0d131f;border-bottom:1px solid var(--panel-border);
+  position:relative;z-index:20;flex-shrink:0;
 }
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;user-select:none;cursor:pointer}
-.brand-logo{width:32px;height:32px;flex-shrink:0}
-.brand-text{font-size:20px;font-weight:900;letter-spacing:-0.5px;color:#fff}
+.brand{display:flex;align-items:center;gap:8px;text-decoration:none;user-select:none;cursor:pointer}
+.brand-logo{width:30px;height:30px;flex-shrink:0}
+.brand-text{font-size:19px;font-weight:900;letter-spacing:-0.5px;color:#fff}
 .brand-text span{color:#38bdf8}
 
-.header-meta{display:flex;align-items:center;gap:10px}
 .lang-select{
   background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.1);
-  padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;outline:none;cursor:pointer;
-  transition:border-color .15s;
+  padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;outline:none;cursor:pointer;
 }
-.lang-select:hover{border-color:rgba(255,255,255,.25)}
 
-/* MAIN CHAT STAGE */
+/* =========================================================
+   STAGE CONTAINER (DESKTOP DEFAULT)
+========================================================= */
 .stage-container{
-  width:100%;height:calc(100vh - 54px);display:flex;gap:10px;padding:10px;
+  width:100%;height:calc(100vh - 50px);
+  display:flex;gap:10px;padding:10px;
 }
 .stream-arena{
   flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px;
@@ -63,7 +66,7 @@ header{
 }
 .cam-box{
   position:relative;flex:1;min-width:0;min-height:0;background:#000;
-  border-radius:12px;overflow:hidden;border:1px solid var(--panel-border);
+  border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
 video{
@@ -71,44 +74,44 @@ video{
   background:#000;display:block;
 }
 
-/* OMETV CRT STANDBY & STATIC NOISE */
+/* OMETV CRT STANDBY SCREEN */
 #standbyScreen{
   position:absolute;inset:0;z-index:2;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:#070b12;overflow:hidden;user-select:none;
 }
 #crtStaticCanvas{
-  position:absolute;inset:0;width:100%;height:100%;opacity:0.40;
-  filter:contrast(170%) brightness(80%);
+  position:absolute;inset:0;width:100%;height:100%;opacity:0.35;
+  filter:contrast(160%) brightness(85%);
 }
 .standby-center{
   position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:0 10px;
 }
 .standby-logo{
-  width:130px;height:130px;margin-bottom:12px;
-  filter:drop-shadow(0 0 25px rgba(56,189,248,.5));
+  width:110px;height:110px;margin-bottom:10px;
+  filter:drop-shadow(0 0 20px rgba(56,189,248,.45));
   animation:floatLogo 3s ease-in-out infinite alternate;
 }
 @keyframes floatLogo{from{transform:translateY(0)}to{transform:translateY(-6px)}}
 
-.standby-title{font-size:32px;font-weight:900;letter-spacing:-0.5px;color:#fff;margin-bottom:6px}
+.standby-title{font-size:28px;font-weight:900;letter-spacing:-0.5px;color:#fff;margin-bottom:6px}
 .standby-online-tag{
   background:rgba(15,23,42,0.85);border:1px solid rgba(255,255,255,.1);
-  padding:5px 14px;border-radius:20px;font-size:13px;font-weight:800;color:#cbd5e1;
-  display:flex;align-items:center;gap:7px;box-shadow:0 4px 15px rgba(0,0,0,.5);
+  padding:5px 14px;border-radius:20px;font-size:12px;font-weight:800;color:#cbd5e1;
+  display:flex;align-items:center;gap:6px;box-shadow:0 4px 15px rgba(0,0,0,.5);
 }
-.online-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+.online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
 
 /* OMETV REMOTE AUDIO CONTROL BAR */
 .remote-audio-bar{
-  position:absolute;bottom:0;left:0;right:0;height:40px;
+  position:absolute;bottom:0;left:0;right:0;height:38px;
   background:linear-gradient(to top, rgba(0,0,0,.9), transparent);
-  display:flex;align-items:center;gap:12px;padding:0 16px;z-index:5;
+  display:flex;align-items:center;gap:10px;padding:0 14px;z-index:5;
 }
 .audio-speaker-btn{
-  width:20px;height:20px;fill:#cbd5e1;cursor:pointer;flex-shrink:0;transition:transform .1s, fill .15s;
+  width:18px;height:18px;fill:#cbd5e1;cursor:pointer;flex-shrink:0;
 }
-.audio-speaker-btn:hover{transform:scale(1.1);fill:#fff}
 .audio-slider{
   flex:1;height:5px;-webkit-appearance:none;appearance:none;background:#334155;border-radius:999px;outline:none;cursor:pointer;
 }
@@ -116,7 +119,7 @@ video{
   -webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:#38bdf8;cursor:pointer;
 }
 
-/* 1-SEC INSTANT PROTECTION BLUR TRANSITION */
+/* 1-SEC INSTANT PROTECTION BLUR */
 #remoteVideo.remote-blur{
   filter:blur(30px) brightness(0.9);
   -webkit-filter:blur(30px) brightness(0.9);
@@ -133,27 +136,27 @@ video{
 
 #camOffCover{
   position:absolute;inset:0;background:#090d16;display:none;
-  flex-direction:column;align-items:center;justify-content:center;gap:8px;
-  color:var(--text-muted);font-size:13px;font-weight:700;z-index:3;
+  flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  color:var(--text-muted);font-size:12px;font-weight:700;z-index:3;
 }
 
 .cam-tag{
-  position:absolute;top:12px;left:12px;z-index:4;
+  position:absolute;top:10px;left:10px;z-index:4;
   background:rgba(0,0,0,.7);backdrop-filter:blur(4px);
-  padding:4px 10px;border-radius:6px;font-size:11px;font-weight:800;color:#fff;
+  padding:3px 8px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;
   border:1px solid rgba(255,255,255,.1);pointer-events:none;
 }
 .cam-status-pill{
-  position:absolute;bottom:46px;left:12px;z-index:4;
-  background:rgba(0,0,0,.75);padding:4px 10px;border-radius:6px;
-  font-size:11px;font-weight:700;color:#cbd5e1;pointer-events:none;
+  position:absolute;bottom:42px;left:10px;z-index:4;
+  background:rgba(0,0,0,.75);padding:3px 8px;border-radius:6px;
+  font-size:10px;font-weight:700;color:#cbd5e1;pointer-events:none;
 }
 
 #reportBtn{
-  position:absolute;top:12px;right:12px;z-index:5;
-  background:#dc2626;color:#fff;border:0;border-radius:8px;
-  padding:6px 12px;font-size:11px;font-weight:800;cursor:pointer;
-  display:flex;align-items:center;gap:6px;transition:opacity .15s;
+  position:absolute;top:10px;right:10px;z-index:5;
+  background:#dc2626;color:#fff;border:0;border-radius:6px;
+  padding:5px 10px;font-size:10px;font-weight:800;cursor:pointer;
+  display:flex;align-items:center;gap:4px;
 }
 #reportBtn:disabled{opacity:.4;cursor:not-allowed}
 
@@ -164,23 +167,23 @@ video{
 }
 .search-card{
   background:#0f172a;border:1px solid rgba(255,255,255,.1);
-  padding:24px 30px;border-radius:18px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.6);
+  padding:20px 24px;border-radius:16px;text-align:center;
 }
 .search-spinner{
-  width:40px;height:40px;margin:0 auto 14px;
-  border:3.5px solid rgba(255,255,255,.15);border-top-color:#38bdf8;
+  width:36px;height:36px;margin:0 auto 12px;
+  border:3px solid rgba(255,255,255,.15);border-top-color:#38bdf8;
   border-radius:50%;animation:spin .75s linear infinite;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
-.search-text{font-size:14px;font-weight:800;color:#e2e8f0}
+.search-text{font-size:13px;font-weight:800;color:#e2e8f0}
 
-/* OMETV CONTROL BUTTONS BAR */
+/* OMETV CONTROLS BAR */
 .controls-panel{
-  display:flex;gap:8px;height:52px;
+  display:flex;gap:8px;height:48px;flex-shrink:0;
 }
 .ctrl-btn{
-  border:0;border-radius:12px;color:#fff;font-size:14px;font-weight:800;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  border:0;border-radius:10px;color:#fff;font-size:13px;font-weight:800;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
   transition:filter .15s, transform .1s;user-select:none;
 }
 .ctrl-btn:active:not(:disabled){transform:scale(.98)}
@@ -193,38 +196,108 @@ video{
 
 /* CHAT SIDEBAR */
 .chat-arena{
-  width:320px;max-width:320px;display:flex;flex-direction:column;
-  background:var(--panel-dark);border:1px solid var(--panel-border);border-radius:12px;overflow:hidden;
+  width:300px;max-width:300px;display:flex;flex-direction:column;
+  background:var(--panel-dark);border:1px solid var(--panel-border);border-radius:14px;overflow:hidden;
 }
 .chat-head{
-  padding:14px 16px;border-bottom:1px solid var(--panel-border);
+  padding:12px 14px;border-bottom:1px solid var(--panel-border);
   display:flex;align-items:center;justify-content:space-between;
 }
-.chat-head-title{font-size:13px;font-weight:900;letter-spacing:-0.2px}
+.chat-head-title{font-size:12px;font-weight:900}
 .chat-stream{
-  flex:1;min-height:0;padding:12px;overflow-y:auto;overscroll-behavior:contain;
+  flex:1;min-height:0;padding:10px;overflow-y:auto;overscroll-behavior:contain;
 }
-.chat-msg{margin-bottom:12px;word-break:break-word}
-.chat-author{font-size:10px;font-weight:800;color:var(--text-muted);margin-bottom:3px}
+.chat-msg{margin-bottom:10px;word-break:break-word}
+.chat-author{font-size:9px;font-weight:800;color:var(--text-muted);margin-bottom:2px}
 .chat-bubble{
-  display:inline-block;max-width:96%;padding:9px 13px;
-  background:#1e293b;border-radius:10px;font-size:12px;line-height:1.45;color:#f8fafc;
+  display:inline-block;max-width:96%;padding:8px 11px;
+  background:#1e293b;border-radius:8px;font-size:11px;line-height:1.4;color:#f8fafc;
 }
-.chat-rules-card{background:#1e1b4b;border:1px solid #4338ca;font-size:11.5px;line-height:1.55}
-.chat-rules-badge{background:#dc2626;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:4px;margin-bottom:6px;display:inline-block}
+.chat-rules-card{background:#1e1b4b;border:1px solid #4338ca;font-size:11px;line-height:1.5}
+.chat-rules-badge{background:#dc2626;color:#fff;font-size:9px;font-weight:900;padding:2px 5px;border-radius:4px;margin-bottom:4px;display:inline-block}
 
 .chat-foot{
-  display:flex;gap:8px;padding:10px;border-top:1px solid var(--panel-border);
+  display:flex;gap:6px;padding:8px;border-top:1px solid var(--panel-border);
 }
 .chat-input{
-  flex:1;min-width:0;height:42px;padding:0 14px;background:#070b14;
-  border:1px solid var(--panel-border);border-radius:10px;color:#fff;outline:none;font-size:12px;
+  flex:1;min-width:0;height:38px;padding:0 12px;background:#070b14;
+  border:1px solid var(--panel-border);border-radius:8px;color:#fff;outline:none;font-size:11px;
 }
 .chat-send-btn{
-  width:68px;height:42px;border:0;border-radius:10px;background:#2563eb;
-  color:#fff;font-size:12px;font-weight:800;cursor:pointer;
+  width:60px;height:38px;border:0;border-radius:8px;background:#2563eb;
+  color:#fff;font-size:11px;font-weight:800;cursor:pointer;
 }
 
+/* =========================================================
+   MOBILE LAYOUT ENGINE (PERFECT FIT)
+========================================================= */
+@media (max-width:850px){
+  body{
+    height:100dvh;overflow-y:auto;overflow-x:hidden;
+  }
+  header{height:46px;padding:0 10px}
+  .brand-logo{width:26px;height:26px}
+  .brand-text{font-size:17px}
+
+  .stage-container{
+    height:auto;min-height:calc(100dvh - 46px);
+    flex-direction:column;gap:8px;padding:8px;
+  }
+  .stream-arena{width:100%;flex:none;gap:8px}
+
+  /* OMETV VIDEO GRID FOR MOBILE */
+  .video-grid{
+    position:relative;width:100%;height:min(52dvh,460px);min-height:280px;
+    display:block;border-radius:12px;overflow:hidden;
+  }
+  .cam-box:first-child{
+    position:absolute;inset:0;width:100%;height:100%;
+  }
+
+  /* FLOATING PIP SELF CAMERA (OMETV STYLE) */
+  #localCamBox{
+    position:absolute;right:8px;bottom:8px;width:30vw;max-width:115px;aspect-ratio:3/4;
+    height:auto;z-index:8;border:2px solid #ffffff;border-radius:10px;
+    box-shadow:0 8px 20px rgba(0,0,0,.8);
+  }
+  #localCamBox.hidden-cam{display:none !important}
+
+  #hideLocalBtn{
+    position:absolute;top:3px;right:3px;z-index:9;width:20px;height:20px;
+    border-radius:50%;background:rgba(0,0,0,.75);color:#fff;border:0;
+    font-size:10px;font-weight:bold;cursor:pointer;display:flex !important;
+    align-items:center;justify-content:center;
+  }
+  #showLocalBtn{
+    position:absolute;right:8px;bottom:8px;z-index:30;display:none;
+    align-items:center;gap:5px;padding:6px 12px;border-radius:999px;
+    background:#1e293b;border:1px solid #38bdf8;color:#fff;font-size:10px;font-weight:800;
+  }
+  #showLocalBtn.visible{display:flex !important}
+
+  /* MOBILE CONTROLS */
+  .controls-panel{
+    height:auto;display:grid;grid-template-columns:repeat(6,1fr);gap:5px;
+  }
+  .ctrl-btn{min-height:42px;font-size:12px;padding:4px}
+  .btn-start-next{grid-column:span 4}
+  .btn-stop{grid-column:span 2}
+  .btn-sec{grid-column:span 2}
+  #flipBtn{grid-column:span 2;display:flex !important}
+
+  /* MOBILE CHAT */
+  .chat-arena{
+    width:100%;max-width:none;height:220px;min-height:220px;border-radius:12px;flex-shrink:0;
+  }
+}
+
+@media (min-width:851px){
+  #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
+}
+
+/* =========================================================
+   MODALS
+========================================================= */
 /* WELCOME PORTAL */
 #welcomePortal{
   position:fixed;inset:0;z-index:999999;
@@ -232,21 +305,19 @@ video{
   background:#070b12;
 }
 .portal-box{
-  max-width:440px;width:100%;padding:32px 24px;text-align:center;
-  background:#111827;border-radius:24px;border:1.5px solid rgba(255,255,255,.1);
+  max-width:420px;width:100%;padding:28px 20px;text-align:center;
+  background:#111827;border-radius:20px;border:1.5px solid rgba(255,255,255,.1);
   box-shadow:0 25px 60px rgba(0,0,0,.9);
 }
-.portal-icon{width:76px;height:76px;margin:0 auto 16px;display:block}
+.portal-icon{width:70px;height:70px;margin:0 auto 12px;display:block}
 .portal-rules{
-  text-align:left;font-size:12px;color:#cbd5e1;line-height:1.7;margin:20px 0;
-  background:#1f293d;padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,.08);
+  text-align:left;font-size:12px;color:#cbd5e1;line-height:1.6;margin:16px 0;
+  background:#1f293d;padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);
 }
 .portal-btn{
-  width:100%;height:50px;border-radius:14px;border:0;background:linear-gradient(135deg,#0284c7,#2563eb);
-  color:#fff;font-size:15px;font-weight:800;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
+  width:100%;height:48px;border-radius:12px;border:0;background:linear-gradient(135deg,#0284c7,#2563eb);
+  color:#fff;font-size:14px;font-weight:800;cursor:pointer;
 }
-.portal-btn:active{transform:scale(0.98)}
 
 /* EXACT OMETV WHITE BANNED SCREEN */
 #banOverlay{
@@ -254,115 +325,74 @@ video{
   display:none;align-items:center;justify-content:center;padding:16px;
 }
 .ometv-ban-card{
-  max-width:470px;width:100%;padding:28px 24px 20px;
+  max-width:460px;width:100%;padding:24px 20px 18px;
   background:#ffffff;border-radius:18px;color:#1e293b;
   box-shadow:0 25px 60px rgba(0,0,0,.9);
 }
-.ban-top{display:flex;gap:18px;margin-bottom:18px}
+.ban-top{display:flex;gap:14px;margin-bottom:16px}
 .ban-snap-frame{
-  width:120px;height:120px;border-radius:10px;overflow:hidden;
+  width:110px;height:110px;border-radius:10px;overflow:hidden;
   position:relative;background:#000;border:1.5px solid #cbd5e1;flex-shrink:0;
 }
 .ban-snap-frame canvas{width:100%;height:100%;object-fit:cover;filter:blur(6px)}
 .ban-snap-brand{
-  position:absolute;top:6px;left:6px;display:flex;align-items:center;gap:4px;
-  background:rgba(0,0,0,.75);padding:3px 6px;border-radius:4px;color:#fff;font-size:9px;font-weight:900;
+  position:absolute;top:5px;left:5px;display:flex;align-items:center;gap:3px;
+  background:rgba(0,0,0,.75);padding:2px 5px;border-radius:4px;color:#fff;font-size:8.5px;font-weight:900;
 }
-.ban-info{display:flex;flex-direction:column;gap:6px;padding-top:4px}
-.ban-title{font-size:22px;font-weight:800;color:#ea580c}
-.ban-reason{font-size:14px;color:#334155;font-weight:600}
+.ban-info{display:flex;flex-direction:column;gap:5px;padding-top:2px}
+.ban-title{font-size:20px;font-weight:800;color:#ea580c}
+.ban-reason{font-size:13px;color:#334155;font-weight:600}
 .ban-reason span{color:#0284c7;text-decoration:underline;cursor:pointer}
-.ban-description{font-size:14px;color:#334155;text-align:center;margin-bottom:18px}
+.ban-description{font-size:13px;color:#334155;text-align:center;margin-bottom:16px;line-height:1.4}
 .ban-gcash-btn{
-  width:100%;height:48px;border-radius:24px;border:0;background:#007dfe;
-  color:#fff;font-size:15px;font-weight:800;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px;
+  width:100%;height:46px;border-radius:24px;border:0;background:#007dfe;
+  color:#fff;font-size:14px;font-weight:800;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;
 }
 .ban-bottom-row{
   display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b;
 }
 .ban-timer-chip{background:#fee2e2;color:#dc2626;font-weight:800;padding:2px 8px;border-radius:12px}
 
-/* GCASH INSTAPAY MODAL */
+/* GCASH MODAL */
 #gcashModal{
   position:fixed;inset:0;z-index:99999999;background:rgba(0,0,0,.88);
   display:none;align-items:center;justify-content:center;padding:16px;
 }
 .gcash-card{
-  max-width:340px;width:100%;padding:22px 18px;text-align:center;
-  background:#007dfe;border-radius:22px;color:#fff;
+  max-width:330px;width:100%;padding:20px 16px;text-align:center;
+  background:#007dfe;border-radius:20px;color:#fff;
 }
 .gcash-white-area{
-  background:#fff;border-radius:16px;padding:16px;margin:12px 0;color:#1e293b;
+  background:#fff;border-radius:14px;padding:14px;margin:10px 0;color:#1e293b;
 }
-.gcash-qr-preview{width:100%;max-width:190px;height:auto;margin:0 auto 10px;display:block}
-.gcash-amount{font-size:26px;font-weight:900;color:#007dfe;margin-bottom:10px}
+.gcash-qr-preview{width:100%;max-width:180px;height:auto;margin:0 auto 8px;display:block}
+.gcash-amount{font-size:24px;font-weight:900;color:#007dfe;margin-bottom:8px}
 .gcash-input{
-  width:100%;height:42px;border:1.5px solid #cbd5e1;border-radius:10px;
-  padding:0 12px;font-size:13px;font-weight:800;text-align:center;margin-bottom:8px;outline:none;
+  width:100%;height:40px;border:1.5px solid #cbd5e1;border-radius:8px;
+  padding:0 10px;font-size:12px;font-weight:800;text-align:center;margin-bottom:8px;outline:none;
 }
 .gcash-verify-btn{
-  width:100%;height:44px;border-radius:10px;border:0;background:#007dfe;color:#fff;
-  font-size:13px;font-weight:900;cursor:pointer;
+  width:100%;height:42px;border-radius:8px;border:0;background:#007dfe;color:#fff;
+  font-size:12px;font-weight:900;cursor:pointer;
 }
 .gcash-cancel-btn{
-  width:100%;height:38px;border-radius:10px;background:rgba(255,255,255,.15);
-  border:1px solid rgba(255,255,255,.3);color:#fff;font-weight:800;font-size:12px;cursor:pointer;margin-top:6px;
+  width:100%;height:36px;border-radius:8px;background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.3);color:#fff;font-weight:800;font-size:11px;cursor:pointer;margin-top:6px;
 }
 
-/* HUMAN FACE WARNING MODAL */
+/* BASIC MODALS */
 .basic-modal{
   position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.85);
   display:none;align-items:center;justify-content:center;padding:16px;
 }
 .basic-modal-card{
-  max-width:380px;width:100%;padding:24px 20px;text-align:center;
-  background:#111827;border-radius:20px;border:1px solid rgba(255,255,255,.1);
+  max-width:360px;width:100%;padding:22px 18px;text-align:center;
+  background:#111827;border-radius:18px;border:1px solid rgba(255,255,255,.1);
 }
-
-/* SINGLE TAB TAKEOVER MODAL */
 #duplicateTabOverlay{
   position:fixed;inset:0;z-index:999999;background:#070b14;
   display:none;align-items:center;justify-content:center;padding:16px;
-}
-
-/* MOBILE RESPONSIVE STYLING */
-@media (max-width:850px){
-  header{height:50px;padding:0 12px}
-  .brand-text{font-size:18px}
-  .stage-container{flex-direction:column;height:calc(100vh - 50px);padding:6px;gap:6px}
-  .video-grid{height:min(50dvh,480px);flex:none;position:relative}
-  .cam-box:first-child{inset:0;position:absolute;width:100%;height:100%}
-
-  #localCamBox{
-    position:absolute;right:8px;bottom:8px;width:28vw;max-width:115px;aspect-ratio:3/4;
-    height:auto;z-index:6;border:2px solid rgba(255,255,255,.9);border-radius:10px;
-  }
-  #localCamBox.hidden-cam{display:none !important}
-  
-  #hideLocalBtn{
-    position:absolute;top:4px;right:4px;z-index:8;width:22px;height:22px;
-    border-radius:50%;background:rgba(0,0,0,.7);color:#fff;border:0;
-    font-size:10px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  }
-  #showLocalBtn{
-    position:absolute;right:10px;bottom:10px;z-index:30;display:none;
-    align-items:center;gap:5px;padding:6px 12px;border-radius:999px;
-    background:#1e293b;border:1px solid #38bdf8;color:#fff;font-size:10px;font-weight:800;
-  }
-  #showLocalBtn.visible{display:flex !important}
-
-  .controls-panel{height:46px;display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
-  .ctrl-btn{font-size:12px;border-radius:8px}
-  .btn-start-next{grid-column:span 4}
-  .btn-stop{grid-column:span 2}
-  .btn-sec{grid-column:span 2}
-  #flipBtn{grid-column:span 2;display:flex !important}
-
-  .chat-arena{width:100%;max-width:none;flex:1;min-height:180px;border-radius:10px}
-}
-@media (min-width:851px){
-  #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 }
 </style>
 </head>
@@ -387,8 +417,8 @@ video{
       <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z" fill="url(#pG2)"/>
     </svg>
 
-    <h1 style="font-size:26px;font-weight:900;color:#fff">MeetLoop</h1>
-    <p style="font-size:13px;color:var(--text-muted);font-weight:700;margin-top:4px">Random Video Chat</p>
+    <h1 style="font-size:24px;font-weight:900;color:#fff">MeetLoop</h1>
+    <p style="font-size:12px;color:var(--text-muted);font-weight:700;margin-top:2px">Random Video Chat</p>
 
     <ul class="portal-rules">
       <li><b>18+ Required:</b> Minors are strictly prohibited.</li>
@@ -404,8 +434,8 @@ video{
 <!-- SINGLE TAB DUPLICATE OVERLAY -->
 <div id="duplicateTabOverlay">
   <div class="basic-modal-card">
-    <div style="font-size:17px;font-weight:900;color:#fff;margin-bottom:6px">MeetLoop Open in Another Tab</div>
-    <div style="font-size:12px;color:#94a3b8;line-height:1.5;margin-bottom:14px">Multiple tabs at the same time are not allowed. Session paused in this tab.</div>
+    <div style="font-size:16px;font-weight:900;color:#fff;margin-bottom:6px">MeetLoop Open in Another Tab</div>
+    <div style="font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:12px">Multiple tabs at the same time are not allowed. Session paused in this tab.</div>
     <button class="ctrl-btn btn-start-next" style="width:100%" id="reclaimSessionBtn" type="button">Use Here</button>
   </div>
 </div>
@@ -415,7 +445,7 @@ video{
   <div class="ometv-ban-card">
     <div class="ban-top">
       <div class="ban-snap-frame">
-        <canvas id="banCanvas" width="120" height="120"></canvas>
+        <canvas id="banCanvas" width="110" height="110"></canvas>
         <div class="ban-snap-brand">MeetLoop</div>
       </div>
       <div class="ban-info">
@@ -429,7 +459,7 @@ video{
     </div>
 
     <button class="ban-gcash-btn" onclick="openGcashModal()">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#fff"/><path d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm-1 12H9v-2h2v2zm0-4H9V8h2v4zm4 4h-2v-2h2v2zm0-4h-2V8h2v4z" fill="#007dfe"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#fff"/><path d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm-1 12H9v-2h2v2zm0-4H9V8h2v4zm4 4h-2v-2h2v2zm0-4h-2V8h2v4z" fill="#007dfe"/></svg>
       <span>Pay with GCash (₱20.00)</span>
     </button>
 
@@ -437,7 +467,7 @@ video{
       <span>support@meetloopchat.com</span>
       <div>
         <span class="ban-timer-chip" id="banCountdown">59:59</span>
-        <span style="font-family:monospace;margin-left:8px;cursor:pointer" id="adminUnbanId">ID: 167214235</span>
+        <span style="font-family:monospace;margin-left:6px;cursor:pointer" id="adminUnbanId">ID: 167214235</span>
       </div>
     </div>
   </div>
@@ -446,7 +476,7 @@ video{
 <!-- GCASH MODAL -->
 <div id="gcashModal">
   <div class="gcash-card">
-    <div style="font-size:18px;font-weight:900">GCash InstaPay</div>
+    <div style="font-size:17px;font-weight:900">GCash InstaPay</div>
     <div style="font-size:11px;opacity:0.9;margin-top:2px">MeetLoopPH • Instant Unban</div>
 
     <div class="gcash-white-area">
@@ -466,13 +496,13 @@ video{
 <!-- HUMAN FACE WARNING MODAL -->
 <div id="faceModal" class="basic-modal">
   <div class="basic-modal-card">
-    <div style="color:#ef4444;font-size:16px;font-weight:900;margin-bottom:6px">Face Required</div>
-    <div style="color:#cbd5e1;font-size:12px;line-height:1.5;margin-bottom:16px">Point your camera at your face. Covered cameras, ceilings, or static photos are strictly prohibited.</div>
+    <div style="color:#ef4444;font-size:15px;font-weight:900;margin-bottom:6px">Face Required</div>
+    <div style="color:#cbd5e1;font-size:11px;line-height:1.5;margin-bottom:14px">Point your camera at your face. Covered cameras, ceilings, or static photos are strictly prohibited.</div>
     <button class="ctrl-btn btn-start-next" style="width:100%" onclick="document.getElementById('faceModal').style.display='none'">I Understand</button>
   </div>
 </div>
 
-<!-- HEADER (CLEAN - NO TOP ONLINE COUNTER) -->
+<!-- HEADER (CLEAN BRAND ONLY) -->
 <header>
   <div class="brand">
     <svg class="brand-logo" viewBox="0 0 100 100">
@@ -494,7 +524,7 @@ video{
 <div class="stage-container">
   <div class="stream-arena">
     <div class="video-grid">
-      <!-- Stranger Box -->
+      <!-- Stranger Box (Full Screen on Mobile) -->
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" class="remote-blur" autoplay playsinline webkit-playsinline></video>
         <audio id="remoteAudio" autoplay playsinline></audio>
@@ -536,7 +566,7 @@ video{
         </div>
       </div>
 
-      <!-- User Local Box -->
+      <!-- User Local Box (Floating PiP on Mobile) -->
       <div class="cam-box" id="localCamBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
         <div id="camOffCover">Camera Off</div>
@@ -643,11 +673,11 @@ let isTabTerminated = false;
 let lastVolume = 1.0;
 
 let lastPartnerCanvas = document.createElement("canvas");
-lastPartnerCanvas.width = 120;
-lastPartnerCanvas.height = 120;
+lastPartnerCanvas.width = 110;
+lastPartnerCanvas.height = 110;
 
 /* =========================================================
-   2. ENTER MEETLOOP BUTTON FIX (DIRECT & FAIL-SAFE)
+   2. ENTER MEETLOOP
 ========================================================= */
 function enterMeetLoop() {
   const portal = document.getElementById("welcomePortal");
@@ -716,7 +746,7 @@ document.getElementById("reclaimSessionBtn").addEventListener("click", () => {
 });
 
 /* =========================================================
-   4. OMETV TV STATIC NOISE
+   4. OMETV CRT TV STATIC NOISE
 ========================================================= */
 function runTVStatic() {
   if (!crtStaticCanvas) return;
@@ -758,7 +788,7 @@ speakerIcon.addEventListener("click", () => {
 });
 
 /* =========================================================
-   5. CAMERA & SENSOR VERIFICATION
+   5. CAMERA ENGINE & MOBILE STREAM OPTIMIZATION
 ========================================================= */
 async function startMedia(specificDeviceId = null) {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live') && !specificDeviceId) {
@@ -771,8 +801,8 @@ async function startMedia(specificDeviceId = null) {
   const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent) || window.innerWidth <= 850;
   const constraints = {
     video: specificDeviceId ? { deviceId: { exact: specificDeviceId } } : {
-      width: isMobile ? { ideal: 640 } : { ideal: 1280 },
-      height: isMobile ? { ideal: 480 } : { ideal: 720 },
+      width: isMobile ? { ideal: 480 } : { ideal: 1280 },
+      height: isMobile ? { ideal: 640 } : { ideal: 720 },
       facingMode: { ideal: currentFacingMode }
     },
     audio: { echoCancellation: true, noiseSuppression: true }
@@ -823,7 +853,7 @@ async function verifyCameraSensor() {
     totalLuma += 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
   }
   const avg = totalLuma / (W * H);
-  return avg > 10 && avg < 250;
+  return avg > 8 && avg < 252;
 }
 
 /* =========================================================
@@ -993,7 +1023,7 @@ function closePeerConnection() {
 }
 
 /* =========================================================
-   8. SOCKET LISTENERS
+   8. SOCKET LISTENERS & ONLINE COUNT
 ========================================================= */
 if (socket) {
   socket.on("online-count", count => {
@@ -1048,7 +1078,7 @@ if (socket) {
 function recordPartnerFrame() {
   if (remoteVideo && remoteVideo.videoWidth > 0) {
     const ctx = lastPartnerCanvas.getContext("2d");
-    ctx.drawImage(remoteVideo, 0, 0, 120, 120);
+    ctx.drawImage(remoteVideo, 0, 0, 110, 110);
     localStorage.setItem("meetloop_snap", lastPartnerCanvas.toDataURL("image/jpeg", 0.6));
   }
 }
@@ -1066,10 +1096,10 @@ function runBanCountdown(banUntil, reason = "irrelevant image") {
 
   if (saved) {
     const img = new Image();
-    img.onload = () => ctx.drawImage(img, 0, 0, 120, 120);
+    img.onload = () => ctx.drawImage(img, 0, 0, 110, 110);
     img.src = saved;
   } else {
-    ctx.fillStyle = "#cbd5e1"; ctx.fillRect(0,0,120,120);
+    ctx.fillStyle = "#cbd5e1"; ctx.fillRect(0,0,110,110);
   }
 
   document.getElementById("banOverlay").style.display = "flex";
@@ -1137,7 +1167,7 @@ async function verifyGcashPayment() {
   }
 }
 
-// Admin Unban Quick Trigger
+// Admin Unban Trigger
 let adminClicks = 0;
 const adminUnbanBtn = document.getElementById("adminUnbanId");
 if (adminUnbanBtn) {
@@ -1169,7 +1199,7 @@ if (adminUnbanBtn) {
 }
 
 /* =========================================================
-   10. UI HELPERS, KEYBOARD SHORTCUTS & CHAT
+   10. CHAT & CONTROL ATTACHMENTS
 ========================================================= */
 function addChatMessage(author, msg) {
   const div = document.createElement("div");
@@ -1197,7 +1227,7 @@ chatInput.addEventListener("keydown", (e) => {
   }
 });
 
-// OmeTV Keyboard Shortcuts (Desktop space/esc)
+// Desktop shortcuts
 window.addEventListener("keydown", (e) => {
   if (document.activeElement === chatInput || document.activeElement.tagName === "INPUT") return;
   if (e.code === "Space") {
@@ -1221,6 +1251,8 @@ camBtn.addEventListener("click", () => {
     camOffCover.style.display = t.enabled ? "none" : "flex";
   }
 });
+
+// Front / Back camera flip for mobile
 flipBtn.addEventListener("click", async () => {
   currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
   const oldTrack = localStream?.getVideoTracks()[0];
@@ -1240,11 +1272,14 @@ reportBtn.addEventListener("click", () => {
   triggerStartNext();
 });
 
-document.getElementById("hideLocalBtn").addEventListener("click", () => {
+// Hide / Show Local PiP Camera on Mobile
+document.getElementById("hideLocalBtn").addEventListener("click", (e) => {
+  e.stopPropagation();
   localCamBox.classList.add("hidden-cam");
   document.getElementById("showLocalBtn").classList.add("visible");
 });
-document.getElementById("showLocalBtn").addEventListener("click", () => {
+document.getElementById("showLocalBtn").addEventListener("click", (e) => {
+  e.stopPropagation();
   localCamBox.classList.remove("hidden-cam");
   document.getElementById("showLocalBtn").classList.remove("visible");
 });
