@@ -12,10 +12,20 @@ app.use(express.json());
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname));
 
+// 🔐 PALITAN MO ITO NG SARILI MONG SECRET PASSWORD
+const ADMIN_SECRET_KEY = process.env.ADMIN_KEY || "meetloop_admin_9988";
+
 // --- SERVER-SIDE IP BAN STORAGE ---
 const bannedIPs = new Map(); // ip -> { banUntil, reason }
 const ipStrikes = new Map(); // ip -> verified violations
-const usedGcashReferences = new Set(); // Anti-fraud: Bawal ulitin ang nagamit nang resibo!
+
+// 💰 GCASH ANTI-FRAUD ENGINE
+// Dito papasok ang mga totoong resibo na natanggap mo sa GCash mo:
+const approvedGcashReceipts = new Set([
+  // Halimbawa: puwede kang maglagay dito nang manual, o gamitin ang terminal command sa baba:
+  // "1002938475812"
+]);
+const usedGcashReferences = new Set(); // Bawal gamitin ulit ang nagamit na
 
 function getClientIP(reqOrSocket) {
   const headers = reqOrSocket.headers || reqOrSocket.handshake?.headers || {};
@@ -29,7 +39,7 @@ function getClientIP(reqOrSocket) {
          "127.0.0.1";
 }
 
-// 💰 AUTOMATED GCASH UNBAN VERIFICATION ENDPOINT
+// 💰 SECURE GCASH UNBAN VERIFICATION (HINDI NA GAGANA ANG RANDOM NUMBER!)
 app.post('/api/verify-gcash-unban', (req, res) => {
   const ip = getClientIP(req);
   const { refNumber } = req.body || {};
@@ -40,32 +50,47 @@ app.post('/api/verify-gcash-unban', (req, res) => {
 
   const cleanRef = refNumber.toString().replace(/\s+/g, '').trim();
 
-  // Validasyon ng GCash / InstaPay Reference format (10 to 16 numeric digits)
+  // 1. Format check
   if (!/^\d{10,16}$/.test(cleanRef)) {
-    return res.status(400).json({ success: false, message: "Invalid Reference Number format. Must be 10-16 digits from GCash receipt." });
+    return res.status(400).json({ success: false, message: "Invalid Reference Number format. Must be 10-16 digits." });
   }
 
-  // Anti-Cheat: Bawal gamitin ang lumang resibo ng ibang tao
+  // 2. Anti-Replay: Check kung nagamit na
   if (usedGcashReferences.has(cleanRef)) {
-    return res.status(400).json({ success: false, message: "This Reference Number has already been used." });
+    return res.status(400).json({ success: false, message: "This Reference Number has already been claimed." });
   }
 
-  // Tanggapin ang resibo at i-markang gamit na
+  // 3. STRICT CHECK: Dapat nasa approved list ng binayaran sa GCash
+  if (!approvedGcashReceipts.has(cleanRef)) {
+    return res.status(400).json({ 
+      success: false, 
+      message: "Reference number not found or payment not yet received. Please ensure you sent ₱20." 
+    });
+  }
+
+  // Kapag verified at totoo:
+  approvedGcashReceipts.delete(cleanRef);
   usedGcashReferences.add(cleanRef);
+
   bannedIPs.delete(ip);
   ipStrikes.delete(ip);
 
-  console.log(`💰 GCash ₱20 Payment Verified! Unbanned IP: ${ip} | Ref: ${cleanRef}`);
+  console.log(`✅ [GCASH UNBAN] Legitimate payment confirmed! IP: ${ip} | Ref: ${cleanRef}`);
   return res.json({ success: true, message: "Payment verified successfully! Your account is now unbanned." });
 });
 
-// 🔓 ADMIN SECRET URL UNBAN
-app.get('/admin/unban-my-ip', (req, res) => {
+// 🔓 PROTECTED ADMIN UNBAN (Nangangailangan na ng Admin Key)
+app.post('/admin/unban-my-ip', (req, res) => {
+  const { adminKey } = req.body || {};
+  if (adminKey !== ADMIN_SECRET_KEY) {
+    return res.status(403).json({ success: false, message: "Invalid Admin Passcode." });
+  }
+
   const ip = getClientIP(req);
   bannedIPs.delete(ip);
   ipStrikes.delete(ip);
   console.log(`🔓 Admin Unbanned IP: ${ip}`);
-  res.json({ status: "success", message: `IP ${ip} has been unbanned!` });
+  return res.json({ success: true, message: `IP ${ip} has been unbanned by admin.` });
 });
 
 // 🛑 SERVER IP INTERCEPTOR
@@ -91,11 +116,7 @@ io.on('connection', (socket) => {
   const userIP = getClientIP(socket);
   io.emit('online-count', io.engine.clientsCount);
 
-  socket.on('admin-secret-unban', () => {
-    bannedIPs.delete(userIP);
-    ipStrikes.delete(userIP);
-    console.log(`🔓 Secret Tap Unbanned IP: ${userIP}`);
-  });
+  // Inalis ang unauthenticated socket admin bypass
 
   function leaveCurrentMatch() {
     waitingQueue = waitingQueue.filter(id => id !== socket.id);
@@ -184,16 +205,33 @@ io.on('connection', (socket) => {
   });
 });
 
+// 💻 TERMINAL COMMANDS (Puwede kang mag-input sa console habang tumatakbo ang server)
 process.stdin.on('data', (data) => {
-  if (data.toString().trim() === 'unban all') {
+  const cmd = data.toString().trim();
+
+  // 1. Kapag may nagbayad sa GCash mo, i-type mo lang: add ref 1002938475812
+  if (cmd.startsWith('add ref ')) {
+    const ref = cmd.replace('add ref ', '').trim();
+    if (ref) {
+      approvedGcashReceipts.add(ref);
+      console.log(`✅ [ADMIN] Added valid GCash Ref: ${ref}. Ready for unban!`);
+    }
+  }
+  // 2. I-unban lahat ng bans
+  else if (cmd === 'unban all') {
     bannedIPs.clear();
     ipStrikes.clear();
     usedGcashReferences.clear();
     console.log("✅ All IP Bans & receipts wiped clean!");
+  }
+  // 3. I-check ang mga active bans
+  else if (cmd === 'list bans') {
+    console.log("Active Bans:", Array.from(bannedIPs.entries()));
   }
 });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`🚀 MeetloopChat Server running on port ${PORT}`);
+  console.log(`💡 Tip: Kapag may nagbayad sa GCash mo, i-type sa terminal: add ref <reference_number>`);
 });
