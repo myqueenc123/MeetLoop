@@ -72,7 +72,7 @@ video{
 /* ================= ANIMATED MOVING TV STATIC CANVAS ================= */
 #crtStaticCanvas{
   position:absolute;inset:0;width:100%;height:100%;
-  z-index:2;opacity:0.38;
+  z-index:2;opacity:0.42;
   filter:contrast(180%) brightness(85%);
   pointer-events:none;display:block;
 }
@@ -503,7 +503,7 @@ video{
     <div class="video-grid">
       <!-- REMOTE / STRANGER BOX -->
       <div class="cam-box" id="remoteBox">
-        <video id="remoteVideo" class="remote-blur" autoplay playsinline></video>
+        <video id="remoteVideo" class="remote-blur" autoplay playsinline webkit-playsinline></video>
         <audio id="remoteAudio" autoplay playsinline></audio>
 
         <!-- VISIBLE ANIMATED TV STATIC NOISE CANVAS -->
@@ -545,7 +545,7 @@ video{
 
       <!-- LOCAL BOX -->
       <div class="cam-box" id="localCamBox">
-        <video id="localVideo" class="mirrored" autoplay muted playsinline></video>
+        <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
         <div id="camOffCover">Camera Off</div>
         <div class="cam-tag" id="localTag">You</div>
         <button id="hideLocalBtn" type="button">✕</button>
@@ -708,6 +708,7 @@ let currentFacingMode = "user";
 let banInterval = null;
 let blurTimer = null;
 let lastCapturedFrame = null;
+let pendingCandidates = [];
 
 /* ================= 4. REAL VISIBLE TV STATIC GENERATOR ================= */
 function runTVStatic() {
@@ -722,7 +723,6 @@ function runTVStatic() {
   function noise() {
     if (crtStaticCanvas && crtStaticCanvas.style.display !== "none") {
       for (let i = 0; i < len; i++) {
-        // High-contrast Gray noise with 255 alpha
         const gray = (Math.random() * 255) | 0;
         buffer[i] = (255 << 24) | (gray << 16) | (gray << 8) | gray;
       }
@@ -934,7 +934,7 @@ async function verifyGCashTransaction() {
   }, 2000);
 }
 
-/* ================= 9. CAMERA & OMETV TRANSITIONS ================= */
+/* ================= 9. ROBUST CAMERA & WEBRTC ENGINE ================= */
 async function startMedia() {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live')) {
     if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
@@ -951,7 +951,11 @@ async function startMedia() {
       frameRate: { ideal: 30, min: 24 },
       facingMode: { ideal: currentFacingMode }
     },
-    audio: { echoCancellation: true, noiseSuppression: true }
+    audio: {
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true
+    }
   };
 
   try {
@@ -978,7 +982,7 @@ function releaseBlur() {
   blurTimer = setTimeout(() => {
     remoteVideo.classList.remove("remote-blur");
     remoteVideo.classList.add("remote-clear");
-  }, 500);
+  }, 400);
 }
 
 async function triggerStartNext() {
@@ -990,7 +994,7 @@ async function triggerStartNext() {
 
   mainActionBtn.disabled = true;
 
-  // Mananatiling bukas ang gumagalaw na TV Static sa background habang naghahanap
+  // TV Static + Loading Spinner habang naghahanap
   crtStaticCanvas.style.display = "block";
   standbyCenter.style.display = "none";
   searchLoader.style.display = "flex";
@@ -1012,7 +1016,6 @@ function stopSession() {
   searching = false;
   connected = false;
 
-  // Ibalik sa Standby mode na may animated TV static at Logo
   crtStaticCanvas.style.display = "block";
   standbyCenter.style.display = "flex";
   searchLoader.style.display = "none";
@@ -1029,25 +1032,34 @@ function stopSession() {
 
 const rtcConfig = {
   iceServers: [
-    { urls: "stun:stun.relay.metered.ca:80" },
-    { urls: "stun:stun.l.google.com:19302" }
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" },
+    { urls: "stun:stun2.l.google.com:19302" },
+    { urls: "stun:stun.relay.metered.ca:80" }
   ]
 };
 
-function createPeer(initiator) {
+async function createPeer(initiator) {
   closePeerConnection();
+  pendingCandidates = [];
+
   peerConnection = new RTCPeerConnection(rtcConfig);
 
+  // Idagdag ang local tracks bago mag-create ng offer/answer
   if (localStream) {
-    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+    localStream.getTracks().forEach(track => {
+      peerConnection.addTrack(track, localStream);
+    });
   }
 
   peerConnection.onicecandidate = (e) => {
-    if (e.candidate && socket) socket.emit("signal", { type: "candidate", candidate: e.candidate });
+    if (e.candidate && socket && socket.connected) {
+      socket.emit("signal", { type: "candidate", candidate: e.candidate });
+    }
   };
 
   peerConnection.ontrack = (e) => {
-    // Kapag may stream na, itago ang TV static at loader card
+    // Matagumpay na natanggap ang video stream ng kausap!
     crtStaticCanvas.style.display = "none";
     standbyCenter.style.display = "none";
     searchLoader.style.display = "none";
@@ -1056,15 +1068,12 @@ function createPeer(initiator) {
     const stream = (e.streams && e.streams[0]) ? e.streams[0] : null;
     if (stream) {
       remoteVideo.srcObject = stream;
-      remoteAudio.srcObject = stream;
     } else {
       if (!remoteVideo.srcObject) remoteVideo.srcObject = new MediaStream();
       remoteVideo.srcObject.addTrack(e.track);
-      if (!remoteAudio.srcObject) remoteAudio.srcObject = new MediaStream();
-      remoteAudio.srcObject.addTrack(e.track);
     }
+
     remoteVideo.play().catch(()=>{});
-    remoteAudio.play().catch(()=>{});
   };
 
   peerConnection.onconnectionstatechange = () => {
@@ -1077,16 +1086,20 @@ function createPeer(initiator) {
       reportBtn.disabled = false;
       releaseBlur();
       setTimeout(captureFrameToStorage, 1000);
+    } else if (peerConnection?.connectionState === "disconnected" || peerConnection?.connectionState === "failed") {
+      triggerStartNext();
     }
   };
 
   if (initiator) {
     dataChannel = peerConnection.createDataChannel("chat");
     setupDataChannel(dataChannel);
-    peerConnection.createOffer().then(o => {
-      peerConnection.setLocalDescription(o);
-      socket.emit("signal", { type: "offer", offer: o });
-    });
+    
+    try {
+      const offer = await peerConnection.createOffer({ offerToReceiveVideo: true, offerToReceiveAudio: true });
+      await peerConnection.setLocalDescription(offer);
+      socket.emit("signal", { type: "offer", offer: offer });
+    } catch(err){}
   } else {
     peerConnection.ondatachannel = (e) => setupDataChannel(e.channel);
   }
@@ -1103,18 +1116,15 @@ function closePeerConnection() {
     try {
       peerConnection.ontrack = null;
       peerConnection.onicecandidate = null;
+      peerConnection.onconnectionstatechange = null;
       peerConnection.close();
     }catch(e){}
     peerConnection = null;
   }
   if (remoteVideo.srcObject) {
-    try { remoteVideo.srcObject.getTracks().forEach(t=>t.stop()); }catch(e){}
     remoteVideo.srcObject = null;
   }
-  if (remoteAudio.srcObject) {
-    try { remoteAudio.srcObject.getTracks().forEach(t=>t.stop()); }catch(e){}
-    remoteAudio.srcObject = null;
-  }
+  pendingCandidates = [];
 }
 
 /* ================= 10. LANGUAGE TRANSLATOR ================= */
@@ -1166,7 +1176,7 @@ document.getElementById("languageSelect").addEventListener("change", (e) => {
   setLanguage(e.target.value);
 });
 
-/* ================= 11. SOCKET EVENTS ================= */
+/* ================= 11. SOCKET & SIGNALING EVENTS ================= */
 if (socket) {
   socket.on("online-count", count => {
     if (standbyUsers) standbyUsers.textContent = Number(count || 1).toLocaleString();
@@ -1181,24 +1191,45 @@ if (socket) {
     remoteStatus.textContent = "Waiting...";
   });
 
-  socket.on("match", data => {
+  socket.on("match", async (data) => {
     searching = false;
     enableBlur();
-    createPeer(Boolean(data?.initiator));
+    await createPeer(Boolean(data?.initiator));
   });
 
-  socket.on("signal", async data => {
-    if (data.type === "offer") {
-      if (!peerConnection) createPeer(false);
-      await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-      const ans = await peerConnection.createAnswer();
-      await peerConnection.setLocalDescription(ans);
-      socket.emit("signal", { type: "answer", answer: ans });
-    } else if (data.type === "answer" && peerConnection) {
-      await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-    } else if (data.type === "candidate" && peerConnection) {
-      await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
-    }
+  socket.on("signal", async (data) => {
+    try {
+      if (data.type === "offer") {
+        if (!peerConnection) await createPeer(false);
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+        
+        // Ilagay ang mga naipong ICE Candidates
+        while (pendingCandidates.length > 0) {
+          const cand = pendingCandidates.shift();
+          await peerConnection.addIceCandidate(cand).catch(()=>{});
+        }
+
+        const ans = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(ans);
+        socket.emit("signal", { type: "answer", answer: ans });
+
+      } else if (data.type === "answer" && peerConnection) {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+        
+        while (pendingCandidates.length > 0) {
+          const cand = pendingCandidates.shift();
+          await peerConnection.addIceCandidate(cand).catch(()=>{});
+        }
+
+      } else if (data.type === "candidate") {
+        const candidate = new RTCIceCandidate(data.candidate);
+        if (peerConnection && peerConnection.remoteDescription) {
+          await peerConnection.addIceCandidate(candidate).catch(()=>{});
+        } else {
+          pendingCandidates.push(candidate);
+        }
+      }
+    } catch(err){}
   });
 
   socket.on("partner-disconnected", () => {
@@ -1273,13 +1304,11 @@ reportBtn.addEventListener("click", () => {
 
 audioSlider.addEventListener("input", (e) => {
   const v = parseFloat(e.target.value);
-  if (remoteAudio) remoteAudio.volume = v;
   if (remoteVideo) remoteVideo.volume = v;
 });
 speakerIcon.addEventListener("click", () => {
   const v = audioSlider.value > 0 ? 0 : 1.0;
   audioSlider.value = v;
-  if (remoteAudio) remoteAudio.volume = v;
   if (remoteVideo) remoteVideo.volume = v;
 });
 
