@@ -1,6 +1,5 @@
 /**
- * MeetLoop - Production Server Backend
- * Complete WebRTC Matchmaking + Server-Side GCash Unban Gateway
+ * MeetLoop - Official Production Server Backend (Render Certified)
  */
 
 const express = require("express");
@@ -10,18 +9,24 @@ const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
+
 const io = new Server(server, {
-  cors: { origin: "*" },
-  pingTimeout: 30000,
-  pingInterval: 10000
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  },
+  pingTimeout: 60000,
+  pingInterval: 25000
 });
 
 const PORT = process.env.PORT || 3000;
 
+// Serve public directory
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
-app.get("*", (req, res) => {
+// Root entry point
+app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
@@ -29,22 +34,21 @@ app.get("*", (req, res) => {
 const bannedDevices = new Map(); // hardwareId -> { banUntil, reason, snapshot }
 const usedGcashReferences = new Set();
 
-// SMART SERVER-SIDE GCASH TRANSACTION VALIDATOR
 function validateGCashReference(ref) {
   if (!ref || typeof ref !== "string") return false;
   const cleanRef = ref.trim().replace(/\s+/g, "");
 
-  // 1. Dapat eksaktong 13 numeric digits (GCash InstaPay Format)
+  // 1. Dapat eksaktong 13 numeric digits
   if (!/^\d{13}$/.test(cleanRef)) return false;
 
-  // 2. Anti-Cheat: Bawal ang puro parehong numero (e.g. 1111111111111) o sunod-sunod (e.g. 1234567890123)
+  // 2. Bawal ang repeated / sequential numbers
   if (/^(\d)\1{12}$/.test(cleanRef)) return false;
   if ("0123456789012345".includes(cleanRef) || "9876543210987".includes(cleanRef)) return false;
 
-  // 3. Check kung nagamit na dati
+  // 3. Bawal gamitin ulit
   if (usedGcashReferences.has(cleanRef)) return false;
 
-  // 4. InstaPay Mod10 Security Algorithm Verification
+  // 4. InstaPay Mod10 Algorithm & Master Codes Check
   let sum = 0;
   for (let i = 0; i < cleanRef.length; i++) {
     let digit = parseInt(cleanRef[i], 10);
@@ -55,7 +59,6 @@ function validateGCashReference(ref) {
     sum += digit;
   }
 
-  // Tanggapin ang mga lehitimong GCash checksum codes o Master Test Codes
   const masterCodes = ["0029381726481", "9981247856123", "8887776665554", "9998887776665"];
   return (sum % 10 === 0) || masterCodes.includes(cleanRef);
 }
@@ -81,7 +84,7 @@ function banDevice(hardwareId, reason, snapshot = null, durationMs = 5 * 60 * 10
 
 /* ================= MATCHMAKING ENGINE ================= */
 let waitingQueue = [];
-const activePairs = new Map(); // socket.id -> partnerSocket.id
+const activePairs = new Map(); // socket.id -> partner.id
 
 function removeFromQueue(socketId) {
   waitingQueue = waitingQueue.filter(id => id !== socketId);
@@ -108,13 +111,13 @@ function matchUsers() {
   }
 }
 
-/* ================= SOCKET EVENTS ================= */
+/* ================= SOCKET.IO EVENTS ================= */
 io.on("connection", (socket) => {
   const hardwareId = socket.handshake.query.hardwareId || socket.handshake.query.deviceId;
 
   io.emit("online-count", io.engine.clientsCount);
 
-  // Check ban upon connection
+  // Check ban upon connect
   const banInfo = checkDeviceBan(hardwareId);
   if (banInfo) {
     socket.emit("ip-banned", {
@@ -152,7 +155,7 @@ io.on("connection", (socket) => {
     matchUsers();
   });
 
-  // WebRTC SIGNALING (Offer, Answer, Candidates)
+  // SIGNALING
   socket.on("signal", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -163,7 +166,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  // REPORT SYSTEM (Bans ONLY the reported partner)
+  // REPORT USER
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -186,13 +189,13 @@ io.on("connection", (socket) => {
     socket.emit("report-success");
   });
 
-  // STRICT SERVER-SIDE GCASH UNBAN
+  // GCASH UNBAN
   socket.on("unban-request", (data) => {
     const ref = String(data.ref || "").trim().replace(/\s+/g, "");
     const reqHardware = data.hardwareId || hardwareId;
 
     if (validateGCashReference(ref)) {
-      usedGcashReferences.add(ref); // One-time use lamang
+      usedGcashReferences.add(ref);
       if (reqHardware) bannedDevices.delete(reqHardware);
 
       return socket.emit("unban-response", {
@@ -207,7 +210,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  // STOP SEARCH
+  // STOP
   socket.on("stop-search", () => {
     removeFromQueue(socket.id);
     const partnerId = activePairs.get(socket.id);
@@ -237,9 +240,9 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(PORT, () => {
+/* ================= BIND TO 0.0.0.0 FOR RENDER ================= */
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
-  console.log(`🚀 MeetLoop WebRTC Server LIVE on port ${PORT}`);
-  console.log(`🔒 GCash Security Validator: ACTIVE`);
+  console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
   console.log(`================================================`);
 });
