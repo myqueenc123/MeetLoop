@@ -35,7 +35,7 @@ html,body{
 button,input,select{font:inherit}
 button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
-/* HEADER OMETV STYLE */
+/* HEADER */
 header{
   height:52px;display:flex;align-items:center;justify-content:space-between;
   padding:0 14px;background:#0d131f;border-bottom:1px solid var(--panel-border);
@@ -55,7 +55,7 @@ header{
 .lang-select:hover{border-color:rgba(255,255,255,.3)}
 .lang-select option{background:#0f172a;color:#fff}
 
-/* STAGE CONTAINER */
+/* MAIN CHAT STAGE */
 .stage-container{
   width:100%;height:calc(100vh - 52px);
   display:flex;gap:10px;padding:10px;
@@ -76,7 +76,7 @@ video{
   background:#000;display:block;
 }
 
-/* OMETV CRT STANDBY SCREEN */
+/* STANDBY SCREEN */
 #standbyScreen{
   position:absolute;inset:0;z-index:2;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -99,7 +99,6 @@ video{
 
 .standby-title{font-size:28px;font-weight:900;letter-spacing:-0.5px;color:#fff;margin-bottom:8px}
 
-/* REALTIME ONLINE COUNTER BADGE */
 .standby-online-tag{
   background:rgba(15,23,42,0.85);border:1px solid rgba(255,255,255,.12);
   padding:6px 16px;border-radius:20px;font-size:13px;font-weight:800;color:#cbd5e1;
@@ -119,11 +118,9 @@ video{
   color:#fff;font-variant-numeric:tabular-nums;font-weight:900;letter-spacing:0.3px;
   transition:color .25s ease;
 }
-#standbyUsers.count-bump{
-  color:#38bdf8;
-}
+#standbyUsers.count-bump{color:#38bdf8}
 
-/* OMETV REMOTE AUDIO CONTROL BAR */
+/* AUDIO CONTROL */
 .remote-audio-bar{
   position:absolute;bottom:0;left:0;right:0;height:40px;
   background:linear-gradient(to top, rgba(0,0,0,.92), transparent);
@@ -140,7 +137,7 @@ video{
   -webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:#38bdf8;cursor:pointer;
 }
 
-/* 1-SEC INSTANT PROTECTION BLUR */
+/* BLUR SHIELD */
 #remoteVideo.remote-blur{
   filter:blur(30px) brightness(0.9);
   -webkit-filter:blur(30px) brightness(0.9);
@@ -181,7 +178,7 @@ video{
 }
 #reportBtn:disabled{opacity:.4;cursor:not-allowed}
 
-/* SEARCHING OVERLAY */
+/* SEARCH LOADER */
 .search-loader{
   position:absolute;inset:0;z-index:10;display:none;
   align-items:center;justify-content:center;background:#050811;
@@ -198,10 +195,8 @@ video{
 @keyframes spin{to{transform:rotate(360deg)}}
 .search-text{font-size:13px;font-weight:800;color:#e2e8f0}
 
-/* OMETV CONTROLS BAR */
-.controls-panel{
-  display:flex;gap:8px;height:48px;flex-shrink:0;
-}
+/* CONTROLS */
+.controls-panel{display:flex;gap:8px;height:48px;flex-shrink:0}
 .ctrl-btn{
   border:0;border-radius:10px;color:#fff;font-size:13px;font-weight:800;
   cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
@@ -215,7 +210,7 @@ video{
 .btn-sec{flex:1;background:#1e293b;border:1px solid rgba(255,255,255,.08)}
 .btn-flip{background:#6b21a8}
 
-/* CHAT SIDEBAR */
+/* CHAT AREA */
 .chat-arena{
   width:300px;max-width:300px;display:flex;flex-direction:column;
   background:var(--panel-dark);border:1px solid var(--panel-border);border-radius:14px;overflow:hidden;
@@ -237,9 +232,7 @@ video{
 .chat-rules-card{background:#1e1b4b;border:1px solid #4338ca;font-size:11px;line-height:1.5}
 .chat-rules-badge{background:#dc2626;color:#fff;font-size:9px;font-weight:900;padding:2px 5px;border-radius:4px;margin-bottom:4px;display:inline-block}
 
-.chat-foot{
-  display:flex;gap:6px;padding:8px;border-top:1px solid var(--panel-border);
-}
+.chat-foot{display:flex;gap:6px;padding:8px;border-top:1px solid var(--panel-border)}
 .chat-input{
   flex:1;min-width:0;height:38px;padding:0 12px;background:#070b14;
   border:1px solid var(--panel-border);border-radius:8px;color:#fff;outline:none;font-size:11px;
@@ -249,39 +242,28 @@ video{
   color:#fff;font-size:11px;font-weight:800;cursor:pointer;
 }
 
-/* =========================================================
-   MOBILE LAYOUT ENGINE
-========================================================= */
+/* MOBILE ADAPTATION */
 @media (max-width:850px){
-  body{
-    height:100dvh;overflow-y:auto;overflow-x:hidden;
-  }
+  body{height:100dvh;overflow-y:auto;overflow-x:hidden}
   header{height:46px;padding:0 10px}
   .brand-logo{width:26px;height:26px}
   .brand-text{font-size:17px}
-
   .stage-container{
     height:auto;min-height:calc(100dvh - 46px);
     flex-direction:column;gap:8px;padding:8px;
   }
   .stream-arena{width:100%;flex:none;gap:8px}
-
   .video-grid{
     position:relative;width:100%;height:min(52dvh,460px);min-height:280px;
     display:block;border-radius:12px;overflow:hidden;
   }
-  .cam-box:first-child{
-    position:absolute;inset:0;width:100%;height:100%;
-  }
-
-  /* FLOATING PIP SELF CAM */
+  .cam-box:first-child{position:absolute;inset:0;width:100%;height:100%}
   #localCamBox{
     position:absolute;right:8px;bottom:8px;width:30vw;max-width:115px;aspect-ratio:3/4;
     height:auto;z-index:8;border:2px solid #ffffff;border-radius:10px;
     box-shadow:0 8px 20px rgba(0,0,0,.8);
   }
   #localCamBox.hidden-cam{display:none !important}
-
   #hideLocalBtn{
     position:absolute;top:3px;right:3px;z-index:9;width:20px;height:20px;
     border-radius:50%;background:rgba(0,0,0,.75);color:#fff;border:0;
@@ -294,31 +276,20 @@ video{
     background:#1e293b;border:1px solid #38bdf8;color:#fff;font-size:10px;font-weight:800;
   }
   #showLocalBtn.visible{display:flex !important}
-
-  /* MOBILE ACTION BAR */
-  .controls-panel{
-    height:auto;display:grid;grid-template-columns:repeat(6,1fr);gap:5px;
-  }
+  .controls-panel{height:auto;display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
   .ctrl-btn{min-height:42px;font-size:12px;padding:4px}
   .btn-start-next{grid-column:span 4}
   .btn-stop{grid-column:span 2}
   .btn-sec{grid-column:span 2}
   #flipBtn{grid-column:span 2;display:flex !important}
-
-  /* MOBILE CHAT */
-  .chat-arena{
-    width:100%;max-width:none;height:220px;min-height:220px;border-radius:12px;flex-shrink:0;
-  }
+  .chat-arena{width:100%;max-width:none;height:220px;min-height:220px;border-radius:12px;flex-shrink:0}
 }
 
 @media (min-width:851px){
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 }
 
-/* =========================================================
-   MODALS
-========================================================= */
-/* WELCOME PORTAL */
+/* MODALS */
 #welcomePortal{
   position:fixed;inset:0;z-index:999999;
   display:flex;align-items:center;justify-content:center;padding:16px;
@@ -339,7 +310,7 @@ video{
   color:#fff;font-size:14px;font-weight:800;cursor:pointer;
 }
 
-/* EXACT OMETV WHITE BANNED SCREEN */
+/* BANNED SCREEN (COOLDOWN + VERIFY CAPTCHA) */
 #banOverlay{
   position:fixed;inset:0;z-index:9999999;background:rgba(0,0,0,.88);
   display:none;align-items:center;justify-content:center;padding:16px;
@@ -364,42 +335,16 @@ video{
 .ban-reason{font-size:13px;color:#334155;font-weight:600}
 .ban-reason span{color:#0284c7;text-decoration:underline;cursor:pointer}
 .ban-description{font-size:13px;color:#334155;text-align:center;margin-bottom:16px;line-height:1.4}
-.ban-gcash-btn{
-  width:100%;height:46px;border-radius:24px;border:0;background:#007dfe;
+.ban-verify-btn{
+  width:100%;height:46px;border-radius:24px;border:0;background:#0284c7;
   color:#fff;font-size:14px;font-weight:800;cursor:pointer;
   display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;
 }
+.ban-verify-btn:disabled{opacity:0.6;cursor:not-allowed}
 .ban-bottom-row{
   display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b;
 }
 .ban-timer-chip{background:#fee2e2;color:#dc2626;font-weight:800;padding:2px 8px;border-radius:12px}
-
-/* GCASH MODAL */
-#gcashModal{
-  position:fixed;inset:0;z-index:99999999;background:rgba(0,0,0,.88);
-  display:none;align-items:center;justify-content:center;padding:16px;
-}
-.gcash-card{
-  max-width:330px;width:100%;padding:20px 16px;text-align:center;
-  background:#007dfe;border-radius:20px;color:#fff;
-}
-.gcash-white-area{
-  background:#fff;border-radius:14px;padding:14px;margin:10px 0;color:#1e293b;
-}
-.gcash-qr-preview{width:100%;max-width:180px;height:auto;margin:0 auto 8px;display:block}
-.gcash-amount{font-size:24px;font-weight:900;color:#007dfe;margin-bottom:8px}
-.gcash-input{
-  width:100%;height:40px;border:1.5px solid #cbd5e1;border-radius:8px;
-  padding:0 10px;font-size:12px;font-weight:800;text-align:center;margin-bottom:8px;outline:none;
-}
-.gcash-verify-btn{
-  width:100%;height:42px;border-radius:8px;border:0;background:#007dfe;color:#fff;
-  font-size:12px;font-weight:900;cursor:pointer;
-}
-.gcash-cancel-btn{
-  width:100%;height:36px;border-radius:8px;background:rgba(255,255,255,.15);
-  border:1px solid rgba(255,255,255,.3);color:#fff;font-weight:800;font-size:11px;cursor:pointer;margin-top:6px;
-}
 
 /* BASIC MODALS */
 .basic-modal{
@@ -438,13 +383,13 @@ video{
     </svg>
 
     <h1 style="font-size:24px;font-weight:900;color:#fff">MeetLoop</h1>
-    <p style="font-size:12px;color:var(--text-muted);font-weight:700;margin-top:2px" id="portalSub">Random Video Chat</p>
+    <p style="font-size:12px;color:var(--text-muted);font-weight:700;margin-top:2px">Random Video Chat</p>
 
     <ul class="portal-rules">
-      <li id="rule1"><b>18+ Required:</b> Minors are strictly prohibited.</li>
-      <li id="rule2"><b>Zero Tolerance:</b> Nudity, obscene behavior, and harassment are banned.</li>
-      <li id="rule3"><b>Human Face Only:</b> Look directly at the camera. Walls/ceilings are banned.</li>
-      <li id="rule4"><b>Instant Blur Shield:</b> Safe transition on every stranger switch.</li>
+      <li><b>18+ Required:</b> Minors are strictly prohibited.</li>
+      <li><b>Zero Tolerance:</b> Nudity, obscene behavior, and harassment are banned.</li>
+      <li><b>Human Face Only:</b> Look directly at the camera. Walls/ceilings are banned.</li>
+      <li><b>Instant Blur Shield:</b> Safe transition on every stranger switch.</li>
     </ul>
 
     <button class="portal-btn" id="portalStartBtn" type="button">START CHATTING</button>
@@ -454,13 +399,13 @@ video{
 <!-- SINGLE TAB DUPLICATE OVERLAY -->
 <div id="duplicateTabOverlay">
   <div class="basic-modal-card">
-    <div style="font-size:16px;font-weight:900;color:#fff;margin-bottom:6px" id="dupTitle">MeetLoop Open in Another Tab</div>
-    <div style="font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:12px" id="dupDesc">Multiple tabs at the same time are not allowed. Session paused in this tab.</div>
+    <div style="font-size:16px;font-weight:900;color:#fff;margin-bottom:6px">MeetLoop Open in Another Tab</div>
+    <div style="font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:12px">Multiple tabs at the same time are not allowed. Session paused in this tab.</div>
     <button class="ctrl-btn btn-start-next" style="width:100%" id="reclaimSessionBtn" type="button">Use Here</button>
   </div>
 </div>
 
-<!-- EXACT OMETV WHITE BANNED SCREEN -->
+<!-- BANNED SCREEN -->
 <div id="banOverlay">
   <div class="ometv-ban-card">
     <div class="ban-top">
@@ -469,56 +414,36 @@ video{
         <div class="ban-snap-brand">MeetLoop</div>
       </div>
       <div class="ban-info">
-        <div class="ban-title" id="banTitle">You're banned</div>
-        <div class="ban-reason"><span id="banReasonPrefix">Reason:</span> <span id="banReasonLabel">irrelevant image</span></div>
+        <div class="ban-title">You're suspended</div>
+        <div class="ban-reason">Reason: <span id="banReasonLabel">irrelevant image</span></div>
       </div>
     </div>
 
-    <div class="ban-description" id="banDesc">
-      You can return to the chat immediately by paying for unban via <b>GCash</b>.
+    <div class="ban-description">
+      Your session is temporarily suspended. Please wait for the cooldown timer or complete the community human verification below.
     </div>
 
-    <button class="ban-gcash-btn" onclick="openGcashModal()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#fff"/><path d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16zm-1 12H9v-2h2v2zm0-4H9V8h2v4zm4 4h-2v-2h2v2zm0-4h-2V8h2v4z" fill="#007dfe"/></svg>
-      <span>Pay with GCash (₱20.00)</span>
+    <button class="ban-verify-btn" id="appealVerifyBtn" onclick="triggerHumanAppeal()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>Complete Verification Appeal</span>
     </button>
 
     <div class="ban-bottom-row">
       <span>support@meetloopchat.com</span>
       <div>
-        <span class="ban-timer-chip" id="banCountdown">59:59</span>
-        <span style="font-family:monospace;margin-left:6px;cursor:pointer" id="adminUnbanId">ID: 167214235</span>
+        <span class="ban-timer-chip" id="banCountdown">05:00</span>
+        <span style="font-family:monospace;margin-left:6px" id="adminUnbanId">ID: 167214235</span>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- GCASH MODAL -->
-<div id="gcashModal">
-  <div class="gcash-card">
-    <div style="font-size:17px;font-weight:900">GCash InstaPay</div>
-    <div style="font-size:11px;opacity:0.9;margin-top:2px">MeetLoopPH • Instant Unban</div>
-
-    <div class="gcash-white-area">
-      <svg class="gcash-qr-preview" viewBox="0 0 200 200">
-        <image href="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020101021226540015ph.com.gcash0111+6392084800000208MeetLoop520460145303608540520.005802PH5910MeetLoopPH6011Philippines6304" width="200" height="200"/>
-      </svg>
-      <div class="gcash-amount">₱20.00</div>
-      <input type="text" id="gcashRef" class="gcash-input" placeholder="GCash Reference No." maxlength="16" inputmode="numeric">
-      <div id="gcashHint" style="display:none;color:#dc2626;font-size:11px;font-weight:700;margin-bottom:8px"></div>
-      <button class="gcash-verify-btn" id="gcashVerifyBtn" onclick="verifyGcashPayment()">Verify Payment</button>
-    </div>
-
-    <button class="gcash-cancel-btn" onclick="closeGcashModal()" id="gcashCancelBtn">Back</button>
   </div>
 </div>
 
 <!-- HUMAN FACE WARNING MODAL -->
 <div id="faceModal" class="basic-modal">
   <div class="basic-modal-card">
-    <div style="color:#ef4444;font-size:15px;font-weight:900;margin-bottom:6px" id="faceModalTitle">Face Required</div>
-    <div style="color:#cbd5e1;font-size:11px;line-height:1.5;margin-bottom:14px" id="faceModalDesc">Point your camera at your face. Covered cameras, ceilings, or static photos are strictly prohibited.</div>
-    <button class="ctrl-btn btn-start-next" style="width:100%" onclick="document.getElementById('faceModal').style.display='none'" id="faceModalBtn">I Understand</button>
+    <div style="color:#ef4444;font-size:15px;font-weight:900;margin-bottom:6px">Face Required</div>
+    <div style="color:#cbd5e1;font-size:11px;line-height:1.5;margin-bottom:14px">Point your camera at your face. Covered cameras, ceilings, or static photos are strictly prohibited.</div>
+    <button class="ctrl-btn btn-start-next" style="width:100%" onclick="document.getElementById('faceModal').style.display='none'">I Understand</button>
   </div>
 </div>
 
@@ -534,14 +459,9 @@ video{
 
   <div class="header-meta">
     <select id="languageSelect" class="lang-select">
-      <option value="en">English (US)</option>
+      <option value="en" selected>English (US)</option>
       <option value="tl">Tagalog (PH)</option>
       <option value="es">Español (ES)</option>
-      <option value="ja">日本語 (JA)</option>
-      <option value="ko">한국어 (KO)</option>
-      <option value="zh">中文 (ZH)</option>
-      <option value="fr">Français (FR)</option>
-      <option value="id">Bahasa Indonesia</option>
     </select>
   </div>
 </header>
@@ -550,12 +470,12 @@ video{
 <div class="stage-container">
   <div class="stream-arena">
     <div class="video-grid">
-      <!-- Stranger Box (Full Screen on Mobile) -->
+      <!-- Stranger Box -->
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" class="remote-blur" autoplay playsinline webkit-playsinline></video>
         <audio id="remoteAudio" autoplay playsinline></audio>
 
-        <!-- OmeTV Standby Screen -->
+        <!-- Standby Screen -->
         <div id="standbyScreen">
           <canvas id="crtStaticCanvas"></canvas>
           <div class="standby-center">
@@ -565,10 +485,9 @@ video{
             </svg>
             <div class="standby-title">MeetLoop</div>
             
-            <!-- REALTIME ONLINE COUNTER -->
             <div class="standby-online-tag">
               <span class="online-dot"></span>
-              <span id="standbyUsers">248,312</span> <span id="standbyUsersLabel">users online</span>
+              <span id="standbyUsers">248,312</span> users online
             </div>
           </div>
         </div>
@@ -585,7 +504,6 @@ video{
         <button id="reportBtn" type="button">Report</button>
         <div class="cam-status-pill" id="remoteStatus">Waiting...</div>
 
-        <!-- Search Overlay -->
         <div class="search-loader" id="searchOverlay">
           <div class="search-card">
             <div class="search-spinner"></div>
@@ -594,7 +512,7 @@ video{
         </div>
       </div>
 
-      <!-- User Local Box (Floating PiP on Mobile) -->
+      <!-- Local Box -->
       <div class="cam-box" id="localCamBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
         <div id="camOffCover">Camera Off</div>
@@ -605,7 +523,7 @@ video{
       <button id="showLocalBtn" type="button">Show Cam</button>
     </div>
 
-    <!-- OmeTV Controls -->
+    <!-- Controls -->
     <div class="controls-panel">
       <button class="ctrl-btn btn-start-next" id="mainActionBtn" type="button">Start</button>
       <button class="ctrl-btn btn-stop" id="stopBtn" type="button" disabled>Stop</button>
@@ -615,16 +533,16 @@ video{
     </div>
   </div>
 
-  <!-- Chat Arena -->
+  <!-- Chat -->
   <div class="chat-arena">
     <div class="chat-head">
-      <span class="chat-head-title" id="chatHeadTitle">Live Chat</span>
+      <span class="chat-head-title">Live Chat</span>
       <span style="font-size:10px;color:var(--text-muted);font-weight:700">MeetLoop</span>
     </div>
     <div class="chat-stream" id="chatStream">
       <div class="chat-msg">
-        <div class="chat-author" id="chatRulesAuthor">MeetLoop System</div>
-        <div class="chat-bubble chat-rules-card" id="chatRulesCard">
+        <div class="chat-author">MeetLoop System</div>
+        <div class="chat-bubble chat-rules-card">
           <span class="chat-rules-badge">RULES</span><br>
           <b>Welcome to MeetLoop.</b><br>
           • 18+ only. Nudity, obscene behavior, or spam are strictly banned.<br>
@@ -643,210 +561,12 @@ video{
 <script>
 "use strict";
 
-/* =========================================================
-   1. TRANSLATION DICTIONARY (8 LANGUAGES)
-========================================================= */
-const i18n = {
-  en: {
-    start: "Start", next: "Next", stop: "Stop", micOn: "Mic On", micOff: "Mic Off",
-    camOn: "Cam On", camOff: "Cam Off", flip: "Flip", showCam: "Show Cam",
-    stranger: "Stranger", you: "You", waiting: "Waiting...", searching: "Searching...",
-    looking: "Looking for someone...", live: "Live", stopped: "Stopped",
-    report: "Report", chat: "Live Chat", send: "Send", inputPlaceholder: "Type a message...",
-    usersOnline: "users online", connecting: "Connecting...",
-    portalBtn: "START CHATTING", camOffLabel: "Camera Off",
-    faceTitle: "Face Required", faceDesc: "Point your camera at your face. Covered cameras, ceilings, or static photos are strictly prohibited.",
-    faceBtn: "I Understand",
-    dupTitle: "MeetLoop Open in Another Tab", dupDesc: "Multiple tabs at the same time are not allowed. Session paused in this tab.",
-    dupBtn: "Use Here",
-    rulesCard: `<span class="chat-rules-badge">RULES</span><br><b>Welcome to MeetLoop.</b><br>• 18+ only. Nudity, obscene behavior, or spam are strictly banned.<br>• Real face required. Point camera towards you.`
-  },
-  tl: {
-    start: "Simulan", next: "Kasunod", stop: "Itigil", micOn: "Mic Bukas", micOff: "Mic Off",
-    camOn: "Cam Bukas", camOff: "Cam Off", flip: "Iikot", showCam: "Ipakita Cam",
-    stranger: "Kausap", you: "Ikaw", waiting: "Naghihintay...", searching: "Naghahanap...",
-    looking: "Naghahanap ng makakausap...", live: "Live", stopped: "Tinigil",
-    report: "I-report", chat: "Usapan", send: "Ipadala", inputPlaceholder: "Mag-type ng mensahe...",
-    usersOnline: "ang online", connecting: "Kumukonekta...",
-    portalBtn: "SIMULAN ANG CHAT", camOffLabel: "Naka-off ang Camera",
-    faceTitle: "Kailangan ng Mukha", faceDesc: "Itapat ang camera sa iyong mukha. Mahigpit na ipinagbabawal ang takpan ang cam, kisame, o litrato.",
-    faceBtn: "Naiintindihan ko",
-    dupTitle: "Bukas ang MeetLoop sa Ibang Tab", dupDesc: "Bawal ang dalawang tab nang sabay. Naka-pause ang session dito.",
-    dupBtn: "Gamitin Dito",
-    rulesCard: `<span class="chat-rules-badge">MGA PATAKARAN</span><br><b>Maligayang pagdating sa MeetLoop.</b><br>• 18+ lamang. Bawal ang kabastusan, paghuhubad, at pang-aabuso.<br>• Tunay na tao at mukha ang kailangan.`
-  },
-  es: {
-    start: "Iniciar", next: "Siguiente", stop: "Parar", micOn: "Mic On", micOff: "Mic Off",
-    camOn: "Cám On", camOff: "Cám Off", flip: "Girar", showCam: "Ver Cám",
-    stranger: "Desconocido", you: "Tú", waiting: "Esperando...", searching: "Buscando...",
-    looking: "Buscando a alguien...", live: "En vivo", stopped: "Detenido",
-    report: "Reportar", chat: "Chat en Vivo", send: "Enviar", inputPlaceholder: "Escribe un mensaje...",
-    usersOnline: "usuarios en línea", connecting: "Conectando...",
-    portalBtn: "EMPEZAR CHAT", camOffLabel: "Cámara Apagada",
-    faceTitle: "Rostro Requerido", faceDesc: "Apunta la cámara a tu cara. Prohibido tapar la cámara, techos o fotos fijas.",
-    faceBtn: "Entendido",
-    dupTitle: "MeetLoop Abierto en Otra Pestaña", dupDesc: "No se permiten múltiples pestañas. Sesión en pausa aquí.",
-    dupBtn: "Usar Aquí",
-    rulesCard: `<span class="chat-rules-badge">REGLAS</span><br><b>Bienvenido a MeetLoop.</b><br>• Solo mayores de 18 años. Prohibida la desnudez o el acoso.<br>• Rostro humano real requerido.`
-  },
-  ja: {
-    start: "開始", next: "次へ", stop: "停止", micOn: "マイクオン", micOff: "マイクオフ",
-    camOn: "カメラオン", camOff: "カメラオフ", flip: "反転", showCam: "カメラ表示",
-    stranger: "相手", you: "あなた", waiting: "待機中...", searching: "検索中...",
-    looking: "相手を探しています...", live: "ライブ", stopped: "停止",
-    report: "通報", chat: "チャット", send: "送信", inputPlaceholder: "メッセージを入力...",
-    usersOnline: "人がオンライン", connecting: "接続中...",
-    portalBtn: "チャットを開始", camOffLabel: "カメラオフ",
-    faceTitle: "顔の表示が必須", faceDesc: "カメラを顔に向けてください。天井、壁、写真の表示は禁止されています。",
-    faceBtn: "了解",
-    dupTitle: "別のタブで開かれています", dupDesc: "複数タブでの同時利用はできません。このタブは一時停止中です。",
-    dupBtn: "ここで使う",
-    rulesCard: `<span class="chat-rules-badge">ルール</span><br><b>MeetLoopへようこそ</b><br>• 18歳以上限定。ヌードや嫌がらせは禁止です。<br>• 実際の顔を映してください。`
-  },
-  ko: {
-    start: "시작", next: "다음", stop: "중지", micOn: "마이크 켜짐", micOff: "마이크 꺼짐",
-    camOn: "카메라 켜짐", camOff: "카메라 꺼짐", flip: "전환", showCam: "카메라 보기",
-    stranger: "상대방", you: "나", waiting: "대기 중...", searching: "검색 중...",
-    looking: "상대를 찾는 중...", live: "라이브", stopped: "중지됨",
-    report: "신고", chat: "라이브 채팅", send: "전송", inputPlaceholder: "메시지 입력...",
-    usersOnline: "명 온라인", connecting: "연결 중...",
-    portalBtn: "채팅 시작", camOffLabel: "카메라 꺼짐",
-    faceTitle: "얼굴 인식 필요", faceDesc: "카메라에 얼굴이 나오도록 해주세요. 천장, 벽, 사진은 금지됩니다.",
-    faceBtn: "확인했습니다",
-    dupTitle: "다른 탭에서 실행 중", dupDesc: "여러 탭을 동시에 실행할 수 없습니다. 이 탭은 일시 중지됩니다.",
-    dupBtn: "여기서 사용",
-    rulesCard: `<span class="chat-rules-badge">규칙</span><br><b>MeetLoop에 오신 것을 환영합니다.</b><br>• 18세 이상 이용 가능. 음란물 및 괴롭힘 엄격 금지.<br>• 실제 얼굴이 보여야 합니다.`
-  },
-  zh: {
-    start: "开始", next: "下一个", stop: "停止", micOn: "麦克风开", micOff: "麦克风关",
-    camOn: "摄像头开", camOff: "摄像头关", flip: "翻转", showCam: "显示相机",
-    stranger: "陌生人", you: "你", waiting: "等待中...", searching: "匹配中...",
-    looking: "正在寻找聊天对象...", live: "直播中", stopped: "已停止",
-    report: "举报", chat: "实时聊天", send: "发送", inputPlaceholder: "输入消息...",
-    usersOnline: "人在线", connecting: "连接中...",
-    portalBtn: "开始聊天", camOffLabel: "摄像头已关闭",
-    faceTitle: "必须露脸", faceDesc: "请正对摄像头。严禁对准天花板、墙壁或使用静态图片。",
-    faceBtn: "我明白了",
-    dupTitle: "已在其他标签页打开", dupDesc: "禁止同时打开多个标签页。当前标签页已暂停。",
-    dupBtn: "在此使用",
-    rulesCard: `<span class="chat-rules-badge">规则</span><br><b>欢迎来到 MeetLoop。</b><br>• 仅限18岁以上。严禁裸露、低俗及骚扰行为。<br>• 必须展示真实人脸。`
-  },
-  fr: {
-    start: "Démarrer", next: "Suivant", stop: "Arrêter", micOn: "Micro On", micOff: "Micro Off",
-    camOn: "Cam On", camOff: "Cam Off", flip: "Tourner", showCam: "Voir Cam",
-    stranger: "Inconnu", you: "Vous", waiting: "En attente...", searching: "Recherche...",
-    looking: "Recherche de partenaire...", live: "En direct", stopped: "Arrêté",
-    report: "Signaler", chat: "Chat en direct", send: "Envoyer", inputPlaceholder: "Écrivez un message...",
-    usersOnline: "utilisateurs en ligne", connecting: "Connexion...",
-    portalBtn: "COMMENCER LE CHAT", camOffLabel: "Caméra Désactivée",
-    faceTitle: "Visage Requis", faceDesc: "Pointez la caméra vers votre visage. Murs, plafonds et photos statiques interdits.",
-    faceBtn: "J'ai compris",
-    dupTitle: "MeetLoop Ouvert sur un Autre Onglet", dupDesc: "Plusieurs onglets simultanés interdits. Session suspendue ici.",
-    dupBtn: "Utiliser Ici",
-    rulesCard: `<span class="chat-rules-badge">RÈGLES</span><br><b>Bienvenue sur MeetLoop.</b><br>• 18+ uniquement. Nudité et harcèlement interdits.<br>• Visage réel requis.`
-  },
-  id: {
-    start: "Mulai", next: "Lanjut", stop: "Berhenti", micOn: "Mik Nyala", micOff: "Mik Mati",
-    camOn: "Kamera Nyala", camOff: "Kamera Mati", flip: "Putar", showCam: "Buka Kamera",
-    stranger: "Orang Lain", you: "Anda", waiting: "Menunggu...", searching: "Mencari...",
-    looking: "Mencari seseorang...", live: "Langsung", stopped: "Berhenti",
-    report: "Lapor", chat: "Obrolan", send: "Kirim", inputPlaceholder: "Ketik pesan...",
-    usersOnline: "pengguna online", connecting: "Menghubungkan...",
-    portalBtn: "MULAI OBROLAN", camOffLabel: "Kamera Mati",
-    faceTitle: "Wajah Diperlukan", faceDesc: "Arahkan kamera ke wajah Anda. Dilarang menutupi kamera, dinding, atau foto.",
-    faceBtn: "Saya Mengerti",
-    dupTitle: "MeetLoop Terbuka di Tab Lain", dupDesc: "Tidak boleh membuka beberapa tab sekaligus. Sesi dijeda di tab ini.",
-    dupBtn: "Gunakan di Sini",
-    rulesCard: `<span class="chat-rules-badge">ATURAN</span><br><b>Selamat datang di MeetLoop.</b><br>• Khusus 18+. Dilarang pornografi atau pelecehan.<br>• Wajib menampakkan wajah asli.`
-  }
-};
-
-let currentLang = localStorage.getItem("meetloop_lang") || "en";
-if (!i18n[currentLang]) currentLang = "en";
-
-function t(key) {
-  return i18n[currentLang]?.[key] || i18n["en"][key] || "";
-}
-
-function applyTranslations() {
-  document.getElementById("remoteTag").textContent = t("stranger");
-  document.getElementById("localTag").textContent = t("you");
-  document.getElementById("reportBtn").textContent = t("report");
-  document.getElementById("chatHeadTitle").textContent = t("chat");
-  document.getElementById("sendBtn").textContent = t("send");
-  document.getElementById("chatInput").placeholder = t("inputPlaceholder");
-  document.getElementById("showLocalBtn").textContent = t("showCam");
-  document.getElementById("camOffCover").textContent = t("camOffLabel");
-  document.getElementById("standbyUsersLabel").textContent = t("usersOnline");
-  document.getElementById("portalStartBtn").textContent = t("portalBtn");
-
-  document.getElementById("faceModalTitle").textContent = t("faceTitle");
-  document.getElementById("faceModalDesc").textContent = t("faceDesc");
-  document.getElementById("faceModalBtn").textContent = t("faceBtn");
-
-  document.getElementById("dupTitle").textContent = t("dupTitle");
-  document.getElementById("dupDesc").textContent = t("dupDesc");
-  document.getElementById("reclaimSessionBtn").textContent = t("dupBtn");
-
-  const rulesCard = document.getElementById("chatRulesCard");
-  if (rulesCard) rulesCard.innerHTML = t("rulesCard");
-
-  if (!connected && !searching) {
-    document.getElementById("mainActionBtn").textContent = t("start");
-    document.getElementById("remoteStatus").textContent = t("waiting");
-  } else {
-    document.getElementById("mainActionBtn").textContent = t("next");
-  }
-  document.getElementById("stopBtn").textContent = t("stop");
-  document.getElementById("flipBtn").textContent = t("flip");
-
-  updateMediaButtonsText();
-}
-
-function updateMediaButtonsText() {
-  const aTrack = localStream?.getAudioTracks()[0];
-  const vTrack = localStream?.getVideoTracks()[0];
-  document.getElementById("micBtn").textContent = (aTrack && !aTrack.enabled) ? t("micOff") : t("micOn");
-  document.getElementById("camBtn").textContent = (vTrack && !vTrack.enabled) ? t("camOff") : t("camOn");
-}
-
-/* =========================================================
-   2. REALTIME LIVE USER ONLINE ENGINE
-========================================================= */
-let liveOnlineTarget = 248312;
-let liveOnlineDisplayed = 248312;
-
-function renderOnlineCounter(num) {
-  const elem = document.getElementById("standbyUsers");
-  if (!elem) return;
-  elem.textContent = Number(num).toLocaleString();
-  elem.classList.add("count-bump");
-  setTimeout(() => elem.classList.remove("count-bump"), 300);
-}
-
-// Organic micro-fluctuation (OmeTV traffic simulator)
-setInterval(() => {
-  const delta = Math.floor(Math.random() * 9) - 4; // -4 to +4 change
-  liveOnlineTarget = Math.max(1, liveOnlineTarget + delta);
-  
-  if (liveOnlineDisplayed !== liveOnlineTarget) {
-    const step = (liveOnlineTarget - liveOnlineDisplayed > 0) ? 1 : -1;
-    liveOnlineDisplayed += step;
-    renderOnlineCounter(liveOnlineDisplayed);
-  }
-}, 3500);
-
-/* =========================================================
-   3. USER IDENTIFIER & SETUP
-========================================================= */
 let myDeviceId = localStorage.getItem("meetloop_device_id") || "dev_" + Math.random().toString(36).substr(2, 9);
 localStorage.setItem("meetloop_device_id", myDeviceId);
 
 let myNumericUserId = localStorage.getItem("meetloop_user_numeric_id") || Math.floor(100000000 + Math.random() * 900000000).toString();
 localStorage.setItem("meetloop_user_numeric_id", myNumericUserId);
-
-const adminUnbanIdElem = document.getElementById("adminUnbanId");
-if (adminUnbanIdElem) adminUnbanIdElem.textContent = "ID: " + myNumericUserId;
+document.getElementById("adminUnbanId").textContent = "ID: " + myNumericUserId;
 
 const standbyScreen = document.getElementById("standbyScreen");
 const crtStaticCanvas = document.getElementById("crtStaticCanvas");
@@ -872,14 +592,7 @@ const sendBtn = document.getElementById("sendBtn");
 
 const audioSlider = document.getElementById("audioSlider");
 const speakerIcon = document.getElementById("speakerIcon");
-const languageSelect = document.getElementById("languageSelect");
-
-languageSelect.value = currentLang;
-languageSelect.addEventListener("change", (e) => {
-  currentLang = e.target.value;
-  localStorage.setItem("meetloop_lang", currentLang);
-  applyTranslations();
-});
+const standbyUsers = document.getElementById("standbyUsers");
 
 let socket = null;
 try {
@@ -904,78 +617,28 @@ let lastPartnerCanvas = document.createElement("canvas");
 lastPartnerCanvas.width = 110;
 lastPartnerCanvas.height = 110;
 
-/* =========================================================
-   4. ENTER MEETLOOP PORTAL
-========================================================= */
-function enterMeetLoop() {
-  const portal = document.getElementById("welcomePortal");
-  if (portal) portal.style.display = "none";
-  startMedia();
+/* LIVE REALTIME USER COUNT */
+let liveOnlineTarget = 248312;
+let liveOnlineDisplayed = 248312;
+
+function renderOnlineCounter(num) {
+  if (!standbyUsers) return;
+  standbyUsers.textContent = Number(num).toLocaleString();
+  standbyUsers.classList.add("count-bump");
+  setTimeout(() => standbyUsers.classList.remove("count-bump"), 300);
 }
 
-const portalStartBtn = document.getElementById("portalStartBtn");
-if (portalStartBtn) {
-  portalStartBtn.addEventListener("click", enterMeetLoop);
-}
-
-/* =========================================================
-   5. SINGLE TAB CONTROLLER
-========================================================= */
-const currentTabId = "tab_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
-const tabChannel = window.BroadcastChannel ? new BroadcastChannel("meetloop_single_tab_bus") : null;
-
-function broadcastTabActive() {
-  if (tabChannel) tabChannel.postMessage({ type: "NEW_SESSION_OPENED", tabId: currentTabId });
-  try {
-    localStorage.setItem("meetloop_active_tab_id", JSON.stringify({ tabId: currentTabId, time: Date.now() }));
-  } catch(e) {}
-}
-
-function terminateThisOldTab() {
-  if (isTabTerminated) return;
-  isTabTerminated = true;
-  try {
-    stopSession();
-    if (localStream) {
-      localStream.getTracks().forEach(t => t.stop());
-      localStream = null;
-    }
-    if (socket) socket.disconnect();
-  } catch(e){}
-  document.getElementById("duplicateTabOverlay").style.display = "flex";
-}
-
-if (tabChannel) {
-  tabChannel.onmessage = (event) => {
-    if (event.data && event.data.type === "NEW_SESSION_OPENED" && event.data.tabId !== currentTabId) {
-      terminateThisOldTab();
-    }
-  };
-}
-
-window.addEventListener("storage", (e) => {
-  if (e.key === "meetloop_active_tab_id" && e.newValue) {
-    try {
-      const data = JSON.parse(e.newValue);
-      if (data && data.tabId !== currentTabId && (Date.now() - data.time < 5000)) {
-        terminateThisOldTab();
-      }
-    } catch(err){}
+setInterval(() => {
+  const delta = Math.floor(Math.random() * 9) - 4;
+  liveOnlineTarget = Math.max(1, liveOnlineTarget + delta);
+  if (liveOnlineDisplayed !== liveOnlineTarget) {
+    const step = (liveOnlineTarget - liveOnlineDisplayed > 0) ? 1 : -1;
+    liveOnlineDisplayed += step;
+    renderOnlineCounter(liveOnlineDisplayed);
   }
-});
-broadcastTabActive();
+}, 3500);
 
-document.getElementById("reclaimSessionBtn").addEventListener("click", () => {
-  document.getElementById("duplicateTabOverlay").style.display = "none";
-  isTabTerminated = false;
-  broadcastTabActive();
-  if (socket && !socket.connected) socket.connect();
-  startMedia();
-});
-
-/* =========================================================
-   6. OMETV CRT TV STATIC NOISE
-========================================================= */
+/* CRT STATIC GENERATOR */
 function runTVStatic() {
   if (!crtStaticCanvas) return;
   const ctx = crtStaticCanvas.getContext("2d");
@@ -986,9 +649,7 @@ function runTVStatic() {
     if (standbyScreen.style.display === "none") return;
     const imgData = ctx.createImageData(w, h);
     const buf = new Uint32Array(imgData.data.buffer);
-    for (let i = 0; i < buf.length; i++) {
-      buf[i] = ((255 * Math.random()) | 0) << 24;
-    }
+    for (let i = 0; i < buf.length; i++) buf[i] = ((255 * Math.random()) | 0) << 24;
     ctx.putImageData(imgData, 0, 0);
     requestAnimationFrame(noise);
   }
@@ -1002,34 +663,21 @@ function applyVolume(v) {
   if (remoteAudio) remoteAudio.volume = v;
   if (remoteVideo) remoteVideo.volume = v;
 }
+audioSlider.addEventListener("input", (e) => applyVolume(parseFloat(e.target.value)));
+speakerIcon.addEventListener("click", () => applyVolume(audioSlider.value > 0 ? 0 : 1.0));
 
-audioSlider.addEventListener("input", (e) => {
-  applyVolume(parseFloat(e.target.value));
-});
-
-speakerIcon.addEventListener("click", () => {
-  if (audioSlider.value > 0) {
-    applyVolume(0);
-  } else {
-    applyVolume(1.0);
-  }
-});
-
-/* =========================================================
-   7. CAMERA ENGINE & VERIFICATION
-========================================================= */
-async function startMedia(specificDeviceId = null) {
-  if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live') && !specificDeviceId) {
+/* CAMERA & VERIFICATION */
+async function startMedia() {
+  if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live')) {
     if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
     camOffCover.style.display = "none";
     try { await localVideo.play(); } catch(e){}
-    updateMediaButtonsText();
     return true;
   }
 
   const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent) || window.innerWidth <= 850;
   const constraints = {
-    video: specificDeviceId ? { deviceId: { exact: specificDeviceId } } : {
+    video: {
       width: isMobile ? { ideal: 480 } : { ideal: 1280 },
       height: isMobile ? { ideal: 640 } : { ideal: 720 },
       facingMode: { ideal: currentFacingMode }
@@ -1038,34 +686,15 @@ async function startMedia(specificDeviceId = null) {
   };
 
   try {
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    if (localStream) {
-      const newVTrack = stream.getVideoTracks()[0];
-      const oldVTrack = localStream.getVideoTracks()[0];
-      if (oldVTrack) { oldVTrack.stop(); localStream.removeTrack(oldVTrack); }
-      if (newVTrack) localStream.addTrack(newVTrack);
-    } else {
-      localStream = stream;
-    }
-
+    localStream = await navigator.mediaDevices.getUserMedia(constraints);
     localVideo.srcObject = localStream;
     localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
     camOffCover.style.display = "none";
     try { await localVideo.play(); } catch(e){}
-    updateMediaButtonsText();
     return true;
   } catch(err) {
-    try {
-      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      localVideo.srcObject = localStream;
-      camOffCover.style.display = "none";
-      try { await localVideo.play(); } catch(e){}
-      updateMediaButtonsText();
-      return true;
-    } catch(e) {
-      camOffCover.style.display = "flex";
-      return false;
-    }
+    camOffCover.style.display = "flex";
+    return false;
   }
 }
 
@@ -1075,7 +704,6 @@ async function verifyCameraSensor() {
   const canvas = document.createElement("canvas");
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
-
   ctx.drawImage(localVideo, 0, 0, W, H);
   const data = ctx.getImageData(0, 0, W, H).data;
 
@@ -1087,9 +715,6 @@ async function verifyCameraSensor() {
   return avg > 8 && avg < 252;
 }
 
-/* =========================================================
-   8. 1-SECOND PROTECTION BLUR
-========================================================= */
 function enableBlur() {
   if (blurTimer) clearTimeout(blurTimer);
   remoteVideo.classList.remove("remote-clear");
@@ -1103,9 +728,7 @@ function releaseBlur() {
   }, 1000);
 }
 
-/* =========================================================
-   9. SEARCH & WEBRTC ENGINE
-========================================================= */
+/* SESSION CONTROLS */
 async function triggerStartNext() {
   if (inCooldown || isTabTerminated) return;
   const ok = await startMedia();
@@ -1113,10 +736,8 @@ async function triggerStartNext() {
 
   inCooldown = true;
   mainActionBtn.disabled = true;
-
   standbyScreen.style.display = "none";
   searchOverlay.style.display = "flex";
-  searchText.textContent = t("looking");
 
   const pass = await verifyCameraSensor();
   if (!pass) {
@@ -1135,8 +756,8 @@ async function triggerStartNext() {
 
   connected = false;
   searching = true;
-  remoteStatus.textContent = t("searching");
-  mainActionBtn.textContent = t("next");
+  remoteStatus.textContent = "Searching...";
+  mainActionBtn.textContent = "Next";
   mainActionBtn.disabled = false;
   stopBtn.disabled = false;
 
@@ -1156,8 +777,8 @@ function stopSession() {
   closePeerConnection();
 
   searchOverlay.style.display = "none";
-  remoteStatus.textContent = t("stopped");
-  mainActionBtn.textContent = t("start");
+  remoteStatus.textContent = "Stopped";
+  mainActionBtn.textContent = "Start";
   mainActionBtn.disabled = false;
   stopBtn.disabled = true;
 }
@@ -1189,7 +810,7 @@ function createPeer(initiator) {
   peerConnection.ontrack = (e) => {
     standbyScreen.style.display = "none";
     searchOverlay.style.display = "none";
-    remoteStatus.textContent = t("live");
+    remoteStatus.textContent = "Live";
     const stream = (e.streams && e.streams[0]) ? e.streams[0] : null;
 
     if (stream) {
@@ -1212,7 +833,6 @@ function createPeer(initiator) {
       searching = false;
       standbyScreen.style.display = "none";
       searchOverlay.style.display = "none";
-      remoteStatus.textContent = t("live");
       reportBtn.disabled = false;
       releaseBlur();
     }
@@ -1232,7 +852,7 @@ function createPeer(initiator) {
 
 function setupDataChannel(ch) {
   dataChannel = ch;
-  ch.onmessage = (e) => addChatMessage(t("stranger"), e.data);
+  ch.onmessage = (e) => addChatMessage("Stranger", e.data);
 }
 
 function closePeerConnection() {
@@ -1255,11 +875,74 @@ function closePeerConnection() {
   }
 }
 
-/* =========================================================
-   10. REALTIME SOCKET EVENTS
-========================================================= */
+/* PROGRESSIVE SUSPENSION SYSTEM */
+function runBanCountdown(banUntil, reason = "irrelevant image") {
+  stopSession();
+  localStorage.setItem("meetloop_banned_until", banUntil);
+  localStorage.setItem("meetloop_banned_reason", reason);
+
+  document.getElementById("banReasonLabel").textContent = reason;
+  const banCanvas = document.getElementById("banCanvas");
+  const ctx = banCanvas.getContext("2d");
+  const saved = localStorage.getItem("meetloop_snap");
+
+  if (saved) {
+    const img = new Image();
+    img.onload = () => ctx.drawImage(img, 0, 0, 110, 110);
+    img.src = saved;
+  } else {
+    ctx.fillStyle = "#cbd5e1"; ctx.fillRect(0,0,110,110);
+  }
+
+  document.getElementById("banOverlay").style.display = "flex";
+
+  if (banInterval) clearInterval(banInterval);
+  banInterval = setInterval(() => {
+    const rem = Math.max(0, Math.floor((banUntil - Date.now()) / 1000));
+    const m = String(Math.floor(rem / 60)).padStart(2, '0');
+    const s = String(rem % 60).padStart(2, '0');
+    document.getElementById("banCountdown").textContent = `${m}:${s}`;
+    if (rem <= 0) {
+      clearInterval(banInterval);
+      localStorage.removeItem("meetloop_banned_until");
+      document.getElementById("banOverlay").style.display = "none";
+    }
+  }, 1000);
+}
+
+/* AUTOMATED HUMAN VERIFICATION APPEAL */
+async function triggerHumanAppeal() {
+  const btn = document.getElementById("appealVerifyBtn");
+  btn.disabled = true;
+  btn.textContent = "Verifying Camera & Face...";
+
+  const ok = await startMedia();
+  if (!ok) {
+    alert("Please allow camera access to complete human verification.");
+    btn.disabled = false;
+    btn.textContent = "Complete Verification Appeal";
+    return;
+  }
+
+  const isHuman = await verifyCameraSensor();
+  if (isHuman) {
+    setTimeout(() => {
+      alert("Verification successful. Your suspension has been lifted.");
+      localStorage.removeItem("meetloop_banned_until");
+      clearInterval(banInterval);
+      document.getElementById("banOverlay").style.display = "none";
+      btn.disabled = false;
+      btn.textContent = "Complete Verification Appeal";
+    }, 1500);
+  } else {
+    alert("Verification failed. Please ensure your face is clearly visible in the camera.");
+    btn.disabled = false;
+    btn.textContent = "Complete Verification Appeal";
+  }
+}
+
+/* SOCKET EVENTS */
 if (socket) {
-  // Realtime Live Counter from Server
   socket.on("online-count", count => {
     const numeric = parseInt(count, 10);
     if (!isNaN(numeric) && numeric > 0) {
@@ -1274,7 +957,7 @@ if (socket) {
     enableBlur();
     standbyScreen.style.display = "none";
     searchOverlay.style.display = "flex";
-    remoteStatus.textContent = t("waiting");
+    remoteStatus.textContent = "Waiting...";
   });
 
   socket.on("match", data => {
@@ -1308,137 +991,6 @@ if (socket) {
   });
 }
 
-/* =========================================================
-   11. BAN SCREEN & GCASH UNBAN
-========================================================= */
-function recordPartnerFrame() {
-  if (remoteVideo && remoteVideo.videoWidth > 0) {
-    const ctx = lastPartnerCanvas.getContext("2d");
-    ctx.drawImage(remoteVideo, 0, 0, 110, 110);
-    localStorage.setItem("meetloop_snap", lastPartnerCanvas.toDataURL("image/jpeg", 0.6));
-  }
-}
-setInterval(recordPartnerFrame, 350);
-
-function runBanCountdown(banUntil, reason = "irrelevant image") {
-  stopSession();
-  localStorage.setItem("meetloop_banned_until", banUntil);
-  localStorage.setItem("meetloop_banned_reason", reason);
-
-  document.getElementById("banReasonLabel").textContent = reason;
-  const banCanvas = document.getElementById("banCanvas");
-  const ctx = banCanvas.getContext("2d");
-  const saved = localStorage.getItem("meetloop_snap");
-
-  if (saved) {
-    const img = new Image();
-    img.onload = () => ctx.drawImage(img, 0, 0, 110, 110);
-    img.src = saved;
-  } else {
-    ctx.fillStyle = "#cbd5e1"; ctx.fillRect(0,0,110,110);
-  }
-
-  document.getElementById("banOverlay").style.display = "flex";
-
-  if (banInterval) clearInterval(banInterval);
-  banInterval = setInterval(() => {
-    const rem = Math.max(0, Math.floor((banUntil - Date.now()) / 1000));
-    const m = String(Math.floor(rem / 60)).padStart(2, '0');
-    const s = String(rem % 60).padStart(2, '0');
-    document.getElementById("banCountdown").textContent = `${m}:${s}`;
-    if (rem <= 0) {
-      clearInterval(banInterval);
-      localStorage.removeItem("meetloop_banned_until");
-      location.reload();
-    }
-  }, 1000);
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-  applyTranslations();
-  renderOnlineCounter(liveOnlineDisplayed);
-  const cachedBan = parseInt(localStorage.getItem("meetloop_banned_until"), 10);
-  if (cachedBan && cachedBan > Date.now()) {
-    runBanCountdown(cachedBan, localStorage.getItem("meetloop_banned_reason") || "irrelevant image");
-  }
-});
-
-function openGcashModal(){ document.getElementById("gcashModal").style.display = "flex"; }
-function closeGcashModal(){ document.getElementById("gcashModal").style.display = "none"; }
-
-async function verifyGcashPayment() {
-  const ref = document.getElementById("gcashRef").value.trim();
-  const hint = document.getElementById("gcashHint");
-  hint.style.display = "none";
-
-  if (!/^\d{10,16}$/.test(ref)) {
-    hint.textContent = "Enter a valid 10-16 digit Reference Number.";
-    hint.style.display = "block";
-    return;
-  }
-
-  const btn = document.getElementById("gcashVerifyBtn");
-  btn.disabled = true;
-  btn.textContent = "Verifying...";
-
-  try {
-    const r = await fetch("/api/verify-gcash-unban", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-device-id": myDeviceId },
-      body: JSON.stringify({ refNumber: ref })
-    });
-    const d = await r.json();
-    if (d.success) {
-      alert("Account Unbanned!");
-      localStorage.removeItem("meetloop_banned_until");
-      location.reload();
-    } else {
-      hint.textContent = d.message || "Payment not found.";
-      hint.style.display = "block";
-    }
-  } catch(e) {
-    hint.textContent = "Server connection error.";
-    hint.style.display = "block";
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Verify Payment";
-  }
-}
-
-// Admin Unban Trigger
-let adminClicks = 0;
-const adminUnbanBtn = document.getElementById("adminUnbanId");
-if (adminUnbanBtn) {
-  adminUnbanBtn.addEventListener("click", () => {
-    adminClicks++;
-    if (adminClicks >= 3) {
-      adminClicks = 0;
-      const adminKey = prompt("Enter Admin Passcode:");
-      if (adminKey) {
-        fetch("/admin/unban-my-ip", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "x-device-id": myDeviceId },
-          body: JSON.stringify({ adminKey })
-        })
-        .then(r => r.json())
-        .then(data => {
-          if (data.success) {
-            alert("Admin Authorized: Account Unbanned!");
-            localStorage.removeItem("meetloop_banned_until");
-            location.reload();
-          } else {
-            alert("Unauthorized.");
-          }
-        })
-        .catch(() => alert("Server error."));
-      }
-    }
-  });
-}
-
-/* =========================================================
-   12. CHAT & CONTROL ATTACHMENTS
-========================================================= */
 function addChatMessage(author, msg) {
   const div = document.createElement("div");
   div.className = "chat-msg";
@@ -1451,49 +1003,35 @@ function sendChat() {
   const val = chatInput.value.trim();
   if (!val || !dataChannel || dataChannel.readyState !== "open") return;
   dataChannel.send(val);
-  addChatMessage(t("you"), val);
+  addChatMessage("You", val);
   chatInput.value = "";
 }
+
+document.getElementById("portalStartBtn").addEventListener("click", () => {
+  document.getElementById("welcomePortal").style.display = "none";
+  startMedia();
+});
 
 mainActionBtn.addEventListener("click", triggerStartNext);
 stopBtn.addEventListener("click", stopSession);
 sendBtn.addEventListener("click", sendChat);
 chatInput.addEventListener("keydown", (e) => { 
-  if (e.key === "Enter") {
-    e.preventDefault();
-    sendChat(); 
-  }
-});
-
-// Desktop shortcuts
-window.addEventListener("keydown", (e) => {
-  if (document.activeElement === chatInput || document.activeElement.tagName === "INPUT") return;
-  if (e.code === "Space") {
-    e.preventDefault();
-    if (!mainActionBtn.disabled) triggerStartNext();
-  } else if (e.code === "Escape") {
-    e.preventDefault();
-    if (!stopBtn.disabled) stopSession();
-  }
+  if (e.key === "Enter") { e.preventDefault(); sendChat(); }
 });
 
 micBtn.addEventListener("click", () => {
-  const tTrack = localStream?.getAudioTracks()[0];
-  if (tTrack) { 
-    tTrack.enabled = !tTrack.enabled; 
-    updateMediaButtonsText();
-  }
+  const t = localStream?.getAudioTracks()[0];
+  if (t) { t.enabled = !t.enabled; micBtn.textContent = t.enabled ? "Mic On" : "Mic Off"; }
 });
 camBtn.addEventListener("click", () => {
-  const tTrack = localStream?.getVideoTracks()[0];
-  if (tTrack) {
-    tTrack.enabled = !tTrack.enabled;
-    updateMediaButtonsText();
-    camOffCover.style.display = tTrack.enabled ? "none" : "flex";
+  const t = localStream?.getVideoTracks()[0];
+  if (t) {
+    t.enabled = !t.enabled;
+    camBtn.textContent = t.enabled ? "Cam On" : "Cam Off";
+    camOffCover.style.display = t.enabled ? "none" : "flex";
   }
 });
 
-// Front / Back camera flip
 flipBtn.addEventListener("click", async () => {
   currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
   const oldTrack = localStream?.getVideoTracks()[0];
@@ -1507,20 +1045,16 @@ flipBtn.addEventListener("click", async () => {
 
 reportBtn.addEventListener("click", () => {
   if (!connected) return;
-  recordPartnerFrame();
   if (socket) socket.emit("report-user", { reason: "irrelevant image", verified: true });
   reportBtn.disabled = true;
   triggerStartNext();
 });
 
-// Mobile PiP Hide / Show Cam
-document.getElementById("hideLocalBtn").addEventListener("click", (e) => {
-  e.stopPropagation();
+document.getElementById("hideLocalBtn").addEventListener("click", () => {
   localCamBox.classList.add("hidden-cam");
   document.getElementById("showLocalBtn").classList.add("visible");
 });
-document.getElementById("showLocalBtn").addEventListener("click", (e) => {
-  e.stopPropagation();
+document.getElementById("showLocalBtn").addEventListener("click", () => {
   localCamBox.classList.remove("hidden-cam");
   document.getElementById("showLocalBtn").classList.remove("visible");
 });
