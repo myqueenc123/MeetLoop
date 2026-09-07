@@ -7,7 +7,7 @@
 
 <title>MeetLoop - Random Video Chat</title>
 
-<!-- FAVICON -->
+<!-- MEETLOOP FAVICON -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='t1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2338bdf8'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3ClinearGradient id='t2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23a855f7'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='%230a0e17'/%3E%3Cpath d='M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z' fill='url(%23t1)'/%3E%3Cpath d='M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z' fill='url(%23t2)'/%3E%3C/svg%3E">
 
 <style>
@@ -62,7 +62,6 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
-/* OMETV STYLE VIDEO VIEW */
 video{
   width:100%;height:100%;
   object-fit:cover;
@@ -70,29 +69,34 @@ video{
   background:#000;display:block;
 }
 
-/* STANDBY SCREEN */
+/* STANDBY SCREEN WITH CUSTOM BG & CRT STATIC NOISE */
 #standbyScreen{
   position:absolute;inset:0;z-index:2;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:#070b12;overflow:hidden;user-select:none;
+  background:linear-gradient(rgba(10, 14, 23, 0.75), rgba(10, 14, 23, 0.85)), url('/meetloop-bg.png') center/cover no-repeat;
+  overflow:hidden;user-select:none;
 }
 #crtStaticCanvas{
-  position:absolute;inset:0;width:100%;height:100%;opacity:0.35;
+  position:absolute;inset:0;width:100%;height:100%;opacity:0.25;
+  filter:contrast(150%) brightness(90%);pointer-events:none;
 }
 .standby-center{
   position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;text-align:center;
   padding:0 12px;
 }
 .standby-logo{
-  width:110px;height:110px;margin-bottom:12px;
-  filter:drop-shadow(0 0 22px rgba(56,189,248,.45));
+  width:115px;height:115px;margin-bottom:12px;
+  filter:drop-shadow(0 0 25px rgba(56,189,248,.6));
+  animation:floatLogo 3s ease-in-out infinite alternate;
 }
-.standby-title{font-size:28px;font-weight:900;letter-spacing:-0.5px;color:#fff;margin-bottom:8px}
+@keyframes floatLogo{from{transform:translateY(0)}to{transform:translateY(-6px)}}
+.standby-title{font-size:30px;font-weight:900;letter-spacing:-0.5px;color:#fff;margin-bottom:8px;text-shadow:0 0 15px rgba(0,0,0,0.8)}
 
 .standby-online-tag{
-  background:rgba(15,23,42,0.85);border:1px solid rgba(255,255,255,.12);
+  background:rgba(15,23,42,0.85);border:1px solid rgba(255,255,255,.15);
   padding:6px 16px;border-radius:20px;font-size:13px;font-weight:800;color:#cbd5e1;
-  display:flex;align-items:center;gap:8px;
+  display:flex;align-items:center;gap:8px;backdrop-filter:blur(8px);
+  box-shadow:0 4px 20px rgba(0,0,0,0.6);
 }
 .online-dot{
   width:8px;height:8px;border-radius:50%;background:var(--green);
@@ -100,7 +104,7 @@ video{
 }
 #standbyUsers{color:#fff;font-weight:900}
 
-/* MOBILE COMPACT VOLUME CONTROL */
+/* COMPACT VOLUME CONTROL */
 .remote-audio-badge{
   position:absolute;bottom:10px;left:10px;z-index:5;
   background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);
@@ -117,7 +121,7 @@ video{
   -webkit-appearance:none;appearance:none;width:11px;height:11px;border-radius:50%;background:#38bdf8;cursor:pointer;
 }
 
-/* BLUR SHIELD (0.3s Fast Transition) */
+/* BLUR SHIELD (Fast 0.3s) */
 #remoteVideo.remote-blur{
   filter:blur(25px) brightness(0.9);
   -webkit-filter:blur(25px) brightness(0.9);
@@ -311,22 +315,30 @@ video{
 }
 .ban-timer-chip{background:#fee2e2;color:#dc2626;font-weight:900;padding:3px 8px;border-radius:8px}
 
-/* MODALS */
+/* WELCOME PORTAL WITH CUSTOM BG */
 #welcomePortal{
   position:fixed;inset:0;z-index:999999;
-  display:flex;align-items:center;justify-content:center;padding:16px;background:#070b12;
+  display:flex;align-items:center;justify-content:center;padding:16px;
+  background:linear-gradient(rgba(10, 14, 23, 0.75), rgba(10, 14, 23, 0.85)), url('/meetloop-bg.png') center/cover no-repeat;
+  backdrop-filter:blur(8px);
 }
 .portal-box{
   max-width:420px;width:100%;padding:28px 20px;text-align:center;
-  background:#111827;border-radius:20px;border:1.5px solid rgba(255,255,255,.1);
+  background:rgba(17, 24, 39, 0.95);border-radius:24px;border:1.5px solid rgba(255,255,255,.12);
+  box-shadow:0 25px 60px rgba(0,0,0,.9);backdrop-filter:blur(10px);
+}
+.portal-logo-svg{
+  width:75px;height:75px;margin:0 auto 12px;display:block;
+  filter:drop-shadow(0 0 20px rgba(56,189,248,.5));
 }
 .portal-btn{
   width:100%;height:48px;border-radius:12px;border:0;background:linear-gradient(135deg,#0284c7,#2563eb);
   color:#fff;font-size:14px;font-weight:800;cursor:pointer;margin-top:12px;
+  box-shadow:0 4px 15px rgba(2, 132, 199, 0.4);
 }
 .portal-rules{
   text-align:left;font-size:12px;color:#cbd5e1;line-height:1.6;margin:16px 0;
-  background:#1f293d;padding:14px;border-radius:12px;
+  background:#1f293d;padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);
 }
 </style>
 </head>
@@ -336,6 +348,22 @@ video{
 <!-- WELCOME PORTAL -->
 <div id="welcomePortal">
   <div class="portal-box">
+    <!-- RESTORED GLOWING LOGO -->
+    <svg class="portal-logo-svg" viewBox="0 0 100 100">
+      <defs>
+        <linearGradient id="pG1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#38bdf8"/>
+          <stop offset="100%" stop-color="#2563eb"/>
+        </linearGradient>
+        <linearGradient id="pG2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#a855f7"/>
+          <stop offset="100%" stop-color="#ec4899"/>
+        </linearGradient>
+      </defs>
+      <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z" fill="url(#pG1)"/>
+      <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z" fill="url(#pG2)"/>
+    </svg>
+
     <h1 style="font-size:24px;font-weight:900;color:#fff">MeetLoop</h1>
     <p style="font-size:12px;color:var(--text-muted);font-weight:700;margin-top:2px" id="lblSubTitle">Random Video Chat</p>
 
@@ -454,6 +482,7 @@ video{
         <video id="remoteVideo" class="remote-blur" autoplay playsinline></video>
         <audio id="remoteAudio" autoplay playsinline></audio>
 
+        <!-- STANDBY SCREEN WITH CUSTOM BG & CRT STATIC -->
         <div id="standbyScreen">
           <canvas id="crtStaticCanvas"></canvas>
           <div class="standby-center">
@@ -555,7 +584,7 @@ let numericId = 0;
 for (let i = 0; i < myHardwareId.length; i++) numericId = (numericId * 31 + myHardwareId.charCodeAt(i)) % 900000000;
 document.getElementById("adminUnbanId").textContent = "ID: " + (100000000 + Math.abs(numericId));
 
-/* ================= 2. INDEXEDDB EVER-STORAGE ================= */
+/* ================= 2. INDEXEDDB STORAGE ================= */
 let dbInstance = null;
 function initSecurityDB() {
   return new Promise((resolve) => {
@@ -599,7 +628,7 @@ async function removeBanFromDB() {
   } catch(e){}
 }
 
-/* ================= 3. SOCKET IO ================= */
+/* ================= 3. SOCKET CONNECTION ================= */
 let socket = null;
 try {
   if (typeof io !== "undefined") {
@@ -644,7 +673,29 @@ let banInterval = null;
 let blurTimer = null;
 let lastCapturedFrame = null;
 
-/* ================= 4. INSTAPAY QR ================= */
+/* ================= 4. CRT MOVING TV STATIC GENERATOR ================= */
+function runTVStatic() {
+  if (!crtStaticCanvas) return;
+  const ctx = crtStaticCanvas.getContext("2d");
+  const w = (crtStaticCanvas.width = 140);
+  const h = (crtStaticCanvas.height = 100);
+
+  function noise() {
+    if (standbyScreen && standbyScreen.style.display !== "none") {
+      const imgData = ctx.createImageData(w, h);
+      const buf = new Uint32Array(imgData.data.buffer);
+      for (let i = 0; i < buf.length; i++) {
+        buf[i] = ((255 * Math.random()) | 0) << 24;
+      }
+      ctx.putImageData(imgData, 0, 0);
+    }
+    requestAnimationFrame(noise);
+  }
+  noise();
+}
+runTVStatic();
+
+/* ================= 5. INSTAPAY QR ================= */
 function renderInstaPayQR() {
   const qrCanvas = document.getElementById("qrCodeCanvas");
   if (!qrCanvas) return;
@@ -656,7 +707,7 @@ function renderInstaPayQR() {
 }
 renderInstaPayQR();
 
-/* ================= 5. VIOLATION SNAPSHOT ================= */
+/* ================= 6. VIOLATION SNAPSHOT ================= */
 function captureFrameToStorage() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
@@ -674,7 +725,7 @@ function captureFrameToStorage() {
 }
 setInterval(() => { if (connected) captureFrameToStorage(); }, 3000);
 
-/* ================= 6. BAN ENGINE ================= */
+/* ================= 7. BAN ENGINE ================= */
 async function checkActiveBan() {
   let banUntil = parseInt(localStorage.getItem("meetloop_banned_until") || "0", 10);
   let banReason = localStorage.getItem("meetloop_banned_reason") || "Policy Violation";
@@ -762,7 +813,7 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 7. GCASH UNBAN VERIFIER ================= */
+/* ================= 8. GCASH UNBAN VERIFIER ================= */
 async function verifyGCashTransaction() {
   const refInput = document.getElementById("gcashRefInput");
   const status = document.getElementById("gcashRefStatus");
@@ -844,7 +895,7 @@ async function verifyGCashTransaction() {
   }, 2000);
 }
 
-/* ================= 8. CAMERA & WEBRTC (OMETV BALANCED) ================= */
+/* ================= 9. CAMERA & WEBRTC ================= */
 async function startMedia() {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live')) {
     if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
@@ -1012,7 +1063,7 @@ function closePeerConnection() {
   }
 }
 
-/* ================= 9. LANGUAGE TRANSLATOR ================= */
+/* ================= 10. LANGUAGE TRANSLATOR ================= */
 const i18n = {
   en: {
     subTitle: "Random Video Chat",
@@ -1064,9 +1115,8 @@ document.getElementById("languageSelect").addEventListener("change", (e) => {
   setLanguage(e.target.value);
 });
 
-/* ================= 10. EVENTS ================= */
+/* ================= 11. SOCKET EVENTS ================= */
 if (socket) {
-  // Realtime Live Online Count mula sa Server
   socket.on("online-count", count => {
     if (standbyUsers) standbyUsers.textContent = Number(count || 1).toLocaleString();
   });
@@ -1190,7 +1240,7 @@ document.getElementById("showLocalBtn").addEventListener("click", () => {
   document.getElementById("showLocalBtn").classList.remove("visible");
 });
 
-// STARTUP CHECK
+// STARTUP
 initSecurityDB().then(() => checkActiveBan());
 setLanguage("en");
 </script>
