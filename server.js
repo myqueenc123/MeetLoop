@@ -1,6 +1,6 @@
 /**
- * MeetLoop - Production Server Backend (Render Certified)
- * Features: Auto Partner Snapshot Ban, GCash Gateway & WebRTC Signaling
+ * MeetLoop - Official Global Production Server Backend
+ * 7-Day Suspension Edition (Render Certified)
  */
 
 const express = require("express");
@@ -21,12 +21,12 @@ const io = new Server(server, {
 });
 
 const PORT = process.env.PORT || 3000;
+const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days in Milliseconds (604,800,000 ms)
 
-// Serve static assets
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
-app.get("/", (req, res) => {
+app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
@@ -68,7 +68,7 @@ function checkDeviceBan(hardwareId) {
   return null;
 }
 
-function banDevice(hardwareId, reason, snapshot = null, durationMs = 5 * 60 * 1000) {
+function banDevice(hardwareId, reason, snapshot = null, durationMs = BAN_DURATION_7DAYS) {
   if (!hardwareId) return null;
   const banUntil = Date.now() + durationMs;
   const record = { banUntil, reason, snapshot };
@@ -78,7 +78,7 @@ function banDevice(hardwareId, reason, snapshot = null, durationMs = 5 * 60 * 10
 
 /* ================= MATCHMAKING ENGINE ================= */
 let waitingQueue = [];
-const activePairs = new Map(); // socket.id -> partner.id
+const activePairs = new Map(); // socket.id -> partnerSocket.id
 
 function removeFromQueue(socketId) {
   waitingQueue = waitingQueue.filter(id => id !== socketId);
@@ -105,13 +105,13 @@ function matchUsers() {
   }
 }
 
-/* ================= SOCKET EVENTS ================= */
+/* ================= SOCKET.IO ================= */
 io.on("connection", (socket) => {
   const hardwareId = socket.handshake.query.hardwareId || socket.handshake.query.deviceId;
 
   io.emit("online-count", io.engine.clientsCount);
 
-  // Check ban upon connection (kasama ang violation picture)
+  // Check 7-day ban upon connection
   const banInfo = checkDeviceBan(hardwareId);
   if (banInfo) {
     socket.emit("ip-banned", {
@@ -160,16 +160,17 @@ io.on("connection", (socket) => {
     }
   });
 
-  // REPORT USER: Ang mukha ng nirereport ang maba-ban at magiging snapshot picture niya
+  // REPORT USER: 7-Day suspension + reporter face evidence
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
       const partner = io.sockets.sockets.get(partnerId);
       if (partner) {
         const partnerHw = partner.handshake.query.hardwareId;
-        const snapshot = data.snapshot || null;
+        const reporterSnapshot = data.snapshot || null;
 
-        const record = banDevice(partnerHw, data.reason || "Policy Violation", snapshot);
+        // 7-Day Suspension
+        const record = banDevice(partnerHw, data.reason || "Policy Violation", reporterSnapshot, BAN_DURATION_7DAYS);
 
         partner.emit("ip-banned", {
           banUntil: record.banUntil,
@@ -196,12 +197,12 @@ io.on("connection", (socket) => {
 
       return socket.emit("unban-response", {
         success: true,
-        message: "✅ GCash Payment Verified! Na-lift na ang suspension ng iyong device."
+        message: "✅ GCash Payment Verified! Your 7-day suspension has been lifted."
       });
     } else {
       return socket.emit("unban-response", {
         success: false,
-        message: "❌ Hindi natagpuan ang Reference Number na ito sa GCash settlement database."
+        message: "❌ Invalid Reference Number. Payment record not found on GCash database."
       });
     }
   });
@@ -236,6 +237,10 @@ io.on("connection", (socket) => {
   });
 });
 
+/* ================= BIND TO 0.0.0.0 FOR RENDER ================= */
 server.listen(PORT, "0.0.0.0", () => {
+  console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
+  console.log(`⏳ 7-Day Suspension Engine: ACTIVE`);
+  console.log(`================================================`);
 });
