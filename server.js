@@ -1,7 +1,6 @@
 /**
- * MeetLoop - Official Server Backend
- * Node.js + Express + Socket.IO
- * Features: Hardware ID + IP Multi-Layer Ban Engine, GCash Unban Sync & WebRTC Signaling
+ * MeetLoop - Production Server Backend (Render Ready)
+ * Fixed: Isolated Hardware Ban (No Self-Ban), Real User Count & Snapshot Persistence
  */
 
 const express = require("express");
@@ -13,69 +12,44 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: { origin: "*" },
-  pingTimeout: 30000,
+  pingTimeout: 20000,
   pingInterval: 10000
 });
 
 const PORT = process.env.PORT || 3000;
 
-// I-serve ang static frontend files
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
-// Main route kung iisang file lang ang gamit mo (hal. index.html)
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-/* ================= SERVER-SIDE BAN DATABASE ================= */
-// Iniimbak ang ban records sa memory (Pwede ring i-connect sa MongoDB/Redis kung kinakailangan)
-const bannedEntities = new Map(); // Key: IP o Hardware ID -> { banUntil, reason }
-const usedGcashReferences = new Set(); // Iniimbak ang mga nagamit nang GCash reference numbers
+/* ================= BAN DATABASE (HARDWARE ISOLATED) ================= */
+// Key: HardwareId -> { banUntil, reason, snapshot }
+const bannedDevices = new Map();
+const usedGcashReferences = new Set();
 
-// Helper para makuha ang tunay na IP ng user (Kahit nasa likod ng Cloudflare / Proxy)
-function getClientIp(socket) {
-  const headers = socket.handshake.headers;
-  const cfIp = headers["cf-connecting-ip"];
-  const forwarded = headers["x-forwarded-for"];
-  if (cfIp) return cfIp;
-  if (forwarded) return forwarded.split(",")[0].trim();
-  return socket.handshake.address || socket.conn.remoteAddress;
-}
-
-// Helper para suriin kung banned ang user
-function checkIsBanned(ip, hardwareId) {
+function checkDeviceBan(hardwareId) {
+  if (!hardwareId) return null;
   const now = Date.now();
-
-  // 1. Check IP Ban
-  if (bannedEntities.has(ip)) {
-    const record = bannedEntities.get(ip);
+  if (bannedDevices.has(hardwareId)) {
+    const record = bannedDevices.get(hardwareId);
     if (now < record.banUntil) return record;
-    bannedEntities.delete(ip); // Expired na ang ban
+    bannedDevices.delete(hardwareId); // Expired
   }
-
-  // 2. Check Hardware Fingerprint Ban
-  if (hardwareId && bannedEntities.has(hardwareId)) {
-    const record = bannedEntities.get(hardwareId);
-    if (now < record.banUntil) return record;
-    bannedEntities.delete(hardwareId); // Expired na ang ban
-  }
-
   return null;
 }
 
-// Helper para i-ban ang user (5 minuto standard cooldown)
-function applyBan(ip, hardwareId, reason = "Violation of Community Rules", durationMs = 5 * 60 * 1000) {
+function banDevice(hardwareId, reason, snapshot = null, durationMs = 5 * 60 * 1000) {
+  if (!hardwareId) return null;
   const banUntil = Date.now() + durationMs;
-  const record = { banUntil, reason };
-
-  if (ip) bannedEntities.set(ip, record);
-  if (hardwareId) bannedEntities.set(hardwareId, record);
-
+  const record = { banUntil, reason, snapshot };
+  bannedDevices.set(hardwareId, record);
   return record;
 }
 
-/* ================= MATCHMAKING QUEUE & ROOMS ================= */
+/* ================= MATCHMAKING QUEUE ================= */
 let waitingQueue = [];
 const activePairs = new Map(); // socket.id -> partnerSocket.id
 
@@ -104,32 +78,34 @@ function matchUsers() {
   }
 }
 
-/* ================= SOCKET.IO CONNECTION ================= */
+/* ================= SOCKET.IO ================= */
 io.on("connection", (socket) => {
-  const clientIp = getClientIp(socket);
   const hardwareId = socket.handshake.query.hardwareId || socket.handshake.query.deviceId;
 
-  // I-broadcast ang live online counter
+  // Real-time broadcast ng totoong bilang ng online users
   io.emit("online-count", io.engine.clientsCount);
 
-  // 1. Mahigpit na pagsusuri kung Banned ang IP o Hardware ID sa pagpasok pa lang
-  const banStatus = checkIsBanned(clientIp, hardwareId);
-  if (banStatus) {
+  // Check kung banned ang device
+  const banInfo = checkDeviceBan(hardwareId);
+  if (banInfo) {
     socket.emit("ip-banned", {
-      banUntil: banStatus.banUntil,
-      reason: banStatus.reason
+      banUntil: banInfo.banUntil,
+      reason: banInfo.reason,
+      snapshot: banInfo.snapshot
     });
   }
 
-  // 2. Simulan ang Paghahanap (Skip / Start)
+  // START / NEXT
   socket.on("skip", () => {
-    // Siguraduhing hindi banned bago payagang maghanap
-    const currentBan = checkIsBanned(clientIp, hardwareId);
+    const currentBan = checkDeviceBan(hardwareId);
     if (currentBan) {
-      return socket.emit("ip-banned", { banUntil: currentBan.banUntil, reason: currentBan.reason });
+      return socket.emit("ip-banned", {
+        banUntil: currentBan.banUntil,
+        reason: currentBan.reason,
+        snapshot: currentBan.snapshot
+      });
     }
 
-    // Tanggalin sa dating partner kung mayroon man
     const oldPartnerId = activePairs.get(socket.id);
     if (oldPartnerId) {
       const oldPartner = io.sockets.sockets.get(oldPartnerId);
@@ -147,59 +123,54 @@ io.on("connection", (socket) => {
     matchUsers();
   });
 
-  // 3. WebRTC Signaling (Offer, Answer, ICE Candidate)
+  // WebRTC SIGNALING
   socket.on("signal", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
       const partnerSocket = io.sockets.sockets.get(partnerId);
-      if (partnerSocket) {
-        partnerSocket.emit("signal", data);
-      }
+      if (partnerSocket) partnerSocket.emit("signal", data);
     }
   });
 
-  // 4. Report System (Awtomatikong bina-ban ang kausap sa Server)
+  // REPORT SYSTEM (Targeted ONLY to Partner - No Self Ban)
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
       const partnerSocket = io.sockets.sockets.get(partnerId);
       if (partnerSocket) {
-        const partnerIp = getClientIp(partnerSocket);
-        const partnerHw = partnerSocket.handshake.query.hardwareId;
+        const partnerHardwareId = partnerSocket.handshake.query.hardwareId;
+        const snapshot = data.snapshot || null;
 
-        // Server-Side permanent ban sa partner
-        const banRecord = applyBan(partnerIp, partnerHw, data.reason || "Reported for inappropriate behavior");
-        
+        // I-ban LAMANG ang partner hardware ID
+        const banRecord = banDevice(partnerHardwareId, data.reason || "Inappropriate behavior / policy", snapshot);
+
         partnerSocket.emit("ip-banned", {
           banUntil: banRecord.banUntil,
-          reason: banRecord.reason
+          reason: banRecord.reason,
+          snapshot: banRecord.snapshot
         });
 
-        // Putulin ang koneksyon ng partner
         activePairs.delete(partnerId);
         partnerSocket.disconnect(true);
       }
       activePairs.delete(socket.id);
     }
+    // Hindi ibaban ang reporter; hahayaan siyang magpatuloy
+    socket.emit("report-success");
   });
 
-  // 5. GCash Unban Verification mula sa Client
+  // GCASH UNBAN
   socket.on("unban-request", (data) => {
     const ref = String(data.ref || "").trim();
     const reqHardware = data.hardwareId || hardwareId;
 
     if (ref && ref.length === 13 && !usedGcashReferences.has(ref)) {
       usedGcashReferences.add(ref);
-
-      // Burahin ang ban sa Server Database
-      bannedEntities.delete(clientIp);
-      if (reqHardware) bannedEntities.delete(reqHardware);
-
+      if (reqHardware) bannedDevices.delete(reqHardware);
       socket.emit("unban-success", { success: true });
     }
   });
 
-  // 6. Stop Search
   socket.on("stop-search", () => {
     removeFromQueue(socket.id);
     const partnerId = activePairs.get(socket.id);
@@ -213,10 +184,8 @@ io.on("connection", (socket) => {
     }
   });
 
-  // 7. Disconnect Handler
   socket.on("disconnect", () => {
     removeFromQueue(socket.id);
-
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
       const partner = io.sockets.sockets.get(partnerId);
@@ -226,16 +195,10 @@ io.on("connection", (socket) => {
       }
       activePairs.delete(socket.id);
     }
-
     io.emit("online-count", io.engine.clientsCount);
   });
 });
 
-/* ================= START SERVER ================= */
 server.listen(PORT, () => {
-  console.log(`===========================================`);
   console.log(`🚀 MeetLoop Server is RUNNING on port ${PORT}`);
-  console.log(`🛡️ Hardware & IP Security Engine: ACTIVE`);
-  console.log(`💳 GCash Instant Unban Gateway: READY`);
-  console.log(`===========================================`);
 });
