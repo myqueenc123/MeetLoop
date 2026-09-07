@@ -149,7 +149,7 @@ video{
   transition:filter 0.5s ease-out, -webkit-filter 0.5s ease-out;
 }
 
-/* COMPACT VOLUME CONTROL */
+/* VOLUME */
 .remote-audio-badge{
   position:absolute;bottom:10px;left:10px;z-index:5;
   background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);
@@ -278,7 +278,7 @@ video{
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 }
 
-/* ================= 24-HOUR BAN OVERLAY ================= */
+/* ================= 7-DAY BAN OVERLAY ================= */
 #banOverlay{
   position:fixed;inset:0;z-index:9999999;background:rgba(0,0,0,.94);
   display:none;align-items:center;justify-content:center;padding:12px;overflow-y:auto;
@@ -349,14 +349,15 @@ video{
 .btn-back-methods{
   background:none;border:0;color:#64748b;font-size:11.5px;font-weight:800;cursor:pointer;margin-top:2px;text-align:center;
 }
-.ban-bottom-bar{
-  display:flex;flex-direction:column;gap:6px;border-top:1px solid #f1f5f9;padding-top:8px;
+
+/* 7-DAY EXPIRATION NOTICE BOX (Clean & Professional) */
+.ban-expire-box{
+  background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;
+  padding:10px 12px;display:flex;flex-direction:column;gap:3px;
 }
-.ban-timer-row{
-  display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b;
-}
-.ban-timer-chip{background:#fee2e2;color:#dc2626;font-weight:900;padding:3px 8px;border-radius:8px}
-.ban-expire-time{font-size:10px;color:#64748b;font-weight:600;text-align:right}
+.ban-expire-label{font-size:11px;font-weight:800;color:#dc2626}
+.ban-expire-time{font-size:12px;font-weight:800;color:#0f172a}
+.ban-id-chip{font-size:10px;color:#64748b;font-family:monospace;margin-top:2px}
 
 /* WELCOME PORTAL */
 #welcomePortal{
@@ -414,7 +415,7 @@ video{
   </div>
 </div>
 
-<!-- 24-HOUR BAN OVERLAY -->
+<!-- 7-DAY BAN OVERLAY -->
 <div id="banOverlay">
   <div class="ban-card">
     <div class="ban-top">
@@ -424,9 +425,9 @@ video{
         <div class="ban-snap-tag">ENCOUNTER EVIDENCE</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:3px">
-        <div class="ban-title" id="banTitle">24-Hour Suspension</div>
+        <div class="ban-title" id="banTitle">7-Day Suspension</div>
         <div class="ban-reason">Reason: <span id="banReasonLabel">Policy Violation</span></div>
-        <div style="font-size:10px;color:#94a3b8;font-weight:600">Reported Encounter Snapshot Recorded</div>
+        <div style="font-size:10px;color:#94a3b8;font-weight:600">Reported Encounter Snapshot Logged</div>
       </div>
     </div>
 
@@ -440,7 +441,7 @@ video{
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
           </div>
           <div>
-            <div class="method-title" style="color:#005ce6">Instant 24H Unban via GCash</div>
+            <div class="method-title" style="color:#005ce6">Instant 7-Day Unban via GCash</div>
             <div class="method-desc" id="lblGcashDesc">Pay clearance fee & enter 13-digit reference number</div>
           </div>
         </div>
@@ -453,8 +454,8 @@ video{
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
           <div>
-            <div class="method-title" id="lblWaitTitle">Wait 24-Hour Cooldown</div>
-            <div class="method-desc" id="lblWaitDesc">Auto unbans after 24 hours</div>
+            <div class="method-title" id="lblWaitTitle">Wait 7-Day Suspension Period</div>
+            <div class="method-desc" id="lblWaitDesc">Auto unbans when 7 days expire</div>
           </div>
         </div>
       </div>
@@ -487,15 +488,11 @@ video{
       <button type="button" class="btn-back-methods" onclick="backToMethodSelection()">← Back to Options</button>
     </div>
 
-    <div class="ban-bottom-bar">
-      <div class="ban-timer-row">
-        <span>Time Remaining:</span>
-        <span class="ban-timer-chip" id="banCountdown">24:00:00</span>
-      </div>
-      <div class="ban-expire-time">
-        <span id="lblExpiresAt">Suspension ends:</span> <b id="banUntilTimeText">--:-- --</b>
-        <span style="font-family:monospace;margin-left:6px" id="adminUnbanId">ID: 167214235</span>
-      </div>
+    <!-- 7-DAY EXPIRATION STATUS (No fast-ticking timer, shows exact Date, Day & Time) -->
+    <div class="ban-expire-box">
+      <span class="ban-expire-label" id="lblExpiresHeader">7-Day Suspension Expiration:</span>
+      <span class="ban-expire-time" id="banUntilFullText">--:-- --</span>
+      <div class="ban-id-chip">Device ID: <span id="adminUnbanId">167214235</span></div>
     </div>
   </div>
 </div>
@@ -638,7 +635,7 @@ function generateHardwareFingerprint() {
 const myHardwareId = generateHardwareFingerprint();
 let numericId = 0;
 for (let i = 0; i < myHardwareId.length; i++) numericId = (numericId * 31 + myHardwareId.charCodeAt(i)) % 900000000;
-document.getElementById("adminUnbanId").textContent = "ID: " + (100000000 + Math.abs(numericId));
+document.getElementById("adminUnbanId").textContent = "" + (100000000 + Math.abs(numericId));
 
 /* ================= 2. INDEXEDDB STORAGE ================= */
 let dbInstance = null;
@@ -754,7 +751,7 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 5. SNAPSHOT OF REPORTER AS ENCOUNTER EVIDENCE ================= */
+/* ================= 5. SNAPSHOT OF REPORTER AS EVIDENCE ================= */
 function captureReporterSnapshot() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
@@ -770,7 +767,7 @@ function captureReporterSnapshot() {
   return null;
 }
 
-/* ================= 6. 24-HOUR BAN ENGINE ================= */
+/* ================= 6. 7-DAY BAN ENGINE ================= */
 async function checkActiveBan() {
   let banUntil = parseInt(localStorage.getItem("meetloop_banned_until") || "0", 10);
   let banReason = localStorage.getItem("meetloop_banned_reason") || "Policy Violation";
@@ -789,7 +786,7 @@ async function checkActiveBan() {
   }
 
   if (banUntil && Date.now() < banUntil) {
-    runBanCountdown(banUntil, banReason, snapData);
+    display7DayBanScreen(banUntil, banReason, snapData);
     return true;
   } else {
     localStorage.removeItem("meetloop_banned_until");
@@ -799,7 +796,7 @@ async function checkActiveBan() {
   }
 }
 
-function runBanCountdown(banUntil, reason = "Policy Violation", customSnap = null) {
+function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap = null) {
   stopSession();
 
   const snapData = customSnap || localStorage.getItem("meetloop_snap");
@@ -810,9 +807,10 @@ function runBanCountdown(banUntil, reason = "Policy Violation", customSnap = nul
 
   document.getElementById("banReasonLabel").textContent = reason;
   
+  // Format exact 7-Day Unban Date & Time (e.g. Friday, Sep 15, 2026 at 2:30 AM)
   const unbanDate = new Date(banUntil);
-  const formattedUnbanTime = unbanDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + " at " + unbanDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  document.getElementById("banUntilTimeText").textContent = formattedUnbanTime;
+  const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+  document.getElementById("banUntilFullText").textContent = unbanDate.toLocaleDateString([], options);
 
   // I-render ang litrato ng kausap na nag-report
   const banCanvas = document.getElementById("banCanvas");
@@ -828,7 +826,7 @@ function runBanCountdown(banUntil, reason = "Policy Violation", customSnap = nul
   } else {
     ctx.fillStyle = "#1e293b"; ctx.fillRect(0, 0, 95, 95);
     ctx.fillStyle = "#94a3b8"; ctx.font = "bold 8.5px sans-serif";
-    ctx.fillText("Encounter Recorded", 4, 50);
+    ctx.fillText("Encounter Logged", 4, 50);
   }
 
   backToMethodSelection();
@@ -836,15 +834,7 @@ function runBanCountdown(banUntil, reason = "Policy Violation", customSnap = nul
 
   if (banInterval) clearInterval(banInterval);
   banInterval = setInterval(async () => {
-    const rem = Math.max(0, Math.floor((banUntil - Date.now()) / 1000));
-    
-    // 24-Hour Format: HH:MM:SS
-    const h = String(Math.floor(rem / 3600)).padStart(2, '0');
-    const m = String(Math.floor((rem % 3600) / 60)).padStart(2, '0');
-    const s = String(rem % 60).padStart(2, '0');
-    document.getElementById("banCountdown").textContent = `${h}:${m}:${s}`;
-    
-    if (rem <= 0) {
+    if (Date.now() >= banUntil) {
       clearInterval(banInterval);
       localStorage.removeItem("meetloop_banned_until");
       localStorage.removeItem("meetloop_banned_reason");
@@ -852,7 +842,7 @@ function runBanCountdown(banUntil, reason = "Policy Violation", customSnap = nul
       await removeBanFromDB();
       document.getElementById("banOverlay").style.display = "none";
     }
-  }, 1000);
+  }, 10000);
 }
 
 function openGcashPayView() {
@@ -917,7 +907,7 @@ if (socket) {
         btn.textContent = "Verify Reference & Unban";
         refInput.value = "";
         status.textContent = "";
-        alert("🎉 GCash Payment Verified! Your suspension has been lifted.");
+        alert("🎉 GCash Payment Verified! Your 7-day suspension has been lifted.");
       }, 1200);
     } else {
       btn.disabled = false;
@@ -1131,11 +1121,11 @@ const i18n = {
     chatTitle: "Live Chat",
     chatRules: "• 18+ only. Strict anti-nudity policy.<br>• Real face required in front of camera.",
     selectMethod: "Select Resolution Method:",
-    waitTitle: "Wait 24-Hour Cooldown",
-    waitDesc: "Auto unbans after 24 hours",
+    waitTitle: "Wait 7-Day Suspension Period",
+    waitDesc: "Auto unbans when 7 days expire",
     scanText: "Scan QR via GCash, pay clearance fee, and enter the 13-Digit Ref No.",
     searching: "Looking for someone...",
-    expiresAt: "Suspension ends:"
+    expiresHeader: "7-Day Suspension Expiration:"
   },
   tl: {
     subTitle: "Random Video Chat",
@@ -1145,11 +1135,11 @@ const i18n = {
     chatTitle: "Live Usapan",
     chatRules: "• Bawal ang 18 pababa. Bawal ang kabastusan.<br>• Totoong mukha ang dapat nakatapat sa camera.",
     selectMethod: "Pumili ng Paraan para Ma-unban:",
-    waitTitle: "Maghintay ng 24-Oras na Cooldown",
-    waitDesc: "Kusang ma-u-unban pagkatapos ng 24 oras",
+    waitTitle: "Maghintay ng 7-Araw na Suspension",
+    waitDesc: "Kusang ma-u-unban pagkatapos ng 7 araw",
     scanText: "I-scan sa GCash, magbayad ng clearance fee, at ilagay ang 13-Digit Reference No.",
     searching: "Naghahanap ng makakausap...",
-    expiresAt: "Matatapos sa:"
+    expiresHeader: "Matatapos ang 7-Araw na Suspension sa:"
   }
 };
 
@@ -1166,7 +1156,7 @@ function setLanguage(lang) {
   document.getElementById("lblWaitDesc").textContent = t.waitDesc;
   document.getElementById("lblScanText").textContent = t.scanText;
   document.getElementById("lblSearchText").textContent = t.searching;
-  document.getElementById("lblExpiresAt").textContent = t.expiresAt;
+  document.getElementById("lblExpiresHeader").textContent = t.expiresHeader;
 }
 
 document.getElementById("languageSelect").addEventListener("change", (e) => {
@@ -1234,7 +1224,7 @@ if (socket) {
   });
 
   socket.on("ip-banned", data => {
-    runBanCountdown(data.banUntil, data.reason, data.snapshot);
+    display7DayBanScreen(data.banUntil, data.reason, data.snapshot);
   });
 }
 
