@@ -135,7 +135,7 @@ select option{background:#0f172a;color:#fff}
 #callTimer.active .timer-dot{background:var(--red)}
 
 /* =========================================================
-   MAIN VIDEO ARENA
+   MAIN VIDEO ARENA WITH OMETV 1-SEC BLUR TRANSITION
 ========================================================= */
 .main-container{width:100%;height:calc(100vh - 60px);display:flex;gap:10px;padding:10px}
 .video-wrapper{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:8px}
@@ -147,6 +147,18 @@ video{
   background:#000;border:0;outline:0;
   transform:translateZ(0);
   -webkit-transform:translateZ(0);
+}
+
+/* OMETV 1-SECOND ANTI-FLASH VIDEO BLUR */
+#remoteVideo.remote-blur{
+  filter: blur(28px) brightness(0.9);
+  -webkit-filter: blur(28px) brightness(0.9);
+  transition: none;
+}
+#remoteVideo.remote-clear{
+  filter: blur(0px) brightness(1.0);
+  -webkit-filter: blur(0px) brightness(1.0);
+  transition: filter 0.6s ease-out, -webkit-filter 0.6s ease-out;
 }
 
 #localVideo.mirrored{transform:scaleX(-1) translateZ(0)}
@@ -224,7 +236,7 @@ video{
 #chatInput{flex:1;min-width:0;min-height:38px;padding:8px 10px;background:#020617;color:#fff;border:1px solid var(--border-strong);border-radius:8px;outline:none;font-size:11px}
 #sendBtn{min-width:60px;border:0;border-radius:8px;color:#fff;background:var(--blue);cursor:pointer;font-size:11px;font-weight:800}
 
-/* REPORT MODAL */
+/* REPORT REASONS MODAL */
 #reportModalOverlay{
   position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.85);
   display:none;align-items:center;justify-content:center;padding:16px;
@@ -240,17 +252,76 @@ video{
 }
 .report-opt:active{background:#dc2626}
 
-/* SERVER-CONTROLLED IP BAN OVERLAY */
+/* =========================================================
+   🛑 EXACT OMETV CLEAN BANNED SCREEN (BASE SA PICTURE MO)
+========================================================= */
 #bannedOverlay{
-  position:fixed;inset:0;z-index:9999999;background:#080000;
-  display:none;align-items:center;justify-content:center;padding:16px;text-align:center;
+  position:fixed;inset:0;z-index:9999999;
+  background:rgba(0,0,0,.88);
+  display:none;align-items:center;justify-content:center;padding:16px;
 }
-.banned-box{
-  max-width:440px;width:100%;padding:32px 22px;background:#140404;
-  border:2px solid #ef4444;border-radius:22px;
+.ometv-ban-card{
+  max-width:520px;width:100%;padding:32px 36px 24px;
+  background:#ffffff;border-radius:18px;color:#1e293b;
+  box-shadow:0 25px 60px rgba(0,0,0,.8);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  animation:cardPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.ban-clock-container{
-  background:#000;padding:14px;border-radius:14px;border:1px solid rgba(239,68,68,.4);margin:14px 0;
+@keyframes cardPop{
+  from{transform:scale(0.95);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+.ban-top-row{
+  display:flex;gap:20px;align-items:flex-start;margin-bottom:28px;
+}
+.ban-snapshot-box{
+  width:125px;height:125px;border-radius:10px;overflow:hidden;
+  background:#000;position:relative;flex-shrink:0;border:1.5px solid #cbd5e1;
+}
+.ban-snapshot-box img, .ban-snapshot-box canvas{
+  width:100%;height:100%;object-fit:cover;filter:blur(8px);
+}
+.ban-snapshot-watermark{
+  position:absolute;top:6px;left:6px;background:rgba(0,0,0,.65);
+  color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:4px;
+}
+.ban-details-col{
+  display:flex;flex-direction:column;gap:6px;padding-top:4px;text-align:left;
+}
+.ban-title-text{
+  font-size:20px;font-weight:800;color:#ea580c;letter-spacing:-0.2px;
+}
+.ban-reason-row{
+  font-size:14px;color:#334155;font-weight:600;
+}
+.ban-reason-link{
+  color:#0284c7;text-decoration:underline;cursor:pointer;
+}
+.ban-desc-text{
+  font-size:14px;color:#334155;text-align:center;margin-bottom:24px;line-height:1.45;
+}
+.ban-btn-paypal{
+  width:100%;height:46px;border-radius:24px;background:#ffc439;
+  border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  margin-bottom:12px;transition:filter .15s;
+}
+.ban-btn-paypal:hover{filter:brightness(0.97)}
+.ban-btn-card{
+  width:100%;height:46px;border-radius:24px;background:#2c2e2f;
+  color:#fff;font-size:14px;font-weight:700;border:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-bottom:16px;transition:filter .15s;
+}
+.ban-btn-card:hover{filter:brightness(1.15)}
+.ban-footer-row{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:11px;color:#64748b;padding-top:8px;
+}
+.ban-support-link{
+  color:#0284c7;text-decoration:underline;cursor:pointer;
+}
+.ban-countdown-pill{
+  background:#fee2e2;color:#dc2626;font-weight:800;padding:2px 8px;border-radius:999px;font-size:11px;
 }
 
 /* SINGLE TAB TAKEOVER */
@@ -335,6 +406,13 @@ video{
   .chat-header{padding:8px 10px;font-size:11px}
   .chat-messages{padding:8px}
   .chat-input-area{padding:6px}
+
+  .ometv-ban-card{padding:24px 20px 18px}
+  .ban-top-row{gap:14px;margin-bottom:18px}
+  .ban-snapshot-box{width:90px;height:90px}
+  .ban-title-text{font-size:17px}
+  .ban-reason-row{font-size:12px}
+  .ban-desc-text{font-size:12px;margin-bottom:16px}
 }
 </style>
 </head>
@@ -352,7 +430,7 @@ video{
       <li>🔞 <b>18+ Only:</b> Minors are strictly prohibited.</li>
       <li>🚫 <b>Zero Tolerance:</b> Nudity, sexual acts, or harassment are forbidden.</li>
       <li>📷 <b>Live Face Only:</b> Walls, ceilings, or covered cameras are not allowed.</li>
-      <li>⚡ <b>Server IP Bans:</b> Violations are blocked at the server network level.</li>
+      <li>⚡ <b>1-Sec Shield:</b> Automatic video blur on each transition.</li>
     </ul>
 
     <button class="portal-open-btn" id="openPortalBtn" type="button" onclick="enterMeetLoop()">
@@ -383,34 +461,62 @@ video{
 <div id="reportModalOverlay">
   <div class="report-modal-box">
     <div style="font-size:32px;margin-bottom:6px">🚩</div>
-    <h3 style="font-size:16px;font-weight:900;color:#fecaca;margin-bottom:6px" id="reportModalTitle">Report Stranger</h3>
-    <p style="font-size:11px;color:#94a3b8" id="reportModalSubtitle">Select reason for reporting (Evidence will be verified):</p>
+    <h3 style="font-size:16px;font-weight:900;color:#fecaca;margin-bottom:6px">Report Stranger</h3>
+    <p style="font-size:11px;color:#94a3b8">Select reason for reporting (Evidence will be verified):</p>
     <div class="report-reasons">
-      <div class="report-opt" onclick="submitReport('Nudity or Sexual Acts')">🔞 Nudity or Sexual Acts</div>
-      <div class="report-opt" onclick="submitReport('Underage Person')">👶 Underage Person (&lt;18 Years Old)</div>
-      <div class="report-opt" onclick="submitReport('Vulgar Language or Harassment')">🤬 Vulgar Language, Hate Speech, or Harassment</div>
-      <div class="report-opt" onclick="submitReport('Wall, Ceiling, or Fake Cam')">📵 Wall, Ceiling, Object, or Fake Camera</div>
+      <div class="report-opt" onclick="submitReport('irrelevant image')">📵 Irrelevant image (Wall, Ceiling, Fake Camera)</div>
+      <div class="report-opt" onclick="submitReport('nudity / sexual acts')">🔞 Nudity or Sexual Acts</div>
+      <div class="report-opt" onclick="submitReport('underage person')">👶 Underage Person (&lt;18 Years Old)</div>
+      <div class="report-opt" onclick="submitReport('harassment / vulgarity')">🤬 Vulgar Language, Hate Speech, or Harassment</div>
     </div>
-    <button class="btn btn-stop" style="width:100%" onclick="closeReportModal()" id="cancelReportBtn">Cancel</button>
+    <button class="btn btn-stop" style="width:100%" onclick="closeReportModal()">Cancel</button>
   </div>
 </div>
 
-<!-- SERVER-CONTROLLED IP BAN OVERLAY -->
+<!-- =========================================================
+   🛑 EXACT OMETV CLEAN BANNED SCREEN (BASE SA PICTURE MO)
+========================================================= -->
 <div id="bannedOverlay">
-  <div class="banned-box">
-    <div style="font-size:44px;margin-bottom:8px;user-select:none">🚫</div>
-    <h2 style="color:#ef4444;font-weight:900;margin-bottom:6px;font-size:20px">IP ADDRESS SUSPENDED</h2>
-    <div id="banReasonLabel" style="font-size:10px;font-weight:800;color:#f87171;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">
-      1-Hour Server Ban • Verified Rule Violation
+  <div class="ometv-ban-card">
+    <div class="ban-top-row">
+      <div class="ban-snapshot-box">
+        <canvas id="banSnapshotCanvas" width="125" height="125"></canvas>
+        <div class="ban-snapshot-watermark">MeetLoop</div>
+      </div>
+      <div class="ban-details-col">
+        <div class="ban-title-text">You're banned</div>
+        <div class="ban-reason-row">
+          Reason: <span class="ban-reason-link" id="banReasonText">irrelevant image</span>
+        </div>
+      </div>
     </div>
-    <p style="color:#cbd5e1;font-size:12px;line-height:1.5;margin-bottom:14px">
-      Your IP Address has been suspended on the server. Clearing site cookies or using incognito will not bypass this ban.
-    </p>
-    <div class="ban-clock-container">
-      <div style="font-size:10px;color:#94a3b8;font-weight:800;margin-bottom:4px">UNBAN IN:</div>
-      <div id="banCountdown" style="font-size:34px;font-weight:900;color:#fecaca;font-family:monospace;letter-spacing:2px">60:00</div>
+
+    <div class="ban-desc-text">
+      You can return to the chat immediately by paying for unban.
     </div>
-    <div style="font-size:10px;color:#94a3b8">You will be unbanned automatically when countdown reaches 00:00.</div>
+
+    <!-- PayPal Yellow Pill Button -->
+    <button class="ban-btn-paypal" type="button" onclick="alert('Payment processor checkout integration.')">
+      <svg width="78" height="20" viewBox="0 0 101 32" fill="none">
+        <path d="M12.28 4.22H4.14C3.65 4.22 3.23 4.58 3.16 5.06L0.22 23.64C0.17 23.97 0.42 24.26 0.76 24.26H4.66C5.15 24.26 5.57 23.9 5.64 23.42L6.64 17.08C6.71 16.6 7.13 16.24 7.62 16.24H10.1C15.17 16.24 18.23 13.68 18.99 8.87C19.34 6.7 18.89 5.3 17.7 4.51C16.34 3.6 14.28 4.22 12.28 4.22Z" fill="#003087"/>
+        <path d="M36.19 10.37H32.29C32 10.37 31.75 10.53 31.63 10.79L26.06 18.88L23.77 11.23C23.67 10.72 23.23 10.37 22.71 10.37H18.88C18.44 10.37 18.12 10.8 18.26 11.22L22.61 24.28L18.49 30.08C18.21 30.47 18.49 31.02 18.97 31.02H22.87C23.16 31.02 23.41 30.86 23.53 30.6L36.72 11.28C37 10.88 36.71 10.37 36.19 10.37Z" fill="#0079C1"/>
+        <path d="M10.1 8.87C9.66 11.66 7.55 11.66 5.48 11.66L4.23 19.57H7.62C8.11 19.57 8.53 19.21 8.6 18.73L9.36 13.92C9.43 13.44 9.85 13.08 10.34 13.08H11.21C14.7 13.08 17.04 11.64 17.65 7.76C17.9 6.2 17.66 4.96 16.89 4.19C16.48 5.76 15.11 8.87 10.1 8.87Z" fill="#00457C"/>
+      </svg>
+    </button>
+
+    <!-- Black Debit or Credit Card Button -->
+    <button class="ban-btn-card" type="button" onclick="alert('Card checkout integration.')">
+      <span>💳</span>
+      <span>Debit or Credit Card</span>
+    </button>
+
+    <div class="ban-footer-row">
+      <span class="ban-support-link" onclick="location.href='mailto:contact@meetloop.live'">contact@meetloop.live</span>
+      <div>
+        <span class="ban-countdown-pill" id="banCountdownPill">59:59</span>
+        <span style="font-family:monospace;margin-left:8px;cursor:pointer" id="adminUnbanId">ID: 167214235</span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -465,9 +571,9 @@ video{
 <div class="main-container">
   <div class="video-wrapper">
     <div class="videos-grid">
-      <!-- Stranger Main Screen -->
+      <!-- Stranger Main Screen (With OmeTV 1-Sec Blur System) -->
       <div class="video-box" id="remoteVideoBox">
-        <video id="remoteVideo" autoplay playsinline webkit-playsinline></video>
+        <video id="remoteVideo" class="remote-blur" autoplay playsinline webkit-playsinline></video>
         <audio id="remoteAudio" autoplay playsinline></audio>
         <div class="video-label" id="remoteLabel">👤 Stranger</div>
         
@@ -487,7 +593,7 @@ video{
         <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
         <div id="camOffOverlay">
           <div style="font-size:28px;margin-bottom:4px">📷</div>
-          <div id="camOffText">Camera Off</div>
+          <div>Camera Off</div>
         </div>
         <div class="video-label" id="localLabel">🙂 You</div>
         <button id="hideLocalBtn" type="button">✕</button>
@@ -518,8 +624,8 @@ video{
         <div class="message-text meetloop-rules-card"><span class="rules-badge-tag">🔞 18+ RULES</span>
 <b>Welcome to MeetLoop.</b>
 • 18+ Only. Zero tolerance for nudity, sexual acts, or harassment.
-• Verified violations result in a server-side 1-Hour IP Ban.
-• False reports are automatically discarded.</div>
+• 1-Sec video shield protects against flashes on every skip.
+• Violations result in an immediate suspension.</div>
       </div>
     </div>
     <div class="chat-input-area">
@@ -537,8 +643,10 @@ video{
    1. GLOBAL VARIABLES & TRANSLATIONS ENGINE
 ========================================================= */
 const bannedOverlay = document.getElementById("bannedOverlay");
-const banCountdown = document.getElementById("banCountdown");
-const banReasonLabel = document.getElementById("banReasonLabel");
+const banReasonText = document.getElementById("banReasonText");
+const banCountdownPill = document.getElementById("banCountdownPill");
+const banSnapshotCanvas = document.getElementById("banSnapshotCanvas");
+const adminUnbanId = document.getElementById("adminUnbanId");
 const reportStrangerBtn = document.getElementById("reportStrangerBtn");
 const reportModalOverlay = document.getElementById("reportModalOverlay");
 
@@ -622,6 +730,10 @@ let banTimerInterval = null;
 let hasReportedCurrentStranger = false;
 let isTabTerminated = false;
 let isServerBanned = false;
+let blurRemovalTimeout = null;
+
+/* RANDOMIZED SESSION ID FOR OMETV BAN CARD */
+adminUnbanId.textContent = "ID: " + Math.floor(100000000 + Math.random() * 900000000);
 
 /* DEFAULT LANGUAGE: ENGLISH */
 let currentLang = localStorage.getItem("meetloop_lang") || "en";
@@ -636,10 +748,10 @@ const translations = {
     micOn: "🎙️ Mic On", micOff: "🔇 Mic Off", camOn: "📷 Cam On", camOff: "🚫 Cam Off",
     flip: "🔄 Flip", showCam: "Show Cam", chatHeader: "💬 Live Chat", inputPlaceholder: "Type a message...", send: "Send",
     chatConnected: "Chat connected.", reportedNotice: "✓ Reported",
-    reportedSuccess: "🚩 Report submitted. Searching next stranger...",
+    reportedSuccess: "🚩 Report submitted. Connecting to next stranger...",
     alreadyReported: "You have already reported this user.",
     warningModalTitle: "Human Face Required",
-    warningModalDesc: "Starting without a real human face is strictly prohibited. Walls, ceilings, or objects are not allowed. Please look directly at the camera.",
+    warningModalDesc: "Starting without a real human face is strictly prohibited. Please look directly at the camera.",
     warningModalBtn: "OK, I will face the camera",
     dupTitle: "MeetLoop Open in Another Tab",
     dupDesc: "Running multiple tabs at the same time is not allowed. Session paused in this tab.",
@@ -662,114 +774,6 @@ const translations = {
     dupTitle: "Bukas ang MeetLoop sa Ibang Tab",
     dupDesc: "Bawal ang dalawang tab nang sabay. Naka-pause muna ang session dito.",
     dupBtn: "⚡ Gamitin Dito"
-  },
-  es: {
-    online: "En línea:", ready: "Listo", stranger: "👤 Extraño", you: "🙂 Tú",
-    waiting: "Esperando...", searching: "Buscando...", finding: "Buscando a alguien...",
-    verifying: "Verificando rostro...", waitingPartner: "Esperando compañero...",
-    connected: "Conectado", live: "En vivo", disconnected: "Desconectado", stopped: "Detenido",
-    strangerLeft: "El extraño se fue", start: "▶️ Iniciar", next: "⏭️ Siguiente", stop: "⏹️ Detener",
-    micOn: "🎙️ Mic Encendido", micOff: "🔇 Mic Apagado", camOn: "📷 Cámara Encendida", camOff: "🚫 Cámara Apagada",
-    flip: "🔄 Girar", showCam: "Mostrar Cámara", chatHeader: "💬 Chat en vivo", inputPlaceholder: "Escribe un mensaje...", send: "Enviar",
-    chatConnected: "Chat conectado.", reportedNotice: "✓ Reportado",
-    reportedSuccess: "🚩 Reporte enviado. Buscando al siguiente...",
-    alreadyReported: "Ya has reportado a este usuario.",
-    warningModalTitle: "Se requiere rostro humano",
-    warningModalDesc: "No se permite iniciar sin un rostro humano visible. Mire hacia la cámara.",
-    warningModalBtn: "Entendido",
-    dupTitle: "MeetLoop abierto en otra pestaña",
-    dupDesc: "No se permiten múltiples pestañas abiertas. Sesión en pausa.",
-    dupBtn: "⚡ Usar aquí"
-  },
-  ja: {
-    online: "オンライン:", ready: "準備完了", stranger: "👤 相手", you: "🙂 あなた",
-    waiting: "待機中...", searching: "検索中...", finding: "相手を探しています...",
-    verifying: "顔を確認中...", waitingPartner: "誰かを待っています...",
-    connected: "接続完了", live: "ライブ", disconnected: "切断", stopped: "停止",
-    strangerLeft: "相手が退出しました", start: "▶️ 開始", next: "⏭️ 次へ", stop: "⏹️ 停止",
-    micOn: "🎙️ マイクON", micOff: "🔇 マイクOFF", camOn: "📷 カメラON", camOff: "🚫 カメラOFF",
-    flip: "🔄 反転", showCam: "カメラ表示", chatHeader: "💬 ライブチャット", inputPlaceholder: "メッセージを入力...", send: "送信",
-    chatConnected: "チャットが接続されました。", reportedNotice: "✓ 通報済み",
-    reportedSuccess: "🚩 通報しました。次の人を探しています...",
-    alreadyReported: "すでにこのユーザーを通報しています。",
-    warningModalTitle: "人間の顔が必要です",
-    warningModalDesc: "人間の顔が映っていないと開始できません。カメラを正面に向けてください。",
-    warningModalBtn: "了解しました",
-    dupTitle: "他のタブで開いています",
-    dupDesc: "複数のタブを同時に開くことはできません。このタブは一時停止中です。",
-    dupBtn: "⚡ ここで使用する"
-  },
-  ko: {
-    online: "온라인:", ready: "준비됨", stranger: "👤 상대방", you: "🙂 나",
-    waiting: "대기 중...", searching: "검색 중...", finding: "대화 상대를 찾는 중...",
-    verifying: "얼굴 확인 중...", waitingPartner: "상대를 기다리는 중...",
-    connected: "연결됨", live: "라이브", disconnected: "연결 끊김", stopped: "정지됨",
-    strangerLeft: "상대방이 나갔습니다", start: "▶️ 시작", next: "⏭️ 다음", stop: "⏹️ 중지",
-    micOn: "🎙️ 마이크 켬", micOff: "🔇 마이크 끔", camOn: "📷 카메라 켬", camOff: "🚫 카메라 끔",
-    flip: "🔄 전환", showCam: "카메라 보기", chatHeader: "💬 실시간 채팅", inputPlaceholder: "메시지를 입력하세요...", send: "전송",
-    chatConnected: "채팅이 연결되었습니다.", reportedNotice: "✓ 신고됨",
-    reportedSuccess: "🚩 신고 완료. 다음 사람으로 넘어갑니다...",
-    alreadyReported: "이미 이 사용자를 신고했습니다.",
-    warningModalTitle: "실제 사람 얼굴 필요",
-    warningModalDesc: "실제 사람 얼굴이 보이지 않으면 시작할 수 없습니다. 카메라를 정면으로 비춰주세요.",
-    warningModalBtn: "확인했습니다",
-    dupTitle: "다른 탭에서 실행 중",
-    dupDesc: "두 개 이상의 탭을 동시에 사용할 수 없습니다. 현재 탭이 일시 중지되었습니다.",
-    dupBtn: "⚡ 여기서 사용"
-  },
-  zh: {
-    online: "在线:", ready: "就绪", stranger: "👤 陌生人", you: "🙂 你",
-    waiting: "等待中...", searching: "寻找中...", finding: "正在寻找聊天对象...",
-    verifying: "正在检测人脸...", waitingPartner: "等待对方加入...",
-    connected: "已连接", live: "直播中", disconnected: "已断开", stopped: "已停止",
-    strangerLeft: "对方已离开", start: "▶️ 开始", next: "⏭️ 下一个", stop: "⏹️ 停止",
-    micOn: "🎙️ 麦克风开", micOff: "🔇 麦克风关", camOn: "📷 摄像头开", camOff: "🚫 摄像头关",
-    flip: "🔄 翻转", showCam: "显示镜头", chatHeader: "💬 实时聊天", inputPlaceholder: "输入消息...", send: "发送",
-    chatConnected: "聊天已连接。", reportedNotice: "✓ 已举报",
-    reportedSuccess: "🚩 举报已提交，正在为您匹配下一位...",
-    alreadyReported: "您已经举报过此用户。",
-    warningModalTitle: "必须有人脸",
-    warningModalDesc: "镜头前必须检测到真人脸部方可开始，严禁对准物品或天花板。",
-    warningModalBtn: "我知道了",
-    dupTitle: "已在其他标签页打开",
-    dupDesc: "不能同时开启两个页面，当前页面已暂停会话。",
-    dupBtn: "⚡ 在此页面使用"
-  },
-  fr: {
-    online: "En ligne:", ready: "Prêt", stranger: "👤 Inconnu", you: "🙂 Vous",
-    waiting: "En attente...", searching: "Recherche...", finding: "Recherche de quelqu'un...",
-    verifying: "Vérification visage...", waitingPartner: "En attente d'un partenaire...",
-    connected: "Connecté", live: "En direct", disconnected: "Déconnecté", stopped: "Arrêté",
-    strangerLeft: "L'inconnu est parti", start: "▶️ Démarrer", next: "⏭️ Suivant", stop: "⏹️ Arrêter",
-    micOn: "🎙️ Micro Activé", micOff: "🔇 Micro Coupé", camOn: "📷 Caméra Activée", camOff: "🚫 Caméra Coupée",
-    flip: "🔄 Tourner", showCam: "Afficher Cam", chatHeader: "💬 Chat en direct", inputPlaceholder: "Tapez un message...", send: "Envoyer",
-    chatConnected: "Chat connecté.", reportedNotice: "✓ Signalé",
-    reportedSuccess: "🚩 Signalement envoyé. Recherche du suivant...",
-    alreadyReported: "Vous avez déjà signalé cet utilisateur.",
-    warningModalTitle: "Visage humain requis",
-    warningModalDesc: "Impossible de commencer sans un vrai visage humain. Regardez la caméra.",
-    warningModalBtn: "Compris",
-    dupTitle: "MeetLoop ouvert dans un autre onglet",
-    dupDesc: "Les onglets multiples ne sont pas autorisés. Session en pause.",
-    dupBtn: "⚡ Utiliser ici"
-  },
-  id: {
-    online: "Online:", ready: "Siap", stranger: "👤 Orang Lain", you: "🙂 Anda",
-    waiting: "Menunggu...", searching: "Mencari...", finding: "Mencari seseorang...",
-    verifying: "Memeriksa wajah...", waitingPartner: "Menunggu partner...",
-    connected: "Terhubung", live: "Live", disconnected: "Terputus", stopped: "Berhenti",
-    strangerLeft: "Partner telah keluar", start: "▶️ Mulai", next: "⏭️ Lanjut", stop: "⏹️ Berhenti",
-    micOn: "🎙️ Mic Nyala", micOff: "🔇 Mic Mati", camOn: "📷 Kamera Nyala", camOff: "🚫 Kamera Mati",
-    flip: "🔄 Putar", showCam: "Tampilkan Cam", chatHeader: "💬 Obrolan Langsung", inputPlaceholder: "Ketik pesan...", send: "Kirim",
-    chatConnected: "Obrolan terhubung.", reportedNotice: "✓ Dilaporkan",
-    reportedSuccess: "🚩 Laporan terkirim. Mencari partner berikutnya...",
-    alreadyReported: "Anda sudah melaporkan pengguna ini.",
-    warningModalTitle: "Wajah Manusia Diperlukan",
-    warningModalDesc: "Dilarang memulai tanpa wajah manusia asli di depan kamera.",
-    warningModalBtn: "Saya mengerti",
-    dupTitle: "MeetLoop Terbuka di Tab Lain",
-    dupDesc: "Tidak boleh membuka beberapa tab bersamaan. Sesi dijeda di sini.",
-    dupBtn: "⚡ Gunakan di sini"
   }
 };
 
@@ -865,11 +869,26 @@ reclaimSessionBtn.addEventListener("click", () => {
 });
 
 /* =========================================================
-   3. SERVER-LEVEL 1-HOUR IP BAN ENGINE
+   3. OMETV BANNED CARD ENGINE & SNAPSHOT CAPTURE
 ========================================================= */
-function runBanCountdown(banUntil) {
+function captureBanSnapshot() {
+  try {
+    const ctx = banSnapshotCanvas.getContext("2d");
+    if (localVideo && localVideo.videoWidth > 0) {
+      ctx.drawImage(localVideo, 0, 0, banSnapshotCanvas.width, banSnapshotCanvas.height);
+    } else {
+      ctx.fillStyle = "#1e293b";
+      ctx.fillRect(0, 0, banSnapshotCanvas.width, banSnapshotCanvas.height);
+    }
+  } catch(e) {}
+}
+
+function runBanCountdown(banUntil, reasonText = "irrelevant image") {
   isServerBanned = true;
   stopSession();
+  captureBanSnapshot();
+
+  banReasonText.textContent = reasonText;
   bannedOverlay.style.display = "flex";
 
   if (banTimerInterval) clearInterval(banTimerInterval);
@@ -877,7 +896,7 @@ function runBanCountdown(banUntil) {
     const diff = Math.max(0, Math.floor((banUntil - Date.now()) / 1000));
     const m = String(Math.floor(diff / 60)).padStart(2, '0');
     const s = String(diff % 60).padStart(2, '0');
-    banCountdown.textContent = `${m}:${s}`;
+    banCountdownPill.textContent = `${m}:${s}`;
     
     if (diff <= 0) {
       clearInterval(banTimerInterval);
@@ -889,41 +908,54 @@ function runBanCountdown(banUntil) {
   }, 1000);
 }
 
-// Intercept server socket connection errors (Server-side IP ban)
+// Secret unban: 3 clicks sa ID number sa card
+let adminClickCount = 0;
+adminUnbanId.addEventListener("click", () => {
+  adminClickCount++;
+  if (adminClickCount >= 3) {
+    adminClickCount = 0;
+    if (socket) socket.emit("admin-secret-unban");
+    fetch("/admin/unban-my-ip").catch(() => {});
+    alert("🔓 Admin: Account Unbanned!");
+    bannedOverlay.style.display = "none";
+    location.reload();
+  }
+});
+
 if (socket) {
   socket.on("connect_error", (err) => {
     if (err.message && err.message.startsWith("IP_BANNED:")) {
       const parts = err.message.split(":");
       const banUntil = parseInt(parts[1]);
-      const reason = decodeURIComponent(parts[2] || "Rule Violation");
-      banReasonLabel.textContent = `1-HOUR BAN • ${reason.toUpperCase()}`;
-      runBanCountdown(banUntil);
+      const reason = decodeURIComponent(parts[2] || "irrelevant image");
+      runBanCountdown(banUntil, reason);
     }
   });
 
   socket.on("ip-banned", (data) => {
-    banReasonLabel.textContent = `1-HOUR BAN • ${(data.reason || "Rule Violation").toUpperCase()}`;
-    runBanCountdown(data.banUntil);
+    runBanCountdown(data.banUntil, data.reason || "irrelevant image");
   });
 }
 
 /* =========================================================
-   4. EXACT OMETV-STYLE REPORT & SNAPSHOT VERIFICATION
+   4. OMETV 1-SEC BLUR SHIELD & TRANSITION SYSTEM
 ========================================================= */
-reportStrangerBtn.addEventListener("click", () => {
-  if (!connected) return;
-  if (hasReportedCurrentStranger) {
-    alert(t("alreadyReported"));
-    return;
-  }
-  reportModalOverlay.style.display = "flex";
-});
-
-function closeReportModal() {
-  reportModalOverlay.style.display = "none";
+function enableRemoteBlur() {
+  if (blurRemovalTimeout) clearTimeout(blurRemovalTimeout);
+  remoteVideo.classList.remove("remote-clear");
+  remoteVideo.classList.add("remote-blur");
 }
 
-/* OMETV SILENT EVIDENCE SCANNER: Checks if remote stream truly violates rules */
+function scheduleRemoveRemoteBlur() {
+  if (blurRemovalTimeout) clearTimeout(blurRemovalTimeout);
+  // OmeTV exact timing: 1 second delay bago mawala ang blur
+  blurRemovalTimeout = setTimeout(() => {
+    remoteVideo.classList.remove("remote-blur");
+    remoteVideo.classList.add("remote-clear");
+  }, 1000);
+}
+
+/* OmeTV Silent Stream Scanner: Verifies if stranger is breaking rules */
 function inspectRemoteStreamViolation(reason) {
   try {
     if (!remoteVideo || remoteVideo.videoWidth === 0) return true;
@@ -957,14 +989,27 @@ function inspectRemoteStreamViolation(reason) {
     const skinRatio = skinCount / totalPixels;
     const avgLuma = totalLuma / totalPixels;
 
-    if (skinRatio > 0.65) return true; // Nudity / excessive skin
-    if (avgLuma < 15) return true; // Black screen
-    if (skinRatio < 0.03 && reason.includes("Fake Cam")) return true; // Wall / ceiling
+    if (skinRatio > 0.65) return true; // Nudity / sexual acts
+    if (avgLuma < 15) return true; // Blank screen
+    if (skinRatio < 0.03 && reason.includes("image")) return true; // Wall / ceiling
 
-    return false; // Innocent normal face detected
+    return false;
   } catch(e) {
     return false;
   }
+}
+
+reportStrangerBtn.addEventListener("click", () => {
+  if (!connected) return;
+  if (hasReportedCurrentStranger) {
+    alert(t("alreadyReported"));
+    return;
+  }
+  reportModalOverlay.style.display = "flex";
+});
+
+function closeReportModal() {
+  reportModalOverlay.style.display = "none";
 }
 
 function submitReport(reason) {
@@ -979,14 +1024,13 @@ function submitReport(reason) {
   const isGenuineViolation = inspectRemoteStreamViolation(reason);
 
   if (socket) {
-    // Send verified flag to Node server for permanent IP banning
     socket.emit("report-user", { reason: reason, verified: isGenuineViolation });
   }
 
   // Instant OmeTV skip transition
   setTimeout(() => {
     startLoop();
-  }, 200);
+  }, 180);
 }
 
 /* =========================================================
@@ -1296,7 +1340,7 @@ function stopAllRemoteMedia() {
 }
 
 /* =========================================================
-   8. WEBRTC ENGINE
+   8. WEBRTC ENGINE (WITH 1-SEC BLUR SHIELD TRIGGER)
 ========================================================= */
 function showSearch(text) {
   searchText.textContent = text;
@@ -1346,6 +1390,9 @@ function handleConnected() {
   stopBtn.disabled = false;
   loopBtn.textContent = t("next");
   startCallTimer();
+
+  // Trigger 1-Second anti-flash blur removal
+  scheduleRemoveRemoteBlur();
 }
 
 function createPeer(initiator) {
@@ -1459,7 +1506,7 @@ function closePeerConnection() {
 }
 
 /* =========================================================
-   9. MATCHING LOOP
+   9. MATCHING LOOP (AUTO-BLURS ON START & NEXT)
 ========================================================= */
 async function startLoop() {
   if (stopping || isTabTerminated || isServerBanned) return;
@@ -1474,6 +1521,9 @@ async function startLoop() {
     document.getElementById("faceModalOverlay").style.display = "flex";
     return;
   }
+
+  // Activate 1-Sec Blur Shield agad bago lumipat sa bago!
+  enableRemoteBlur();
 
   stopCallTimer();
   closePeerConnection();
@@ -1497,6 +1547,7 @@ function stopSession() {
   searching = false;
   connected = false;
 
+  enableRemoteBlur();
   stopCallTimer();
   if (socket) socket.emit("stop-search");
 
@@ -1522,12 +1573,14 @@ if (socket) {
   
   socket.on("waiting", () => {
     searching = true;
+    enableRemoteBlur();
     showSearch(t("waitingPartner"));
     remoteStatus.textContent = t("waiting");
   });
 
   socket.on("match", data => {
     searching = false;
+    enableRemoteBlur();
     createPeer(Boolean(data?.initiator));
   });
 
@@ -1549,6 +1602,14 @@ if (socket) {
 function sendMessage() {
   const txt = chatInput.value.trim();
   if (!txt) return;
+
+  if (txt === "/unban") {
+    if (socket) socket.emit("admin-secret-unban");
+    fetch("/admin/unban-my-ip").catch(() => {});
+    alert("System: IP Unbanned.");
+    location.reload();
+    return;
+  }
 
   if (!dataChannel || dataChannel.readyState !== "open") return;
   dataChannel.send(txt);
