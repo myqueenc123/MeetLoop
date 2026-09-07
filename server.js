@@ -8,13 +8,12 @@ const io = new Server(server, {
   cors: { origin: "*" }
 });
 
-// Serve static files mula sa "public" folder (o root kung nandoon ang index.html)
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname));
 
 // --- SERVER-SIDE IP BAN STORAGE ---
-const bannedIPs = new Map(); // ip -> { banUntil: timestamp, reason: string }
-const ipStrikes = new Map(); // ip -> number of verified violations
+const bannedIPs = new Map(); // ip -> { banUntil, reason }
+const ipStrikes = new Map(); // ip -> verified strike count
 
 function getClientIP(reqOrSocket) {
   const headers = reqOrSocket.headers || reqOrSocket.handshake?.headers || {};
@@ -28,16 +27,16 @@ function getClientIP(reqOrSocket) {
          "127.0.0.1";
 }
 
-// 🔓 SECRET ADMIN HTTP UNBAN ENDPOINT
+// 🔓 ADMIN UNBAN VIA URL
 app.get('/admin/unban-my-ip', (req, res) => {
   const ip = getClientIP(req);
   bannedIPs.delete(ip);
   ipStrikes.delete(ip);
-  console.log(`🔓 Admin URL Unbanned IP: ${ip}`);
+  console.log(`🔓 Admin Unbanned IP: ${ip}`);
   res.json({ status: "success", message: `IP ${ip} has been unbanned!` });
 });
 
-// 🛑 GLOBAL IP BAN INTERCEPTOR (Haharangan agad bago makakonekta)
+// 🛑 SERVER IP INTERCEPTOR
 io.use((socket, next) => {
   const ip = getClientIP(socket);
   const banRecord = bannedIPs.get(ip);
@@ -46,7 +45,6 @@ io.use((socket, next) => {
     if (banRecord.banUntil > Date.now()) {
       return next(new Error(`IP_BANNED:${banRecord.banUntil}:${encodeURIComponent(banRecord.reason)}`));
     } else {
-      // Tapos na ang 1-Hour ban
       bannedIPs.delete(ip);
       ipStrikes.delete(ip);
     }
@@ -61,7 +59,6 @@ io.on('connection', (socket) => {
   const userIP = getClientIP(socket);
   io.emit('online-count', io.engine.clientsCount);
 
-  // 🔓 SECRET ADMIN SOCKET UNBAN (Galing sa Secret Tap sa Card)
   socket.on('admin-secret-unban', () => {
     bannedIPs.delete(userIP);
     ipStrikes.delete(userIP);
@@ -115,37 +112,41 @@ io.on('connection', (socket) => {
     }
   });
 
-  // --- OMETV VERIFIED REPORT HANDLER & 1-HOUR IP BAN ---
+  // --- REPORT HANDLER (IKAW NA NAG-REPORT AY LIGTAS 100%) ---
   socket.on('report-user', (data) => {
     const match = matches.get(socket.id);
     if (!match || match.reported) return;
-    match.reported = true;
+    match.reported = true; // Mark as reported
 
-    const partner = io.sockets.sockets.get(match.partnerId);
-    if (!partner) return;
+    const targetPartner = io.sockets.sockets.get(match.partnerId);
+    if (!targetPartner) {
+      findMatch();
+      return;
+    }
 
-    // Tanging verified violations lang ang bibilangin ng server (Anti-Troll)
+    // Ang targetPartner LAMANG ang paparusahan, HINDI ang nag-report!
     if (data.verified === true) {
-      const partnerIP = getClientIP(partner);
-      const strikes = (ipStrikes.get(partnerIP) || 0) + 1;
-      ipStrikes.set(partnerIP, strikes);
+      const targetIP = getClientIP(targetPartner);
+      const strikes = (ipStrikes.get(targetIP) || 0) + 1;
+      ipStrikes.set(targetIP, strikes);
 
       if (strikes >= 2) {
         const ONE_HOUR = 60 * 60 * 1000;
         const banUntil = Date.now() + ONE_HOUR;
         const reason = data.reason || "irrelevant image";
 
-        // I-save ang ban sa Server Memory
-        bannedIPs.set(partnerIP, { banUntil, reason });
+        bannedIPs.set(targetIP, { banUntil, reason });
 
-        partner.emit('ip-banned', { banUntil, reason });
+        // Ipadala ang ban signal sa target partner LAMANG
+        targetPartner.emit('ip-banned', { banUntil, reason });
 
         setTimeout(() => {
-          partner.disconnect(true);
-        }, 300);
+          targetPartner.disconnect(true);
+        }, 400);
       }
     }
 
+    // Ilipat agad ang nag-report sa ibang stranger
     leaveCurrentMatch();
     findMatch();
   });
@@ -156,18 +157,16 @@ io.on('connection', (socket) => {
   });
 });
 
-// 🔓 TERMINAL COMMAND PARA SA ADMIN ("unban all")
+// Terminal unban: type "unban all"
 process.stdin.on('data', (data) => {
-  const input = data.toString().trim();
-  if (input === 'unban all') {
+  if (data.toString().trim() === 'unban all') {
     bannedIPs.clear();
     ipStrikes.clear();
-    console.log("✅ Server: All IP Bans have been wiped clean!");
+    console.log("✅ All IP Bans wiped!");
   }
 });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`🚀 MeetLoop Server running on port ${PORT}`);
-  console.log(`💡 Tip: Type "unban all" in this console anytime to unban everyone.`);
+  console.log(`🚀 MeetloopChat Server running on port ${PORT}`);
 });
