@@ -189,16 +189,17 @@ video{
   border-radius:7px;border:0;background:#dc2626;color:#fff;
   font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px;
 }
-#reportStrangerBtn svg{width:14px;height:14px;fill:currentColor}
+#reportStrangerBtn svg{width:14px;height:14px}
 #reportStrangerBtn:disabled{background:#475569;cursor:not-allowed}
 
 .search-overlay{
   position:absolute;inset:0;z-index:10;display:none;align-items:center;
   justify-content:center;background:#020617;
 }
-.search-box{min-width:200px;padding:18px;text-align:center;background:#0f172a;border:1px solid rgba(255,255,255,.12);border-radius:14px}
-.spinner{width:34px;height:34px;margin:0 auto 10px;border:3px solid rgba(255,255,255,.1);border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite}
-#searchText{color:#e2e8f0;font-size:12px;font-weight:800}
+.search-box{min-width:220px;padding:22px;text-align:center;background:#0f172a;border:1px solid rgba(255,255,255,.12);border-radius:16px}
+.spinner{width:36px;height:36px;margin:0 auto 12px;border:3px solid rgba(255,255,255,.1);border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite}
+#searchText{color:#e2e8f0;font-size:13px;font-weight:800}
+#cooldownCounter{font-size:26px;font-weight:900;color:#38bdf8;margin-top:6px;display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* CONTROLS */
@@ -209,7 +210,7 @@ video{
   font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;
   user-select:none;transition:filter .15s, transform .12s;
 }
-.btn svg{width:16px;height:16px;fill:currentColor;flex-shrink:0}
+.btn svg{width:16px;height:16px;flex-shrink:0}
 .btn:active:not(:disabled){transform:scale(.98)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 
@@ -316,7 +317,7 @@ video{
 }
 
 /* =========================================================
-   💰 GCASH QR CODE & VERIFICATION MODAL
+   💰 GCASH QR CODE & AUTO-VERIFY POPUP
 ========================================================= */
 #gcashModalOverlay{
   position:fixed;inset:0;z-index:99999999;
@@ -376,7 +377,7 @@ video{
   background:var(--blue);font-weight:800;cursor:pointer;
 }
 
-/* STRICT FACE WARNING */
+/* STRICT LIVE FACE WARNING */
 #faceModalOverlay{
   position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.85);
   display:none;align-items:center;justify-content:center;padding:16px;
@@ -484,7 +485,7 @@ video{
       <li><b>18+ Only:</b> Minors are strictly prohibited.</li>
       <li><b>Zero Tolerance:</b> Nudity, sexual acts, or harassment are forbidden.</li>
       <li><b>Live Face Only:</b> Walls, ceilings, or covered cameras are not allowed.</li>
-      <li><b>Instant Shield:</b> 1-Sec protection blur on every stranger switch.</li>
+      <li><b>Anti-Spam Shield:</b> Cooldown protections on skipping.</li>
     </ul>
 
     <button class="portal-open-btn" id="openPortalBtn" type="button" onclick="enterMeetLoop()">
@@ -540,7 +541,7 @@ video{
 </div>
 
 <!-- =========================================================
-   🛑 EXACT OMETV WHITE BANNED SCREEN (WITH STRANGER EVIDENCE)
+   🛑 EXACT OMETV WHITE BANNED SCREEN
 ========================================================= -->
 <div id="bannedOverlay">
   <div class="ometv-ban-card">
@@ -620,11 +621,11 @@ video{
   </div>
 </div>
 
-<!-- STRICT FACE WARNING -->
+<!-- STRICT LIVE FACE WARNING -->
 <div id="faceModalOverlay">
   <div class="face-modal-card">
     <div class="face-modal-title" id="faceModalTitle">Human Face Required</div>
-    <div class="face-modal-desc" id="faceModalDesc">Starting without a real human face is strictly prohibited. Please look directly at the camera.</div>
+    <div class="face-modal-desc" id="faceModalDesc">Real live person required. Photos, screens, walls, or covering the camera will not pass.</div>
     <button class="face-modal-btn" id="closeFaceModalBtn" type="button">OK, I will face the camera</button>
   </div>
 </div>
@@ -682,15 +683,16 @@ video{
         <div class="video-label" id="remoteLabel">Stranger</div>
         
         <button id="reportStrangerBtn" type="button">
-          <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></svg>
           <span>Report</span>
         </button>
         
         <div class="status" id="remoteStatus">Waiting...</div>
         <div class="search-overlay" id="searchOverlay">
           <div class="search-box">
-            <div class="spinner"></div>
+            <div class="spinner" id="searchSpinner"></div>
             <div id="searchText">Finding someone...</div>
+            <div id="cooldownCounter">2</div>
           </div>
         </div>
       </div>
@@ -715,28 +717,28 @@ video{
     <!-- CONTROLS BAR -->
     <div class="controls-bar">
       <button class="btn btn-loop" id="loopBtn" type="button">
-        <svg id="loopBtnIcon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <svg id="loopBtnIcon" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         <span id="loopBtnText">Start</span>
       </button>
 
       <button class="btn btn-stop" id="stopBtn" type="button" disabled>
-        <svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
         <span>Stop</span>
       </button>
 
       <button class="btn btn-toggle" id="micBtn" type="button">
-        <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
         <span id="micBtnText">Mic On</span>
       </button>
 
       <button class="btn btn-toggle" id="camBtn" type="button">
-        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
         <span id="camBtnText">Cam On</span>
       </button>
 
       <!-- Flip Button: Only on Mobile -->
       <button class="btn btn-flip" id="flipBtn" type="button">
-        <svg viewBox="0 0 24 24"><path d="M20 10c0-4.418-3.582-8-8-8s-8 3.582-8 8c0 2.21 0.895 4.21 2.343 5.657l-2.343 2.343h6v-6l-2.05 2.05c-1.196-1.196-1.95-2.85-1.95-4.05 0-3.314 2.686-6 6-6s6 2.686 6 6c0 1.2-0.754 2.854-1.95 4.05l1.414 1.414c1.64-1.64 2.536-3.834 2.536-5.464z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 10c0-4.418-3.582-8-8-8s-8 3.582-8 8c0 2.21 0.895 4.21 2.343 5.657l-2.343 2.343h6v-6l-2.05 2.05c-1.196-1.196-1.95-2.85-1.95-4.05 0-3.314 2.686-6 6-6s6 2.686 6 6c0 1.2-0.754 2.854-1.95 4.05l1.414 1.414c1.64-1.64 2.536-3.834 2.536-5.464z"/></svg>
         <span>Flip</span>
       </button>
     </div>
@@ -754,7 +756,7 @@ video{
         <div class="message-text meetloop-rules-card"><span class="rules-badge-tag">18+ RULES</span>
 <b>Welcome to MeetloopChat.</b>
 • 18+ Only. Zero tolerance for nudity, sexual acts, or harassment.
-• 1-Sec video shield protects against flashes on every skip.
+• Live Human Face required. No photos or covered cameras.
 • Violations result in an immediate suspension.</div>
       </div>
     </div>
@@ -770,7 +772,16 @@ video{
 "use strict";
 
 /* =========================================================
-   1. GLOBAL VARIABLES & TRANSLATIONS ENGINE
+   PERSISTENT DEVICE IDENTIFIER (Proteksyon laban sa Same-WiFi Ban)
+========================================================= */
+let myDeviceId = localStorage.getItem("meetloop_device_id");
+if (!myDeviceId) {
+  myDeviceId = "dev_" + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+  localStorage.setItem("meetloop_device_id", myDeviceId);
+}
+
+/* =========================================================
+   1. GLOBAL VARIABLES & TRANSLATIONS
 ========================================================= */
 const bannedOverlay = document.getElementById("bannedOverlay");
 const banReasonText = document.getElementById("banReasonText");
@@ -806,6 +817,8 @@ const flipBtn = document.getElementById("flipBtn");
 
 const searchOverlay = document.getElementById("searchOverlay");
 const searchText = document.getElementById("searchText");
+const searchSpinner = document.getElementById("searchSpinner");
+const cooldownCounter = document.getElementById("cooldownCounter");
 const remoteStatus = document.getElementById("remoteStatus");
 const onlineCount = document.getElementById("onlineCount");
 const statusBadge = document.getElementById("statusBadge");
@@ -817,7 +830,6 @@ const callTimer = document.getElementById("callTimer");
 const callTimerValue = document.getElementById("callTimerValue");
 const languageSelect = document.getElementById("languageSelect");
 
-/* METERED TURN/STUN CONFIGURATION */
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.relay.metered.ca:80" },
@@ -827,29 +839,22 @@ const rtcConfig = {
       credential: "jqFOtepU3tMVTfEX"
     },
     {
-      urls: "turn:standard.relay.metered.ca:80?transport=tcp",
-      username: "0974f7094bbb79185dd1d4ce",
-      credential: "jqFOtepU3tMVTfEX"
-    },
-    {
       urls: "turn:standard.relay.metered.ca:443",
       username: "0974f7094bbb79185dd1d4ce",
       credential: "jqFOtepU3tMVTfEX"
     },
-    {
-      urls: "turns:standard.relay.metered.ca:443?transport=tcp",
-      username: "0974f7094bbb79185dd1d4ce",
-      credential: "jqFOtepU3tMVTfEX"
-    },
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun1.l.google.com:19302" }
+    { urls: "stun:stun.l.google.com:19302" }
   ]
 };
 
 let socket = null;
 try {
   if (typeof io !== "undefined") {
-    socket = io({ transports: ["websocket", "polling"], reconnection: true });
+    socket = io({ 
+      transports: ["websocket", "polling"], 
+      reconnection: true,
+      query: { deviceId: myDeviceId }
+    });
   }
 } catch(e) {}
 
@@ -860,6 +865,7 @@ let pendingIceCandidates = [];
 let searching = false;
 let connected = false;
 let stopping = false;
+let inCooldown = false;
 let currentFacingMode = "user";
 let callTimerInterval = null;
 let callStartTime = null;
@@ -881,16 +887,16 @@ const translations = {
   en: {
     online: "Online:", ready: "Ready", stranger: "Stranger", you: "You",
     waiting: "Waiting...", searching: "Searching...", finding: "Finding someone...",
-    verifying: "Verifying face...", waitingPartner: "Waiting for partner...",
+    verifying: "Verifying live face...", waitingPartner: "Waiting for partner...",
     connected: "Connected", live: "Live", disconnected: "Disconnected", stopped: "Stopped",
     strangerLeft: "Stranger left", start: "Start", next: "Next", stop: "Stop",
     micOn: "Mic On", micOff: "Mic Off", camOn: "Cam On", camOff: "Cam Off",
     flip: "Flip", showCam: "Show Cam", chatHeader: "Live Chat", inputPlaceholder: "Type a message...", send: "Send",
     chatConnected: "Chat connected.", reportedNotice: "Reported",
     alreadyReported: "You have already reported this user.",
-    warningModalTitle: "Human Face Required",
-    warningModalDesc: "Starting without a real human face is strictly prohibited. Please look directly at the camera.",
-    warningModalBtn: "OK, I will face the camera",
+    warningModalTitle: "Real Live Face Required",
+    warningModalDesc: "Walls, ceilings, photos, screens, or static cameras are strictly forbidden. Look directly at the camera and move naturally.",
+    warningModalBtn: "I understand",
     dupTitle: "MeetloopChat Open in Another Tab",
     dupDesc: "Running multiple tabs at the same time is not allowed. Session paused in this tab.",
     dupBtn: "Use Here"
@@ -905,9 +911,9 @@ const translations = {
     flip: "Iikot", showCam: "Ipakita Cam", chatHeader: "Usapan", inputPlaceholder: "Mag-type ng mensahe...", send: "Ipadala",
     chatConnected: "Konektado na ang chat.", reportedNotice: "Na-report na",
     alreadyReported: "Nai-report mo na ang user na ito.",
-    warningModalTitle: "Kailangan ng Mukha ng Tao",
-    warningModalDesc: "Bawal mag-start nang walang totoong mukha ng tao. Paki-itapat nang maayos ang mukha sa camera.",
-    warningModalBtn: "OK, Itatapat ko",
+    warningModalTitle: "Kailangan ng Tunay na Tao",
+    warningModalDesc: "Bawal ang dingding, kisame, litrato, o camera na walang tao. Itapat ang mukha at kumilos nang natural.",
+    warningModalBtn: "Naiintindihan ko",
     dupTitle: "Bukas ang MeetloopChat sa Ibang Tab",
     dupDesc: "Bawal ang dalawang tab nang sabay. Naka-pause muna ang session dito.",
     dupBtn: "Gamitin Dito"
@@ -944,15 +950,164 @@ function updateUILanguage() {
 }
 
 /* =========================================================
-   2. SINGLE TAB / MULTI-TAB CONTROLLER
+   2. ANTI-CHEAT MULTI-LAYER LIVE FACE DETECTOR
+========================================================= */
+async function ensureVideoReady(video, maxWaitMs = 1200) {
+  const start = Date.now();
+  while ((video.readyState < 2 || video.videoWidth === 0) && (Date.now() - start < maxWaitMs)) {
+    await new Promise(r => setTimeout(r, 50));
+  }
+  return video.readyState >= 2 && video.videoWidth > 0;
+}
+
+async function verifyStrictHumanFace() {
+  if (!localVideo) return false;
+  
+  const isReady = await ensureVideoReady(localVideo);
+  if (!isReady) return false;
+
+  const vTrack = localStream?.getVideoTracks()[0];
+  if (!vTrack || !vTrack.enabled || vTrack.readyState !== 'live') {
+    return false;
+  }
+
+  const W = 64; 
+  const H = 48;
+  const canvas = document.createElement("canvas");
+  canvas.width = W; 
+  canvas.height = H;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+  ctx.drawImage(localVideo, 0, 0, W, H);
+  const frame1 = ctx.getImageData(0, 0, W, H).data;
+
+  // 150ms delay para sa anti-photo / micro-motion test
+  await new Promise(r => setTimeout(r, 150));
+  ctx.drawImage(localVideo, 0, 0, W, H);
+  const frame2 = ctx.getImageData(0, 0, W, H).data;
+
+  let skinPixels = 0;
+  let centerSkin = 0;
+  let totalLuma = 0;
+  let motionDiff = 0;
+  let edgeComplexity = 0;
+  const totalSampled = (W * H);
+
+  for (let i = 0; i < frame1.length; i += 4) {
+    const r = frame1[i];
+    const g = frame1[i+1];
+    const b = frame1[i+2];
+
+    const y = 0.299 * r + 0.587 * g + 0.114 * b;
+    totalLuma += y;
+
+    const diff = Math.abs(r - frame2[i]) + Math.abs(g - frame2[i+1]) + Math.abs(b - frame2[i+2]);
+    motionDiff += diff;
+
+    if (i % 8 === 0 && i > 4) {
+      edgeComplexity += Math.abs(y - (0.299 * frame1[i-4] + 0.587 * frame1[i-3] + 0.114 * frame1[i-2]));
+    }
+
+    const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+    const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+
+    if (cb >= 77 && cb <= 130 && cr >= 133 && cr <= 175 && y >= 35 && y <= 230) {
+      skinPixels++;
+      const pIdx = i / 4;
+      const x = pIdx % W;
+      const yCoord = Math.floor(pIdx / W);
+      if (x >= W * 0.25 && x <= W * 0.75 && yCoord >= H * 0.15 && yCoord <= H * 0.85) {
+        centerSkin++;
+      }
+    }
+  }
+
+  const avgLuma = totalLuma / totalSampled;
+  const skinRatio = skinPixels / totalSampled;
+  const avgMotion = motionDiff / totalSampled;
+  const avgComplexity = edgeComplexity / (totalSampled / 2);
+
+  if (avgLuma < 25 || avgLuma > 235) return false;
+  if (avgComplexity < 2.5) return false;
+  if (skinRatio < 0.10 || skinRatio > 0.80 || centerSkin < (totalSampled * 0.06)) return false;
+  if (avgMotion < 0.25) return false;
+
+  return true;
+}
+
+/* =========================================================
+   3. UMINGLE-STYLE COOLDOWN SHIELD
+========================================================= */
+async function startSearchWithCooldown() {
+  if (inCooldown || stopping || isTabTerminated || isServerBanned) return;
+
+  const ok = await startMedia();
+  if (!ok) return;
+
+  inCooldown = true;
+  loopBtn.disabled = true;
+  stopBtn.disabled = false;
+
+  showSearch(t("verifying"));
+  searchSpinner.style.display = "none";
+  cooldownCounter.style.display = "block";
+
+  let count = 2;
+  cooldownCounter.textContent = count;
+  
+  const coolInterval = setInterval(() => {
+    count--;
+    if (count > 0) {
+      cooldownCounter.textContent = count;
+    } else {
+      clearInterval(coolInterval);
+    }
+  }, 700);
+
+  await new Promise(r => setTimeout(r, 1400));
+  cooldownCounter.style.display = "none";
+  searchSpinner.style.display = "block";
+
+  const isHuman = await verifyStrictHumanFace();
+  if (!isHuman) {
+    inCooldown = false;
+    hideSearch();
+    loopBtn.disabled = false;
+    document.getElementById("faceModalOverlay").style.display = "flex";
+    return;
+  }
+
+  inCooldown = false;
+  startLoopMatching();
+}
+
+function startLoopMatching() {
+  enableRemoteBlur();
+  stopCallTimer();
+  closePeerConnection();
+  stopAllRemoteMedia();
+
+  connected = false;
+  searching = true;
+
+  showSearch(t("finding"));
+  remoteStatus.textContent = t("searching");
+  statusBadge.textContent = t("searching");
+  loopBtnText.textContent = t("next");
+  loopBtn.disabled = false;
+  stopBtn.disabled = false;
+
+  if (socket) socket.emit("skip");
+}
+
+/* =========================================================
+   4. SINGLE TAB CONTROLLER
 ========================================================= */
 const currentTabId = "tab_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
 const tabChannel = window.BroadcastChannel ? new BroadcastChannel("meetloop_single_tab_bus") : null;
 
 function broadcastTabActive() {
-  if (tabChannel) {
-    tabChannel.postMessage({ type: "NEW_SESSION_OPENED", tabId: currentTabId });
-  }
+  if (tabChannel) tabChannel.postMessage({ type: "NEW_SESSION_OPENED", tabId: currentTabId });
   try {
     localStorage.setItem("meetloop_active_tab_id", JSON.stringify({ tabId: currentTabId, time: Date.now() }));
   } catch(e) {}
@@ -961,7 +1116,6 @@ function broadcastTabActive() {
 function terminateThisOldTab() {
   if (isTabTerminated) return;
   isTabTerminated = true;
-
   try {
     stopSession();
     if (localStream) {
@@ -970,7 +1124,6 @@ function terminateThisOldTab() {
     }
     if (socket) socket.disconnect();
   } catch(e){}
-
   duplicateTabOverlay.style.display = "flex";
 }
 
@@ -986,13 +1139,10 @@ window.addEventListener("storage", (e) => {
   if (e.key === "meetloop_active_tab_id" && e.newValue) {
     try {
       const data = JSON.parse(e.newValue);
-      if (data && data.tabId !== currentTabId) {
-        terminateThisOldTab();
-      }
+      if (data && data.tabId !== currentTabId) terminateThisOldTab();
     } catch(err){}
   }
 });
-
 broadcastTabActive();
 
 reclaimSessionBtn.addEventListener("click", () => {
@@ -1004,7 +1154,7 @@ reclaimSessionBtn.addEventListener("click", () => {
 });
 
 /* =========================================================
-   3. OMETV EXACT EVIDENCE SNAPSHOT & ANTI-CHEAT UNBAN
+   5. EVIDENCE SNAPSHOT & BAN COUNTDOWN
 ========================================================= */
 function trackStrangerLastFrame() {
   if (remoteVideo && remoteVideo.videoWidth > 0 && remoteVideo.readyState >= 2) {
@@ -1042,7 +1192,6 @@ function runBanCountdown(banUntil, reasonText = "irrelevant image") {
   stopSession();
 
   renderStrangerEvidenceSnapshot();
-
   banReasonText.textContent = reasonText;
   bannedOverlay.style.display = "flex";
 
@@ -1074,7 +1223,6 @@ function closeGcashModal() {
   gcashModalOverlay.style.display = "none";
 }
 
-/* SECURE GCASH UNBAN VERIFICATION */
 async function verifyGcashPayment() {
   const ref = gcashRefInput.value.trim();
   gcashErrorHint.style.display = "none";
@@ -1091,14 +1239,17 @@ async function verifyGcashPayment() {
   try {
     const res = await fetch("/api/verify-gcash-unban", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "x-device-id": myDeviceId
+      },
       body: JSON.stringify({ refNumber: ref })
     });
 
     const data = await res.json();
 
     if (data.success) {
-      alert("✅ Payment Confirmed! Your IP has been UNBANNED.");
+      alert("✅ Payment Confirmed! Your account has been UNBANNED.");
       closeGcashModal();
       bannedOverlay.style.display = "none";
       isServerBanned = false;
@@ -1109,7 +1260,7 @@ async function verifyGcashPayment() {
       gcashErrorHint.style.display = "block";
     }
   } catch(e) {
-    gcashErrorHint.textContent = "Verification error. Ensure you sent ₱20 and server is running.";
+    gcashErrorHint.textContent = "Verification error. Server is unreachable.";
     gcashErrorHint.style.display = "block";
   } finally {
     verifyGcashBtn.disabled = false;
@@ -1117,7 +1268,7 @@ async function verifyGcashPayment() {
   }
 }
 
-// 🔐 Admin Key Authenticated Unban
+// 🔐 Admin Key Passcode Trigger
 let adminClickCount = 0;
 adminUnbanId.addEventListener("click", () => {
   adminClickCount++;
@@ -1127,7 +1278,10 @@ adminUnbanId.addEventListener("click", () => {
     if (adminKey) {
       fetch("/admin/unban-my-ip", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "x-device-id": myDeviceId
+        },
         body: JSON.stringify({ adminKey })
       })
       .then(r => r.json())
@@ -1160,236 +1314,7 @@ if (socket) {
 }
 
 /* =========================================================
-   4. OMETV 1-SEC BLUR SHIELD & TRANSITION SYSTEM
-========================================================= */
-function enableRemoteBlur() {
-  if (blurRemovalTimeout) clearTimeout(blurRemovalTimeout);
-  remoteVideo.classList.remove("remote-clear");
-  remoteVideo.classList.add("remote-blur");
-}
-
-function scheduleRemoveRemoteBlur() {
-  if (blurRemovalTimeout) clearTimeout(blurRemovalTimeout);
-  blurRemovalTimeout = setTimeout(() => {
-    remoteVideo.classList.remove("remote-blur");
-    remoteVideo.classList.add("remote-clear");
-  }, 1000);
-}
-
-function inspectRemoteStreamViolation(reason) {
-  try {
-    if (!remoteVideo || remoteVideo.videoWidth === 0) return true;
-
-    const canvas = document.createElement("canvas");
-    const W = 40, H = 30;
-    canvas.width = W; 
-    canvas.height = H;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    ctx.drawImage(remoteVideo, 0, 0, W, H);
-
-    const frame = ctx.getImageData(0, 0, W, H).data;
-    let skinCount = 0;
-    let totalLuma = 0;
-    let totalPixels = 0;
-
-    for (let i = 0; i < frame.length; i += 8) {
-      const r = frame[i], g = frame[i+1], b = frame[i+2];
-      const y = 0.299 * r + 0.587 * g + 0.114 * b;
-      totalLuma += y;
-      totalPixels++;
-
-      const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
-      const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
-
-      if (cb >= 75 && cb <= 135 && cr >= 130 && cr <= 180 && y >= 30 && y <= 235) {
-        skinCount++;
-      }
-    }
-
-    const skinRatio = skinCount / totalPixels;
-    const avgLuma = totalLuma / totalPixels;
-
-    if (skinRatio > 0.65) return true;
-    if (avgLuma < 15) return true;
-    if (skinRatio < 0.03 && reason.includes("image")) return true;
-
-    return false;
-  } catch(e) {
-    return false;
-  }
-}
-
-reportStrangerBtn.addEventListener("click", () => {
-  if (!connected) return;
-  if (hasReportedCurrentStranger) {
-    alert(t("alreadyReported"));
-    return;
-  }
-  reportModalOverlay.style.display = "flex";
-});
-
-function closeReportModal() {
-  reportModalOverlay.style.display = "none";
-}
-
-function submitReport(reason) {
-  closeReportModal();
-  if (!connected) return;
-
-  hasReportedCurrentStranger = true;
-  reportStrangerBtn.disabled = true;
-  reportStrangerBtn.style.opacity = "0.5";
-
-  trackStrangerLastFrame();
-
-  const isGenuineViolation = inspectRemoteStreamViolation(reason);
-
-  if (socket) {
-    socket.emit("report-user", { reason: reason, verified: isGenuineViolation });
-  }
-
-  setTimeout(() => {
-    startLoop();
-  }, 180);
-}
-
-/* =========================================================
-   5. INTRO PORTAL
-========================================================= */
-window.enterMeetLoop = function() {
-  sessionStorage.setItem("meetloop_session_active", "true");
-
-  const portal = document.getElementById("welcomePortal");
-  const loader = document.getElementById("meetloopLoader");
-  const pBar = document.getElementById("loaderProgressBar");
-  const pNum = document.getElementById("loaderPercent");
-  const sText = document.getElementById("loaderStatusText");
-
-  if (portal) portal.classList.add("portal-hidden");
-  if (loader) loader.style.display = "flex";
-
-  try {
-    if (remoteAudio) { remoteAudio.muted = false; remoteAudio.volume = 1.0; }
-  } catch(e) {}
-
-  const mediaPromise = startMedia();
-
-  let progress = 0;
-  const progressInterval = setInterval(() => {
-    progress += Math.floor(Math.random() * 18) + 14;
-    if (progress >= 100) {
-      progress = 100;
-      clearInterval(progressInterval);
-    }
-    pBar.style.width = progress + "%";
-    pNum.textContent = progress + "%";
-
-    if (progress < 40) sText.textContent = "Connecting to server...";
-    else if (progress < 80) sText.textContent = "Checking camera...";
-    else sText.textContent = "Ready!";
-  }, 80);
-
-  setTimeout(async () => {
-    await mediaPromise;
-    clearInterval(progressInterval);
-    pBar.style.width = "100%";
-    pNum.textContent = "100%";
-    sText.textContent = "Ready!";
-
-    setTimeout(() => {
-      if (loader) {
-        loader.style.opacity = "0";
-        setTimeout(() => { loader.style.display = "none"; }, 250);
-      }
-    }, 150);
-  }, 800);
-};
-
-/* =========================================================
-   6. LOW-CPU FACE DETECTOR
-========================================================= */
-async function ensureVideoReady(video, maxWaitMs = 1000) {
-  const start = Date.now();
-  while ((video.readyState < 2 || video.videoWidth === 0) && (Date.now() - start < maxWaitMs)) {
-    await new Promise(r => setTimeout(r, 40));
-  }
-  return video.readyState >= 2 && video.videoWidth > 0;
-}
-
-async function verifyStrictHumanFace() {
-  if (!localVideo) return false;
-  
-  const isReady = await ensureVideoReady(localVideo);
-  if (!isReady) return false;
-
-  const vTrack = localStream?.getVideoTracks()[0];
-  if (!vTrack || !vTrack.enabled || vTrack.readyState !== 'live') {
-    return false;
-  }
-
-  if ('FaceDetector' in window) {
-    try {
-      const detector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 1 });
-      const faces = await detector.detect(localVideo);
-      if (faces && faces.length > 0) {
-        const f = faces[0].boundingBox;
-        if (f.width >= localVideo.videoWidth * 0.10 && f.height >= localVideo.videoHeight * 0.10) {
-          return true;
-        }
-      }
-      return false;
-    } catch(err) {}
-  }
-
-  try {
-    const W = 40, H = 30;
-    const canvas = document.createElement("canvas");
-    canvas.width = W; 
-    canvas.height = H;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    ctx.drawImage(localVideo, 0, 0, W, H);
-
-    const frame = ctx.getImageData(0, 0, W, H).data;
-    let totalLuma = 0;
-    let skinMatches = 0;
-    let centerMatches = 0;
-    let sampledCount = 0;
-
-    for (let i = 0; i < frame.length; i += 8) {
-      const r = frame[i], g = frame[i+1], b = frame[i+2];
-      const y = 0.299 * r + 0.587 * g + 0.114 * b;
-      totalLuma += y;
-      sampledCount++;
-
-      const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
-      const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
-
-      if (cb >= 75 && cb <= 135 && cr >= 130 && cr <= 180 && y >= 30 && y <= 235) {
-        skinMatches++;
-        const pIndex = i / 4;
-        const x = pIndex % W;
-        const yCoord = Math.floor(pIndex / W);
-        if (x >= W * 0.20 && x <= W * 0.80 && yCoord >= H * 0.15 && yCoord <= H * 0.85) {
-          centerMatches++;
-        }
-      }
-    }
-
-    const avgLuma = totalLuma / sampledCount;
-    if (avgLuma < 22 || avgLuma > 238) return false;
-
-    return (skinMatches / sampledCount) >= 0.08 && centerMatches >= 4;
-  } catch(e) {
-    return true;
-  }
-}
-
-document.getElementById("closeFaceModalBtn").addEventListener("click", () => {
-  document.getElementById("faceModalOverlay").style.display = "none";
-});
-
-/* =========================================================
-   7. CAMERA ENGINE WITH DEDICATED HARDWARE FLIP
+   6. CAMERA ENGINE
 ========================================================= */
 let availableVideoDevices = [];
 let currentDeviceId = null;
@@ -1443,7 +1368,6 @@ async function startMedia(specificDeviceId = null) {
     if (localStream) {
       const newVideoTrack = newStream.getVideoTracks()[0];
       const oldVideoTrack = localStream.getVideoTracks()[0];
-
       if (oldVideoTrack) {
         oldVideoTrack.stop();
         localStream.removeTrack(oldVideoTrack);
@@ -1457,9 +1381,7 @@ async function startMedia(specificDeviceId = null) {
     if (vTrack) {
       const settings = vTrack.getSettings ? vTrack.getSettings() : {};
       currentDeviceId = settings.deviceId || null;
-      if (settings.facingMode) {
-        currentFacingMode = settings.facingMode;
-      }
+      if (settings.facingMode) currentFacingMode = settings.facingMode;
     }
 
     localVideo.srcObject = localStream;
@@ -1473,7 +1395,6 @@ async function startMedia(specificDeviceId = null) {
     updateMediaButtons();
     return true;
   } catch(err) {
-    console.error("Camera Init Error:", err);
     try {
       localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       localVideo.srcObject = localStream;
@@ -1511,7 +1432,6 @@ function toggleCam() {
   camOffOverlay.style.display = v.enabled ? "none" : "flex";
 }
 
-/* 100% WORKING FLIP FOR MOBILE */
 async function flipCamera() {
   if (!localStream) return;
   flipBtn.disabled = true;
@@ -1539,9 +1459,7 @@ async function flipCamera() {
   if (peerConnection && localStream) {
     const newVTrack = localStream.getVideoTracks()[0];
     const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
-    if (sender && newVTrack) {
-      await sender.replaceTrack(newVTrack);
-    }
+    if (sender && newVTrack) await sender.replaceTrack(newVTrack);
   }
 
   flipBtn.disabled = false;
@@ -1560,8 +1478,22 @@ function stopAllRemoteMedia() {
 }
 
 /* =========================================================
-   8. WEBRTC ENGINE (WITH 1-SEC BLUR SHIELD TRIGGER)
+   7. WEBRTC & SEARCH MANAGEMENT
 ========================================================= */
+function enableRemoteBlur() {
+  if (blurRemovalTimeout) clearTimeout(blurRemovalTimeout);
+  remoteVideo.classList.remove("remote-clear");
+  remoteVideo.classList.add("remote-blur");
+}
+
+function scheduleRemoveRemoteBlur() {
+  if (blurRemovalTimeout) clearTimeout(blurRemovalTimeout);
+  blurRemovalTimeout = setTimeout(() => {
+    remoteVideo.classList.remove("remote-blur");
+    remoteVideo.classList.add("remote-clear");
+  }, 1000);
+}
+
 function showSearch(text) {
   searchText.textContent = text;
   searchOverlay.style.display = "flex";
@@ -1600,7 +1532,6 @@ function handleConnected() {
   hasReportedCurrentStranger = false;
   reportStrangerBtn.disabled = false;
   reportStrangerBtn.style.opacity = "1";
-  reportStrangerBtn.style.cursor = "pointer";
 
   hideSearch();
   statusBadge.textContent = t("connected");
@@ -1609,7 +1540,6 @@ function handleConnected() {
   stopBtn.disabled = false;
   loopBtnText.textContent = t("next");
   startCallTimer();
-
   scheduleRemoveRemoteBlur();
 }
 
@@ -1618,9 +1548,7 @@ function createPeer(initiator) {
   peerConnection = new RTCPeerConnection(rtcConfig);
 
   if (localStream) {
-    localStream.getTracks().forEach(track => {
-      peerConnection.addTrack(track, localStream);
-    });
+    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
   }
 
   peerConnection.onicecandidate = (e) => {
@@ -1662,9 +1590,7 @@ function createPeer(initiator) {
 function setupDataChannel(ch) {
   dataChannel = ch;
   ch.onopen = () => addMessage("System", t("chatConnected"));
-  ch.onmessage = (e) => {
-    addMessage("Stranger", e.data);
-  };
+  ch.onmessage = (e) => addMessage("Stranger", e.data);
 }
 
 async function createOffer() {
@@ -1723,45 +1649,11 @@ function closePeerConnection() {
   pendingIceCandidates = [];
 }
 
-/* =========================================================
-   9. MATCHING LOOP
-========================================================= */
-async function startLoop() {
-  if (stopping || isTabTerminated || isServerBanned) return;
-
-  const ok = await startMedia();
-  if (!ok) return;
-
-  showSearch(t("verifying"));
-  const faceVerified = await verifyStrictHumanFace();
-  if (!faceVerified) {
-    hideSearch();
-    document.getElementById("faceModalOverlay").style.display = "flex";
-    return;
-  }
-
-  enableRemoteBlur();
-  stopCallTimer();
-  closePeerConnection();
-  stopAllRemoteMedia();
-
-  connected = false;
-  searching = true;
-
-  showSearch(t("finding"));
-  remoteStatus.textContent = t("searching");
-  statusBadge.textContent = t("searching");
-  loopBtnText.textContent = t("next");
-  loopBtn.disabled = false;
-  stopBtn.disabled = false;
-
-  if (socket) socket.emit("skip");
-}
-
 function stopSession() {
   stopping = true;
   searching = false;
   connected = false;
+  inCooldown = false;
 
   enableRemoteBlur();
   stopCallTimer();
@@ -1782,11 +1674,10 @@ function stopSession() {
 }
 
 /* =========================================================
-   10. SOCKET EVENTS
+   8. SOCKET & PORTAL EVENTS
 ========================================================= */
 if (socket) {
   socket.on("online-count", count => { onlineCount.textContent = count; });
-  
   socket.on("waiting", () => {
     searching = true;
     enableRemoteBlur();
@@ -1808,12 +1699,60 @@ if (socket) {
 
   socket.on("partner-disconnected", () => {
     addMessage("System", t("strangerLeft"));
-    if (!stopping) startLoop();
+    if (!stopping) startSearchWithCooldown();
   });
 }
 
+window.enterMeetLoop = function() {
+  sessionStorage.setItem("meetloop_session_active", "true");
+
+  const portal = document.getElementById("welcomePortal");
+  const loader = document.getElementById("meetloopLoader");
+  const pBar = document.getElementById("loaderProgressBar");
+  const pNum = document.getElementById("loaderPercent");
+  const sText = document.getElementById("loaderStatusText");
+
+  if (portal) portal.classList.add("portal-hidden");
+  if (loader) loader.style.display = "flex";
+
+  try {
+    if (remoteAudio) { remoteAudio.muted = false; remoteAudio.volume = 1.0; }
+  } catch(e) {}
+
+  const mediaPromise = startMedia();
+
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    progress += Math.floor(Math.random() * 18) + 14;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(progressInterval);
+    }
+    pBar.style.width = progress + "%";
+    pNum.textContent = progress + "%";
+    if (progress < 40) sText.textContent = "Connecting to server...";
+    else if (progress < 80) sText.textContent = "Checking camera & sensors...";
+    else sText.textContent = "Ready!";
+  }, 80);
+
+  setTimeout(async () => {
+    await mediaPromise;
+    clearInterval(progressInterval);
+    pBar.style.width = "100%";
+    pNum.textContent = "100%";
+    sText.textContent = "Ready!";
+
+    setTimeout(() => {
+      if (loader) {
+        loader.style.opacity = "0";
+        setTimeout(() => { loader.style.display = "none"; }, 250);
+      }
+    }, 150);
+  }, 800);
+};
+
 /* =========================================================
-   11. CHAT SYSTEM & UI EVENTS
+   9. MESSAGING & BUTTON ATTACHMENTS
 ========================================================= */
 function sendMessage() {
   const txt = chatInput.value.trim();
@@ -1837,7 +1776,38 @@ function escapeHTML(str) {
   return str.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t));
 }
 
-loopBtn.addEventListener("click", startLoop);
+reportStrangerBtn.addEventListener("click", () => {
+  if (!connected) return;
+  if (hasReportedCurrentStranger) {
+    alert(t("alreadyReported"));
+    return;
+  }
+  reportModalOverlay.style.display = "flex";
+});
+
+function closeReportModal() {
+  reportModalOverlay.style.display = "none";
+}
+
+function submitReport(reason) {
+  closeReportModal();
+  if (!connected) return;
+
+  hasReportedCurrentStranger = true;
+  reportStrangerBtn.disabled = true;
+  reportStrangerBtn.style.opacity = "0.5";
+
+  trackStrangerLastFrame();
+  if (socket) socket.emit("report-user", { reason: reason, verified: true });
+
+  setTimeout(() => { startSearchWithCooldown(); }, 200);
+}
+
+document.getElementById("closeFaceModalBtn").addEventListener("click", () => {
+  document.getElementById("faceModalOverlay").style.display = "none";
+});
+
+loopBtn.addEventListener("click", startSearchWithCooldown);
 stopBtn.addEventListener("click", stopSession);
 micBtn.addEventListener("click", toggleMic);
 camBtn.addEventListener("click", toggleCam);
@@ -1864,7 +1834,6 @@ languageSelect.addEventListener("change", (e) => {
   updateUILanguage();
 });
 
-// INITIAL SETUP IN ENGLISH
 updateUILanguage();
 </script>
 </body>
