@@ -1,5 +1,6 @@
 /**
- * MeetLoop - Official Robust WebRTC Server Backend
+ * MeetLoop - Production Server Backend
+ * Complete WebRTC Matchmaking + Anti-Bypass Hardware Ban Engine
  */
 
 const express = require("express");
@@ -25,7 +26,7 @@ app.get("/", (req, res) => {
 });
 
 /* ================= BAN DATABASE ================= */
-const bannedDevices = new Map();
+const bannedDevices = new Map(); // hardwareId -> { banUntil, reason, snapshot }
 const usedGcashReferences = new Set();
 
 function checkDeviceBan(hardwareId) {
@@ -47,9 +48,9 @@ function banDevice(hardwareId, reason, snapshot = null, durationMs = 5 * 60 * 10
   return record;
 }
 
-/* ================= MATCHMAKING ENGINE ================= */
+/* ================= MATCHMAKING QUEUE ================= */
 let waitingQueue = [];
-const activePairs = new Map(); // socket.id -> partner.id
+const activePairs = new Map(); // socket.id -> partnerSocket.id
 
 function removeFromQueue(socketId) {
   waitingQueue = waitingQueue.filter(id => id !== socketId);
@@ -67,7 +68,7 @@ function matchUsers() {
       activePairs.set(user1Id, user2Id);
       activePairs.set(user2Id, user1Id);
 
-      // s1 ang mag-o-offer, s2 ang sasagot
+      // s1 initiates offer, s2 answers
       s1.emit("match", { initiator: true });
       s2.emit("match", { initiator: false });
     } else {
@@ -93,7 +94,7 @@ io.on("connection", (socket) => {
     });
   }
 
-  // SEARCH / SKIP
+  // SEARCH / NEXT / START
   socket.on("skip", () => {
     const currentBan = checkDeviceBan(hardwareId);
     if (currentBan) {
@@ -121,7 +122,7 @@ io.on("connection", (socket) => {
     matchUsers();
   });
 
-  // WebRTC SIGNALING (Offers, Answers, ICE Candidates)
+  // WebRTC SIGNALING (Offer, Answer, ICE Candidates)
   socket.on("signal", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -132,7 +133,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  // REPORT SYSTEM (Isolate ban to partner only)
+  // REPORT USER (Bans ONLY the reported partner)
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -198,5 +199,5 @@ io.on("connection", (socket) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`🚀 MeetLoop Server is RUNNING on port ${PORT}`);
+  console.log(`🚀 MeetLoop WebRTC Server RUNNING on port ${PORT}`);
 });
