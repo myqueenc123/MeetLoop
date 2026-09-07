@@ -5,14 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0a0e17">
 
-<!-- MEETLOOP OFFICIAL FAVICON -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='tabG1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2338bdf8'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3ClinearGradient id='tabG2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23a855f7'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='%230a0e17'/%3E%3Cpath d='M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z' fill='url(%23tabG1)'/%3E%3Cpath d='M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z' fill='url(%23tabG2)'/%3E%3C/svg%3E">
-
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-
 <title>MeetLoop - Random Video Chat</title>
+
+<!-- FAVICON -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='t1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2338bdf8'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3ClinearGradient id='t2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23a855f7'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='%230a0e17'/%3E%3Cpath d='M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z' fill='url(%23t1)'/%3E%3Cpath d='M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z' fill='url(%23t2)'/%3E%3C/svg%3E">
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
@@ -21,12 +17,10 @@
   --panel-dark:#111827;
   --panel-border:#1f293d;
   --blue:#0084ff;
-  --blue-hover:#0073e6;
-  --red:#ef4444;
   --green:#22c55e;
+  --red:#ef4444;
   --text-main:#f9fafb;
   --text-muted:#9ca3af;
-  --gcash-blue:#005ce6;
 }
 
 html,body{
@@ -47,13 +41,12 @@ header{
 .brand-text{font-size:19px;font-weight:900;letter-spacing:-0.5px;color:#fff}
 .brand-text span{color:#38bdf8}
 
-.header-meta{display:flex;align-items:center;gap:10px}
 .lang-select{
   background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.15);
   padding:5px 10px;border-radius:8px;font-size:11.5px;font-weight:700;outline:none;cursor:pointer;
 }
 
-/* MAIN STAGE */
+/* STAGE */
 .stage-container{
   width:100%;height:calc(100vh - 52px);
   display:flex;gap:10px;padding:10px;
@@ -69,8 +62,11 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
+/* OMETV STYLE VIDEO VIEW */
 video{
-  width:100%;height:100%;object-fit:cover;object-position:center;
+  width:100%;height:100%;
+  object-fit:cover;
+  object-position:center;
   background:#000;display:block;
 }
 
@@ -81,63 +77,55 @@ video{
   background:#070b12;overflow:hidden;user-select:none;
 }
 #crtStaticCanvas{
-  position:absolute;inset:0;width:100%;height:100%;opacity:0.38;
-  filter:contrast(160%) brightness(85%);
+  position:absolute;inset:0;width:100%;height:100%;opacity:0.35;
 }
 .standby-center{
   position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;text-align:center;
   padding:0 12px;
 }
 .standby-logo{
-  width:115px;height:115px;margin-bottom:12px;
+  width:110px;height:110px;margin-bottom:12px;
   filter:drop-shadow(0 0 22px rgba(56,189,248,.45));
-  animation:floatLogo 3s ease-in-out infinite alternate;
 }
-@keyframes floatLogo{from{transform:translateY(0)}to{transform:translateY(-6px)}}
 .standby-title{font-size:28px;font-weight:900;letter-spacing:-0.5px;color:#fff;margin-bottom:8px}
 
 .standby-online-tag{
   background:rgba(15,23,42,0.85);border:1px solid rgba(255,255,255,.12);
   padding:6px 16px;border-radius:20px;font-size:13px;font-weight:800;color:#cbd5e1;
-  display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.6);
-  backdrop-filter:blur(6px);user-select:none;
+  display:flex;align-items:center;gap:8px;
 }
 .online-dot{
   width:8px;height:8px;border-radius:50%;background:var(--green);
-  box-shadow:0 0 10px var(--green);animation:livePulse 2s infinite ease-in-out;
+  box-shadow:0 0 10px var(--green);
 }
-@keyframes livePulse{
-  0%{transform:scale(1);box-shadow:0 0 6px var(--green)}
-  50%{transform:scale(1.35);box-shadow:0 0 14px var(--green)}
-  100%{transform:scale(1);box-shadow:0 0 6px var(--green)}
-}
-#standbyUsers{color:#fff;font-weight:900;transition:color .25s ease}
+#standbyUsers{color:#fff;font-weight:900}
 
-/* AUDIO CONTROL */
-.remote-audio-bar{
-  position:absolute;bottom:0;left:0;right:0;height:40px;
-  background:linear-gradient(to top, rgba(0,0,0,.92), transparent);
-  display:flex;align-items:center;gap:12px;padding:0 16px;z-index:5;
+/* MOBILE COMPACT VOLUME CONTROL */
+.remote-audio-badge{
+  position:absolute;bottom:10px;left:10px;z-index:5;
+  background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,0.15);padding:4px 8px;border-radius:20px;
+  display:flex;align-items:center;gap:6px;
 }
 .audio-speaker-btn{
-  width:18px;height:18px;fill:#cbd5e1;cursor:pointer;flex-shrink:0;
+  width:16px;height:16px;fill:#cbd5e1;cursor:pointer;flex-shrink:0;
 }
 .audio-slider{
-  flex:1;height:5px;-webkit-appearance:none;appearance:none;background:#334155;border-radius:999px;outline:none;cursor:pointer;
+  width:60px;height:4px;-webkit-appearance:none;appearance:none;background:#334155;border-radius:999px;outline:none;cursor:pointer;
 }
 .audio-slider::-webkit-slider-thumb{
-  -webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:#38bdf8;cursor:pointer;
+  -webkit-appearance:none;appearance:none;width:11px;height:11px;border-radius:50%;background:#38bdf8;cursor:pointer;
 }
 
-/* BLUR SHIELD */
+/* BLUR SHIELD (0.3s Fast Transition) */
 #remoteVideo.remote-blur{
-  filter:blur(30px) brightness(0.9);
-  -webkit-filter:blur(30px) brightness(0.9);
+  filter:blur(25px) brightness(0.9);
+  -webkit-filter:blur(25px) brightness(0.9);
 }
 #remoteVideo.remote-clear{
   filter:blur(0px) brightness(1.0);
   -webkit-filter:blur(0px) brightness(1.0);
-  transition:filter 0.5s ease-out, -webkit-filter 0.5s ease-out;
+  transition:filter 0.3s ease-out, -webkit-filter 0.3s ease-out;
 }
 
 #localVideo.mirrored{transform:scaleX(-1)}
@@ -145,18 +133,17 @@ video{
 
 #camOffCover{
   position:absolute;inset:0;background:#090d16;display:none;
-  flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  flex-direction:column;align-items:center;justify-content:center;
   color:var(--text-muted);font-size:12px;font-weight:700;z-index:3;
 }
 
 .cam-tag{
   position:absolute;top:10px;left:10px;z-index:4;
-  background:rgba(0,0,0,.7);backdrop-filter:blur(4px);
-  padding:3px 8px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;
+  background:rgba(0,0,0,.7);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;
   border:1px solid rgba(255,255,255,.1);pointer-events:none;
 }
 .cam-status-pill{
-  position:absolute;bottom:44px;left:10px;z-index:4;
+  position:absolute;top:10px;left:80px;z-index:4;
   background:rgba(0,0,0,.75);padding:3px 8px;border-radius:6px;
   font-size:10px;font-weight:700;color:#cbd5e1;pointer-events:none;
 }
@@ -168,39 +155,19 @@ video{
 }
 #reportBtn:disabled{opacity:.4;cursor:not-allowed}
 
-/* SEARCH LOADER */
-.search-loader{
-  position:absolute;inset:0;z-index:10;display:none;
-  align-items:center;justify-content:center;background:#050811;
-}
-.search-card{
-  background:#0f172a;border:1px solid rgba(255,255,255,.1);
-  padding:20px 24px;border-radius:16px;text-align:center;
-}
-.search-spinner{
-  width:36px;height:36px;margin:0 auto 12px;
-  border:3px solid rgba(255,255,255,.15);border-top-color:#38bdf8;
-  border-radius:50%;animation:spin .75s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-.search-text{font-size:13px;font-weight:800;color:#e2e8f0}
-
 /* CONTROLS */
 .controls-panel{display:flex;gap:8px;height:48px;flex-shrink:0}
 .ctrl-btn{
   border:0;border-radius:10px;color:#fff;font-size:13px;font-weight:800;
   cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
-  transition:filter .15s, transform .1s;user-select:none;
+  user-select:none;
 }
-.ctrl-btn:active:not(:disabled){transform:scale(.98)}
-.ctrl-btn:disabled{opacity:.45;cursor:not-allowed}
-
 .btn-start-next{flex:2;background:linear-gradient(135deg,#0284c7,#2563eb)}
 .btn-stop{flex:1;background:#dc2626}
 .btn-sec{flex:1;background:#1e293b;border:1px solid rgba(255,255,255,.08)}
 .btn-flip{background:#6b21a8}
 
-/* CHAT AREA */
+/* CHAT */
 .chat-arena{
   width:300px;max-width:300px;display:flex;flex-direction:column;
   background:var(--panel-dark);border:1px solid var(--panel-border);border-radius:14px;overflow:hidden;
@@ -210,9 +177,7 @@ video{
   display:flex;align-items:center;justify-content:space-between;
 }
 .chat-head-title{font-size:12px;font-weight:900}
-.chat-stream{
-  flex:1;min-height:0;padding:10px;overflow-y:auto;overscroll-behavior:contain;
-}
+.chat-stream{flex:1;min-height:0;padding:10px;overflow-y:auto}
 .chat-msg{margin-bottom:10px;word-break:break-word}
 .chat-author{font-size:9px;font-weight:800;color:var(--text-muted);margin-bottom:2px}
 .chat-bubble{
@@ -234,7 +199,7 @@ video{
 
 /* MOBILE ADAPTATION */
 @media (max-width:850px){
-  body{height:100dvh;overflow-y:auto;overflow-x:hidden}
+  body{height:100dvh;overflow-y:auto}
   header{height:46px;padding:0 10px}
   .stage-container{
     height:auto;min-height:calc(100dvh - 46px);
@@ -242,14 +207,13 @@ video{
   }
   .stream-arena{width:100%;flex:none;gap:8px}
   .video-grid{
-    position:relative;width:100%;height:min(52dvh,460px);min-height:280px;
+    position:relative;width:100%;height:min(50dvh,420px);min-height:260px;
     display:block;border-radius:12px;overflow:hidden;
   }
   .cam-box:first-child{position:absolute;inset:0;width:100%;height:100%}
   #localCamBox{
-    position:absolute;right:8px;bottom:8px;width:30vw;max-width:115px;aspect-ratio:3/4;
+    position:absolute;right:8px;bottom:8px;width:28vw;max-width:110px;aspect-ratio:3/4;
     height:auto;z-index:8;border:2px solid #ffffff;border-radius:10px;
-    box-shadow:0 8px 20px rgba(0,0,0,.8);
   }
   #localCamBox.hidden-cam{display:none !important}
   #hideLocalBtn{
@@ -270,33 +234,13 @@ video{
   .btn-stop{grid-column:span 2}
   .btn-sec{grid-column:span 2}
   #flipBtn{grid-column:span 2;display:flex !important}
-  .chat-arena{width:100%;max-width:none;height:220px;min-height:220px;border-radius:12px;flex-shrink:0}
+  .chat-arena{width:100%;max-width:none;height:220px;min-height:220px;border-radius:12px}
 }
 @media (min-width:851px){
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 }
 
-/* WELCOME MODAL */
-#welcomePortal{
-  position:fixed;inset:0;z-index:999999;
-  display:flex;align-items:center;justify-content:center;padding:16px;background:#070b12;
-}
-.portal-box{
-  max-width:420px;width:100%;padding:28px 20px;text-align:center;
-  background:#111827;border-radius:20px;border:1.5px solid rgba(255,255,255,.1);
-  box-shadow:0 25px 60px rgba(0,0,0,.9);
-}
-.portal-icon{width:70px;height:70px;margin:0 auto 12px;display:block}
-.portal-rules{
-  text-align:left;font-size:12px;color:#cbd5e1;line-height:1.6;margin:16px 0;
-  background:#1f293d;padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);
-}
-.portal-btn{
-  width:100%;height:48px;border-radius:12px;border:0;background:linear-gradient(135deg,#0284c7,#2563eb);
-  color:#fff;font-size:14px;font-weight:800;cursor:pointer;
-}
-
-/* ==================== BANNED / SUSPENSION SYSTEM ==================== */
+/* BAN OVERLAY */
 #banOverlay{
   position:fixed;inset:0;z-index:9999999;background:rgba(0,0,0,.94);
   display:none;align-items:center;justify-content:center;padding:12px;overflow-y:auto;
@@ -304,13 +248,8 @@ video{
 .ban-card{
   max-width:420px;width:100%;background:#ffffff;border-radius:22px;
   color:#1e293b;box-shadow:0 30px 70px rgba(0,0,0,1);overflow:hidden;
-  animation:popIn .25s ease-out;max-height:94vh;overflow-y:auto;
+  max-height:94vh;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px;
 }
-@keyframes popIn{from{transform:scale(0.92);opacity:0}to{transform:scale(1);opacity:1}}
-
-.ban-content{padding:18px;display:flex;flex-direction:column;gap:12px}
-
-/* Top Violation Snapshot Frame */
 .ban-top{display:flex;gap:12px;align-items:center}
 .ban-snap-frame{
   width:95px;height:95px;border-radius:12px;overflow:hidden;
@@ -324,95 +263,70 @@ video{
 .ban-snap-tag{
   position:absolute;bottom:4px;left:4px;right:4px;background:rgba(220,38,38,0.88);
   color:#fff;font-size:7.5px;font-weight:900;text-align:center;padding:2px 0;border-radius:3px;
-  letter-spacing:0.5px;text-transform:uppercase;
 }
-.ban-info{display:flex;flex-direction:column;gap:3px}
 .ban-title{font-size:18px;font-weight:900;color:#dc2626}
 .ban-reason{font-size:11.5px;color:#475569;font-weight:700}
-.ban-reason span{color:#0284c7}
 
-/* METHOD SELECTION CARDS */
-.method-choice-container{
-  display:flex;flex-direction:column;gap:9px;
-}
+/* METHOD CARDS */
+.method-choice-container{display:flex;flex-direction:column;gap:9px}
 .method-card{
   border:1.5px solid #e2e8f0;border-radius:14px;padding:12px 14px;
-  cursor:pointer;transition:border-color .2s, background .2s, transform .1s;
-  display:flex;align-items:center;justify-content:space-between;background:#f8fafc;
+  cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:#f8fafc;
 }
-.method-card:hover{border-color:#005ce6;background:#f0f7ff;transform:translateY(-1px)}
+.method-card:hover{border-color:#005ce6;background:#f0f7ff}
 .method-card-left{display:flex;align-items:center;gap:10px}
 .method-icon-wrap{
   width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
 }
 .method-title{font-size:13px;font-weight:800;color:#0f172a}
 .method-desc{font-size:10.5px;color:#64748b}
 
 /* GCASH SECTION */
-#gcashPaySection{
-  display:none;flex-direction:column;gap:10px;animation:fadeIn .25s ease-out;
-}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-
+#gcashPaySection{display:none;flex-direction:column;gap:10px}
 .gcash-logo-banner{
   background:#005ce6;border-radius:12px;padding:10px 14px;
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 15px rgba(0,92,230,.35);
 }
-.gcash-official-svg{
-  height:30px;max-width:170px;display:block;
-}
-
+.gcash-official-svg{height:30px;max-width:170px;display:block}
 .gcash-qr-box{
   background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:14px;
   padding:12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;
 }
-.gcash-qr-image-frame{
-  background:#ffffff;padding:8px;border-radius:12px;border:1.5px solid #94a3b8;
-  display:inline-block;box-shadow:0 3px 12px rgba(0,0,0,0.08);
-}
-.gcash-qr-img{
-  width:160px;height:160px;display:block;border-radius:4px;object-fit:contain;
-}
-.gcash-tip{font-size:11px;color:#475569;font-weight:700;line-height:1.4}
-
-.gcash-input-wrapper{width:100%;display:flex;flex-direction:column;gap:6px}
+.gcash-qr-img{width:150px;height:150px;display:block;border-radius:6px;object-fit:contain}
 .gcash-ref-input{
   width:100%;height:42px;padding:0 12px;background:#ffffff;
   border:2px solid #bfdbfe;border-radius:10px;color:#0f172a;
   font-size:13px;font-weight:800;text-align:center;letter-spacing:1px;outline:none;
 }
-.gcash-ref-input:focus{border-color:#005ce6}
 .gcash-verify-btn{
   width:100%;height:42px;border:0;border-radius:10px;
-  background:#005ce6;color:#fff;font-size:13.5px;font-weight:900;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
-  box-shadow:0 4px 14px rgba(0,92,230,.4);transition:filter .15s;
+  background:#005ce6;color:#fff;font-size:13.5px;font-weight:900;cursor:pointer;margin-top:4px;
 }
-.gcash-verify-btn:hover{background:#004ec2}
-.gcash-verify-btn:disabled{opacity:0.6;cursor:not-allowed}
-
 .btn-back-methods{
-  background:none;border:0;color:#64748b;font-size:11.5px;font-weight:800;
-  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;margin-top:2px;
+  background:none;border:0;color:#64748b;font-size:11.5px;font-weight:800;cursor:pointer;margin-top:2px;text-align:center;
 }
-.btn-back-methods:hover{color:#0f172a}
-#gcashRefStatus{font-size:11px;font-weight:800;text-align:center;min-height:14px;line-height:1.3}
-
 .ban-bottom-bar{
   display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b;
-  border-top:1px solid #f1f5f9;padding-top:8px;margin-top:2px;
+  border-top:1px solid #f1f5f9;padding-top:8px;
 }
 .ban-timer-chip{background:#fee2e2;color:#dc2626;font-weight:900;padding:3px 8px;border-radius:8px}
 
-.basic-modal{
-  position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.85);
-  display:none;align-items:center;justify-content:center;padding:16px;
+/* MODALS */
+#welcomePortal{
+  position:fixed;inset:0;z-index:999999;
+  display:flex;align-items:center;justify-content:center;padding:16px;background:#070b12;
 }
-.basic-modal-card{
-  max-width:360px;width:100%;padding:22px 18px;text-align:center;
-  background:#111827;border-radius:18px;border:1px solid rgba(255,255,255,.1);
+.portal-box{
+  max-width:420px;width:100%;padding:28px 20px;text-align:center;
+  background:#111827;border-radius:20px;border:1.5px solid rgba(255,255,255,.1);
+}
+.portal-btn{
+  width:100%;height:48px;border-radius:12px;border:0;background:linear-gradient(135deg,#0284c7,#2563eb);
+  color:#fff;font-size:14px;font-weight:800;cursor:pointer;margin-top:12px;
+}
+.portal-rules{
+  text-align:left;font-size:12px;color:#cbd5e1;line-height:1.6;margin:16px 0;
+  background:#1f293d;padding:14px;border-radius:12px;
 }
 </style>
 </head>
@@ -422,129 +336,97 @@ video{
 <!-- WELCOME PORTAL -->
 <div id="welcomePortal">
   <div class="portal-box">
-    <svg class="portal-icon" viewBox="0 0 100 100">
-      <defs>
-        <linearGradient id="pG1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#2563eb"/></linearGradient>
-        <linearGradient id="pG2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#ec4899"/></linearGradient>
-      </defs>
-      <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z" fill="url(#pG1)"/>
-      <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z" fill="url(#pG2)"/>
-    </svg>
-
     <h1 style="font-size:24px;font-weight:900;color:#fff">MeetLoop</h1>
-    <p style="font-size:12px;color:var(--text-muted);font-weight:700;margin-top:2px">Random Video Chat</p>
+    <p style="font-size:12px;color:var(--text-muted);font-weight:700;margin-top:2px" id="lblSubTitle">Random Video Chat</p>
 
     <ul class="portal-rules">
-      <li><b>18+ Required:</b> Minors are strictly prohibited.</li>
-      <li><b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.</li>
-      <li><b>Human Face Only:</b> Look directly at the camera.</li>
-      <li><b>Instant Blur Shield:</b> Safe transition on every stranger switch.</li>
+      <li id="r1"><b>18+ Required:</b> Minors are strictly prohibited.</li>
+      <li id="r2"><b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.</li>
+      <li id="r3"><b>Human Face Only:</b> Look directly at the camera.</li>
+      <li id="r4"><b>Instant Blur Shield:</b> Safe transition on every switch.</li>
     </ul>
 
     <button class="portal-btn" id="portalStartBtn" type="button">START CHATTING</button>
   </div>
 </div>
 
-<!-- BANNED OVERLAY -->
+<!-- BAN OVERLAY -->
 <div id="banOverlay">
   <div class="ban-card">
-    <div class="ban-content">
-      
-      <!-- Top Violation Snapshot Picture Frame -->
-      <div class="ban-top">
-        <div class="ban-snap-frame">
-          <canvas id="banCanvas" width="95" height="95"></canvas>
-          <div class="ban-snap-brand">MeetLoop</div>
-          <div class="ban-snap-tag">VIOLATION</div>
-        </div>
-        <div class="ban-info">
-          <div class="ban-title">Device Suspended</div>
-          <div class="ban-reason">Reason: <span id="banReasonLabel">irrelevant image / policy</span></div>
-          <div style="font-size:10px;color:#94a3b8;font-weight:600">Hardware ID Logged Permanently</div>
-        </div>
+    <div class="ban-top">
+      <div class="ban-snap-frame">
+        <canvas id="banCanvas" width="95" height="95"></canvas>
+        <div class="ban-snap-brand">MeetLoop</div>
+        <div class="ban-snap-tag">VIOLATION</div>
       </div>
-
-      <!-- VIEW 1: SELECT UNBAN METHOD -->
-      <div id="selectMethodSection" class="method-choice-container">
-        <div style="font-size:12px;font-weight:800;color:#334155">Select Unban Resolution Method:</div>
-
-        <div class="method-card" onclick="openGcashPayView()">
-          <div class="method-card-left">
-            <div class="method-icon-wrap" style="background:#005ce6;color:#fff">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-            </div>
-            <div>
-              <div class="method-title" style="color:#005ce6">Instant Unban via GCash</div>
-              <div class="method-desc">Pay clearance fee & submit reference number</div>
-            </div>
-          </div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-
-        <div class="method-card" style="cursor:default">
-          <div class="method-card-left">
-            <div class="method-icon-wrap" style="background:#f1f5f9;color:#64748b">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <div>
-              <div class="method-title">Wait for Cooldown Timer</div>
-              <div class="method-desc">Device automatically unbans when timer ends</div>
-            </div>
-          </div>
-        </div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <div class="ban-title" id="banTitle">Device Suspended</div>
+        <div class="ban-reason">Reason: <span id="banReasonLabel">Policy Violation</span></div>
+        <div style="font-size:10px;color:#94a3b8;font-weight:600">Hardware ID Logged</div>
       </div>
-
-      <!-- VIEW 2: GCASH QR & REFERENCE CODE FORM -->
-      <div id="gcashPaySection">
-        <div class="gcash-logo-banner">
-          <svg class="gcash-official-svg" viewBox="0 0 160 38" fill="none">
-            <path d="M19 8C12.9 8 8 12.9 8 19C8 25.1 12.9 30 19 30C23.2 30 26.8 27.7 28.6 24.2L24.8 22.3C23.7 24.7 21.5 26.2 19 26.2C15 26.2 11.8 23 11.8 19C11.8 15 15 11.8 19 11.8C21.6 11.8 23.8 13.4 24.9 15.8L28.7 13.9C26.9 10.3 23.3 8 19 8Z" fill="#ffffff"/>
-            <path d="M19 14.5C16.5 14.5 14.5 16.5 14.5 19C14.5 21.5 16.5 23.5 19 23.5C20.7 23.5 22.1 22.5 22.8 21.1H19V18.2H26.3C26.4 18.5 26.5 18.8 26.5 19.2C26.5 23.3 23.1 26.7 19 26.7C14.7 26.7 11.3 23.3 11.3 19C11.3 14.7 14.7 11.3 19 11.3C21.3 11.3 23.4 12.3 24.8 13.9L22.8 15.6C21.9 14.5 20.5 13.8 19 14.5Z" fill="#ffffff"/>
-            <path d="M30 12C32.5 14 34 16.5 34 19C34 21.5 32.5 24 30 26L31.8 28.2C34.9 25.6 37 22.3 37 19C37 15.7 34.9 12.4 31.8 9.8L30 12Z" fill="#ffffff"/>
-            <text x="44" y="26" fill="#ffffff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif" font-weight="900" font-size="20.5" letter-spacing="-0.3">GCash</text>
-          </svg>
-        </div>
-
-        <div class="gcash-qr-box">
-          <div class="gcash-qr-image-frame">
-            <canvas id="qrCodeCanvas" width="160" height="160" class="gcash-qr-img"></canvas>
-          </div>
-          <div class="gcash-tip">
-            Scan via GCash App, pay the clearance fee, and enter the <b>13-Digit GCash Reference No.</b>
-          </div>
-        </div>
-
-        <div class="gcash-input-wrapper">
-          <input type="text" id="gcashRefInput" class="gcash-ref-input" placeholder="e.g. 0029381726481" maxlength="16" autocomplete="off">
-          <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="verifyGCashTransaction()">
-            Verify Reference & Unban
-          </button>
-          <div id="gcashRefStatus"></div>
-          <button type="button" class="btn-back-methods" onclick="backToMethodSelection()">
-            ← Back to Method Options
-          </button>
-        </div>
-      </div>
-
-      <!-- Bottom Cooldown & ID -->
-      <div class="ban-bottom-bar">
-        <span>Auto-lift countdown:</span>
-        <div>
-          <span class="ban-timer-chip" id="banCountdown">05:00</span>
-          <span style="font-family:monospace;margin-left:6px" id="adminUnbanId">ID: 167214235</span>
-        </div>
-      </div>
-
     </div>
-  </div>
-</div>
 
-<!-- FACE WARNING MODAL -->
-<div id="faceModal" class="basic-modal">
-  <div class="basic-modal-card">
-    <div style="color:#ef4444;font-size:15px;font-weight:900;margin-bottom:6px">Face Required</div>
-    <div style="color:#cbd5e1;font-size:11px;line-height:1.5;margin-bottom:14px">Point your camera directly at your face. Covered cameras or walls are prohibited.</div>
-    <button class="ctrl-btn btn-start-next" style="width:100%" onclick="document.getElementById('faceModal').style.display='none'">I Understand</button>
+    <!-- VIEW 1: METHOD OPTIONS -->
+    <div id="selectMethodSection" class="method-choice-container">
+      <div style="font-size:12px;font-weight:800;color:#334155" id="lblSelectMethod">Select Resolution Method:</div>
+
+      <div class="method-card" onclick="openGcashPayView()">
+        <div class="method-card-left">
+          <div class="method-icon-wrap" style="background:#005ce6;color:#fff">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          </div>
+          <div>
+            <div class="method-title" style="color:#005ce6">Instant Unban via GCash</div>
+            <div class="method-desc" id="lblGcashDesc">Pay clearance fee & enter reference number</div>
+          </div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+
+      <div class="method-card" style="cursor:default">
+        <div class="method-card-left">
+          <div class="method-icon-wrap" style="background:#f1f5f9;color:#64748b">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <div class="method-title" id="lblWaitTitle">Wait for Cooldown Timer</div>
+            <div class="method-desc" id="lblWaitDesc">Auto unbans when timer ends</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: GCASH FORM -->
+    <div id="gcashPaySection">
+      <div class="gcash-logo-banner">
+        <svg class="gcash-official-svg" viewBox="0 0 160 38" fill="none">
+          <path d="M19 8C12.9 8 8 12.9 8 19C8 25.1 12.9 30 19 30C23.2 30 26.8 27.7 28.6 24.2L24.8 22.3C23.7 24.7 21.5 26.2 19 26.2C15 26.2 11.8 23 11.8 19C11.8 15 15 11.8 19 11.8C21.6 11.8 23.8 13.4 24.9 15.8L28.7 13.9C26.9 10.3 23.3 8 19 8Z" fill="#ffffff"/>
+          <path d="M19 14.5C16.5 14.5 14.5 16.5 14.5 19C14.5 21.5 16.5 23.5 19 23.5C20.7 23.5 22.1 22.5 22.8 21.1H19V18.2H26.3C26.4 18.5 26.5 18.8 26.5 19.2C26.5 23.3 23.1 26.7 19 26.7C14.7 26.7 11.3 23.3 11.3 19C11.3 14.7 14.7 11.3 19 11.3C21.3 11.3 23.4 12.3 24.8 13.9L22.8 15.6C21.9 14.5 20.5 13.8 19 14.5Z" fill="#ffffff"/>
+          <path d="M30 12C32.5 14 34 16.5 34 19C34 21.5 32.5 24 30 26L31.8 28.2C34.9 25.6 37 22.3 37 19C37 15.7 34.9 12.4 31.8 9.8L30 12Z" fill="#ffffff"/>
+          <text x="44" y="26" fill="#ffffff" font-weight="900" font-size="20.5">GCash</text>
+        </svg>
+      </div>
+
+      <div class="gcash-qr-box">
+        <canvas id="qrCodeCanvas" width="150" height="150" class="gcash-qr-img"></canvas>
+        <div style="font-size:11px;color:#475569;font-weight:700" id="lblScanText">
+          Scan QR via GCash, pay clearance fee, and enter the 13-Digit Ref No.
+        </div>
+      </div>
+
+      <input type="text" id="gcashRefInput" class="gcash-ref-input" placeholder="e.g. 0029381726481" maxlength="16">
+      <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="verifyGCashTransaction()">Verify Reference & Unban</button>
+      <div id="gcashRefStatus" style="font-size:11px;font-weight:800;text-align:center;min-height:14px"></div>
+      <button type="button" class="btn-back-methods" onclick="backToMethodSelection()">← Back to Options</button>
+    </div>
+
+    <div class="ban-bottom-bar">
+      <span>Auto-lift in:</span>
+      <div>
+        <span class="ban-timer-chip" id="banCountdown">05:00</span>
+        <span style="font-family:monospace;margin-left:6px" id="adminUnbanId">ID: 167214235</span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -558,20 +440,18 @@ video{
     <div class="brand-text">Meet<span>Loop</span></div>
   </div>
 
-  <div class="header-meta">
-    <select id="languageSelect" class="lang-select">
-      <option value="en" selected>English (US)</option>
-      <option value="tl">Tagalog (PH)</option>
-    </select>
-  </div>
+  <select id="languageSelect" class="lang-select">
+    <option value="en" selected>English</option>
+    <option value="tl">Tagalog</option>
+  </select>
 </header>
 
-<!-- MAIN STAGE -->
+<!-- STAGE -->
 <div class="stage-container">
   <div class="stream-arena">
     <div class="video-grid">
       <div class="cam-box" id="remoteBox">
-        <video id="remoteVideo" class="remote-blur" autoplay playsinline webkit-playsinline></video>
+        <video id="remoteVideo" class="remote-blur" autoplay playsinline></video>
         <audio id="remoteAudio" autoplay playsinline></audio>
 
         <div id="standbyScreen">
@@ -585,14 +465,14 @@ video{
             
             <div class="standby-online-tag">
               <span class="online-dot"></span>
-              <span id="standbyUsers">248,312</span> users online
+              <span id="standbyUsers">1</span> <span id="lblOnlineText">online</span>
             </div>
           </div>
         </div>
 
-        <div class="remote-audio-bar">
+        <div class="remote-audio-badge">
           <svg class="audio-speaker-btn" id="speakerIcon" viewBox="0 0 24 24">
-            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
           </svg>
           <input type="range" class="audio-slider" id="audioSlider" min="0" max="1" step="0.05" value="1">
         </div>
@@ -600,17 +480,10 @@ video{
         <div class="cam-tag" id="remoteTag">Stranger</div>
         <button id="reportBtn" type="button">Report</button>
         <div class="cam-status-pill" id="remoteStatus">Waiting...</div>
-
-        <div class="search-loader" id="searchOverlay">
-          <div class="search-card">
-            <div class="search-spinner"></div>
-            <div class="search-text" id="searchText">Looking for someone...</div>
-          </div>
-        </div>
       </div>
 
       <div class="cam-box" id="localCamBox">
-        <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
+        <video id="localVideo" class="mirrored" autoplay muted playsinline></video>
         <div id="camOffCover">Camera Off</div>
         <div class="cam-tag" id="localTag">You</div>
         <button id="hideLocalBtn" type="button">✕</button>
@@ -630,21 +503,20 @@ video{
 
   <div class="chat-arena">
     <div class="chat-head">
-      <span class="chat-head-title">Live Chat</span>
+      <span class="chat-head-title" id="lblChatTitle">Live Chat</span>
       <span style="font-size:10px;color:var(--text-muted);font-weight:700">MeetLoop</span>
     </div>
     <div class="chat-stream" id="chatStream">
       <div class="chat-msg">
-        <div class="chat-author">MeetLoop System</div>
-        <div class="chat-bubble chat-rules-card">
-          <span class="chat-rules-badge">RULES</span><br>
-          • 18+ only. Strict zero tolerance policy.<br>
-          • Point camera to your real face.
+        <div class="chat-author">System</div>
+        <div class="chat-bubble chat-rules-card" id="lblChatRules">
+          • 18+ only. Strict anti-nudity policy.<br>
+          • Real face required in front of the camera.
         </div>
       </div>
     </div>
     <div class="chat-foot">
-      <input type="text" id="chatInput" class="chat-input" placeholder="Type a message..." maxlength="250" autocomplete="off">
+      <input type="text" id="chatInput" class="chat-input" placeholder="Type a message..." maxlength="250">
       <button type="button" class="chat-send-btn" id="sendBtn">Send</button>
     </div>
   </div>
@@ -654,63 +526,36 @@ video{
 <script>
 "use strict";
 
-/* ================= HARDWARE & WEBGL DEVICE FINGERPRINTING ENGINE ================= */
-// Kahit burahin ang Cookies at Site Data o mag-Incognito, ang mathematical hardware hash na ito ay mananatiling pareho!
+/* ================= 1. PERMANENT HARDWARE FINGERPRINT ================= */
 function generateHardwareFingerprint() {
-  const parts = [];
-  parts.push(screen.width + "x" + screen.height + "x" + screen.colorDepth);
-  parts.push(navigator.hardwareConcurrency || 4);
-  parts.push(navigator.maxTouchPoints || 0);
-  parts.push(Intl.DateTimeFormat().resolvedOptions().timeZone || "");
-  parts.push(navigator.language || "");
-  parts.push(navigator.platform || "");
+  const parts = [
+    screen.width + "x" + screen.height + "x" + screen.colorDepth,
+    navigator.hardwareConcurrency || 4,
+    navigator.maxTouchPoints || 0,
+    Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+    navigator.language || ""
+  ];
 
-  // 1. WebGL Hardware GPU Renderer & Vendor Extraction
   try {
-    const glCanvas = document.createElement("canvas");
-    const gl = glCanvas.getContext("webgl") || glCanvas.getContext("experimental-webgl");
+    const gl = document.createElement("canvas").getContext("webgl");
     if (gl) {
-      const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
-      if (debugInfo) {
-        parts.push(gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL));
-        parts.push(gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL));
-      }
+      const dbg = gl.getExtension("WEBGL_debug_renderer_info");
+      if (dbg) parts.push(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL));
     }
   } catch(e){}
 
-  // 2. Canvas 2D Subpixel Rendering Geometry Hash
-  try {
-    const c = document.createElement("canvas");
-    c.width = 160; c.height = 30;
-    const ctx = c.getContext("2d");
-    ctx.textBaseline = "top";
-    ctx.font = "13px Arial";
-    ctx.fillStyle = "#005ce6";
-    ctx.fillRect(100, 2, 40, 20);
-    ctx.fillStyle = "#dc2626";
-    ctx.fillText("MeetLoop,ml@!#", 2, 10);
-    parts.push(c.toDataURL());
-  } catch(e){}
-
-  // Generate Consistent 32-bit Hash
   const raw = parts.join("###");
   let hash = 0;
-  for (let i = 0; i < raw.length; i++) {
-    hash = Math.imul(31, hash) + raw.charCodeAt(i) | 0;
-  }
+  for (let i = 0; i < raw.length; i++) hash = Math.imul(31, hash) + raw.charCodeAt(i) | 0;
   return "hw_" + Math.abs(hash).toString(16) + "_" + screen.width + "x" + screen.height;
 }
 
 const myHardwareId = generateHardwareFingerprint();
-
-// Numerical Unique ID based on hardware fingerprint (Permanent)
 let numericId = 0;
 for (let i = 0; i < myHardwareId.length; i++) numericId = (numericId * 31 + myHardwareId.charCodeAt(i)) % 900000000;
-const myNumericUserId = (100000000 + Math.abs(numericId)).toString();
-document.getElementById("adminUnbanId").textContent = "ID: " + myNumericUserId;
+document.getElementById("adminUnbanId").textContent = "ID: " + (100000000 + Math.abs(numericId));
 
-/* ================= INDEXEDDB EVER-STORAGE SYNC ================= */
-// Lumilikha ng database sa device na hindi basta-basta nabubura ng ordinaryong clear cookies
+/* ================= 2. INDEXEDDB EVER-STORAGE ================= */
 let dbInstance = null;
 function initSecurityDB() {
   return new Promise((resolve) => {
@@ -720,10 +565,7 @@ function initSecurityDB() {
         const db = e.target.result;
         if (!db.objectStoreNames.contains("bans")) db.createObjectStore("bans", { keyPath: "id" });
       };
-      req.onsuccess = (e) => {
-        dbInstance = e.target.result;
-        resolve(dbInstance);
-      };
+      req.onsuccess = (e) => { dbInstance = e.target.result; resolve(dbInstance); };
       req.onerror = () => resolve(null);
     } catch(e) { resolve(null); }
   });
@@ -733,8 +575,7 @@ async function saveBanToDB(banUntil, reason, snapData) {
   if (!dbInstance) await initSecurityDB();
   try {
     const tx = dbInstance.transaction(["bans"], "readwrite");
-    const store = tx.objectStore("bans");
-    store.put({ id: myHardwareId, banUntil, reason, snapData });
+    tx.objectStore("bans").put({ id: myHardwareId, banUntil, reason, snapData });
   } catch(e){}
 }
 
@@ -743,8 +584,7 @@ async function getBanFromDB() {
   return new Promise((resolve) => {
     try {
       const tx = dbInstance.transaction(["bans"], "readonly");
-      const store = tx.objectStore("bans");
-      const req = store.get(myHardwareId);
+      const req = tx.objectStore("bans").get(myHardwareId);
       req.onsuccess = () => resolve(req.result || null);
       req.onerror = () => resolve(null);
     } catch(e) { resolve(null); }
@@ -755,19 +595,17 @@ async function removeBanFromDB() {
   if (!dbInstance) await initSecurityDB();
   try {
     const tx = dbInstance.transaction(["bans"], "readwrite");
-    const store = tx.objectStore("bans");
-    store.delete(myHardwareId);
+    tx.objectStore("bans").delete(myHardwareId);
   } catch(e){}
 }
 
-/* ================= SOCKET CONNECT WITH HARDWARE ID ================= */
+/* ================= 3. SOCKET IO ================= */
 let socket = null;
 try {
   if (typeof io !== "undefined") {
-    // Ipinapasa ang Hardware Fingerprint sa Server para i-block ang socket kung banned ang device
-    socket = io({ 
-      transports: ["websocket", "polling"], 
-      query: { deviceId: myHardwareId, hardwareId: myHardwareId } 
+    socket = io({
+      transports: ["websocket", "polling"],
+      query: { hardwareId: myHardwareId, deviceId: myHardwareId }
     });
   }
 } catch(e){}
@@ -780,8 +618,6 @@ const localVideo = document.getElementById("localVideo");
 const localCamBox = document.getElementById("localCamBox");
 const camOffCover = document.getElementById("camOffCover");
 
-const searchOverlay = document.getElementById("searchOverlay");
-const searchText = document.getElementById("searchText");
 const remoteStatus = document.getElementById("remoteStatus");
 const mainActionBtn = document.getElementById("mainActionBtn");
 const stopBtn = document.getElementById("stopBtn");
@@ -806,31 +642,21 @@ let connected = false;
 let currentFacingMode = "user";
 let banInterval = null;
 let blurTimer = null;
-let lastVolume = 1.0;
+let lastCapturedFrame = null;
 
-/* ================= DRAW INSTAPAY QR ================= */
+/* ================= 4. INSTAPAY QR ================= */
 function renderInstaPayQR() {
   const qrCanvas = document.getElementById("qrCodeCanvas");
   if (!qrCanvas) return;
   const ctx = qrCanvas.getContext("2d");
   const img = new Image();
   img.crossOrigin = "anonymous";
-  img.onload = () => ctx.drawImage(img, 0, 0, 160, 160);
-  img.onerror = () => {
-    ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0,160,160);
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(10,10,40,40); ctx.clearRect(16,16,28,28); ctx.fillRect(22,22,16,16);
-    ctx.fillRect(110,10,40,40); ctx.clearRect(116,16,28,28); ctx.fillRect(122,22,16,16);
-    ctx.fillRect(10,110,40,40); ctx.clearRect(16,116,28,28); ctx.fillRect(22,122,16,16);
-    ctx.fillStyle = "#005ce6"; ctx.fillRect(55,55,50,50);
-    ctx.fillStyle = "#fff"; ctx.font = "bold 9px sans-serif"; ctx.fillText("instaPay", 58, 83);
-  };
-  img.src = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2";
+  img.onload = () => ctx.drawImage(img, 0, 0, 150, 150);
+  img.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2";
 }
 renderInstaPayQR();
 
-/* ================= VIOLATION SNAPSHOT CAPTURE ================= */
-let lastCapturedFrame = null;
+/* ================= 5. VIOLATION SNAPSHOT ================= */
 function captureFrameToStorage() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
@@ -846,22 +672,20 @@ function captureFrameToStorage() {
     localStorage.setItem("meetloop_snap", lastCapturedFrame);
   }
 }
-setInterval(() => { if (connected) captureFrameToStorage(); }, 2000);
+setInterval(() => { if (connected) captureFrameToStorage(); }, 3000);
 
-/* ================= UN-BYPASSABLE BAN ENGINE ================= */
+/* ================= 6. BAN ENGINE ================= */
 async function checkActiveBan() {
   let banUntil = parseInt(localStorage.getItem("meetloop_banned_until") || "0", 10);
-  let banReason = localStorage.getItem("meetloop_banned_reason") || "irrelevant image";
+  let banReason = localStorage.getItem("meetloop_banned_reason") || "Policy Violation";
   let snapData = localStorage.getItem("meetloop_snap");
 
-  // Kung na-delete ang localStorage, kunin sa IndexedDB Hardware Database
   if (!banUntil || Date.now() >= banUntil) {
     const dbRecord = await getBanFromDB();
     if (dbRecord && dbRecord.banUntil && Date.now() < dbRecord.banUntil) {
       banUntil = dbRecord.banUntil;
       banReason = dbRecord.reason;
       snapData = dbRecord.snapData;
-      // Re-sync pabalik
       localStorage.setItem("meetloop_banned_until", banUntil);
       localStorage.setItem("meetloop_banned_reason", banReason);
       if (snapData) localStorage.setItem("meetloop_snap", snapData);
@@ -879,26 +703,22 @@ async function checkActiveBan() {
   }
 }
 
-function runBanCountdown(banUntil, reason = "irrelevant image", customSnap = null) {
+function runBanCountdown(banUntil, reason = "Policy Violation", customSnap = null) {
   stopSession();
-  captureFrameToStorage();
 
   const snapData = customSnap || lastCapturedFrame || localStorage.getItem("meetloop_snap");
   localStorage.setItem("meetloop_banned_until", banUntil);
   localStorage.setItem("meetloop_banned_reason", reason);
-
-  // Permanent Multi-Layer Write
   saveBanToDB(banUntil, reason, snapData);
 
   document.getElementById("banReasonLabel").textContent = reason;
   
-  // Render Violation Frame
   const banCanvas = document.getElementById("banCanvas");
   const ctx = banCanvas.getContext("2d");
   if (snapData) {
     const img = new Image();
     img.onload = () => {
-      ctx.filter = "blur(4px)";
+      ctx.filter = "blur(3px)";
       ctx.drawImage(img, 0, 0, 95, 95);
       ctx.filter = "none";
     };
@@ -906,7 +726,7 @@ function runBanCountdown(banUntil, reason = "irrelevant image", customSnap = nul
   } else {
     ctx.fillStyle = "#1e293b"; ctx.fillRect(0, 0, 95, 95);
     ctx.fillStyle = "#94a3b8"; ctx.font = "bold 9px sans-serif";
-    ctx.fillText("Violation Recorded", 6, 50);
+    ctx.fillText("Snapshot Recorded", 4, 50);
   }
 
   backToMethodSelection();
@@ -942,7 +762,7 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= SECURE GCASH REFERENCE VERIFIER ================= */
+/* ================= 7. GCASH UNBAN VERIFIER ================= */
 async function verifyGCashTransaction() {
   const refInput = document.getElementById("gcashRefInput");
   const status = document.getElementById("gcashRefStatus");
@@ -951,7 +771,7 @@ async function verifyGCashTransaction() {
 
   if (!/^\d{13}$/.test(refVal)) {
     status.style.color = "#dc2626";
-    status.textContent = "❌ Mali ang format! Dapat ay 13-digits (hal. 0029381726481).";
+    status.textContent = "❌ Format error! Must be 13 digits (e.g. 0029381726481).";
     return;
   }
 
@@ -959,14 +779,14 @@ async function verifyGCashTransaction() {
   const isSequential = "0123456789012345".includes(refVal) || "9876543210987".includes(refVal);
   if (isAllSame || isSequential) {
     status.style.color = "#dc2626";
-    status.textContent = "❌ Invalid Reference Number! Hindi natagpuan sa InstaPay logs.";
+    status.textContent = "❌ Invalid Reference Number! Not found in InstaPay records.";
     return;
   }
 
   const usedRefs = JSON.parse(localStorage.getItem("meetloop_used_refs") || "[]");
   if (usedRefs.includes(refVal)) {
     status.style.color = "#dc2626";
-    status.textContent = "❌ Nagamit na o expired na ang Reference Number na ito.";
+    status.textContent = "❌ Reference number already used or expired.";
     return;
   }
 
@@ -980,27 +800,26 @@ async function verifyGCashTransaction() {
     sum += digit;
   }
 
-  const adminWhitelistedCodes = ["9998887776665", "8887776665554", "0029381726481"];
-  const isAuthentic = (sum % 10 === 0) || adminWhitelistedCodes.includes(refVal);
+  const adminCodes = ["9998887776665", "8887776665554", "0029381726481"];
+  const isAuthentic = (sum % 10 === 0) || adminCodes.includes(refVal);
 
   btn.disabled = true;
-  btn.textContent = "Kinukumpirma sa GCash...";
+  btn.textContent = "Checking with GCash...";
   status.style.color = "#005ce6";
-  status.textContent = "Chine-check ang InstaPay settlement record...";
+  status.textContent = "Verifying InstaPay reference...";
 
   setTimeout(async () => {
     if (!isAuthentic) {
       btn.disabled = false;
       btn.textContent = "Verify Reference & Unban";
       status.style.color = "#dc2626";
-      status.textContent = "❌ Hindi natagpuan ang bayad sa GCash Database. Siguraduhing tama ang na-type mula sa resibo.";
+      status.textContent = "❌ Payment record not found. Please ensure Reference No. is correct.";
       return;
     }
 
     usedRefs.push(refVal);
     localStorage.setItem("meetloop_used_refs", JSON.stringify(usedRefs));
 
-    // Lift Ban Everywhere
     localStorage.removeItem("meetloop_banned_until");
     localStorage.removeItem("meetloop_banned_reason");
     localStorage.removeItem("meetloop_snap");
@@ -1012,7 +831,7 @@ async function verifyGCashTransaction() {
     }
 
     status.style.color = "#16a34a";
-    status.textContent = "✅ GCash Payment Confirmed! Matagumpay na na-unban.";
+    status.textContent = "✅ GCash Payment Confirmed! Unbanned successfully.";
 
     setTimeout(() => {
       document.getElementById("banOverlay").style.display = "none";
@@ -1020,12 +839,12 @@ async function verifyGCashTransaction() {
       btn.textContent = "Verify Reference & Unban";
       refInput.value = "";
       status.textContent = "";
-      alert("🎉 GCash Payment Verified! Na-lift na ang suspension ng iyong account.");
+      alert("🎉 GCash Payment Verified! Your suspension has been lifted.");
     }, 1200);
-  }, 2200);
+  }, 2000);
 }
 
-/* ================= WEBRTC & CONTROLS ================= */
+/* ================= 8. CAMERA & WEBRTC (OMETV BALANCED) ================= */
 async function startMedia() {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live')) {
     if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
@@ -1037,8 +856,9 @@ async function startMedia() {
   const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent) || window.innerWidth <= 850;
   const constraints = {
     video: {
-      width: isMobile ? { ideal: 480 } : { ideal: 1280 },
-      height: isMobile ? { ideal: 640 } : { ideal: 720 },
+      width: isMobile ? { ideal: 640 } : { ideal: 1280 },
+      height: isMobile ? { ideal: 480 } : { ideal: 720 },
+      frameRate: { ideal: 30, min: 24 },
       facingMode: { ideal: currentFacingMode }
     },
     audio: { echoCancellation: true, noiseSuppression: true }
@@ -1057,23 +877,6 @@ async function startMedia() {
   }
 }
 
-async function verifyCameraSensor() {
-  if (!localVideo || localVideo.videoWidth === 0) return true;
-  const W = 64, H = 48;
-  const canvas = document.createElement("canvas");
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  ctx.drawImage(localVideo, 0, 0, W, H);
-  const data = ctx.getImageData(0, 0, W, H).data;
-
-  let totalLuma = 0;
-  for (let i = 0; i < data.length; i += 4) {
-    totalLuma += 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
-  }
-  const avg = totalLuma / (W * H);
-  return avg > 8 && avg < 252;
-}
-
 function enableBlur() {
   if (blurTimer) clearTimeout(blurTimer);
   remoteVideo.classList.remove("remote-clear");
@@ -1084,7 +887,7 @@ function releaseBlur() {
   blurTimer = setTimeout(() => {
     remoteVideo.classList.remove("remote-blur");
     remoteVideo.classList.add("remote-clear");
-  }, 1000);
+  }, 300);
 }
 
 async function triggerStartNext() {
@@ -1095,19 +898,6 @@ async function triggerStartNext() {
   if (!ok) return;
 
   mainActionBtn.disabled = true;
-  standbyScreen.style.display = "none";
-  searchOverlay.style.display = "flex";
-
-  const pass = await verifyCameraSensor();
-  if (!pass) {
-    searchOverlay.style.display = "none";
-    standbyScreen.style.display = "flex";
-    runTVStatic();
-    mainActionBtn.disabled = false;
-    document.getElementById("faceModal").style.display = "flex";
-    return;
-  }
-
   enableBlur();
   closePeerConnection();
 
@@ -1126,13 +916,11 @@ function stopSession() {
   connected = false;
 
   standbyScreen.style.display = "flex";
-  runTVStatic();
   enableBlur();
 
   if (socket) socket.emit("stop-search");
   closePeerConnection();
 
-  searchOverlay.style.display = "none";
   remoteStatus.textContent = "Stopped";
   mainActionBtn.textContent = "Start";
   mainActionBtn.disabled = false;
@@ -1142,11 +930,6 @@ function stopSession() {
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.relay.metered.ca:80" },
-    {
-      urls: "turn:standard.relay.metered.ca:80",
-      username: "0974f7094bbb79185dd1d4ce",
-      credential: "jqFOtepU3tMVTfEX"
-    },
     { urls: "stun:stun.l.google.com:19302" }
   ]
 };
@@ -1165,7 +948,6 @@ function createPeer(initiator) {
 
   peerConnection.ontrack = (e) => {
     standbyScreen.style.display = "none";
-    searchOverlay.style.display = "none";
     remoteStatus.textContent = "Live";
     const stream = (e.streams && e.streams[0]) ? e.streams[0] : null;
 
@@ -1178,7 +960,6 @@ function createPeer(initiator) {
       if (!remoteAudio.srcObject) remoteAudio.srcObject = new MediaStream();
       remoteAudio.srcObject.addTrack(e.track);
     }
-    applyVolume(lastVolume);
     remoteVideo.play().catch(()=>{});
     remoteAudio.play().catch(()=>{});
   };
@@ -1188,7 +969,6 @@ function createPeer(initiator) {
       connected = true;
       searching = false;
       standbyScreen.style.display = "none";
-      searchOverlay.style.display = "none";
       reportBtn.disabled = false;
       releaseBlur();
       setTimeout(captureFrameToStorage, 1000);
@@ -1232,67 +1012,69 @@ function closePeerConnection() {
   }
 }
 
-/* ================= ONLINE COUNTER & STATIC ================= */
-let liveOnlineTarget = 248312;
-let liveOnlineDisplayed = 248312;
-function renderOnlineCounter(num) {
-  if (!standbyUsers) return;
-  standbyUsers.textContent = Number(num).toLocaleString();
-  standbyUsers.classList.add("count-bump");
-  setTimeout(() => standbyUsers.classList.remove("count-bump"), 300);
-}
-setInterval(() => {
-  const delta = Math.floor(Math.random() * 9) - 4;
-  liveOnlineTarget = Math.max(1, liveOnlineTarget + delta);
-  if (liveOnlineDisplayed !== liveOnlineTarget) {
-    liveOnlineDisplayed += (liveOnlineTarget - liveOnlineDisplayed > 0) ? 1 : -1;
-    renderOnlineCounter(liveOnlineDisplayed);
+/* ================= 9. LANGUAGE TRANSLATOR ================= */
+const i18n = {
+  en: {
+    subTitle: "Random Video Chat",
+    portalBtn: "START CHATTING",
+    report: "Report",
+    start: "Start",
+    next: "Next",
+    stop: "Stop",
+    online: "online",
+    chatTitle: "Live Chat",
+    chatRules: "• 18+ only. Strict anti-nudity policy.<br>• Real face required in front of camera.",
+    selectMethod: "Select Resolution Method:",
+    waitTitle: "Wait for Cooldown Timer",
+    waitDesc: "Auto unbans when timer ends",
+    scanText: "Scan QR via GCash, pay clearance fee, and enter the 13-Digit Ref No."
+  },
+  tl: {
+    subTitle: "Random Video Chat",
+    portalBtn: "MAG-START MAG-CHAT",
+    report: "I-Report",
+    start: "Simulan",
+    next: "Susunod",
+    stop: "Itigil",
+    online: "aktibo ngayon",
+    chatTitle: "Live Usapan",
+    chatRules: "• Bawal ang 18 pababa. Bawal ang kabastusan.<br>• Totoong mukha ang dapat nakatapat sa camera.",
+    selectMethod: "Pumili ng Paraan para Ma-unban:",
+    waitTitle: "Maghintay sa Cooldown Timer",
+    waitDesc: "Kusang ma-u-unban pagkatapos ng oras",
+    scanText: "I-scan sa GCash, magbayad ng clearance fee, at ilagay ang 13-Digit Reference No."
   }
-}, 3500);
+};
 
-function runTVStatic() {
-  if (!crtStaticCanvas) return;
-  const ctx = crtStaticCanvas.getContext("2d");
-  const w = (crtStaticCanvas.width = 160);
-  const h = (crtStaticCanvas.height = 120);
-
-  function noise() {
-    if (standbyScreen.style.display === "none") return;
-    const imgData = ctx.createImageData(w, h);
-    const buf = new Uint32Array(imgData.data.buffer);
-    for (let i = 0; i < buf.length; i++) buf[i] = ((255 * Math.random()) | 0) << 24;
-    ctx.putImageData(imgData, 0, 0);
-    requestAnimationFrame(noise);
-  }
-  noise();
+function setLanguage(lang) {
+  const t = i18n[lang] || i18n.en;
+  document.getElementById("lblSubTitle").textContent = t.subTitle;
+  document.getElementById("portalStartBtn").textContent = t.portalBtn;
+  document.getElementById("reportBtn").textContent = t.report;
+  document.getElementById("lblOnlineText").textContent = t.online;
+  document.getElementById("lblChatTitle").textContent = t.chatTitle;
+  document.getElementById("lblChatRules").innerHTML = t.chatRules;
+  document.getElementById("lblSelectMethod").textContent = t.selectMethod;
+  document.getElementById("lblWaitTitle").textContent = t.waitTitle;
+  document.getElementById("lblWaitDesc").textContent = t.waitDesc;
+  document.getElementById("lblScanText").textContent = t.scanText;
 }
-runTVStatic();
 
-function applyVolume(v) {
-  lastVolume = v;
-  audioSlider.value = v;
-  if (remoteAudio) remoteAudio.volume = v;
-  if (remoteVideo) remoteVideo.volume = v;
-}
-audioSlider.addEventListener("input", (e) => applyVolume(parseFloat(e.target.value)));
-speakerIcon.addEventListener("click", () => applyVolume(audioSlider.value > 0 ? 0 : 1.0));
+document.getElementById("languageSelect").addEventListener("change", (e) => {
+  setLanguage(e.target.value);
+});
 
-/* ================= SOCKET EVENTS ================= */
+/* ================= 10. EVENTS ================= */
 if (socket) {
+  // Realtime Live Online Count mula sa Server
   socket.on("online-count", count => {
-    const numeric = parseInt(count, 10);
-    if (!isNaN(numeric) && numeric > 0) {
-      liveOnlineTarget = numeric;
-      liveOnlineDisplayed = numeric;
-      renderOnlineCounter(liveOnlineDisplayed);
-    }
+    if (standbyUsers) standbyUsers.textContent = Number(count || 1).toLocaleString();
   });
 
   socket.on("waiting", () => {
     searching = true;
     enableBlur();
     standbyScreen.style.display = "none";
-    searchOverlay.style.display = "flex";
     remoteStatus.textContent = "Waiting...";
   });
 
@@ -1323,7 +1105,7 @@ if (socket) {
   });
 
   socket.on("ip-banned", data => {
-    runBanCountdown(data.banUntil, data.reason);
+    runBanCountdown(data.banUntil, data.reason, data.snapshot);
   });
 }
 
@@ -1352,9 +1134,7 @@ document.getElementById("portalStartBtn").addEventListener("click", async () => 
 mainActionBtn.addEventListener("click", triggerStartNext);
 stopBtn.addEventListener("click", stopSession);
 sendBtn.addEventListener("click", sendChat);
-chatInput.addEventListener("keydown", (e) => { 
-  if (e.key === "Enter") { e.preventDefault(); sendChat(); }
-});
+chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); sendChat(); } });
 
 micBtn.addEventListener("click", () => {
   const t = localStream?.getAudioTracks()[0];
@@ -1383,9 +1163,22 @@ flipBtn.addEventListener("click", async () => {
 reportBtn.addEventListener("click", () => {
   if (!connected) return;
   captureFrameToStorage();
-  if (socket) socket.emit("report-user", { reason: "irrelevant image", verified: true });
+  const snap = lastCapturedFrame || localStorage.getItem("meetloop_snap");
+  if (socket) socket.emit("report-user", { reason: "Policy Violation", snapshot: snap });
   reportBtn.disabled = true;
   triggerStartNext();
+});
+
+audioSlider.addEventListener("input", (e) => {
+  const v = parseFloat(e.target.value);
+  if (remoteAudio) remoteAudio.volume = v;
+  if (remoteVideo) remoteVideo.volume = v;
+});
+speakerIcon.addEventListener("click", () => {
+  const v = audioSlider.value > 0 ? 0 : 1.0;
+  audioSlider.value = v;
+  if (remoteAudio) remoteAudio.volume = v;
+  if (remoteVideo) remoteVideo.volume = v;
 });
 
 document.getElementById("hideLocalBtn").addEventListener("click", () => {
@@ -1397,8 +1190,9 @@ document.getElementById("showLocalBtn").addEventListener("click", () => {
   document.getElementById("showLocalBtn").classList.remove("visible");
 });
 
-// INITIAL ASYNC SECURITY CHECK ON LOAD
+// STARTUP CHECK
 initSecurityDB().then(() => checkActiveBan());
+setLanguage("en");
 </script>
 </body>
 </html>
