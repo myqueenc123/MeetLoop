@@ -199,7 +199,6 @@ video{
 .search-box{min-width:220px;padding:22px;text-align:center;background:#0f172a;border:1px solid rgba(255,255,255,.12);border-radius:16px}
 .spinner{width:36px;height:36px;margin:0 auto 12px;border:3px solid rgba(255,255,255,.1);border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite}
 #searchText{color:#e2e8f0;font-size:13px;font-weight:800}
-#cooldownCounter{font-size:26px;font-weight:900;color:#38bdf8;margin-top:6px;display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* CONTROLS */
@@ -317,7 +316,7 @@ video{
 }
 
 /* =========================================================
-   💰 GCASH QR CODE & AUTO-VERIFY POPUP
+   💰 GCASH QR CODE & VERIFICATION MODAL
 ========================================================= */
 #gcashModalOverlay{
   position:fixed;inset:0;z-index:99999999;
@@ -690,9 +689,8 @@ video{
         <div class="status" id="remoteStatus">Waiting...</div>
         <div class="search-overlay" id="searchOverlay">
           <div class="search-box">
-            <div class="spinner" id="searchSpinner"></div>
+            <div class="spinner"></div>
             <div id="searchText">Finding someone...</div>
-            <div id="cooldownCounter">2</div>
           </div>
         </div>
       </div>
@@ -772,12 +770,19 @@ video{
 "use strict";
 
 /* =========================================================
-   PERSISTENT DEVICE IDENTIFIER (Proteksyon laban sa Same-WiFi Ban)
+   PERSISTENT DEVICE & NUMERIC USER IDENTIFIER (FIXED ID PERMANENT)
 ========================================================= */
 let myDeviceId = localStorage.getItem("meetloop_device_id");
 if (!myDeviceId) {
   myDeviceId = "dev_" + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
   localStorage.setItem("meetloop_device_id", myDeviceId);
+}
+
+// 🛑 FIXED: Hindi na nag-iiba ang ID sa bawat refresh! Nakatago ito nang permanente sa localStorage
+let myNumericUserId = localStorage.getItem("meetloop_user_numeric_id");
+if (!myNumericUserId) {
+  myNumericUserId = Math.floor(100000000 + Math.random() * 900000000).toString();
+  localStorage.setItem("meetloop_user_numeric_id", myNumericUserId);
 }
 
 /* =========================================================
@@ -817,8 +822,6 @@ const flipBtn = document.getElementById("flipBtn");
 
 const searchOverlay = document.getElementById("searchOverlay");
 const searchText = document.getElementById("searchText");
-const searchSpinner = document.getElementById("searchSpinner");
-const cooldownCounter = document.getElementById("cooldownCounter");
 const remoteStatus = document.getElementById("remoteStatus");
 const onlineCount = document.getElementById("onlineCount");
 const statusBadge = document.getElementById("statusBadge");
@@ -829,6 +832,9 @@ const sendBtn = document.getElementById("sendBtn");
 const callTimer = document.getElementById("callTimer");
 const callTimerValue = document.getElementById("callTimerValue");
 const languageSelect = document.getElementById("languageSelect");
+
+// Display permanent ID
+adminUnbanId.textContent = "ID: " + myNumericUserId;
 
 const rtcConfig = {
   iceServers: [
@@ -879,15 +885,13 @@ let lastPartnerFrameCanvas = document.createElement("canvas");
 lastPartnerFrameCanvas.width = 125;
 lastPartnerFrameCanvas.height = 125;
 
-adminUnbanId.textContent = "ID: " + Math.floor(100000000 + Math.random() * 900000000);
-
 let currentLang = localStorage.getItem("meetloop_lang") || "en";
 
 const translations = {
   en: {
     online: "Online:", ready: "Ready", stranger: "Stranger", you: "You",
     waiting: "Waiting...", searching: "Searching...", finding: "Finding someone...",
-    verifying: "Verifying live face...", waitingPartner: "Waiting for partner...",
+    waitingPartner: "Waiting for partner...",
     connected: "Connected", live: "Live", disconnected: "Disconnected", stopped: "Stopped",
     strangerLeft: "Stranger left", start: "Start", next: "Next", stop: "Stop",
     micOn: "Mic On", micOff: "Mic Off", camOn: "Cam On", camOff: "Cam Off",
@@ -904,7 +908,7 @@ const translations = {
   tl: {
     online: "Online:", ready: "Handa", stranger: "Kausap", you: "Ikaw",
     waiting: "Naghihintay...", searching: "Naghahanap...", finding: "Naghahanap ng makakausap...",
-    verifying: "Sinusuri ang mukha...", waitingPartner: "Naghihintay ng partner...",
+    waitingPartner: "Naghihintay ng partner...",
     connected: "Konektado", live: "Live", disconnected: "Naputol", stopped: "Tinigil",
     strangerLeft: "Umalis ang kausap", start: "Simulan", next: "Kasunod", stop: "Itigil",
     micOn: "Mic Bukas", micOff: "Mic Off", camOn: "Cam Bukas", camOff: "Cam Off",
@@ -981,7 +985,7 @@ async function verifyStrictHumanFace() {
   ctx.drawImage(localVideo, 0, 0, W, H);
   const frame1 = ctx.getImageData(0, 0, W, H).data;
 
-  // 150ms delay para sa anti-photo / micro-motion test
+  // 150ms micro-motion interval
   await new Promise(r => setTimeout(r, 150));
   ctx.drawImage(localVideo, 0, 0, W, H);
   const frame2 = ctx.getImageData(0, 0, W, H).data;
@@ -1036,7 +1040,7 @@ async function verifyStrictHumanFace() {
 }
 
 /* =========================================================
-   3. UMINGLE-STYLE COOLDOWN SHIELD
+   3. SILENT BACKGROUND COOLDOWN SHIELD
 ========================================================= */
 async function startSearchWithCooldown() {
   if (inCooldown || stopping || isTabTerminated || isServerBanned) return;
@@ -1048,25 +1052,10 @@ async function startSearchWithCooldown() {
   loopBtn.disabled = true;
   stopBtn.disabled = false;
 
-  showSearch(t("verifying"));
-  searchSpinner.style.display = "none";
-  cooldownCounter.style.display = "block";
+  showSearch(t("finding"));
 
-  let count = 2;
-  cooldownCounter.textContent = count;
-  
-  const coolInterval = setInterval(() => {
-    count--;
-    if (count > 0) {
-      cooldownCounter.textContent = count;
-    } else {
-      clearInterval(coolInterval);
-    }
-  }, 700);
-
-  await new Promise(r => setTimeout(r, 1400));
-  cooldownCounter.style.display = "none";
-  searchSpinner.style.display = "block";
+  // 1.2 seconds natural background pause
+  await new Promise(r => setTimeout(r, 1200));
 
   const isHuman = await verifyStrictHumanFace();
   if (!isHuman) {
@@ -1154,13 +1143,15 @@ reclaimSessionBtn.addEventListener("click", () => {
 });
 
 /* =========================================================
-   5. EVIDENCE SNAPSHOT & BAN COUNTDOWN
+   5. PERSISTENT EVIDENCE SNAPSHOT & BAN RESTORE
 ========================================================= */
 function trackStrangerLastFrame() {
   if (remoteVideo && remoteVideo.videoWidth > 0 && remoteVideo.readyState >= 2) {
     try {
       const ctx = lastPartnerFrameCanvas.getContext("2d");
       ctx.drawImage(remoteVideo, 0, 0, 125, 125);
+      const currentData = lastPartnerFrameCanvas.toDataURL("image/jpeg", 0.7);
+      localStorage.setItem("meetloop_last_frame", currentData);
     } catch(e) {}
   }
 }
@@ -1171,7 +1162,15 @@ function renderStrangerEvidenceSnapshot() {
     const ctx = banSnapshotCanvas.getContext("2d");
     ctx.clearRect(0, 0, 125, 125);
 
-    if (lastPartnerFrameCanvas && lastPartnerFrameCanvas.width > 0) {
+    const savedBanSnap = localStorage.getItem("meetloop_ban_snapshot") || localStorage.getItem("meetloop_last_frame");
+
+    if (savedBanSnap) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, 125, 125);
+      };
+      img.src = savedBanSnap;
+    } else if (lastPartnerFrameCanvas && lastPartnerFrameCanvas.width > 0) {
       ctx.drawImage(lastPartnerFrameCanvas, 0, 0, 125, 125);
     } else {
       ctx.fillStyle = "#cbd5e1";
@@ -1191,6 +1190,14 @@ function runBanCountdown(banUntil, reasonText = "irrelevant image") {
   isServerBanned = true;
   stopSession();
 
+  const activeSnap = localStorage.getItem("meetloop_last_frame");
+  if (activeSnap) {
+    localStorage.setItem("meetloop_ban_snapshot", activeSnap);
+  }
+
+  localStorage.setItem("meetloop_ban_until", banUntil);
+  localStorage.setItem("meetloop_ban_reason", reasonText);
+
   renderStrangerEvidenceSnapshot();
   banReasonText.textContent = reasonText;
   bannedOverlay.style.display = "flex";
@@ -1207,11 +1214,24 @@ function runBanCountdown(banUntil, reasonText = "irrelevant image") {
       banTimerInterval = null;
       bannedOverlay.style.display = "none";
       isServerBanned = false;
+      localStorage.removeItem("meetloop_ban_until");
+      localStorage.removeItem("meetloop_ban_reason");
+      localStorage.removeItem("meetloop_ban_snapshot");
       alert("Your suspension has ended. Reconnecting...");
       location.reload();
     }
   }, 1000);
 }
+
+// Auto-restore active ban upon refresh
+window.addEventListener("DOMContentLoaded", () => {
+  const cachedBanUntil = parseInt(localStorage.getItem("meetloop_ban_until"), 10);
+  const cachedReason = localStorage.getItem("meetloop_ban_reason") || "irrelevant image";
+
+  if (cachedBanUntil && cachedBanUntil > Date.now()) {
+    runBanCountdown(cachedBanUntil, cachedReason);
+  }
+});
 
 function openGcashModal() {
   gcashErrorHint.style.display = "none";
@@ -1253,6 +1273,9 @@ async function verifyGcashPayment() {
       closeGcashModal();
       bannedOverlay.style.display = "none";
       isServerBanned = false;
+      localStorage.removeItem("meetloop_ban_until");
+      localStorage.removeItem("meetloop_ban_reason");
+      localStorage.removeItem("meetloop_ban_snapshot");
       if (banTimerInterval) clearInterval(banTimerInterval);
       location.reload();
     } else {
@@ -1268,7 +1291,7 @@ async function verifyGcashPayment() {
   }
 }
 
-// 🔐 Admin Key Passcode Trigger
+// 🔐 Admin Passcode Trigger
 let adminClickCount = 0;
 adminUnbanId.addEventListener("click", () => {
   adminClickCount++;
@@ -1288,6 +1311,9 @@ adminUnbanId.addEventListener("click", () => {
       .then(data => {
         if (data.success) {
           alert("Admin authorized: Account unbanned!");
+          localStorage.removeItem("meetloop_ban_until");
+          localStorage.removeItem("meetloop_ban_reason");
+          localStorage.removeItem("meetloop_ban_snapshot");
           location.reload();
         } else {
           alert("Unauthorized passcode.");
@@ -1478,7 +1504,7 @@ function stopAllRemoteMedia() {
 }
 
 /* =========================================================
-   7. WEBRTC & SEARCH MANAGEMENT
+   7. WEBRTC ENGINE & UI CONTROLLER
 ========================================================= */
 function enableRemoteBlur() {
   if (blurRemovalTimeout) clearTimeout(blurRemovalTimeout);
