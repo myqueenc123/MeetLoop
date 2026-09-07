@@ -12,20 +12,16 @@ app.use(express.json());
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname));
 
-// 🔐 PALITAN MO ITO NG SARILI MONG SECRET PASSWORD
+// 🔐 ADMIN PASSCODE (Para sa secure manual unban)
 const ADMIN_SECRET_KEY = process.env.ADMIN_KEY || "meetloop_admin_9988";
 
-// --- SERVER-SIDE IP BAN STORAGE ---
-const bannedIPs = new Map(); // ip -> { banUntil, reason }
-const ipStrikes = new Map(); // ip -> verified violations
+// --- BAN & STRIKES STORAGE (Keyed by Device ID + Fallback IP) ---
+const bannedEntities = new Map(); // entityKey -> { banUntil, reason }
+const entityStrikes = new Map();  // entityKey -> strikes count
 
-// 💰 GCASH ANTI-FRAUD ENGINE
-// Dito papasok ang mga totoong resibo na natanggap mo sa GCash mo:
-const approvedGcashReceipts = new Set([
-  // Halimbawa: puwede kang maglagay dito nang manual, o gamitin ang terminal command sa baba:
-  // "1002938475812"
-]);
-const usedGcashReferences = new Set(); // Bawal gamitin ulit ang nagamit na
+// --- GCASH ANTI-CHEAT ENGINE ---
+const approvedGcashReceipts = new Set();
+const usedGcashReferences = new Set();
 
 function getClientIP(reqOrSocket) {
   const headers = reqOrSocket.headers || reqOrSocket.handshake?.headers || {};
@@ -39,9 +35,17 @@ function getClientIP(reqOrSocket) {
          "127.0.0.1";
 }
 
-// 💰 SECURE GCASH UNBAN VERIFICATION (HINDI NA GAGANA ANG RANDOM NUMBER!)
+function getEntityKey(reqOrSocket) {
+  const query = reqOrSocket.query || reqOrSocket.handshake?.query || {};
+  const deviceId = query.deviceId || reqOrSocket.headers?.['x-device-id'];
+  const ip = getClientIP(reqOrSocket);
+  // Proteksyon sa Same-WiFi test: Gumagamit ng persistent device ID para hindi madamay ang reporter
+  return deviceId ? `dev_${deviceId}` : `ip_${ip}`;
+}
+
+// 💰 GCASH UNBAN VERIFICATION ENDPOINT
 app.post('/api/verify-gcash-unban', (req, res) => {
-  const ip = getClientIP(req);
+  const entityKey = getEntityKey(req);
   const { refNumber } = req.body || {};
 
   if (!refNumber) {
@@ -50,60 +54,60 @@ app.post('/api/verify-gcash-unban', (req, res) => {
 
   const cleanRef = refNumber.toString().replace(/\s+/g, '').trim();
 
-  // 1. Format check
+  // Validate reference length (Standard GCash 10-16 digits)
   if (!/^\d{10,16}$/.test(cleanRef)) {
-    return res.status(400).json({ success: false, message: "Invalid Reference Number format. Must be 10-16 digits." });
+    return res.status(400).json({ success: false, message: "Invalid Reference format. Must be 10-16 digits." });
   }
 
-  // 2. Anti-Replay: Check kung nagamit na
+  // Anti-Replay: Bawal i-recycle ang nagamit na resibo
   if (usedGcashReferences.has(cleanRef)) {
-    return res.status(400).json({ success: false, message: "This Reference Number has already been claimed." });
+    return res.status(400).json({ success: false, message: "This Reference Number has already been used." });
   }
 
-  // 3. STRICT CHECK: Dapat nasa approved list ng binayaran sa GCash
+  // Anti-Cheat: HINDI na gagana ang random numbers; kailangan nasa approved list
   if (!approvedGcashReceipts.has(cleanRef)) {
     return res.status(400).json({ 
       success: false, 
-      message: "Reference number not found or payment not yet received. Please ensure you sent ₱20." 
+      message: "Reference number not found or payment not yet received. Please confirm you sent ₱20." 
     });
   }
 
-  // Kapag verified at totoo:
   approvedGcashReceipts.delete(cleanRef);
   usedGcashReferences.add(cleanRef);
 
-  bannedIPs.delete(ip);
-  ipStrikes.delete(ip);
+  bannedEntities.delete(entityKey);
+  entityStrikes.delete(entityKey);
 
-  console.log(`✅ [GCASH UNBAN] Legitimate payment confirmed! IP: ${ip} | Ref: ${cleanRef}`);
+  console.log(`✅ [GCASH PAYMENT VERIFIED] Unbanned: ${entityKey} | Ref: ${cleanRef}`);
   return res.json({ success: true, message: "Payment verified successfully! Your account is now unbanned." });
 });
 
-// 🔓 PROTECTED ADMIN UNBAN (Nangangailangan na ng Admin Key)
+// 🔓 PROTECTED ADMIN UNBAN ENDPOINT
 app.post('/admin/unban-my-ip', (req, res) => {
   const { adminKey } = req.body || {};
   if (adminKey !== ADMIN_SECRET_KEY) {
     return res.status(403).json({ success: false, message: "Invalid Admin Passcode." });
   }
 
-  const ip = getClientIP(req);
-  bannedIPs.delete(ip);
-  ipStrikes.delete(ip);
-  console.log(`🔓 Admin Unbanned IP: ${ip}`);
-  return res.json({ success: true, message: `IP ${ip} has been unbanned by admin.` });
+  const entityKey = getEntityKey(req);
+  bannedEntities.delete(entityKey);
+  entityStrikes.delete(entityKey);
+
+  console.log(`🔓 Admin Unbanned: ${entityKey}`);
+  return res.json({ success: true, message: `Account has been unbanned by admin.` });
 });
 
-// 🛑 SERVER IP INTERCEPTOR
+// 🛑 SERVER CONNECTION BAN INTERCEPTOR
 io.use((socket, next) => {
-  const ip = getClientIP(socket);
-  const banRecord = bannedIPs.get(ip);
+  const entityKey = getEntityKey(socket);
+  const banRecord = bannedEntities.get(entityKey);
 
   if (banRecord) {
     if (banRecord.banUntil > Date.now()) {
       return next(new Error(`IP_BANNED:${banRecord.banUntil}:${encodeURIComponent(banRecord.reason)}`));
     } else {
-      bannedIPs.delete(ip);
-      ipStrikes.delete(ip);
+      bannedEntities.delete(entityKey);
+      entityStrikes.delete(entityKey);
     }
   }
   next();
@@ -113,10 +117,7 @@ let waitingQueue = [];
 const matches = new Map();
 
 io.on('connection', (socket) => {
-  const userIP = getClientIP(socket);
   io.emit('online-count', io.engine.clientsCount);
-
-  // Inalis ang unauthenticated socket admin bypass
 
   function leaveCurrentMatch() {
     waitingQueue = waitingQueue.filter(id => id !== socket.id);
@@ -165,6 +166,7 @@ io.on('connection', (socket) => {
     }
   });
 
+  // 🛑 REPORT HANDLER: TARGET KAUSAP LANG ANG MABABAN!
   socket.on('report-user', (data) => {
     const match = matches.get(socket.id);
     if (!match || match.reported) return;
@@ -172,21 +174,22 @@ io.on('connection', (socket) => {
 
     const targetPartner = io.sockets.sockets.get(match.partnerId);
     if (!targetPartner) {
+      leaveCurrentMatch();
       findMatch();
       return;
     }
 
     if (data.verified === true) {
-      const targetIP = getClientIP(targetPartner);
-      const strikes = (ipStrikes.get(targetIP) || 0) + 1;
-      ipStrikes.set(targetIP, strikes);
+      const targetEntity = getEntityKey(targetPartner);
+      const strikes = (entityStrikes.get(targetEntity) || 0) + 1;
+      entityStrikes.set(targetEntity, strikes);
 
       if (strikes >= 2) {
         const ONE_HOUR = 60 * 60 * 1000;
         const banUntil = Date.now() + ONE_HOUR;
         const reason = data.reason || "irrelevant image";
 
-        bannedIPs.set(targetIP, { banUntil, reason });
+        bannedEntities.set(targetEntity, { banUntil, reason });
         targetPartner.emit('ip-banned', { banUntil, reason });
 
         setTimeout(() => {
@@ -205,33 +208,28 @@ io.on('connection', (socket) => {
   });
 });
 
-// 💻 TERMINAL COMMANDS (Puwede kang mag-input sa console habang tumatakbo ang server)
+// 💻 TERMINAL COMMANDS (Direct controls via Server Console)
 process.stdin.on('data', (data) => {
   const cmd = data.toString().trim();
 
-  // 1. Kapag may nagbayad sa GCash mo, i-type mo lang: add ref 1002938475812
   if (cmd.startsWith('add ref ')) {
     const ref = cmd.replace('add ref ', '').trim();
     if (ref) {
       approvedGcashReceipts.add(ref);
-      console.log(`✅ [ADMIN] Added valid GCash Ref: ${ref}. Ready for unban!`);
+      console.log(`✅ [ADMIN] Added Valid GCash Ref: ${ref}`);
     }
-  }
-  // 2. I-unban lahat ng bans
-  else if (cmd === 'unban all') {
-    bannedIPs.clear();
-    ipStrikes.clear();
+  } else if (cmd === 'unban all') {
+    bannedEntities.clear();
+    entityStrikes.clear();
     usedGcashReferences.clear();
-    console.log("✅ All IP Bans & receipts wiped clean!");
-  }
-  // 3. I-check ang mga active bans
-  else if (cmd === 'list bans') {
-    console.log("Active Bans:", Array.from(bannedIPs.entries()));
+    console.log("✅ All Bans and receipt caches wiped clean!");
+  } else if (cmd === 'list bans') {
+    console.log("Current Bans:", Array.from(bannedEntities.entries()));
   }
 });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`🚀 MeetloopChat Server running on port ${PORT}`);
-  console.log(`💡 Tip: Kapag may nagbayad sa GCash mo, i-type sa terminal: add ref <reference_number>`);
+  console.log(`💡 Para mag-approve ng GCash bayad, i-type sa terminal: add ref <reference_number>`);
 });
