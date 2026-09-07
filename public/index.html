@@ -37,7 +37,7 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
 /* HEADER OMETV STYLE */
 header{
-  height:50px;display:flex;align-items:center;justify-content:space-between;
+  height:52px;display:flex;align-items:center;justify-content:space-between;
   padding:0 14px;background:#0d131f;border-bottom:1px solid var(--panel-border);
   position:relative;z-index:20;flex-shrink:0;
 }
@@ -46,16 +46,18 @@ header{
 .brand-text{font-size:19px;font-weight:900;letter-spacing:-0.5px;color:#fff}
 .brand-text span{color:#38bdf8}
 
+.header-meta{display:flex;align-items:center;gap:10px}
 .lang-select{
-  background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.1);
-  padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;outline:none;cursor:pointer;
+  background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.15);
+  padding:5px 10px;border-radius:8px;font-size:11.5px;font-weight:700;outline:none;cursor:pointer;
+  transition:border-color .15s;
 }
+.lang-select:hover{border-color:rgba(255,255,255,.3)}
+.lang-select option{background:#0f172a;color:#fff}
 
-/* =========================================================
-   STAGE CONTAINER (DESKTOP DEFAULT)
-========================================================= */
+/* STAGE CONTAINER (DESKTOP) */
 .stage-container{
-  width:100%;height:calc(100vh - 50px);
+  width:100%;height:calc(100vh - 52px);
   display:flex;gap:10px;padding:10px;
 }
 .stream-arena{
@@ -81,16 +83,16 @@ video{
   background:#070b12;overflow:hidden;user-select:none;
 }
 #crtStaticCanvas{
-  position:absolute;inset:0;width:100%;height:100%;opacity:0.35;
+  position:absolute;inset:0;width:100%;height:100%;opacity:0.38;
   filter:contrast(160%) brightness(85%);
 }
 .standby-center{
   position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;text-align:center;
-  padding:0 10px;
+  padding:0 12px;
 }
 .standby-logo{
-  width:110px;height:110px;margin-bottom:10px;
-  filter:drop-shadow(0 0 20px rgba(56,189,248,.45));
+  width:115px;height:115px;margin-bottom:12px;
+  filter:drop-shadow(0 0 22px rgba(56,189,248,.45));
   animation:floatLogo 3s ease-in-out infinite alternate;
 }
 @keyframes floatLogo{from{transform:translateY(0)}to{transform:translateY(-6px)}}
@@ -99,19 +101,20 @@ video{
 .standby-online-tag{
   background:rgba(15,23,42,0.85);border:1px solid rgba(255,255,255,.1);
   padding:5px 14px;border-radius:20px;font-size:12px;font-weight:800;color:#cbd5e1;
-  display:flex;align-items:center;gap:6px;box-shadow:0 4px 15px rgba(0,0,0,.5);
+  display:flex;align-items:center;gap:7px;box-shadow:0 4px 15px rgba(0,0,0,.5);
 }
 .online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
 
 /* OMETV REMOTE AUDIO CONTROL BAR */
 .remote-audio-bar{
-  position:absolute;bottom:0;left:0;right:0;height:38px;
-  background:linear-gradient(to top, rgba(0,0,0,.9), transparent);
-  display:flex;align-items:center;gap:10px;padding:0 14px;z-index:5;
+  position:absolute;bottom:0;left:0;right:0;height:40px;
+  background:linear-gradient(to top, rgba(0,0,0,.92), transparent);
+  display:flex;align-items:center;gap:12px;padding:0 16px;z-index:5;
 }
 .audio-speaker-btn{
-  width:18px;height:18px;fill:#cbd5e1;cursor:pointer;flex-shrink:0;
+  width:18px;height:18px;fill:#cbd5e1;cursor:pointer;flex-shrink:0;transition:transform .1s, fill .15s;
 }
+.audio-speaker-btn:hover{transform:scale(1.1);fill:#fff}
 .audio-slider{
   flex:1;height:5px;-webkit-appearance:none;appearance:none;background:#334155;border-radius:999px;outline:none;cursor:pointer;
 }
@@ -147,7 +150,7 @@ video{
   border:1px solid rgba(255,255,255,.1);pointer-events:none;
 }
 .cam-status-pill{
-  position:absolute;bottom:42px;left:10px;z-index:4;
+  position:absolute;bottom:44px;left:10px;z-index:4;
   background:rgba(0,0,0,.75);padding:3px 8px;border-radius:6px;
   font-size:10px;font-weight:700;color:#cbd5e1;pointer-events:none;
 }
@@ -229,7 +232,7 @@ video{
 }
 
 /* =========================================================
-   MOBILE LAYOUT ENGINE (PERFECT FIT)
+   MOBILE LAYOUT ENGINE
 ========================================================= */
 @media (max-width:850px){
   body{
@@ -245,7 +248,7 @@ video{
   }
   .stream-arena{width:100%;flex:none;gap:8px}
 
-  /* OMETV VIDEO GRID FOR MOBILE */
+  /* OMETV VIDEO GRID MOBILE */
   .video-grid{
     position:relative;width:100%;height:min(52dvh,460px);min-height:280px;
     display:block;border-radius:12px;overflow:hidden;
@@ -254,7 +257,7 @@ video{
     position:absolute;inset:0;width:100%;height:100%;
   }
 
-  /* FLOATING PIP SELF CAMERA (OMETV STYLE) */
+  /* FLOATING PIP SELF CAM */
   #localCamBox{
     position:absolute;right:8px;bottom:8px;width:30vw;max-width:115px;aspect-ratio:3/4;
     height:auto;z-index:8;border:2px solid #ffffff;border-radius:10px;
@@ -275,7 +278,7 @@ video{
   }
   #showLocalBtn.visible{display:flex !important}
 
-  /* MOBILE CONTROLS */
+  /* MOBILE ACTION BAR */
   .controls-panel{
     height:auto;display:grid;grid-template-columns:repeat(6,1fr);gap:5px;
   }
@@ -418,13 +421,13 @@ video{
     </svg>
 
     <h1 style="font-size:24px;font-weight:900;color:#fff">MeetLoop</h1>
-    <p style="font-size:12px;color:var(--text-muted);font-weight:700;margin-top:2px">Random Video Chat</p>
+    <p style="font-size:12px;color:var(--text-muted);font-weight:700;margin-top:2px" id="portalSub">Random Video Chat</p>
 
     <ul class="portal-rules">
-      <li><b>18+ Required:</b> Minors are strictly prohibited.</li>
-      <li><b>Zero Tolerance:</b> Nudity, obscene behavior, and harassment are banned.</li>
-      <li><b>Human Face Only:</b> Look directly at the camera. Walls/ceilings are banned.</li>
-      <li><b>Instant Blur Shield:</b> Safe transition on every stranger switch.</li>
+      <li id="rule1"><b>18+ Required:</b> Minors are strictly prohibited.</li>
+      <li id="rule2"><b>Zero Tolerance:</b> Nudity, obscene behavior, and harassment are banned.</li>
+      <li id="rule3"><b>Human Face Only:</b> Look directly at the camera. Walls/ceilings are banned.</li>
+      <li id="rule4"><b>Instant Blur Shield:</b> Safe transition on every stranger switch.</li>
     </ul>
 
     <button class="portal-btn" id="portalStartBtn" type="button">START CHATTING</button>
@@ -434,8 +437,8 @@ video{
 <!-- SINGLE TAB DUPLICATE OVERLAY -->
 <div id="duplicateTabOverlay">
   <div class="basic-modal-card">
-    <div style="font-size:16px;font-weight:900;color:#fff;margin-bottom:6px">MeetLoop Open in Another Tab</div>
-    <div style="font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:12px">Multiple tabs at the same time are not allowed. Session paused in this tab.</div>
+    <div style="font-size:16px;font-weight:900;color:#fff;margin-bottom:6px" id="dupTitle">MeetLoop Open in Another Tab</div>
+    <div style="font-size:11px;color:#94a3b8;line-height:1.5;margin-bottom:12px" id="dupDesc">Multiple tabs at the same time are not allowed. Session paused in this tab.</div>
     <button class="ctrl-btn btn-start-next" style="width:100%" id="reclaimSessionBtn" type="button">Use Here</button>
   </div>
 </div>
@@ -449,12 +452,12 @@ video{
         <div class="ban-snap-brand">MeetLoop</div>
       </div>
       <div class="ban-info">
-        <div class="ban-title">You're banned</div>
-        <div class="ban-reason">Reason: <span id="banReasonLabel">irrelevant image</span></div>
+        <div class="ban-title" id="banTitle">You're banned</div>
+        <div class="ban-reason"><span id="banReasonPrefix">Reason:</span> <span id="banReasonLabel">irrelevant image</span></div>
       </div>
     </div>
 
-    <div class="ban-description">
+    <div class="ban-description" id="banDesc">
       You can return to the chat immediately by paying for unban via <b>GCash</b>.
     </div>
 
@@ -489,20 +492,20 @@ video{
       <button class="gcash-verify-btn" id="gcashVerifyBtn" onclick="verifyGcashPayment()">Verify Payment</button>
     </div>
 
-    <button class="gcash-cancel-btn" onclick="closeGcashModal()">Back</button>
+    <button class="gcash-cancel-btn" onclick="closeGcashModal()" id="gcashCancelBtn">Back</button>
   </div>
 </div>
 
 <!-- HUMAN FACE WARNING MODAL -->
 <div id="faceModal" class="basic-modal">
   <div class="basic-modal-card">
-    <div style="color:#ef4444;font-size:15px;font-weight:900;margin-bottom:6px">Face Required</div>
-    <div style="color:#cbd5e1;font-size:11px;line-height:1.5;margin-bottom:14px">Point your camera at your face. Covered cameras, ceilings, or static photos are strictly prohibited.</div>
-    <button class="ctrl-btn btn-start-next" style="width:100%" onclick="document.getElementById('faceModal').style.display='none'">I Understand</button>
+    <div style="color:#ef4444;font-size:15px;font-weight:900;margin-bottom:6px" id="faceModalTitle">Face Required</div>
+    <div style="color:#cbd5e1;font-size:11px;line-height:1.5;margin-bottom:14px" id="faceModalDesc">Point your camera at your face. Covered cameras, ceilings, or static photos are strictly prohibited.</div>
+    <button class="ctrl-btn btn-start-next" style="width:100%" onclick="document.getElementById('faceModal').style.display='none'" id="faceModalBtn">I Understand</button>
   </div>
 </div>
 
-<!-- HEADER (CLEAN BRAND ONLY) -->
+<!-- HEADER -->
 <header>
   <div class="brand">
     <svg class="brand-logo" viewBox="0 0 100 100">
@@ -514,8 +517,14 @@ video{
 
   <div class="header-meta">
     <select id="languageSelect" class="lang-select">
-      <option value="en" selected>English</option>
-      <option value="tl">Tagalog</option>
+      <option value="en">English (US)</option>
+      <option value="tl">Tagalog (PH)</option>
+      <option value="es">Español (ES)</option>
+      <option value="ja">日本語 (JA)</option>
+      <option value="ko">한국어 (KO)</option>
+      <option value="zh">中文 (ZH)</option>
+      <option value="fr">Français (FR)</option>
+      <option value="id">Bahasa Indonesia</option>
     </select>
   </div>
 </header>
@@ -529,7 +538,7 @@ video{
         <video id="remoteVideo" class="remote-blur" autoplay playsinline webkit-playsinline></video>
         <audio id="remoteAudio" autoplay playsinline></audio>
 
-        <!-- OmeTV Standby Screen with Accurate Live Online Counter -->
+        <!-- OmeTV Standby Screen -->
         <div id="standbyScreen">
           <canvas id="crtStaticCanvas"></canvas>
           <div class="standby-center">
@@ -540,7 +549,7 @@ video{
             <div class="standby-title">MeetLoop</div>
             <div class="standby-online-tag">
               <span class="online-dot"></span>
-              <span id="standbyUsers">Connecting...</span> users online
+              <span id="standbyUsers">Connecting...</span> <span id="standbyUsersLabel">users online</span>
             </div>
           </div>
         </div>
@@ -590,13 +599,13 @@ video{
   <!-- Chat Arena -->
   <div class="chat-arena">
     <div class="chat-head">
-      <span class="chat-head-title">Live Chat</span>
+      <span class="chat-head-title" id="chatHeadTitle">Live Chat</span>
       <span style="font-size:10px;color:var(--text-muted);font-weight:700">MeetLoop</span>
     </div>
     <div class="chat-stream" id="chatStream">
       <div class="chat-msg">
-        <div class="chat-author">MeetLoop System</div>
-        <div class="chat-bubble chat-rules-card">
+        <div class="chat-author" id="chatRulesAuthor">MeetLoop System</div>
+        <div class="chat-bubble chat-rules-card" id="chatRulesCard">
           <span class="chat-rules-badge">RULES</span><br>
           <b>Welcome to MeetLoop.</b><br>
           • 18+ only. Nudity, obscene behavior, or spam are strictly banned.<br>
@@ -616,7 +625,175 @@ video{
 "use strict";
 
 /* =========================================================
-   1. USER IDENTIFIER & INITIAL SETUP
+   1. TRANSLATION DICTIONARY (8 LANGUAGES)
+========================================================= */
+const i18n = {
+  en: {
+    start: "Start", next: "Next", stop: "Stop", micOn: "Mic On", micOff: "Mic Off",
+    camOn: "Cam On", camOff: "Cam Off", flip: "Flip", showCam: "Show Cam",
+    stranger: "Stranger", you: "You", waiting: "Waiting...", searching: "Searching...",
+    looking: "Looking for someone...", live: "Live", stopped: "Stopped",
+    report: "Report", chat: "Live Chat", send: "Send", inputPlaceholder: "Type a message...",
+    usersOnline: "users online", connecting: "Connecting...",
+    portalBtn: "START CHATTING", camOffLabel: "Camera Off",
+    faceTitle: "Face Required", faceDesc: "Point your camera at your face. Covered cameras, ceilings, or static photos are strictly prohibited.",
+    faceBtn: "I Understand",
+    dupTitle: "MeetLoop Open in Another Tab", dupDesc: "Multiple tabs at the same time are not allowed. Session paused in this tab.",
+    dupBtn: "Use Here",
+    rulesCard: `<span class="chat-rules-badge">RULES</span><br><b>Welcome to MeetLoop.</b><br>• 18+ only. Nudity, obscene behavior, or spam are strictly banned.<br>• Real face required. Point camera towards you.`
+  },
+  tl: {
+    start: "Simulan", next: "Kasunod", stop: "Itigil", micOn: "Mic Bukas", micOff: "Mic Off",
+    camOn: "Cam Bukas", camOff: "Cam Off", flip: "Iikot", showCam: "Ipakita Cam",
+    stranger: "Kausap", you: "Ikaw", waiting: "Naghihintay...", searching: "Naghahanap...",
+    looking: "Naghahanap ng makakausap...", live: "Live", stopped: "Tinigil",
+    report: "I-report", chat: "Usapan", send: "Ipadala", inputPlaceholder: "Mag-type ng mensahe...",
+    usersOnline: "ang online", connecting: "Kumukonekta...",
+    portalBtn: "SIMULAN ANG CHAT", camOffLabel: "Naka-off ang Camera",
+    faceTitle: "Kailangan ng Mukha", faceDesc: "Itapat ang camera sa iyong mukha. Mahigpit na ipinagbabawal ang takpan ang cam, kisame, o litrato.",
+    faceBtn: "Naiintindihan ko",
+    dupTitle: "Bukas ang MeetLoop sa Ibang Tab", dupDesc: "Bawal ang dalawang tab nang sabay. Naka-pause ang session dito.",
+    dupBtn: "Gamitin Dito",
+    rulesCard: `<span class="chat-rules-badge">MGA PATAKARAN</span><br><b>Maligayang pagdating sa MeetLoop.</b><br>• 18+ lamang. Bawal ang kabastusan, paghuhubad, at pang-aabuso.<br>• Tunay na tao at mukha ang kailangan.`
+  },
+  es: {
+    start: "Iniciar", next: "Siguiente", stop: "Parar", micOn: "Mic On", micOff: "Mic Off",
+    camOn: "Cám On", camOff: "Cám Off", flip: "Girar", showCam: "Ver Cám",
+    stranger: "Desconocido", you: "Tú", waiting: "Esperando...", searching: "Buscando...",
+    looking: "Buscando a alguien...", live: "En vivo", stopped: "Detenido",
+    report: "Reportar", chat: "Chat en Vivo", send: "Enviar", inputPlaceholder: "Escribe un mensaje...",
+    usersOnline: "usuarios en línea", connecting: "Conectando...",
+    portalBtn: "EMPEZAR CHAT", camOffLabel: "Cámara Apagada",
+    faceTitle: "Rostro Requerido", faceDesc: "Apunta la cámara a tu cara. Prohibido tapar la cámara, techos o fotos fijas.",
+    faceBtn: "Entendido",
+    dupTitle: "MeetLoop Abierto en Otra Pestaña", dupDesc: "No se permiten múltiples pestañas. Sesión en pausa aquí.",
+    dupBtn: "Usar Aquí",
+    rulesCard: `<span class="chat-rules-badge">REGLAS</span><br><b>Bienvenido a MeetLoop.</b><br>• Solo mayores de 18 años. Prohibida la desnudez o el acoso.<br>• Rostro humano real requerido.`
+  },
+  ja: {
+    start: "開始", next: "次へ", stop: "停止", micOn: "マイクオン", micOff: "マイクオフ",
+    camOn: "カメラオン", camOff: "カメラオフ", flip: "反転", showCam: "カメラ表示",
+    stranger: "相手", you: "あなた", waiting: "待機中...", searching: "検索中...",
+    looking: "相手を探しています...", live: "ライブ", stopped: "停止",
+    report: "通報", chat: "チャット", send: "送信", inputPlaceholder: "メッセージを入力...",
+    usersOnline: "人がオンライン", connecting: "接続中...",
+    portalBtn: "チャットを開始", camOffLabel: "カメラオフ",
+    faceTitle: "顔の表示が必須", faceDesc: "カメラを顔に向けてください。天井、壁、写真の表示は禁止されています。",
+    faceBtn: "了解",
+    dupTitle: "別のタブで開かれています", dupDesc: "複数タブでの同時利用はできません。このタブは一時停止中です。",
+    dupBtn: "ここで使う",
+    rulesCard: `<span class="chat-rules-badge">ルール</span><br><b>MeetLoopへようこそ</b><br>• 18歳以上限定。ヌードや嫌がらせは禁止です。<br>• 実際の顔を映してください。`
+  },
+  ko: {
+    start: "시작", next: "다음", stop: "중지", micOn: "마이크 켜짐", micOff: "마이크 꺼짐",
+    camOn: "카메라 켜짐", camOff: "카메라 꺼짐", flip: "전환", showCam: "카메라 보기",
+    stranger: "상대방", you: "나", waiting: "대기 중...", searching: "검색 중...",
+    looking: "상대를 찾는 중...", live: "라이브", stopped: "중지됨",
+    report: "신고", chat: "라이브 채팅", send: "전송", inputPlaceholder: "메시지 입력...",
+    usersOnline: "명 온라인", connecting: "연결 중...",
+    portalBtn: "채팅 시작", camOffLabel: "카메라 꺼짐",
+    faceTitle: "얼굴 인식 필요", faceDesc: "카메라에 얼굴이 나오도록 해주세요. 천장, 벽, 사진은 금지됩니다.",
+    faceBtn: "확인했습니다",
+    dupTitle: "다른 탭에서 실행 중", dupDesc: "여러 탭을 동시에 실행할 수 없습니다. 이 탭은 일시 중지됩니다.",
+    dupBtn: "여기서 사용",
+    rulesCard: `<span class="chat-rules-badge">규칙</span><br><b>MeetLoop에 오신 것을 환영합니다.</b><br>• 18세 이상 이용 가능. 음란물 및 괴롭힘 엄격 금지.<br>• 실제 얼굴이 보여야 합니다.`
+  },
+  zh: {
+    start: "开始", next: "下一个", stop: "停止", micOn: "麦克风开", micOff: "麦克风关",
+    camOn: "摄像头开", camOff: "摄像头关", flip: "翻转", showCam: "显示相机",
+    stranger: "陌生人", you: "你", waiting: "等待中...", searching: "匹配中...",
+    looking: "正在寻找聊天对象...", live: "直播中", stopped: "已停止",
+    report: "举报", chat: "实时聊天", send: "发送", inputPlaceholder: "输入消息...",
+    usersOnline: "人在线", connecting: "连接中...",
+    portalBtn: "开始聊天", camOffLabel: "摄像头已关闭",
+    faceTitle: "必须露脸", faceDesc: "请正对摄像头。严禁对准天花板、墙壁或使用静态图片。",
+    faceBtn: "我明白了",
+    dupTitle: "已在其他标签页打开", dupDesc: "禁止同时打开多个标签页。当前标签页已暂停。",
+    dupBtn: "在此使用",
+    rulesCard: `<span class="chat-rules-badge">规则</span><br><b>欢迎来到 MeetLoop。</b><br>• 仅限18岁以上。严禁裸露、低俗及骚扰行为。<br>• 必须展示真实人脸。`
+  },
+  fr: {
+    start: "Démarrer", next: "Suivant", stop: "Arrêter", micOn: "Micro On", micOff: "Micro Off",
+    camOn: "Cam On", camOff: "Cam Off", flip: "Tourner", showCam: "Voir Cam",
+    stranger: "Inconnu", you: "Vous", waiting: "En attente...", searching: "Recherche...",
+    looking: "Recherche de partenaire...", live: "En direct", stopped: "Arrêté",
+    report: "Signaler", chat: "Chat en direct", send: "Envoyer", inputPlaceholder: "Écrivez un message...",
+    usersOnline: "utilisateurs en ligne", connecting: "Connexion...",
+    portalBtn: "COMMENCER LE CHAT", camOffLabel: "Caméra Désactivée",
+    faceTitle: "Visage Requis", faceDesc: "Pointez la caméra vers votre visage. Murs, plafonds et photos statiques interdits.",
+    faceBtn: "J'ai compris",
+    dupTitle: "MeetLoop Ouvert sur un Autre Onglet", dupDesc: "Plusieurs onglets simultanés interdits. Session suspendue ici.",
+    dupBtn: "Utiliser Ici",
+    rulesCard: `<span class="chat-rules-badge">RÈGLES</span><br><b>Bienvenue sur MeetLoop.</b><br>• 18+ uniquement. Nudité et harcèlement interdits.<br>• Visage réel requis.`
+  },
+  id: {
+    start: "Mulai", next: "Lanjut", stop: "Berhenti", micOn: "Mik Nyala", micOff: "Mik Mati",
+    camOn: "Kamera Nyala", camOff: "Kamera Mati", flip: "Putar", showCam: "Buka Kamera",
+    stranger: "Orang Lain", you: "Anda", waiting: "Menunggu...", searching: "Mencari...",
+    looking: "Mencari seseorang...", live: "Langsung", stopped: "Berhenti",
+    report: "Lapor", chat: "Obrolan", send: "Kirim", inputPlaceholder: "Ketik pesan...",
+    usersOnline: "pengguna online", connecting: "Menghubungkan...",
+    portalBtn: "MULAI OBROLAN", camOffLabel: "Kamera Mati",
+    faceTitle: "Wajah Diperlukan", faceDesc: "Arahkan kamera ke wajah Anda. Dilarang menutupi kamera, dinding, atau foto.",
+    faceBtn: "Saya Mengerti",
+    dupTitle: "MeetLoop Terbuka di Tab Lain", dupDesc: "Tidak boleh membuka beberapa tab sekaligus. Sesi dijeda di tab ini.",
+    dupBtn: "Gunakan di Sini",
+    rulesCard: `<span class="chat-rules-badge">ATURAN</span><br><b>Selamat datang di MeetLoop.</b><br>• Khusus 18+. Dilarang pornografi atau pelecehan.<br>• Wajib menampakkan wajah asli.`
+  }
+};
+
+let currentLang = localStorage.getItem("meetloop_lang") || "en";
+if (!i18n[currentLang]) currentLang = "en";
+
+function t(key) {
+  return i18n[currentLang]?.[key] || i18n["en"][key] || "";
+}
+
+function applyTranslations() {
+  document.getElementById("remoteTag").textContent = t("stranger");
+  document.getElementById("localTag").textContent = t("you");
+  document.getElementById("reportBtn").textContent = t("report");
+  document.getElementById("chatHeadTitle").textContent = t("chat");
+  document.getElementById("sendBtn").textContent = t("send");
+  document.getElementById("chatInput").placeholder = t("inputPlaceholder");
+  document.getElementById("showLocalBtn").textContent = t("showCam");
+  document.getElementById("camOffCover").textContent = t("camOffLabel");
+  document.getElementById("standbyUsersLabel").textContent = t("usersOnline");
+  document.getElementById("portalStartBtn").textContent = t("portalBtn");
+
+  document.getElementById("faceModalTitle").textContent = t("faceTitle");
+  document.getElementById("faceModalDesc").textContent = t("faceDesc");
+  document.getElementById("faceModalBtn").textContent = t("faceBtn");
+
+  document.getElementById("dupTitle").textContent = t("dupTitle");
+  document.getElementById("dupDesc").textContent = t("dupDesc");
+  document.getElementById("reclaimSessionBtn").textContent = t("dupBtn");
+
+  const rulesCard = document.getElementById("chatRulesCard");
+  if (rulesCard) rulesCard.innerHTML = t("rulesCard");
+
+  // Dynamic buttons state update
+  if (!connected && !searching) {
+    document.getElementById("mainActionBtn").textContent = t("start");
+    document.getElementById("remoteStatus").textContent = t("waiting");
+  } else {
+    document.getElementById("mainActionBtn").textContent = t("next");
+  }
+  document.getElementById("stopBtn").textContent = t("stop");
+  document.getElementById("flipBtn").textContent = t("flip");
+
+  updateMediaButtonsText();
+}
+
+function updateMediaButtonsText() {
+  const aTrack = localStream?.getAudioTracks()[0];
+  const vTrack = localStream?.getVideoTracks()[0];
+  document.getElementById("micBtn").textContent = (aTrack && !aTrack.enabled) ? t("micOff") : t("micOn");
+  document.getElementById("camBtn").textContent = (vTrack && !vTrack.enabled) ? t("camOff") : t("camOn");
+}
+
+/* =========================================================
+   2. USER IDENTIFIER & INITIAL SETUP
 ========================================================= */
 let myDeviceId = localStorage.getItem("meetloop_device_id") || "dev_" + Math.random().toString(36).substr(2, 9);
 localStorage.setItem("meetloop_device_id", myDeviceId);
@@ -652,6 +829,14 @@ const sendBtn = document.getElementById("sendBtn");
 const audioSlider = document.getElementById("audioSlider");
 const speakerIcon = document.getElementById("speakerIcon");
 const standbyUsers = document.getElementById("standbyUsers");
+const languageSelect = document.getElementById("languageSelect");
+
+languageSelect.value = currentLang;
+languageSelect.addEventListener("change", (e) => {
+  currentLang = e.target.value;
+  localStorage.setItem("meetloop_lang", currentLang);
+  applyTranslations();
+});
 
 let socket = null;
 try {
@@ -677,7 +862,7 @@ lastPartnerCanvas.width = 110;
 lastPartnerCanvas.height = 110;
 
 /* =========================================================
-   2. ENTER MEETLOOP
+   3. ENTER MEETLOOP PORTAL
 ========================================================= */
 function enterMeetLoop() {
   const portal = document.getElementById("welcomePortal");
@@ -691,7 +876,7 @@ if (portalStartBtn) {
 }
 
 /* =========================================================
-   3. SINGLE TAB CONTROLLER
+   4. SINGLE TAB CONTROLLER
 ========================================================= */
 const currentTabId = "tab_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
 const tabChannel = window.BroadcastChannel ? new BroadcastChannel("meetloop_single_tab_bus") : null;
@@ -746,7 +931,7 @@ document.getElementById("reclaimSessionBtn").addEventListener("click", () => {
 });
 
 /* =========================================================
-   4. OMETV CRT TV STATIC NOISE
+   5. OMETV CRT TV STATIC NOISE
 ========================================================= */
 function runTVStatic() {
   if (!crtStaticCanvas) return;
@@ -788,13 +973,14 @@ speakerIcon.addEventListener("click", () => {
 });
 
 /* =========================================================
-   5. CAMERA ENGINE & MOBILE STREAM OPTIMIZATION
+   6. CAMERA & SENSOR VERIFICATION
 ========================================================= */
 async function startMedia(specificDeviceId = null) {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live') && !specificDeviceId) {
     if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
     camOffCover.style.display = "none";
     try { await localVideo.play(); } catch(e){}
+    updateMediaButtonsText();
     return true;
   }
 
@@ -823,6 +1009,7 @@ async function startMedia(specificDeviceId = null) {
     localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
     camOffCover.style.display = "none";
     try { await localVideo.play(); } catch(e){}
+    updateMediaButtonsText();
     return true;
   } catch(err) {
     try {
@@ -830,6 +1017,7 @@ async function startMedia(specificDeviceId = null) {
       localVideo.srcObject = localStream;
       camOffCover.style.display = "none";
       try { await localVideo.play(); } catch(e){}
+      updateMediaButtonsText();
       return true;
     } catch(e) {
       camOffCover.style.display = "flex";
@@ -857,7 +1045,7 @@ async function verifyCameraSensor() {
 }
 
 /* =========================================================
-   6. 1-SECOND PROTECTION BLUR
+   7. 1-SECOND PROTECTION BLUR
 ========================================================= */
 function enableBlur() {
   if (blurTimer) clearTimeout(blurTimer);
@@ -873,7 +1061,7 @@ function releaseBlur() {
 }
 
 /* =========================================================
-   7. SEARCH & WEBRTC ENGINE
+   8. SEARCH & WEBRTC ENGINE
 ========================================================= */
 async function triggerStartNext() {
   if (inCooldown || isTabTerminated) return;
@@ -885,6 +1073,7 @@ async function triggerStartNext() {
 
   standbyScreen.style.display = "none";
   searchOverlay.style.display = "flex";
+  searchText.textContent = t("looking");
 
   const pass = await verifyCameraSensor();
   if (!pass) {
@@ -903,8 +1092,8 @@ async function triggerStartNext() {
 
   connected = false;
   searching = true;
-  remoteStatus.textContent = "Searching...";
-  mainActionBtn.textContent = "Next";
+  remoteStatus.textContent = t("searching");
+  mainActionBtn.textContent = t("next");
   mainActionBtn.disabled = false;
   stopBtn.disabled = false;
 
@@ -924,8 +1113,8 @@ function stopSession() {
   closePeerConnection();
 
   searchOverlay.style.display = "none";
-  remoteStatus.textContent = "Stopped";
-  mainActionBtn.textContent = "Start";
+  remoteStatus.textContent = t("stopped");
+  mainActionBtn.textContent = t("start");
   mainActionBtn.disabled = false;
   stopBtn.disabled = true;
 }
@@ -957,7 +1146,7 @@ function createPeer(initiator) {
   peerConnection.ontrack = (e) => {
     standbyScreen.style.display = "none";
     searchOverlay.style.display = "none";
-    remoteStatus.textContent = "Live";
+    remoteStatus.textContent = t("live");
     const stream = (e.streams && e.streams[0]) ? e.streams[0] : null;
 
     if (stream) {
@@ -980,6 +1169,7 @@ function createPeer(initiator) {
       searching = false;
       standbyScreen.style.display = "none";
       searchOverlay.style.display = "none";
+      remoteStatus.textContent = t("live");
       reportBtn.disabled = false;
       releaseBlur();
     }
@@ -999,7 +1189,7 @@ function createPeer(initiator) {
 
 function setupDataChannel(ch) {
   dataChannel = ch;
-  ch.onmessage = (e) => addChatMessage("Stranger", e.data);
+  ch.onmessage = (e) => addChatMessage(t("stranger"), e.data);
 }
 
 function closePeerConnection() {
@@ -1023,7 +1213,7 @@ function closePeerConnection() {
 }
 
 /* =========================================================
-   8. SOCKET LISTENERS & ONLINE COUNT
+   9. SOCKET LISTENERS & ONLINE COUNTER
 ========================================================= */
 if (socket) {
   socket.on("online-count", count => {
@@ -1036,7 +1226,7 @@ if (socket) {
     enableBlur();
     standbyScreen.style.display = "none";
     searchOverlay.style.display = "flex";
-    remoteStatus.textContent = "Waiting...";
+    remoteStatus.textContent = t("waiting");
   });
 
   socket.on("match", data => {
@@ -1061,7 +1251,7 @@ if (socket) {
   });
 
   socket.on("partner-disconnected", () => {
-    addChatMessage("System", "Stranger disconnected.");
+    addChatMessage("MeetLoop", "Stranger disconnected.");
     triggerStartNext();
   });
 
@@ -1073,7 +1263,7 @@ if (socket) {
 }
 
 /* =========================================================
-   9. BAN SCREEN & EVIDENCE
+   10. BAN SCREEN & GCASH UNBAN
 ========================================================= */
 function recordPartnerFrame() {
   if (remoteVideo && remoteVideo.videoWidth > 0) {
@@ -1119,6 +1309,7 @@ function runBanCountdown(banUntil, reason = "irrelevant image") {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+  applyTranslations();
   const cachedBan = parseInt(localStorage.getItem("meetloop_banned_until"), 10);
   if (cachedBan && cachedBan > Date.now()) {
     runBanCountdown(cachedBan, localStorage.getItem("meetloop_banned_reason") || "irrelevant image");
@@ -1199,7 +1390,7 @@ if (adminUnbanBtn) {
 }
 
 /* =========================================================
-   10. CHAT & CONTROL ATTACHMENTS
+   11. CHAT & CONTROL ATTACHMENTS
 ========================================================= */
 function addChatMessage(author, msg) {
   const div = document.createElement("div");
@@ -1213,7 +1404,7 @@ function sendChat() {
   const val = chatInput.value.trim();
   if (!val || !dataChannel || dataChannel.readyState !== "open") return;
   dataChannel.send(val);
-  addChatMessage("You", val);
+  addChatMessage(t("you"), val);
   chatInput.value = "";
 }
 
@@ -1240,19 +1431,22 @@ window.addEventListener("keydown", (e) => {
 });
 
 micBtn.addEventListener("click", () => {
-  const t = localStream?.getAudioTracks()[0];
-  if (t) { t.enabled = !t.enabled; micBtn.textContent = t.enabled ? "Mic On" : "Mic Off"; }
+  const tTrack = localStream?.getAudioTracks()[0];
+  if (tTrack) { 
+    tTrack.enabled = !tTrack.enabled; 
+    updateMediaButtonsText();
+  }
 });
 camBtn.addEventListener("click", () => {
-  const t = localStream?.getVideoTracks()[0];
-  if (t) {
-    t.enabled = !t.enabled;
-    camBtn.textContent = t.enabled ? "Cam On" : "Cam Off";
-    camOffCover.style.display = t.enabled ? "none" : "flex";
+  const tTrack = localStream?.getVideoTracks()[0];
+  if (tTrack) {
+    tTrack.enabled = !tTrack.enabled;
+    updateMediaButtonsText();
+    camOffCover.style.display = tTrack.enabled ? "none" : "flex";
   }
 });
 
-// Front / Back camera flip for mobile
+// Front / Back camera flip
 flipBtn.addEventListener("click", async () => {
   currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
   const oldTrack = localStream?.getVideoTracks()[0];
@@ -1272,7 +1466,7 @@ reportBtn.addEventListener("click", () => {
   triggerStartNext();
 });
 
-// Hide / Show Local PiP Camera on Mobile
+// Mobile PiP Hide / Show Cam
 document.getElementById("hideLocalBtn").addEventListener("click", (e) => {
   e.stopPropagation();
   localCamBox.classList.add("hidden-cam");
