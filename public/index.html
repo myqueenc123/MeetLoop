@@ -44,18 +44,12 @@ header{
 .brand-text span{color:#38bdf8}
 
 .header-meta{display:flex;align-items:center;gap:10px}
-.badge-online{
-  display:flex;align-items:center;gap:6px;background:#1e293b;
-  padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;color:#94a3b8;
-  border:1px solid rgba(255,255,255,.07);
-}
-.online-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
-.badge-online span.count{color:#fff;font-weight:800}
-
 .lang-select{
   background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.1);
-  padding:5px 10px;border-radius:8px;font-size:12px;font-weight:700;outline:none;cursor:pointer;
+  padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;outline:none;cursor:pointer;
+  transition:border-color .15s;
 }
+.lang-select:hover{border-color:rgba(255,255,255,.25)}
 
 /* MAIN CHAT STAGE */
 .stage-container{
@@ -84,8 +78,8 @@ video{
   background:#070b12;overflow:hidden;user-select:none;
 }
 #crtStaticCanvas{
-  position:absolute;inset:0;width:100%;height:100%;opacity:0.35;
-  filter:contrast(160%) brightness(85%);
+  position:absolute;inset:0;width:100%;height:100%;opacity:0.40;
+  filter:contrast(170%) brightness(80%);
 }
 .standby-center{
   position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;text-align:center;
@@ -103,6 +97,7 @@ video{
   padding:5px 14px;border-radius:20px;font-size:13px;font-weight:800;color:#cbd5e1;
   display:flex;align-items:center;gap:7px;box-shadow:0 4px 15px rgba(0,0,0,.5);
 }
+.online-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
 
 /* OMETV REMOTE AUDIO CONTROL BAR */
 .remote-audio-bar{
@@ -111,7 +106,7 @@ video{
   display:flex;align-items:center;gap:12px;padding:0 16px;z-index:5;
 }
 .audio-speaker-btn{
-  width:20px;height:20px;fill:#cbd5e1;cursor:pointer;flex-shrink:0;transition:transform .1s;
+  width:20px;height:20px;fill:#cbd5e1;cursor:pointer;flex-shrink:0;transition:transform .1s, fill .15s;
 }
 .audio-speaker-btn:hover{transform:scale(1.1);fill:#fff}
 .audio-slider{
@@ -477,7 +472,7 @@ video{
   </div>
 </div>
 
-<!-- HEADER -->
+<!-- HEADER (CLEAN - NO TOP ONLINE COUNTER) -->
 <header>
   <div class="brand">
     <svg class="brand-logo" viewBox="0 0 100 100">
@@ -488,7 +483,6 @@ video{
   </div>
 
   <div class="header-meta">
-    <div class="badge-online"><span class="online-dot"></span>Online: <span class="count" id="onlineCounter">270,658</span></div>
     <select id="languageSelect" class="lang-select">
       <option value="en" selected>English</option>
       <option value="tl">Tagalog</option>
@@ -505,7 +499,7 @@ video{
         <video id="remoteVideo" class="remote-blur" autoplay playsinline webkit-playsinline></video>
         <audio id="remoteAudio" autoplay playsinline></audio>
 
-        <!-- OmeTV Standby Screen -->
+        <!-- OmeTV Standby Screen with Accurate Live Online Counter -->
         <div id="standbyScreen">
           <canvas id="crtStaticCanvas"></canvas>
           <div class="standby-center">
@@ -516,7 +510,7 @@ video{
             <div class="standby-title">MeetLoop</div>
             <div class="standby-online-tag">
               <span class="online-dot"></span>
-              <span id="standbyUsers">270,658</span> users online
+              <span id="standbyUsers">Connecting...</span> users online
             </div>
           </div>
         </div>
@@ -627,7 +621,6 @@ const sendBtn = document.getElementById("sendBtn");
 
 const audioSlider = document.getElementById("audioSlider");
 const speakerIcon = document.getElementById("speakerIcon");
-const onlineCounter = document.getElementById("onlineCounter");
 const standbyUsers = document.getElementById("standbyUsers");
 
 let socket = null;
@@ -647,6 +640,7 @@ let currentFacingMode = "user";
 let banInterval = null;
 let blurTimer = null;
 let isTabTerminated = false;
+let lastVolume = 1.0;
 
 let lastPartnerCanvas = document.createElement("canvas");
 lastPartnerCanvas.width = 120;
@@ -734,7 +728,9 @@ function runTVStatic() {
     if (standbyScreen.style.display === "none") return;
     const imgData = ctx.createImageData(w, h);
     const buf = new Uint32Array(imgData.data.buffer);
-    for (let i = 0; i < buf.length; i++) buf[i] = ((255 * Math.random()) | 0) << 24;
+    for (let i = 0; i < buf.length; i++) {
+      buf[i] = ((255 * Math.random()) | 0) << 24;
+    }
     ctx.putImageData(imgData, 0, 0);
     requestAnimationFrame(noise);
   }
@@ -742,16 +738,23 @@ function runTVStatic() {
 }
 runTVStatic();
 
-audioSlider.addEventListener("input", (e) => {
-  const v = parseFloat(e.target.value);
-  if (remoteAudio) remoteAudio.volume = v;
-  if (remoteVideo) remoteVideo.volume = v;
-});
-speakerIcon.addEventListener("click", () => {
-  const v = audioSlider.value > 0 ? 0 : 1;
+function applyVolume(v) {
+  lastVolume = v;
   audioSlider.value = v;
   if (remoteAudio) remoteAudio.volume = v;
   if (remoteVideo) remoteVideo.volume = v;
+}
+
+audioSlider.addEventListener("input", (e) => {
+  applyVolume(parseFloat(e.target.value));
+});
+
+speakerIcon.addEventListener("click", () => {
+  if (audioSlider.value > 0) {
+    applyVolume(0);
+  } else {
+    applyVolume(1.0);
+  }
 });
 
 /* =========================================================
@@ -820,7 +823,7 @@ async function verifyCameraSensor() {
     totalLuma += 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
   }
   const avg = totalLuma / (W * H);
-  return avg > 12 && avg < 248;
+  return avg > 10 && avg < 250;
 }
 
 /* =========================================================
@@ -936,6 +939,7 @@ function createPeer(initiator) {
       if (!remoteAudio.srcObject) remoteAudio.srcObject = new MediaStream();
       remoteAudio.srcObject.addTrack(e.track);
     }
+    applyVolume(lastVolume);
     remoteVideo.play().catch(()=>{});
     remoteAudio.play().catch(()=>{});
   };
@@ -993,9 +997,8 @@ function closePeerConnection() {
 ========================================================= */
 if (socket) {
   socket.on("online-count", count => {
-    const c = Math.max(count, 270658).toLocaleString();
-    onlineCounter.textContent = c;
-    standbyUsers.textContent = c;
+    const formatted = Number(count).toLocaleString();
+    standbyUsers.textContent = formatted;
   });
 
   socket.on("waiting", () => {
@@ -1035,6 +1038,8 @@ if (socket) {
   socket.on("ip-banned", data => {
     runBanCountdown(data.banUntil, data.reason);
   });
+} else {
+  standbyUsers.textContent = "1";
 }
 
 /* =========================================================
@@ -1164,7 +1169,7 @@ if (adminUnbanBtn) {
 }
 
 /* =========================================================
-   10. UI HELPERS & CHAT
+   10. UI HELPERS, KEYBOARD SHORTCUTS & CHAT
 ========================================================= */
 function addChatMessage(author, msg) {
   const div = document.createElement("div");
@@ -1185,7 +1190,24 @@ function sendChat() {
 mainActionBtn.addEventListener("click", triggerStartNext);
 stopBtn.addEventListener("click", stopSession);
 sendBtn.addEventListener("click", sendChat);
-chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") sendChat(); });
+chatInput.addEventListener("keydown", (e) => { 
+  if (e.key === "Enter") {
+    e.preventDefault();
+    sendChat(); 
+  }
+});
+
+// OmeTV Keyboard Shortcuts (Desktop space/esc)
+window.addEventListener("keydown", (e) => {
+  if (document.activeElement === chatInput || document.activeElement.tagName === "INPUT") return;
+  if (e.code === "Space") {
+    e.preventDefault();
+    if (!mainActionBtn.disabled) triggerStartNext();
+  } else if (e.code === "Escape") {
+    e.preventDefault();
+    if (!stopBtn.disabled) stopSession();
+  }
+});
 
 micBtn.addEventListener("click", () => {
   const t = localStream?.getAudioTracks()[0];
