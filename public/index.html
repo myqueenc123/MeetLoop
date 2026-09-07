@@ -69,7 +69,7 @@ video{
   background:#030712;display:block;
 }
 
-/* ================= AUTHENTIC OMETV TV STATIC NOISE WITH SCANLINES ================= */
+/* ================= AUTHENTIC OMETV CRT SCREEN WRAPPER ================= */
 .crt-screen-wrapper{
   position:absolute;inset:0;z-index:2;
   overflow:hidden;background:#050811;
@@ -80,7 +80,6 @@ video{
   opacity:0.35;filter:contrast(200%) brightness(95%);
   display:block;
 }
-/* Authentic CRT TV Scanline & Vignette Effect */
 .crt-overlay-vignette{
   position:absolute;inset:0;
   background:radial-gradient(circle, rgba(0,0,0,0) 50%, rgba(0,0,0,0.85) 100%),
@@ -509,7 +508,6 @@ video{
       <!-- STRANGER BOX -->
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" class="remote-blur" autoplay playsinline webkit-playsinline></video>
-        <audio id="remoteAudio" autoplay playsinline></audio>
 
         <!-- AUTHENTIC OMETV CRT SCREEN WRAPPER -->
         <div class="crt-screen-wrapper" id="crtWrapper">
@@ -687,7 +685,6 @@ const crtStaticCanvas = document.getElementById("crtStaticCanvas");
 const standbyCenter = document.getElementById("standbyCenter");
 const searchLoader = document.getElementById("searchLoader");
 const remoteVideo = document.getElementById("remoteVideo");
-const remoteAudio = document.getElementById("remoteAudio");
 const localVideo = document.getElementById("localVideo");
 const localCamBox = document.getElementById("localCamBox");
 const camOffCover = document.getElementById("camOffCover");
@@ -732,7 +729,6 @@ function runTVStatic() {
   function noise() {
     if (crtWrapper && crtWrapper.style.display !== "none") {
       for (let i = 0; i < len; i++) {
-        // Authentic TV Phosphor Noise Generation (Grayscale with full alpha)
         const gray = (Math.random() * 255) | 0;
         buffer[i] = (255 << 24) | (gray << 16) | (gray << 8) | gray;
       }
@@ -862,91 +858,70 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 8. GCASH UNBAN VERIFIER ================= */
-async function verifyGCashTransaction() {
+/* ================= 8. STRICT GCASH UNBAN VERIFIER ================= */
+function verifyGCashTransaction() {
   const refInput = document.getElementById("gcashRefInput");
   const status = document.getElementById("gcashRefStatus");
   const btn = document.getElementById("gcashVerifyBtn");
-  const refVal = refInput.value.trim().replace(/\s+/g, '');
+  const refVal = refInput.value.trim().replace(/\s+/g, "");
 
-  if (!/^\d{13}$/.test(refVal)) {
+  if (!refVal || refVal.length !== 13) {
     status.style.color = "#dc2626";
-    status.textContent = "❌ Format error! Must be 13 digits (e.g. 0029381726481).";
+    status.textContent = "❌ Mali ang format! Ang GCash Reference No. ay eksaktong 13-digits.";
     return;
   }
-
-  const isAllSame = /^(\d)\1{12}$/.test(refVal);
-  const isSequential = "0123456789012345".includes(refVal) || "9876543210987".includes(refVal);
-  if (isAllSame || isSequential) {
-    status.style.color = "#dc2626";
-    status.textContent = "❌ Invalid Reference Number! Not found in InstaPay records.";
-    return;
-  }
-
-  const usedRefs = JSON.parse(localStorage.getItem("meetloop_used_refs") || "[]");
-  if (usedRefs.includes(refVal)) {
-    status.style.color = "#dc2626";
-    status.textContent = "❌ Reference number already used or expired.";
-    return;
-  }
-
-  let sum = 0;
-  for (let i = 0; i < refVal.length; i++) {
-    let digit = parseInt(refVal[i], 10);
-    if (i % 2 === 1) {
-      digit *= 2;
-      if (digit > 9) digit -= 9;
-    }
-    sum += digit;
-  }
-
-  const adminCodes = ["9998887776665", "8887776665554", "0029381726481"];
-  const isAuthentic = (sum % 10 === 0) || adminCodes.includes(refVal);
 
   btn.disabled = true;
-  btn.textContent = "Checking with GCash...";
+  btn.textContent = "Kinukumpirma sa Server...";
   status.style.color = "#005ce6";
-  status.textContent = "Verifying InstaPay reference...";
+  status.textContent = "Sinusuri ang official GCash payment record...";
 
-  setTimeout(async () => {
-    if (!isAuthentic) {
+  if (socket && socket.connected) {
+    socket.emit("unban-request", { hardwareId: myHardwareId, ref: refVal });
+  } else {
+    status.style.color = "#dc2626";
+    status.textContent = "❌ Walang koneksyon sa server. Pakisubukan muli.";
+    btn.disabled = false;
+    btn.textContent = "Verify Reference & Unban";
+  }
+}
+
+if (socket) {
+  socket.on("unban-response", async (data) => {
+    const status = document.getElementById("gcashRefStatus");
+    const btn = document.getElementById("gcashVerifyBtn");
+    const refInput = document.getElementById("gcashRefInput");
+
+    if (data.success) {
+      localStorage.removeItem("meetloop_banned_until");
+      localStorage.removeItem("meetloop_banned_reason");
+      localStorage.removeItem("meetloop_snap");
+      await removeBanFromDB();
+      if (banInterval) clearInterval(banInterval);
+
+      status.style.color = "#16a34a";
+      status.textContent = data.message;
+
+      setTimeout(() => {
+        document.getElementById("banOverlay").style.display = "none";
+        btn.disabled = false;
+        btn.textContent = "Verify Reference & Unban";
+        refInput.value = "";
+        status.textContent = "";
+        alert("🎉 GCash Payment Verified! Na-lift na ang suspension ng iyong device.");
+      }, 1200);
+    } else {
       btn.disabled = false;
       btn.textContent = "Verify Reference & Unban";
       status.style.color = "#dc2626";
-      status.textContent = "❌ Payment record not found. Please ensure Reference No. is correct.";
-      return;
+      status.textContent = data.message;
     }
-
-    usedRefs.push(refVal);
-    localStorage.setItem("meetloop_used_refs", JSON.stringify(usedRefs));
-
-    localStorage.removeItem("meetloop_banned_until");
-    localStorage.removeItem("meetloop_banned_reason");
-    localStorage.removeItem("meetloop_snap");
-    await removeBanFromDB();
-    if (banInterval) clearInterval(banInterval);
-
-    if (socket && socket.connected) {
-      socket.emit("unban-request", { hardwareId: myHardwareId, ref: refVal });
-    }
-
-    status.style.color = "#16a34a";
-    status.textContent = "✅ GCash Payment Confirmed! Unbanned successfully.";
-
-    setTimeout(() => {
-      document.getElementById("banOverlay").style.display = "none";
-      btn.disabled = false;
-      btn.textContent = "Verify Reference & Unban";
-      refInput.value = "";
-      status.textContent = "";
-      alert("🎉 GCash Payment Verified! Your suspension has been lifted.");
-    }, 1200);
-  }, 2000);
+  });
 }
 
-/* ================= 9. WEBRTC ENGINE (100% RELIABLE) ================= */
+/* ================= 9. 100% RELIABLE WEBRTC ENGINE ================= */
 async function startMedia() {
-  if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live')) {
+  if (localStream && localStream.getVideoTracks().some(t => t.readyState === "live")) {
     if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
     camOffCover.style.display = "none";
     try { await localVideo.play(); } catch(e){}
@@ -1004,7 +979,7 @@ async function triggerStartNext() {
 
   mainActionBtn.disabled = true;
 
-  // Active TV Static + Searching Loader
+  // TV Static + Searching Loader active
   crtWrapper.style.display = "block";
   standbyCenter.style.display = "none";
   searchLoader.style.display = "flex";
@@ -1040,7 +1015,6 @@ function stopSession() {
   stopBtn.disabled = true;
 }
 
-// Robust STUN/TURN configuration
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
@@ -1060,7 +1034,6 @@ async function createPeer(initiator) {
 
   peerConnection = new RTCPeerConnection(rtcConfig);
 
-  // Add all local tracks
   if (localStream) {
     localStream.getTracks().forEach(track => {
       peerConnection.addTrack(track, localStream);
@@ -1074,7 +1047,6 @@ async function createPeer(initiator) {
   };
 
   peerConnection.ontrack = (e) => {
-    // Matagumpay na natanggap ang live video ng stranger!
     crtWrapper.style.display = "none";
     standbyCenter.style.display = "none";
     searchLoader.style.display = "none";
