@@ -254,7 +254,7 @@ video{
 .report-opt:active{background:#dc2626}
 
 /* =========================================================
-   🛑 EXACT OMETV WHITE BANNED SCREEN (WITH STRANGER EVIDENCE)
+   🛑 EXACT OMETV WHITE BANNED SCREEN
 ========================================================= */
 #bannedOverlay{
   position:fixed;inset:0;z-index:9999999;
@@ -316,7 +316,7 @@ video{
 }
 
 /* =========================================================
-   💰 GCASH QR CODE & AUTO-VERIFY POPUP
+   💰 GCASH QR CODE & VERIFICATION MODAL
 ========================================================= */
 #gcashModalOverlay{
   position:fixed;inset:0;z-index:99999999;
@@ -541,7 +541,7 @@ video{
 
 <!-- =========================================================
    🛑 EXACT OMETV WHITE BANNED SCREEN (WITH STRANGER EVIDENCE)
-========================================================= */
+========================================================= -->
 <div id="bannedOverlay">
   <div class="ometv-ban-card">
     <div class="ban-top-row">
@@ -1117,7 +1117,7 @@ async function verifyGcashPayment() {
   }
 }
 
-// 🔐 Admin Key Authenticated Unban (Hindi na libreng 3-clicks lang)
+// 🔐 Admin Key Authenticated Unban
 let adminClickCount = 0;
 adminUnbanId.addEventListener("click", () => {
   adminClickCount++;
@@ -1818,8 +1818,6 @@ if (socket) {
 function sendMessage() {
   const txt = chatInput.value.trim();
   if (!txt) return;
-
-  // Inalis ang /unban cheat command
 
   if (!dataChannel || dataChannel.readyState !== "open") return;
   dataChannel.send(txt);
