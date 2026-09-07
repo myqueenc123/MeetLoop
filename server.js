@@ -1,235 +1,241 @@
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
+/**
+ * MeetLoop - Official Server Backend
+ * Node.js + Express + Socket.IO
+ * Features: Hardware ID + IP Multi-Layer Ban Engine, GCash Unban Sync & WebRTC Signaling
+ */
+
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: "*" }
-});
-
-app.use(express.json());
-app.use(express.static(__dirname + '/public'));
-app.use(express.static(__dirname));
-
-// 🔐 ADMIN PASSCODE (Para sa secure manual unban)
-const ADMIN_SECRET_KEY = process.env.ADMIN_KEY || "meetloop_admin_9988";
-
-// --- BAN & STRIKES STORAGE (Keyed by Device ID + Fallback IP) ---
-const bannedEntities = new Map(); // entityKey -> { banUntil, reason }
-const entityStrikes = new Map();  // entityKey -> strikes count
-
-// --- GCASH ANTI-CHEAT ENGINE ---
-const approvedGcashReceipts = new Set();
-const usedGcashReferences = new Set();
-
-function getClientIP(reqOrSocket) {
-  const headers = reqOrSocket.headers || reqOrSocket.handshake?.headers || {};
-  const forwarded = headers['x-forwarded-for'];
-  if (forwarded) {
-    return forwarded.split(',')[0].trim();
-  }
-  return reqOrSocket.connection?.remoteAddress || 
-         reqOrSocket.socket?.remoteAddress || 
-         reqOrSocket.handshake?.address || 
-         "127.0.0.1";
-}
-
-function getEntityKey(reqOrSocket) {
-  const query = reqOrSocket.query || reqOrSocket.handshake?.query || {};
-  const deviceId = query.deviceId || reqOrSocket.headers?.['x-device-id'];
-  const ip = getClientIP(reqOrSocket);
-  // Proteksyon sa Same-WiFi test: Gumagamit ng persistent device ID para hindi madamay ang reporter
-  return deviceId ? `dev_${deviceId}` : `ip_${ip}`;
-}
-
-// 💰 GCASH UNBAN VERIFICATION ENDPOINT
-app.post('/api/verify-gcash-unban', (req, res) => {
-  const entityKey = getEntityKey(req);
-  const { refNumber } = req.body || {};
-
-  if (!refNumber) {
-    return res.status(400).json({ success: false, message: "Please enter your GCash Reference Number." });
-  }
-
-  const cleanRef = refNumber.toString().replace(/\s+/g, '').trim();
-
-  // Validate reference length (Standard GCash 10-16 digits)
-  if (!/^\d{10,16}$/.test(cleanRef)) {
-    return res.status(400).json({ success: false, message: "Invalid Reference format. Must be 10-16 digits." });
-  }
-
-  // Anti-Replay: Bawal i-recycle ang nagamit na resibo
-  if (usedGcashReferences.has(cleanRef)) {
-    return res.status(400).json({ success: false, message: "This Reference Number has already been used." });
-  }
-
-  // Anti-Cheat: HINDI na gagana ang random numbers; kailangan nasa approved list
-  if (!approvedGcashReceipts.has(cleanRef)) {
-    return res.status(400).json({ 
-      success: false, 
-      message: "Reference number not found or payment not yet received. Please confirm you sent ₱20." 
-    });
-  }
-
-  approvedGcashReceipts.delete(cleanRef);
-  usedGcashReferences.add(cleanRef);
-
-  bannedEntities.delete(entityKey);
-  entityStrikes.delete(entityKey);
-
-  console.log(`✅ [GCASH PAYMENT VERIFIED] Unbanned: ${entityKey} | Ref: ${cleanRef}`);
-  return res.json({ success: true, message: "Payment verified successfully! Your account is now unbanned." });
-});
-
-// 🔓 PROTECTED ADMIN UNBAN ENDPOINT
-app.post('/admin/unban-my-ip', (req, res) => {
-  const { adminKey } = req.body || {};
-  if (adminKey !== ADMIN_SECRET_KEY) {
-    return res.status(403).json({ success: false, message: "Invalid Admin Passcode." });
-  }
-
-  const entityKey = getEntityKey(req);
-  bannedEntities.delete(entityKey);
-  entityStrikes.delete(entityKey);
-
-  console.log(`🔓 Admin Unbanned: ${entityKey}`);
-  return res.json({ success: true, message: `Account has been unbanned by admin.` });
-});
-
-// 🛑 SERVER CONNECTION BAN INTERCEPTOR
-io.use((socket, next) => {
-  const entityKey = getEntityKey(socket);
-  const banRecord = bannedEntities.get(entityKey);
-
-  if (banRecord) {
-    if (banRecord.banUntil > Date.now()) {
-      return next(new Error(`IP_BANNED:${banRecord.banUntil}:${encodeURIComponent(banRecord.reason)}`));
-    } else {
-      bannedEntities.delete(entityKey);
-      entityStrikes.delete(entityKey);
-    }
-  }
-  next();
-});
-
-let waitingQueue = [];
-const matches = new Map();
-
-io.on('connection', (socket) => {
-  io.emit('online-count', io.engine.clientsCount);
-
-  function leaveCurrentMatch() {
-    waitingQueue = waitingQueue.filter(id => id !== socket.id);
-    const match = matches.get(socket.id);
-    if (match) {
-      const partner = io.sockets.sockets.get(match.partnerId);
-      if (partner) {
-        partner.emit('partner-disconnected');
-        matches.delete(match.partnerId);
-      }
-      matches.delete(socket.id);
-    }
-  }
-
-  function findMatch() {
-    leaveCurrentMatch();
-    waitingQueue = waitingQueue.filter(id => id !== socket.id && io.sockets.sockets.has(id));
-
-    if (waitingQueue.length > 0) {
-      const partnerId = waitingQueue.shift();
-      const partner = io.sockets.sockets.get(partnerId);
-
-      if (partner) {
-        matches.set(socket.id, { partnerId, reported: false });
-        matches.set(partnerId, { partnerId: socket.id, reported: false });
-
-        socket.emit('match', { initiator: true });
-        partner.emit('match', { initiator: false });
-      } else {
-        waitingQueue.push(socket.id);
-        socket.emit('waiting');
-      }
-    } else {
-      waitingQueue.push(socket.id);
-      socket.emit('waiting');
-    }
-  }
-
-  socket.on('skip', findMatch);
-  socket.on('stop-search', leaveCurrentMatch);
-
-  socket.on('signal', (data) => {
-    const match = matches.get(socket.id);
-    if (match && match.partnerId) {
-      io.to(match.partnerId).emit('signal', data);
-    }
-  });
-
-  // 🛑 REPORT HANDLER: TARGET KAUSAP LANG ANG MABABAN!
-  socket.on('report-user', (data) => {
-    const match = matches.get(socket.id);
-    if (!match || match.reported) return;
-    match.reported = true;
-
-    const targetPartner = io.sockets.sockets.get(match.partnerId);
-    if (!targetPartner) {
-      leaveCurrentMatch();
-      findMatch();
-      return;
-    }
-
-    if (data.verified === true) {
-      const targetEntity = getEntityKey(targetPartner);
-      const strikes = (entityStrikes.get(targetEntity) || 0) + 1;
-      entityStrikes.set(targetEntity, strikes);
-
-      if (strikes >= 2) {
-        const ONE_HOUR = 60 * 60 * 1000;
-        const banUntil = Date.now() + ONE_HOUR;
-        const reason = data.reason || "irrelevant image";
-
-        bannedEntities.set(targetEntity, { banUntil, reason });
-        targetPartner.emit('ip-banned', { banUntil, reason });
-
-        setTimeout(() => {
-          targetPartner.disconnect(true);
-        }, 400);
-      }
-    }
-
-    leaveCurrentMatch();
-    findMatch();
-  });
-
-  socket.on('disconnect', () => {
-    leaveCurrentMatch();
-    io.emit('online-count', io.engine.clientsCount);
-  });
-});
-
-// 💻 TERMINAL COMMANDS (Direct controls via Server Console)
-process.stdin.on('data', (data) => {
-  const cmd = data.toString().trim();
-
-  if (cmd.startsWith('add ref ')) {
-    const ref = cmd.replace('add ref ', '').trim();
-    if (ref) {
-      approvedGcashReceipts.add(ref);
-      console.log(`✅ [ADMIN] Added Valid GCash Ref: ${ref}`);
-    }
-  } else if (cmd === 'unban all') {
-    bannedEntities.clear();
-    entityStrikes.clear();
-    usedGcashReferences.clear();
-    console.log("✅ All Bans and receipt caches wiped clean!");
-  } else if (cmd === 'list bans') {
-    console.log("Current Bans:", Array.from(bannedEntities.entries()));
-  }
+  cors: { origin: "*" },
+  pingTimeout: 30000,
+  pingInterval: 10000
 });
 
 const PORT = process.env.PORT || 3000;
+
+// I-serve ang static frontend files
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.json());
+
+// Main route kung iisang file lang ang gamit mo (hal. index.html)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+/* ================= SERVER-SIDE BAN DATABASE ================= */
+// Iniimbak ang ban records sa memory (Pwede ring i-connect sa MongoDB/Redis kung kinakailangan)
+const bannedEntities = new Map(); // Key: IP o Hardware ID -> { banUntil, reason }
+const usedGcashReferences = new Set(); // Iniimbak ang mga nagamit nang GCash reference numbers
+
+// Helper para makuha ang tunay na IP ng user (Kahit nasa likod ng Cloudflare / Proxy)
+function getClientIp(socket) {
+  const headers = socket.handshake.headers;
+  const cfIp = headers["cf-connecting-ip"];
+  const forwarded = headers["x-forwarded-for"];
+  if (cfIp) return cfIp;
+  if (forwarded) return forwarded.split(",")[0].trim();
+  return socket.handshake.address || socket.conn.remoteAddress;
+}
+
+// Helper para suriin kung banned ang user
+function checkIsBanned(ip, hardwareId) {
+  const now = Date.now();
+
+  // 1. Check IP Ban
+  if (bannedEntities.has(ip)) {
+    const record = bannedEntities.get(ip);
+    if (now < record.banUntil) return record;
+    bannedEntities.delete(ip); // Expired na ang ban
+  }
+
+  // 2. Check Hardware Fingerprint Ban
+  if (hardwareId && bannedEntities.has(hardwareId)) {
+    const record = bannedEntities.get(hardwareId);
+    if (now < record.banUntil) return record;
+    bannedEntities.delete(hardwareId); // Expired na ang ban
+  }
+
+  return null;
+}
+
+// Helper para i-ban ang user (5 minuto standard cooldown)
+function applyBan(ip, hardwareId, reason = "Violation of Community Rules", durationMs = 5 * 60 * 1000) {
+  const banUntil = Date.now() + durationMs;
+  const record = { banUntil, reason };
+
+  if (ip) bannedEntities.set(ip, record);
+  if (hardwareId) bannedEntities.set(hardwareId, record);
+
+  return record;
+}
+
+/* ================= MATCHMAKING QUEUE & ROOMS ================= */
+let waitingQueue = [];
+const activePairs = new Map(); // socket.id -> partnerSocket.id
+
+function removeFromQueue(socketId) {
+  waitingQueue = waitingQueue.filter(id => id !== socketId);
+}
+
+function matchUsers() {
+  while (waitingQueue.length >= 2) {
+    const user1Id = waitingQueue.shift();
+    const user2Id = waitingQueue.shift();
+
+    const socket1 = io.sockets.sockets.get(user1Id);
+    const socket2 = io.sockets.sockets.get(user2Id);
+
+    if (socket1 && socket2) {
+      activePairs.set(user1Id, user2Id);
+      activePairs.set(user2Id, user1Id);
+
+      socket1.emit("match", { initiator: true });
+      socket2.emit("match", { initiator: false });
+    } else {
+      if (socket1) waitingQueue.push(user1Id);
+      if (socket2) waitingQueue.push(user2Id);
+    }
+  }
+}
+
+/* ================= SOCKET.IO CONNECTION ================= */
+io.on("connection", (socket) => {
+  const clientIp = getClientIp(socket);
+  const hardwareId = socket.handshake.query.hardwareId || socket.handshake.query.deviceId;
+
+  // I-broadcast ang live online counter
+  io.emit("online-count", io.engine.clientsCount);
+
+  // 1. Mahigpit na pagsusuri kung Banned ang IP o Hardware ID sa pagpasok pa lang
+  const banStatus = checkIsBanned(clientIp, hardwareId);
+  if (banStatus) {
+    socket.emit("ip-banned", {
+      banUntil: banStatus.banUntil,
+      reason: banStatus.reason
+    });
+  }
+
+  // 2. Simulan ang Paghahanap (Skip / Start)
+  socket.on("skip", () => {
+    // Siguraduhing hindi banned bago payagang maghanap
+    const currentBan = checkIsBanned(clientIp, hardwareId);
+    if (currentBan) {
+      return socket.emit("ip-banned", { banUntil: currentBan.banUntil, reason: currentBan.reason });
+    }
+
+    // Tanggalin sa dating partner kung mayroon man
+    const oldPartnerId = activePairs.get(socket.id);
+    if (oldPartnerId) {
+      const oldPartner = io.sockets.sockets.get(oldPartnerId);
+      if (oldPartner) {
+        oldPartner.emit("partner-disconnected");
+        activePairs.delete(oldPartnerId);
+      }
+      activePairs.delete(socket.id);
+    }
+
+    removeFromQueue(socket.id);
+    waitingQueue.push(socket.id);
+    socket.emit("waiting");
+
+    matchUsers();
+  });
+
+  // 3. WebRTC Signaling (Offer, Answer, ICE Candidate)
+  socket.on("signal", (data) => {
+    const partnerId = activePairs.get(socket.id);
+    if (partnerId) {
+      const partnerSocket = io.sockets.sockets.get(partnerId);
+      if (partnerSocket) {
+        partnerSocket.emit("signal", data);
+      }
+    }
+  });
+
+  // 4. Report System (Awtomatikong bina-ban ang kausap sa Server)
+  socket.on("report-user", (data) => {
+    const partnerId = activePairs.get(socket.id);
+    if (partnerId) {
+      const partnerSocket = io.sockets.sockets.get(partnerId);
+      if (partnerSocket) {
+        const partnerIp = getClientIp(partnerSocket);
+        const partnerHw = partnerSocket.handshake.query.hardwareId;
+
+        // Server-Side permanent ban sa partner
+        const banRecord = applyBan(partnerIp, partnerHw, data.reason || "Reported for inappropriate behavior");
+        
+        partnerSocket.emit("ip-banned", {
+          banUntil: banRecord.banUntil,
+          reason: banRecord.reason
+        });
+
+        // Putulin ang koneksyon ng partner
+        activePairs.delete(partnerId);
+        partnerSocket.disconnect(true);
+      }
+      activePairs.delete(socket.id);
+    }
+  });
+
+  // 5. GCash Unban Verification mula sa Client
+  socket.on("unban-request", (data) => {
+    const ref = String(data.ref || "").trim();
+    const reqHardware = data.hardwareId || hardwareId;
+
+    if (ref && ref.length === 13 && !usedGcashReferences.has(ref)) {
+      usedGcashReferences.add(ref);
+
+      // Burahin ang ban sa Server Database
+      bannedEntities.delete(clientIp);
+      if (reqHardware) bannedEntities.delete(reqHardware);
+
+      socket.emit("unban-success", { success: true });
+    }
+  });
+
+  // 6. Stop Search
+  socket.on("stop-search", () => {
+    removeFromQueue(socket.id);
+    const partnerId = activePairs.get(socket.id);
+    if (partnerId) {
+      const partner = io.sockets.sockets.get(partnerId);
+      if (partner) {
+        partner.emit("partner-disconnected");
+        activePairs.delete(partnerId);
+      }
+      activePairs.delete(socket.id);
+    }
+  });
+
+  // 7. Disconnect Handler
+  socket.on("disconnect", () => {
+    removeFromQueue(socket.id);
+
+    const partnerId = activePairs.get(socket.id);
+    if (partnerId) {
+      const partner = io.sockets.sockets.get(partnerId);
+      if (partner) {
+        partner.emit("partner-disconnected");
+        activePairs.delete(partnerId);
+      }
+      activePairs.delete(socket.id);
+    }
+
+    io.emit("online-count", io.engine.clientsCount);
+  });
+});
+
+/* ================= START SERVER ================= */
 server.listen(PORT, () => {
-  console.log(`🚀 MeetloopChat Server running on port ${PORT}`);
-  console.log(`💡 Para mag-approve ng GCash bayad, i-type sa terminal: add ref <reference_number>`);
+  console.log(`===========================================`);
+  console.log(`🚀 MeetLoop Server is RUNNING on port ${PORT}`);
+  console.log(`🛡️ Hardware & IP Security Engine: ACTIVE`);
+  console.log(`💳 GCash Instant Unban Gateway: READY`);
+  console.log(`===========================================`);
 });
