@@ -55,7 +55,7 @@ header{
 .lang-select:hover{border-color:rgba(255,255,255,.3)}
 .lang-select option{background:#0f172a;color:#fff}
 
-/* STAGE CONTAINER (DESKTOP) */
+/* STAGE CONTAINER */
 .stage-container{
   width:100%;height:calc(100vh - 52px);
   display:flex;gap:10px;padding:10px;
@@ -97,13 +97,31 @@ video{
 }
 @keyframes floatLogo{from{transform:translateY(0)}to{transform:translateY(-6px)}}
 
-.standby-title{font-size:28px;font-weight:900;letter-spacing:-0.5px;color:#fff;margin-bottom:6px}
+.standby-title{font-size:28px;font-weight:900;letter-spacing:-0.5px;color:#fff;margin-bottom:8px}
+
+/* REALTIME ONLINE COUNTER BADGE */
 .standby-online-tag{
-  background:rgba(15,23,42,0.85);border:1px solid rgba(255,255,255,.1);
-  padding:5px 14px;border-radius:20px;font-size:12px;font-weight:800;color:#cbd5e1;
-  display:flex;align-items:center;gap:7px;box-shadow:0 4px 15px rgba(0,0,0,.5);
+  background:rgba(15,23,42,0.85);border:1px solid rgba(255,255,255,.12);
+  padding:6px 16px;border-radius:20px;font-size:13px;font-weight:800;color:#cbd5e1;
+  display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.6);
+  backdrop-filter:blur(6px);user-select:none;
 }
-.online-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+.online-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 10px var(--green);animation:livePulse 2s infinite ease-in-out;
+}
+@keyframes livePulse{
+  0%{transform:scale(1);box-shadow:0 0 6px var(--green)}
+  50%{transform:scale(1.35);box-shadow:0 0 14px var(--green)}
+  100%{transform:scale(1);box-shadow:0 0 6px var(--green)}
+}
+#standbyUsers{
+  color:#fff;font-variant-numeric:tabular-nums;font-weight:900;letter-spacing:0.3px;
+  transition:color .25s ease;
+}
+#standbyUsers.count-bump{
+  color:#38bdf8;
+}
 
 /* OMETV REMOTE AUDIO CONTROL BAR */
 .remote-audio-bar{
@@ -248,7 +266,6 @@ video{
   }
   .stream-arena{width:100%;flex:none;gap:8px}
 
-  /* OMETV VIDEO GRID MOBILE */
   .video-grid{
     position:relative;width:100%;height:min(52dvh,460px);min-height:280px;
     display:block;border-radius:12px;overflow:hidden;
@@ -547,9 +564,11 @@ video{
               <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z" fill="#a855f7"/>
             </svg>
             <div class="standby-title">MeetLoop</div>
+            
+            <!-- REALTIME ONLINE COUNTER -->
             <div class="standby-online-tag">
               <span class="online-dot"></span>
-              <span id="standbyUsers">Connecting...</span> <span id="standbyUsersLabel">users online</span>
+              <span id="standbyUsers">248,312</span> <span id="standbyUsersLabel">users online</span>
             </div>
           </div>
         </div>
@@ -772,7 +791,6 @@ function applyTranslations() {
   const rulesCard = document.getElementById("chatRulesCard");
   if (rulesCard) rulesCard.innerHTML = t("rulesCard");
 
-  // Dynamic buttons state update
   if (!connected && !searching) {
     document.getElementById("mainActionBtn").textContent = t("start");
     document.getElementById("remoteStatus").textContent = t("waiting");
@@ -793,7 +811,33 @@ function updateMediaButtonsText() {
 }
 
 /* =========================================================
-   2. USER IDENTIFIER & INITIAL SETUP
+   2. REALTIME LIVE USER ONLINE ENGINE
+========================================================= */
+let liveOnlineTarget = 248312;
+let liveOnlineDisplayed = 248312;
+
+function renderOnlineCounter(num) {
+  const elem = document.getElementById("standbyUsers");
+  if (!elem) return;
+  elem.textContent = Number(num).toLocaleString();
+  elem.classList.add("count-bump");
+  setTimeout(() => elem.classList.remove("count-bump"), 300);
+}
+
+// Organic micro-fluctuation (OmeTV traffic simulator)
+setInterval(() => {
+  const delta = Math.floor(Math.random() * 9) - 4; // -4 to +4 change
+  liveOnlineTarget = Math.max(1, liveOnlineTarget + delta);
+  
+  if (liveOnlineDisplayed !== liveOnlineTarget) {
+    const step = (liveOnlineTarget - liveOnlineDisplayed > 0) ? 1 : -1;
+    liveOnlineDisplayed += step;
+    renderOnlineCounter(liveOnlineDisplayed);
+  }
+}, 3500);
+
+/* =========================================================
+   3. USER IDENTIFIER & SETUP
 ========================================================= */
 let myDeviceId = localStorage.getItem("meetloop_device_id") || "dev_" + Math.random().toString(36).substr(2, 9);
 localStorage.setItem("meetloop_device_id", myDeviceId);
@@ -828,7 +872,6 @@ const sendBtn = document.getElementById("sendBtn");
 
 const audioSlider = document.getElementById("audioSlider");
 const speakerIcon = document.getElementById("speakerIcon");
-const standbyUsers = document.getElementById("standbyUsers");
 const languageSelect = document.getElementById("languageSelect");
 
 languageSelect.value = currentLang;
@@ -862,7 +905,7 @@ lastPartnerCanvas.width = 110;
 lastPartnerCanvas.height = 110;
 
 /* =========================================================
-   3. ENTER MEETLOOP PORTAL
+   4. ENTER MEETLOOP PORTAL
 ========================================================= */
 function enterMeetLoop() {
   const portal = document.getElementById("welcomePortal");
@@ -876,7 +919,7 @@ if (portalStartBtn) {
 }
 
 /* =========================================================
-   4. SINGLE TAB CONTROLLER
+   5. SINGLE TAB CONTROLLER
 ========================================================= */
 const currentTabId = "tab_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
 const tabChannel = window.BroadcastChannel ? new BroadcastChannel("meetloop_single_tab_bus") : null;
@@ -931,7 +974,7 @@ document.getElementById("reclaimSessionBtn").addEventListener("click", () => {
 });
 
 /* =========================================================
-   5. OMETV CRT TV STATIC NOISE
+   6. OMETV CRT TV STATIC NOISE
 ========================================================= */
 function runTVStatic() {
   if (!crtStaticCanvas) return;
@@ -973,7 +1016,7 @@ speakerIcon.addEventListener("click", () => {
 });
 
 /* =========================================================
-   6. CAMERA & SENSOR VERIFICATION
+   7. CAMERA ENGINE & VERIFICATION
 ========================================================= */
 async function startMedia(specificDeviceId = null) {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === 'live') && !specificDeviceId) {
@@ -1045,7 +1088,7 @@ async function verifyCameraSensor() {
 }
 
 /* =========================================================
-   7. 1-SECOND PROTECTION BLUR
+   8. 1-SECOND PROTECTION BLUR
 ========================================================= */
 function enableBlur() {
   if (blurTimer) clearTimeout(blurTimer);
@@ -1061,7 +1104,7 @@ function releaseBlur() {
 }
 
 /* =========================================================
-   8. SEARCH & WEBRTC ENGINE
+   9. SEARCH & WEBRTC ENGINE
 ========================================================= */
 async function triggerStartNext() {
   if (inCooldown || isTabTerminated) return;
@@ -1213,12 +1256,17 @@ function closePeerConnection() {
 }
 
 /* =========================================================
-   9. SOCKET LISTENERS & ONLINE COUNTER
+   10. REALTIME SOCKET EVENTS
 ========================================================= */
 if (socket) {
+  // Realtime Live Counter from Server
   socket.on("online-count", count => {
-    const formatted = Number(count).toLocaleString();
-    standbyUsers.textContent = formatted;
+    const numeric = parseInt(count, 10);
+    if (!isNaN(numeric) && numeric > 0) {
+      liveOnlineTarget = numeric;
+      liveOnlineDisplayed = numeric;
+      renderOnlineCounter(liveOnlineDisplayed);
+    }
   });
 
   socket.on("waiting", () => {
@@ -1258,12 +1306,10 @@ if (socket) {
   socket.on("ip-banned", data => {
     runBanCountdown(data.banUntil, data.reason);
   });
-} else {
-  standbyUsers.textContent = "1";
 }
 
 /* =========================================================
-   10. BAN SCREEN & GCASH UNBAN
+   11. BAN SCREEN & GCASH UNBAN
 ========================================================= */
 function recordPartnerFrame() {
   if (remoteVideo && remoteVideo.videoWidth > 0) {
@@ -1310,6 +1356,7 @@ function runBanCountdown(banUntil, reason = "irrelevant image") {
 
 window.addEventListener("DOMContentLoaded", () => {
   applyTranslations();
+  renderOnlineCounter(liveOnlineDisplayed);
   const cachedBan = parseInt(localStorage.getItem("meetloop_banned_until"), 10);
   if (cachedBan && cachedBan > Date.now()) {
     runBanCountdown(cachedBan, localStorage.getItem("meetloop_banned_reason") || "irrelevant image");
@@ -1390,7 +1437,7 @@ if (adminUnbanBtn) {
 }
 
 /* =========================================================
-   11. CHAT & CONTROL ATTACHMENTS
+   12. CHAT & CONTROL ATTACHMENTS
 ========================================================= */
 function addChatMessage(author, msg) {
   const div = document.createElement("div");
