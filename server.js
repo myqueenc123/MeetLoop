@@ -1,6 +1,5 @@
 /**
- * MeetLoop - Production Server Backend (Render Ready)
- * Fixed: Isolated Hardware Ban (No Self-Ban), Real User Count & Snapshot Persistence
+ * MeetLoop - Official Robust WebRTC Server Backend
  */
 
 const express = require("express");
@@ -12,7 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: { origin: "*" },
-  pingTimeout: 20000,
+  pingTimeout: 30000,
   pingInterval: 10000
 });
 
@@ -25,8 +24,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-/* ================= BAN DATABASE (HARDWARE ISOLATED) ================= */
-// Key: HardwareId -> { banUntil, reason, snapshot }
+/* ================= BAN DATABASE ================= */
 const bannedDevices = new Map();
 const usedGcashReferences = new Set();
 
@@ -36,7 +34,7 @@ function checkDeviceBan(hardwareId) {
   if (bannedDevices.has(hardwareId)) {
     const record = bannedDevices.get(hardwareId);
     if (now < record.banUntil) return record;
-    bannedDevices.delete(hardwareId); // Expired
+    bannedDevices.delete(hardwareId);
   }
   return null;
 }
@@ -49,9 +47,9 @@ function banDevice(hardwareId, reason, snapshot = null, durationMs = 5 * 60 * 10
   return record;
 }
 
-/* ================= MATCHMAKING QUEUE ================= */
+/* ================= MATCHMAKING ENGINE ================= */
 let waitingQueue = [];
-const activePairs = new Map(); // socket.id -> partnerSocket.id
+const activePairs = new Map(); // socket.id -> partner.id
 
 function removeFromQueue(socketId) {
   waitingQueue = waitingQueue.filter(id => id !== socketId);
@@ -62,30 +60,30 @@ function matchUsers() {
     const user1Id = waitingQueue.shift();
     const user2Id = waitingQueue.shift();
 
-    const socket1 = io.sockets.sockets.get(user1Id);
-    const socket2 = io.sockets.sockets.get(user2Id);
+    const s1 = io.sockets.sockets.get(user1Id);
+    const s2 = io.sockets.sockets.get(user2Id);
 
-    if (socket1 && socket2) {
+    if (s1 && s2 && s1.connected && s2.connected) {
       activePairs.set(user1Id, user2Id);
       activePairs.set(user2Id, user1Id);
 
-      socket1.emit("match", { initiator: true });
-      socket2.emit("match", { initiator: false });
+      // s1 ang mag-o-offer, s2 ang sasagot
+      s1.emit("match", { initiator: true });
+      s2.emit("match", { initiator: false });
     } else {
-      if (socket1) waitingQueue.push(user1Id);
-      if (socket2) waitingQueue.push(user2Id);
+      if (s1 && s1.connected) waitingQueue.push(user1Id);
+      if (s2 && s2.connected) waitingQueue.push(user2Id);
     }
   }
 }
 
-/* ================= SOCKET.IO ================= */
+/* ================= SOCKET EVENTS ================= */
 io.on("connection", (socket) => {
   const hardwareId = socket.handshake.query.hardwareId || socket.handshake.query.deviceId;
 
-  // Real-time broadcast ng totoong bilang ng online users
   io.emit("online-count", io.engine.clientsCount);
 
-  // Check kung banned ang device
+  // Check ban upon connection
   const banInfo = checkDeviceBan(hardwareId);
   if (banInfo) {
     socket.emit("ip-banned", {
@@ -95,7 +93,7 @@ io.on("connection", (socket) => {
     });
   }
 
-  // START / NEXT
+  // SEARCH / SKIP
   socket.on("skip", () => {
     const currentBan = checkDeviceBan(hardwareId);
     if (currentBan) {
@@ -106,12 +104,12 @@ io.on("connection", (socket) => {
       });
     }
 
-    const oldPartnerId = activePairs.get(socket.id);
-    if (oldPartnerId) {
-      const oldPartner = io.sockets.sockets.get(oldPartnerId);
-      if (oldPartner) {
-        oldPartner.emit("partner-disconnected");
-        activePairs.delete(oldPartnerId);
+    const partnerId = activePairs.get(socket.id);
+    if (partnerId) {
+      const partner = io.sockets.sockets.get(partnerId);
+      if (partner) {
+        partner.emit("partner-disconnected");
+        activePairs.delete(partnerId);
       }
       activePairs.delete(socket.id);
     }
@@ -123,39 +121,37 @@ io.on("connection", (socket) => {
     matchUsers();
   });
 
-  // WebRTC SIGNALING
+  // WebRTC SIGNALING (Offers, Answers, ICE Candidates)
   socket.on("signal", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
-      const partnerSocket = io.sockets.sockets.get(partnerId);
-      if (partnerSocket) partnerSocket.emit("signal", data);
+      const partner = io.sockets.sockets.get(partnerId);
+      if (partner) {
+        partner.emit("signal", data);
+      }
     }
   });
 
-  // REPORT SYSTEM (Targeted ONLY to Partner - No Self Ban)
+  // REPORT SYSTEM (Isolate ban to partner only)
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
-      const partnerSocket = io.sockets.sockets.get(partnerId);
-      if (partnerSocket) {
-        const partnerHardwareId = partnerSocket.handshake.query.hardwareId;
-        const snapshot = data.snapshot || null;
+      const partner = io.sockets.sockets.get(partnerId);
+      if (partner) {
+        const partnerHw = partner.handshake.query.hardwareId;
+        const record = banDevice(partnerHw, data.reason || "Policy Violation", data.snapshot);
 
-        // I-ban LAMANG ang partner hardware ID
-        const banRecord = banDevice(partnerHardwareId, data.reason || "Inappropriate behavior / policy", snapshot);
-
-        partnerSocket.emit("ip-banned", {
-          banUntil: banRecord.banUntil,
-          reason: banRecord.reason,
-          snapshot: banRecord.snapshot
+        partner.emit("ip-banned", {
+          banUntil: record.banUntil,
+          reason: record.reason,
+          snapshot: record.snapshot
         });
 
         activePairs.delete(partnerId);
-        partnerSocket.disconnect(true);
+        partner.disconnect(true);
       }
       activePairs.delete(socket.id);
     }
-    // Hindi ibaban ang reporter; hahayaan siyang magpatuloy
     socket.emit("report-success");
   });
 
@@ -171,6 +167,7 @@ io.on("connection", (socket) => {
     }
   });
 
+  // STOP
   socket.on("stop-search", () => {
     removeFromQueue(socket.id);
     const partnerId = activePairs.get(socket.id);
@@ -184,6 +181,7 @@ io.on("connection", (socket) => {
     }
   });
 
+  // DISCONNECT
   socket.on("disconnect", () => {
     removeFromQueue(socket.id);
     const partnerId = activePairs.get(socket.id);
