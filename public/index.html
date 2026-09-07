@@ -113,7 +113,7 @@ video{
 }
 #standbyUsers{color:#fff;font-weight:900}
 
-/* SEARCHING LOADER (Over Moving Noise) */
+/* SEARCHING CARD */
 .search-loader{
   position:absolute;inset:0;z-index:4;display:none;
   align-items:center;justify-content:center;
@@ -278,13 +278,13 @@ video{
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 }
 
-/* BAN OVERLAY */
+/* ================= 24-HOUR BAN OVERLAY ================= */
 #banOverlay{
   position:fixed;inset:0;z-index:9999999;background:rgba(0,0,0,.94);
   display:none;align-items:center;justify-content:center;padding:12px;overflow-y:auto;
 }
 .ban-card{
-  max-width:420px;width:100%;background:#ffffff;border-radius:22px;
+  max-width:440px;width:100%;background:#ffffff;border-radius:22px;
   color:#1e293b;box-shadow:0 30px 70px rgba(0,0,0,1);overflow:hidden;
   max-height:94vh;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px;
 }
@@ -330,8 +330,12 @@ video{
   background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:14px;
   padding:12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;
 }
+.gcash-qr-frame{
+  background:#ffffff;padding:8px;border-radius:12px;border:1.5px solid #94a3b8;
+  display:inline-block;box-shadow:0 3px 12px rgba(0,0,0,0.08);
+}
 .gcash-qr-img{
-  width:160px;height:160px;display:block;border-radius:6px;object-fit:contain;
+  width:165px;height:165px;display:block;border-radius:4px;object-fit:contain;
 }
 .gcash-ref-input{
   width:100%;height:42px;padding:0 12px;background:#ffffff;
@@ -346,10 +350,13 @@ video{
   background:none;border:0;color:#64748b;font-size:11.5px;font-weight:800;cursor:pointer;margin-top:2px;text-align:center;
 }
 .ban-bottom-bar{
+  display:flex;flex-direction:column;gap:6px;border-top:1px solid #f1f5f9;padding-top:8px;
+}
+.ban-timer-row{
   display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#64748b;
-  border-top:1px solid #f1f5f9;padding-top:8px;
 }
 .ban-timer-chip{background:#fee2e2;color:#dc2626;font-weight:900;padding:3px 8px;border-radius:8px}
+.ban-expire-time{font-size:10px;color:#64748b;font-weight:600;text-align:right}
 
 /* WELCOME PORTAL */
 #welcomePortal{
@@ -407,19 +414,19 @@ video{
   </div>
 </div>
 
-<!-- BAN OVERLAY -->
+<!-- 24-HOUR BAN OVERLAY -->
 <div id="banOverlay">
   <div class="ban-card">
     <div class="ban-top">
       <div class="ban-snap-frame">
         <canvas id="banCanvas" width="95" height="95"></canvas>
         <div class="ban-snap-brand">MeetLoop</div>
-        <div class="ban-snap-tag">VIOLATION</div>
+        <div class="ban-snap-tag">ENCOUNTER EVIDENCE</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:3px">
-        <div class="ban-title" id="banTitle">Device Suspended</div>
+        <div class="ban-title" id="banTitle">24-Hour Suspension</div>
         <div class="ban-reason">Reason: <span id="banReasonLabel">Policy Violation</span></div>
-        <div style="font-size:10px;color:#94a3b8;font-weight:600">Hardware ID Logged</div>
+        <div style="font-size:10px;color:#94a3b8;font-weight:600">Reported Encounter Snapshot Recorded</div>
       </div>
     </div>
 
@@ -433,8 +440,8 @@ video{
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
           </div>
           <div>
-            <div class="method-title" style="color:#005ce6">Instant Unban via GCash</div>
-            <div class="method-desc" id="lblGcashDesc">Pay clearance fee & enter reference number</div>
+            <div class="method-title" style="color:#005ce6">Instant 24H Unban via GCash</div>
+            <div class="method-desc" id="lblGcashDesc">Pay clearance fee & enter 13-digit reference number</div>
           </div>
         </div>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
@@ -446,8 +453,8 @@ video{
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
           <div>
-            <div class="method-title" id="lblWaitTitle">Wait for Cooldown Timer</div>
-            <div class="method-desc" id="lblWaitDesc">Auto unbans when timer ends</div>
+            <div class="method-title" id="lblWaitTitle">Wait 24-Hour Cooldown</div>
+            <div class="method-desc" id="lblWaitDesc">Auto unbans after 24 hours</div>
           </div>
         </div>
       </div>
@@ -465,8 +472,10 @@ video{
       </div>
 
       <div class="gcash-qr-box">
-        <!-- Exact New InstaPay QR Code -->
-        <canvas id="qrCodeCanvas" width="160" height="160" class="gcash-qr-img"></canvas>
+        <!-- EXACT INSTAPAY QR CODE IMAGE -->
+        <div class="gcash-qr-frame">
+          <img src="/gcash-qr.png" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=165x165&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2'" class="gcash-qr-img" alt="GCash InstaPay QR Code">
+        </div>
         <div style="font-size:11px;color:#475569;font-weight:700" id="lblScanText">
           Scan QR via GCash, pay clearance fee, and enter the 13-Digit Ref No.
         </div>
@@ -479,9 +488,12 @@ video{
     </div>
 
     <div class="ban-bottom-bar">
-      <span>Auto-lift in:</span>
-      <div>
-        <span class="ban-timer-chip" id="banCountdown">05:00</span>
+      <div class="ban-timer-row">
+        <span>Time Remaining:</span>
+        <span class="ban-timer-chip" id="banCountdown">24:00:00</span>
+      </div>
+      <div class="ban-expire-time">
+        <span id="lblExpiresAt">Suspension ends:</span> <b id="banUntilTimeText">--:-- --</b>
         <span style="font-family:monospace;margin-left:6px" id="adminUnbanId">ID: 167214235</span>
       </div>
     </div>
@@ -518,7 +530,7 @@ video{
           <div class="crt-overlay-vignette"></div>
         </div>
 
-        <!-- STANDBY VIEW (Logo + Online Count) -->
+        <!-- STANDBY VIEW -->
         <div id="standbyCenter" class="standby-center">
           <svg class="standby-logo" viewBox="0 0 100 100">
             <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z" fill="#38bdf8"/>
@@ -532,7 +544,7 @@ video{
           </div>
         </div>
 
-        <!-- OMETV SEARCHING CARD (Over Moving Noise) -->
+        <!-- OMETV SEARCHING CARD -->
         <div class="search-loader" id="searchLoader">
           <div class="search-card">
             <div class="search-spinner"></div>
@@ -742,39 +754,23 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 5. RENDER THE NEW INSTAPAY QR CODE ================= */
-function renderInstaPayQR() {
-  const qrCanvas = document.getElementById("qrCodeCanvas");
-  if (!qrCanvas) return;
-  const ctx = qrCanvas.getContext("2d");
-  const img = new Image();
-  img.crossOrigin = "anonymous";
-  img.onload = () => {
-    ctx.drawImage(img, 0, 0, 160, 160);
-  };
-  // Fallback high-res InstaPay QR API
-  img.src = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2";
-}
-renderInstaPayQR();
-
-/* ================= 6. VIOLATION SNAPSHOT RECORDER ================= */
-// Kinukunan ang STRANGER FEED (remoteVideo) para mukha ng kausap ang ma-screenshot
-function capturePartnerSnapshot() {
+/* ================= 5. SNAPSHOT OF REPORTER AS ENCOUNTER EVIDENCE ================= */
+function captureReporterSnapshot() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
   const ctx = canvas.getContext("2d");
 
-  if (remoteVideo && remoteVideo.videoWidth > 0) {
-    ctx.drawImage(remoteVideo, 0, 0, 180, 180);
-    return canvas.toDataURL("image/jpeg", 0.75);
-  } else if (localVideo && localVideo.videoWidth > 0) {
+  if (localVideo && localVideo.videoWidth > 0) {
     ctx.drawImage(localVideo, 0, 0, 180, 180);
+    return canvas.toDataURL("image/jpeg", 0.75);
+  } else if (remoteVideo && remoteVideo.videoWidth > 0) {
+    ctx.drawImage(remoteVideo, 0, 0, 180, 180);
     return canvas.toDataURL("image/jpeg", 0.75);
   }
   return null;
 }
 
-/* ================= 7. BAN ENGINE ================= */
+/* ================= 6. 24-HOUR BAN ENGINE ================= */
 async function checkActiveBan() {
   let banUntil = parseInt(localStorage.getItem("meetloop_banned_until") || "0", 10);
   let banReason = localStorage.getItem("meetloop_banned_reason") || "Policy Violation";
@@ -814,7 +810,11 @@ function runBanCountdown(banUntil, reason = "Policy Violation", customSnap = nul
 
   document.getElementById("banReasonLabel").textContent = reason;
   
-  // I-render ang litrato ng kausap sa loob ng violation box
+  const unbanDate = new Date(banUntil);
+  const formattedUnbanTime = unbanDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + " at " + unbanDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  document.getElementById("banUntilTimeText").textContent = formattedUnbanTime;
+
+  // I-render ang litrato ng kausap na nag-report
   const banCanvas = document.getElementById("banCanvas");
   const ctx = banCanvas.getContext("2d");
   if (snapData) {
@@ -827,8 +827,8 @@ function runBanCountdown(banUntil, reason = "Policy Violation", customSnap = nul
     img.src = snapData;
   } else {
     ctx.fillStyle = "#1e293b"; ctx.fillRect(0, 0, 95, 95);
-    ctx.fillStyle = "#94a3b8"; ctx.font = "bold 9px sans-serif";
-    ctx.fillText("Snapshot Recorded", 4, 50);
+    ctx.fillStyle = "#94a3b8"; ctx.font = "bold 8.5px sans-serif";
+    ctx.fillText("Encounter Recorded", 4, 50);
   }
 
   backToMethodSelection();
@@ -837,9 +837,12 @@ function runBanCountdown(banUntil, reason = "Policy Violation", customSnap = nul
   if (banInterval) clearInterval(banInterval);
   banInterval = setInterval(async () => {
     const rem = Math.max(0, Math.floor((banUntil - Date.now()) / 1000));
-    const m = String(Math.floor(rem / 60)).padStart(2, '0');
+    
+    // 24-Hour Format: HH:MM:SS
+    const h = String(Math.floor(rem / 3600)).padStart(2, '0');
+    const m = String(Math.floor((rem % 3600) / 60)).padStart(2, '0');
     const s = String(rem % 60).padStart(2, '0');
-    document.getElementById("banCountdown").textContent = `${m}:${s}`;
+    document.getElementById("banCountdown").textContent = `${h}:${m}:${s}`;
     
     if (rem <= 0) {
       clearInterval(banInterval);
@@ -864,7 +867,7 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 8. STRICT SERVER-SIDE GCASH VERIFIER ================= */
+/* ================= 7. STRICT GCASH VERIFIER ================= */
 function verifyGCashTransaction() {
   const refInput = document.getElementById("gcashRefInput");
   const status = document.getElementById("gcashRefStatus");
@@ -873,20 +876,20 @@ function verifyGCashTransaction() {
 
   if (!refVal || refVal.length !== 13) {
     status.style.color = "#dc2626";
-    status.textContent = "❌ Mali ang format! Ang GCash Reference No. ay eksaktong 13-digits.";
+    status.textContent = "❌ Invalid format. GCash Reference No. must be exactly 13 digits.";
     return;
   }
 
   btn.disabled = true;
-  btn.textContent = "Kinukumpirma sa Server...";
+  btn.textContent = "Verifying with Server...";
   status.style.color = "#005ce6";
-  status.textContent = "Sinusuri ang official GCash payment record...";
+  status.textContent = "Checking official payment settlement records...";
 
   if (socket && socket.connected) {
     socket.emit("unban-request", { hardwareId: myHardwareId, ref: refVal });
   } else {
     status.style.color = "#dc2626";
-    status.textContent = "❌ Walang koneksyon sa server. Pakisubukan muli.";
+    status.textContent = "❌ Server connection lost. Please try again.";
     btn.disabled = false;
     btn.textContent = "Verify Reference & Unban";
   }
@@ -914,7 +917,7 @@ if (socket) {
         btn.textContent = "Verify Reference & Unban";
         refInput.value = "";
         status.textContent = "";
-        alert("🎉 GCash Payment Verified! Na-lift na ang suspension ng iyong device.");
+        alert("🎉 GCash Payment Verified! Your suspension has been lifted.");
       }, 1200);
     } else {
       btn.disabled = false;
@@ -925,7 +928,7 @@ if (socket) {
   });
 }
 
-/* ================= 9. 100% RELIABLE WEBRTC ENGINE ================= */
+/* ================= 8. WEBRTC MEDIA ENGINE ================= */
 async function startMedia() {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === "live")) {
     if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
@@ -985,7 +988,6 @@ async function triggerStartNext() {
 
   mainActionBtn.disabled = true;
 
-  // TV Static + Searching Loader active
   crtWrapper.style.display = "block";
   standbyCenter.style.display = "none";
   searchLoader.style.display = "flex";
@@ -1119,7 +1121,7 @@ function closePeerConnection() {
   pendingCandidates = [];
 }
 
-/* ================= 10. LANGUAGE TRANSLATOR ================= */
+/* ================= 9. LANGUAGE TRANSLATOR ================= */
 const i18n = {
   en: {
     subTitle: "Random Video Chat",
@@ -1129,10 +1131,11 @@ const i18n = {
     chatTitle: "Live Chat",
     chatRules: "• 18+ only. Strict anti-nudity policy.<br>• Real face required in front of camera.",
     selectMethod: "Select Resolution Method:",
-    waitTitle: "Wait for Cooldown Timer",
-    waitDesc: "Auto unbans when timer ends",
+    waitTitle: "Wait 24-Hour Cooldown",
+    waitDesc: "Auto unbans after 24 hours",
     scanText: "Scan QR via GCash, pay clearance fee, and enter the 13-Digit Ref No.",
-    searching: "Looking for someone..."
+    searching: "Looking for someone...",
+    expiresAt: "Suspension ends:"
   },
   tl: {
     subTitle: "Random Video Chat",
@@ -1142,10 +1145,11 @@ const i18n = {
     chatTitle: "Live Usapan",
     chatRules: "• Bawal ang 18 pababa. Bawal ang kabastusan.<br>• Totoong mukha ang dapat nakatapat sa camera.",
     selectMethod: "Pumili ng Paraan para Ma-unban:",
-    waitTitle: "Maghintay sa Cooldown Timer",
-    waitDesc: "Kusang ma-u-unban pagkatapos ng oras",
+    waitTitle: "Maghintay ng 24-Oras na Cooldown",
+    waitDesc: "Kusang ma-u-unban pagkatapos ng 24 oras",
     scanText: "I-scan sa GCash, magbayad ng clearance fee, at ilagay ang 13-Digit Reference No.",
-    searching: "Naghahanap ng makakausap..."
+    searching: "Naghahanap ng makakausap...",
+    expiresAt: "Matatapos sa:"
   }
 };
 
@@ -1162,13 +1166,14 @@ function setLanguage(lang) {
   document.getElementById("lblWaitDesc").textContent = t.waitDesc;
   document.getElementById("lblScanText").textContent = t.scanText;
   document.getElementById("lblSearchText").textContent = t.searching;
+  document.getElementById("lblExpiresAt").textContent = t.expiresAt;
 }
 
 document.getElementById("languageSelect").addEventListener("change", (e) => {
   setLanguage(e.target.value);
 });
 
-/* ================= 11. SOCKET & SIGNALING EVENTS ================= */
+/* ================= 10. SOCKET & SIGNALING EVENTS ================= */
 if (socket) {
   socket.on("online-count", count => {
     if (standbyUsers) standbyUsers.textContent = Number(count || 1).toLocaleString();
@@ -1284,11 +1289,11 @@ flipBtn.addEventListener("click", async () => {
   }
 });
 
-// REPORT BUTTON: Kinukunan ang partner camera feed at ipapadala sa server
+// REPORT: Reporter face captured so violator sees who reported them
 reportBtn.addEventListener("click", () => {
   if (!connected) return;
-  const partnerSnap = capturePartnerSnapshot();
-  if (socket) socket.emit("report-user", { reason: "Policy Violation", snapshot: partnerSnap });
+  const snap = captureReporterSnapshot();
+  if (socket) socket.emit("report-user", { reason: "Policy Violation", snapshot: snap });
   reportBtn.disabled = true;
   triggerStartNext();
 });
