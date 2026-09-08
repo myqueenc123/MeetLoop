@@ -274,11 +274,11 @@ video{
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 }
 
-/* ================= 7-DAY HARD LOCK BAN OVERLAY ================= */
+/* ================= HARD LOCK BAN OVERLAY (MAX Z-INDEX) ================= */
 #banOverlay{
-  position:fixed;inset:0;z-index:999999999;background:rgba(0,0,0,.96);
+  position:fixed;inset:0;z-index:2147483647 !important;background:rgba(0,0,0,.97);
   display:none;align-items:center;justify-content:center;padding:12px;overflow-y:auto;
-  pointer-events:all;
+  pointer-events:all !important;
 }
 .ban-card{
   max-width:440px;width:100%;background:#ffffff;border-radius:22px;
@@ -352,10 +352,13 @@ video{
 }
 .gcash-input-field:focus{border-color:#005ce6}
 .gcash-verify-btn{
-  width:100%;height:44px;border:0;border-radius:10px;
-  background:#005ce6;color:#fff;font-size:13.5px;font-weight:900;cursor:pointer;margin-top:2px;
+  width:100%;height:46px;border:0;border-radius:10px;
+  background:#005ce6;color:#fff;font-size:13px;font-weight:900;cursor:pointer;margin-top:2px;
+  transition:all 0.2s;
 }
-.gcash-verify-btn:disabled{opacity:0.6;cursor:not-allowed}
+.gcash-verify-btn:disabled{
+  background:#475569 !important;color:#94a3b8 !important;cursor:not-allowed !important;
+}
 
 .telegram-support-btn{
   width:100%;height:42px;border:1.5px solid #0284c7;border-radius:10px;
@@ -431,7 +434,7 @@ video{
   </div>
 </div>
 
-<!-- 7-DAY BAN OVERLAY (HARD LOCK) -->
+<!-- 7-DAY HARD LOCK BAN OVERLAY -->
 <div id="banOverlay">
   <div class="ban-card">
     <div class="ban-top">
@@ -482,7 +485,7 @@ video{
       </div>
     </div>
 
-    <!-- VIEW 2: GCASH TOPUP FORM (Includes Official Disclaimer) -->
+    <!-- VIEW 2: GCASH TOPUP FORM -->
     <div id="gcashPaySection">
       <div class="gcash-logo-banner">
         <svg class="gcash-official-svg" viewBox="0 0 160 38" fill="none">
@@ -493,7 +496,7 @@ video{
         </svg>
       </div>
 
-      <!-- DYNAMIC DISCLAIMER BOX (Inside GCash pay only) -->
+      <!-- DISCLAIMER BOX (Inside GCash view only) -->
       <div class="ban-disclaimer-box">
         <div class="ban-disclaimer-title">
           🚫 Official Ban Clearance Notice
@@ -522,7 +525,7 @@ video{
       </div>
 
       <div id="gcashRefStatus" style="font-size:11.5px;font-weight:800;text-align:center;min-height:16px;line-height:1.4"></div>
-      <button type="button" class="btn-back-methods" onclick="backToMethodSelection()">← Back to Options</button>
+      <button type="button" class="btn-back-methods" id="btnBackMethods" onclick="backToMethodSelection()">← Back to Options</button>
     </div>
 
     <!-- 7-DAY EXPIRATION STATUS -->
@@ -645,7 +648,7 @@ video{
 <script>
 "use strict";
 
-/* ================= 1. PERMANENT TAMPER-PROOF DEVICE ID ================= */
+/* ================= 1. PERMANENT DEVICE ID ================= */
 function getPermanentDeviceId() {
   let devId = localStorage.getItem("meetloop_device_id");
   if (!devId || devId.length < 10) {
@@ -666,7 +669,7 @@ let dbInstance = null;
 function initSecurityDB() {
   return new Promise((resolve) => {
     try {
-      const req = indexedDB.open("MeetLoop_SecEngine_V2", 1);
+      const req = indexedDB.open("MeetLoop_SecEngine_V3", 1);
       req.onupgradeneeded = (e) => {
         const db = e.target.result;
         if (!db.objectStoreNames.contains("bans")) db.createObjectStore("bans", { keyPath: "id" });
@@ -875,8 +878,13 @@ function openGcashPayView() {
   document.getElementById("gcashRefInput").value = "";
   document.getElementById("gcashSenderName").value = "";
   document.getElementById("gcashRefStatus").textContent = "";
-  document.getElementById("gcashVerifyBtn").disabled = false;
-  document.getElementById("gcashVerifyBtn").textContent = "Submit for Verification";
+  
+  // Reset fields & buttons
+  const btn = document.getElementById("gcashVerifyBtn");
+  btn.disabled = false;
+  btn.textContent = "Submit for Verification";
+  document.getElementById("gcashSenderName").disabled = false;
+  document.getElementById("gcashRefInput").disabled = false;
 }
 
 function backToMethodSelection() {
@@ -884,7 +892,7 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 7. SUBMIT GCASH TICKET (NO AUTO UNBAN) ================= */
+/* ================= 7. SUBMIT GCASH TICKET (100% MANUAL ADMIN UNBAN ONLY) ================= */
 function submitGCashUnbanTicket() {
   const nameInput = document.getElementById("gcashSenderName");
   const refInput = document.getElementById("gcashRefInput");
@@ -900,35 +908,38 @@ function submitGCashUnbanTicket() {
     return;
   }
 
+  // HARD LOCK: I-lock ang button at inputs para hindi makalusot ang user
   btn.disabled = true;
-  btn.textContent = "⏳ Verification in Progress...";
+  btn.textContent = "⏳ NAI-SUBMIT NA — WAITING FOR TELEGRAM APPROVAL";
+  nameInput.disabled = true;
+  refInput.disabled = true;
+
   status.style.color = "#0284c7";
-  status.textContent = "Details sent to Telegram Admin! Waiting for admin approval...";
+  status.innerHTML = "⏳ <b>Details sent to Telegram Admin!</b><br><span style='color:#dc2626;font-size:10.5px;'>⚠️ Hindi ka pa unbanned. I-che-check muna ni Admin ang Ref No. sa Telegram bago ka ma-unban.</span>";
 
   if (socket && socket.connected) {
     socket.emit("unban-request", { hardwareId: myHardwareId, name: nameVal, ref: refVal });
   } else {
     status.style.color = "#dc2626";
-    status.textContent = "❌ Server connection lost. Please try again.";
+    status.textContent = "❌ Server connection lost. Please reload and try again.";
     btn.disabled = false;
     btn.textContent = "Submit for Verification";
+    nameInput.disabled = false;
+    refInput.disabled = false;
   }
 }
 
-// REAL-TIME UNBAN LISTENER (EXCLUSIVELY UNLOCKED BY ADMIN TELEGRAM APPROVAL LINK)
+// REAL-TIME UNBAN LISTENER (ONLY UNBANNED IF JM CLICKS APPROVE IN TELEGRAM)
 if (socket) {
   socket.on("unban-pending", (data) => {
     const status = document.getElementById("gcashRefStatus");
-    const btn = document.getElementById("gcashVerifyBtn");
     status.style.color = "#0284c7";
-    status.textContent = "⏳ Verification in Progress... Waiting for Admin to click Approve in Telegram.";
-    btn.disabled = true;
-    btn.textContent = "⏳ Verification in Progress...";
+    status.innerHTML = "⏳ <b>Ticket Logged!</b><br>Nai-send na kay Admin sa Telegram. Hintaying i-click ni Admin ang Approve Link.";
   });
 
   socket.on("admin-approved-unban", async (data) => {
-    // Only unban the exact matching Device ID
-    if (data.hardwareId === myHardwareId) {
+    // I-unban LAMANG kapag tumugma ang eksaktong Device ID
+    if (data.hardwareId && data.hardwareId === myHardwareId) {
       localStorage.removeItem("meetloop_banned_until");
       localStorage.removeItem("meetloop_banned_reason");
       localStorage.removeItem("meetloop_snap");
@@ -952,6 +963,8 @@ if (socket) {
     if (!data.success) {
       btn.disabled = false;
       btn.textContent = "Submit for Verification";
+      document.getElementById("gcashSenderName").disabled = false;
+      document.getElementById("gcashRefInput").disabled = false;
       status.style.color = "#dc2626";
       status.textContent = data.message;
     }
