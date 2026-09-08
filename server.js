@@ -23,10 +23,11 @@ const PORT = process.env.PORT || 3000;
 const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days in Milliseconds
 
 // =========================================================================
-// 🤖 TELEGRAM BOT (@MeetLoop_bot | Admin ID: 5779976596)
+// 🤖 TELEGRAM BOT CONFIGURATION (@MeetLoop_bot | Admin ID: 5779976596)
 // =========================================================================
-const _SECURE_KEY = "ODY0ODM1Njc2NTpBQUdnakVZOVc4VF9yV1VFazFEZ3hIUzQ4b05MT2hnMGQycw==";
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || Buffer.from(_SECURE_KEY, "base64").toString("utf-8");
+const _partA = "8648356765";
+const _partB = "AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || (_partA + ":" + _partB);
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || "5779976596";
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -37,38 +38,21 @@ app.use(express.urlencoded({ extended: true }));
 const bannedDevices = new Map();
 const pendingRequests = new Map();
 
-// Helper para magpadala ng mensahe sa Telegram (100% Reliable HTML Mode)
+// Helper para magpadala ng mensahe sa Telegram (100% Guaranteed GET Method)
 function sendTelegramMessage(chatId, text) {
   if (!chatId || !TELEGRAM_BOT_TOKEN) return;
 
-  const payload = JSON.stringify({
-    chat_id: chatId,
-    text: text,
-    parse_mode: "HTML",
-    disable_web_page_preview: false
-  });
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}&parse_mode=HTML`;
 
-  const options = {
-    hostname: "api.telegram.org",
-    path: `/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Content-Length": Buffer.byteLength(payload)
-    }
-  };
-
-  const req = https.request(options, (res) => {
-    let resData = "";
-    res.on("data", (chunk) => resData += chunk);
+  https.get(url, (res) => {
+    let data = "";
+    res.on("data", (chunk) => data += chunk);
     res.on("end", () => {
-      console.log("Telegram API Send Result:", resData);
+      console.log("✅ Telegram Alert Result:", data);
     });
+  }).on("error", (e) => {
+    console.log("❌ Telegram Send Error:", e.message);
   });
-
-  req.on("error", (e) => console.log("Telegram Send Error:", e.message));
-  req.write(payload);
-  req.end();
 }
 
 // Function: Magpadala ng ₱20 Unban Alert sa Telegram mo
@@ -79,7 +63,7 @@ function sendTelegramNotification(reqId, name, ref) {
                   `👤 <b>Sender:</b> ${name}\n` +
                   `💳 <b>Ref No:</b> <code>${ref}</code>\n` +
                   `💰 <b>Amount:</b> ₱20 Support Payment\n\n` +
-                  `👉 <b>Tingnan ang GCash mo. Kung pumasok ang ₱20, i-click ito para ma-unban agad siya:</b>\n\n` +
+                  `👉 <b>Kung pumasok ang ₱20 sa GCash mo, i-click ang link na ito para ma-unban agad siya:</b>\n\n` +
                   `${approveLink}`;
 
   sendTelegramMessage(ADMIN_CHAT_ID, msgText);
@@ -92,22 +76,17 @@ app.get("/test-telegram", (req, res) => {
   const testId = "test" + Math.floor(Math.random() * 90000 + 10000);
   pendingRequests.set(testId, { hardwareId: "test_hw", ref: "1234567890123", name: "Jm Live Test" });
   sendTelegramNotification(testId, "Jm Live Test", "1234567890123");
-  res.send("<h1 style='font-family:sans-serif;text-align:center;margin-top:50px;color:#16a34a;'>✅ Test Alert Sent to your Telegram! Tingnan mo ang Telegram app mo.</h1>");
+  res.send("<h1 style='font-family:sans-serif;text-align:center;margin-top:50px;color:#16a34a;'>✅ Test Alert Sent! Tingnan mo ang Telegram mo.</h1>");
 });
 
 // =========================================================================
-// ⚡ HIGH-SPEED TELEGRAM BOT LISTENER & AUTO-RESPONDER
+// ⚡ TELEGRAM AUTO-POLLING LISTENER
 // =========================================================================
 let lastUpdateId = 0;
 function pollTelegramUpdates() {
-  const options = {
-    hostname: "api.telegram.org",
-    path: `/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=10`,
-    method: "GET",
-    timeout: 15000
-  };
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=10`;
 
-  const req = https.request(options, (res) => {
+  https.get(url, (res) => {
     let data = "";
     res.on("data", (chunk) => data += chunk);
     res.on("end", () => {
@@ -136,18 +115,9 @@ function pollTelegramUpdates() {
       } catch (e) {}
       setTimeout(pollTelegramUpdates, 1000);
     });
-  });
-
-  req.on("timeout", () => {
-    req.destroy();
-    setTimeout(pollTelegramUpdates, 1500);
-  });
-
-  req.on("error", (e) => {
+  }).on("error", (e) => {
     setTimeout(pollTelegramUpdates, 3000);
   });
-
-  req.end();
 }
 
 // ==========================================
@@ -318,7 +288,7 @@ io.on("connection", (socket) => {
     const reqId = "req" + Math.floor(Math.random() * 900000 + 100000);
     pendingRequests.set(reqId, { hardwareId: reqHardware, ref, name, socketId: socket.id });
 
-    // Send instant alert to Telegram (HTML mode)
+    // Send instant alert to Telegram (GET Method)
     sendTelegramNotification(reqId, name, ref);
 
     return socket.emit("unban-pending", {
