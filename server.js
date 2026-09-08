@@ -23,12 +23,10 @@ const PORT = process.env.PORT || 3000;
 const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days in Milliseconds
 
 // =========================================================================
-// 🤖 SECURE TELEGRAM CONFIGURATION (SAFE ENCRYPTED DECRYPTION)
+// 🤖 TELEGRAM BOT (Bot ID: 8648356765 | Admin ID: 5779976596)
 // =========================================================================
 const _SECURE_KEY = "ODY0ODM1Njc2NTpBQUdnakVZOVc4VF9yV1VFazFEZ3hIUzQ4b05MT2hnMGQycw==";
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || Buffer.from(_SECURE_KEY, "base64").toString("utf-8");
-
-// IYONG TELEGRAM CHAT ID: 5779976596
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || "5779976596";
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -77,7 +75,7 @@ function sendTelegramNotification(reqId, name, ref) {
                   `👤 *Sender:* ${name}\n` +
                   `💳 *Ref No:* \`${ref}\`\n` +
                   `💰 *Amount:* ₱20 Support Payment\n\n` +
-                  `👉 *Tingnan ang GCash mo. Kung pumasok ang ₱20, i-click ang link na ito para ma-unban agad siya:* \n\n` +
+                  `👉 *Tingnan ang iyong GCash. Kung pumasok ang ₱20, i-click ang link na ito para ma-unban agad siya:* \n\n` +
                   `${approveLink}`;
 
   sendTelegramMessage(ADMIN_CHAT_ID, msgText);
@@ -113,11 +111,10 @@ function startTelegramBotListener() {
 
               console.log(`✅ [TELEGRAM] Message from ${senderName} (ID: ${incomingChatId}): ${text}`);
 
-              // Awtomatikong magre-reply kapag nag-start ka
               if (text.startsWith("/start")) {
                 const welcomeReply = `👋 *Kamusta Jm!*\n\n` +
-                                     `✅ *100% Connected na ang bot sa MeetLoop Server mo!*\n\n` +
-                                     `Kapag may user na nagbayad ng *₱20* sa GCash at nag-submit ng Ref No., agad kitang papadalhan ng alert dito na may 1-Click Approve link. 🎉`;
+                                     `✅ *100% Connected na ang bot (@MeetLoopPayBot) sa MeetLoop Server mo!*\n\n` +
+                                     `Kapag may user na nagbayad ng *₱20* sa GCash at nag-submit ng Ref No., dito ko agad ipapadala ang alert na may 1-Click Approve Link. 🎉`;
                 sendTelegramMessage(incomingChatId, welcomeReply);
               }
             }
@@ -155,7 +152,7 @@ app.get("/admin/approve", (req, res) => {
   bannedDevices.delete(request.hardwareId);
   pendingRequests.delete(id);
 
-  // Real-time unban signal papunta sa website
+  // Real-time unban signal papunta sa browser ng user
   io.emit("admin-approved-unban", { hardwareId: request.hardwareId });
 
   res.send(`
@@ -266,7 +263,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  // REPORT USER: 7-Day suspension sa partner + snapshot evidence
+  // REPORT USER: 7-Day suspension sa partner + stranger snapshot evidence
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -304,7 +301,7 @@ io.on("connection", (socket) => {
     const reqId = "req_" + Math.random().toString(36).substr(2, 9);
     pendingRequests.set(reqId, { hardwareId: reqHardware, ref, name, socketId: socket.id });
 
-    // I-send agad ang alert sa Telegram mo!
+    // Send instant alert to Telegram
     sendTelegramNotification(reqId, name, ref);
 
     return socket.emit("unban-pending", {
