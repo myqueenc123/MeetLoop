@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 3000;
 const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days in Milliseconds
 
 // =========================================================================
-// 🤖 TELEGRAM BOT (Bot ID: 8648356765 | Admin ID: 5779976596)
+// 🤖 TELEGRAM BOT (@MeetLoop_bot | Admin ID: 5779976596)
 // =========================================================================
 const _SECURE_KEY = "ODY0ODM1Njc2NTpBQUdnakVZOVc4VF9yV1VFazFEZ3hIUzQ4b05MT2hnMGQycw==";
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || Buffer.from(_SECURE_KEY, "base64").toString("utf-8");
@@ -113,7 +113,7 @@ function startTelegramBotListener() {
 
               if (text.startsWith("/start")) {
                 const welcomeReply = `👋 *Kamusta Jm!*\n\n` +
-                                     `✅ *100% Connected na ang bot (@MeetLoopPayBot) sa MeetLoop Server mo!*\n\n` +
+                                     `✅ *100% Connected na ang bot (@MeetLoop_bot) sa MeetLoop Server mo!*\n\n` +
                                      `Kapag may user na nagbayad ng *₱20* sa GCash at nag-submit ng Ref No., dito ko agad ipapadala ang alert na may 1-Click Approve Link. 🎉`;
                 sendTelegramMessage(incomingChatId, welcomeReply);
               }
@@ -345,6 +345,6 @@ app.get("*", (req, res) => {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`🤖 Telegram Auto-Responder Bot: ACTIVE (Admin ID: ${ADMIN_CHAT_ID})`);
+  console.log(`🤖 Telegram Auto-Responder Bot: ACTIVE (@MeetLoop_bot | Admin ID: ${ADMIN_CHAT_ID})`);
   console.log(`================================================`);
 });
