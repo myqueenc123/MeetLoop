@@ -1,8 +1,7 @@
 /**
  * MeetLoop - Official Production Server Backend
- * 100% Filipino Made Random Video Chat 🇵🇭
  * High-Speed Telegram Auto-Pairing Bot + WebRTC Matchmaking
- * (Zero-Cache Anti-Bypass Security Engine)
+ * (Single-Tab Enforced + Anti-Bypass Security)
  */
 
 const express = require("express");
@@ -31,7 +30,7 @@ const _partB = "AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || (_partA + ":" + _partB);
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || "5779976596";
 
-// 🛡️ ANTI-CACHE HEADERS: Para laging fresh at bago ang code sa browser ng user
+// Anti-Cache Headers
 app.use((req, res, next) => {
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
   res.setHeader("Pragma", "no-cache");
@@ -51,7 +50,7 @@ const pendingRequests = new Map();
 function sendTelegramMessage(chatId, text) {
   if (!chatId || !TELEGRAM_BOT_TOKEN) return;
 
-  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}&parse_mode=HTML`;
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}&parse_mode=HTML&disable_web_page_preview=true`;
 
   https.get(url, (res) => {
     let data = "";
@@ -69,14 +68,14 @@ function sendTelegramNotification(reqId, name, ref) {
                   `👤 <b>Sender Name:</b> ${name}\n` +
                   `💳 <b>GCash Ref No:</b> <code>${ref}</code>\n` +
                   `💰 <b>Amount:</b> ₱20 Support Payment\n\n` +
-                  `👉 <b>Kung pumasok ang ₱20 sa GCash mo, i-click ang link na ito para ma-unban agad siya:</b>\n\n` +
+                  `👉 <b>Kung pumasok ang ₱20 sa GCash mo, i-click ang link na ito para buksan ang Approval Portal:</b>\n\n` +
                   `${approveLink}`;
 
   sendTelegramMessage(ADMIN_CHAT_ID, msgText);
 }
 
 // ==========================================
-// 🔗 1-CLICK APPROVAL LINK (ADMIN ONLY)
+// 🔒 ADMIN CONFIRMATION PORTAL
 // ==========================================
 app.get("/admin/approve", (req, res) => {
   const { id, secret } = req.query;
@@ -87,20 +86,73 @@ app.get("/admin/approve", (req, res) => {
 
   const request = pendingRequests.get(id);
   if (!request) {
-    return res.send("<h1 style='font-family:sans-serif;text-align:center;margin-top:50px;'>⚠️ Request not found or already approved/expired.</h1>");
+    return res.send(`
+      <div style="font-family:sans-serif;text-align:center;padding:50px;background:#0a0e17;color:#fff;min-height:100vh;">
+        <h1 style="color:#ef4444;">⚠️ Ticket Not Found or Already Handled</h1>
+        <p style="color:#94a3b8;">Baka na-approve na ito dati o nag-expire na.</p>
+      </div>
+    `);
   }
 
-  // Tanggalin ang ban sa server memory
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>MeetLoop Admin - Unban Approval</title>
+      <style>
+        body{background:#0a0e17;color:#fff;font-family:system-ui,-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:16px;}
+        .card{background:#111827;border:1.5px solid #1f293d;border-radius:20px;max-width:420px;width:100%;padding:24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.8);}
+        .title{font-size:20px;font-weight:900;color:#38bdf8;margin-bottom:16px;}
+        .info-box{background:#070b14;border:1px solid #1f293d;border-radius:12px;padding:14px;text-align:left;font-size:13px;line-height:1.7;margin-bottom:20px;}
+        .btn-confirm{width:100%;height:50px;border:0;border-radius:12px;background:#16a34a;color:#fff;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 4px 15px rgba(22,163,74,0.4);}
+        .btn-confirm:hover{background:#15803d;}
+      </style>
+    </head>
+    <body>
+      <div class="card">
+        <div class="title">MeetLoop Admin Verification</div>
+        <div class="info-box">
+          <div>👤 <b>Sender Name:</b> <span style="color:#38bdf8;">${request.name}</span></div>
+          <div>💳 <b>GCash Ref No:</b> <code style="color:#facc15;font-size:14px;">${request.ref}</code></div>
+          <div>💰 <b>Amount:</b> <b>₱20.00 GCash</b></div>
+          <div>📱 <b>Device ID:</b> <span style="color:#94a3b8;font-size:11px;">${request.hardwareId}</span></div>
+        </div>
+        <form method="POST" action="/admin/confirm-unban">
+          <input type="hidden" name="id" value="${id}">
+          <input type="hidden" name="secret" value="MEETLOOP2026">
+          <button type="submit" class="btn-confirm">✅ CONFIRM & UNBAN USER NOW</button>
+        </form>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
+// POST ACTION: Confirm Unban
+app.post("/admin/confirm-unban", (req, res) => {
+  const { id, secret } = req.body;
+
+  if (secret !== "MEETLOOP2026") {
+    return res.status(403).send("<h1>Unauthorized</h1>");
+  }
+
+  const request = pendingRequests.get(id);
+  if (!request) {
+    return res.send("<h1 style='font-family:sans-serif;text-align:center;margin-top:50px;color:#fff;background:#0a0e17;min-height:100vh;'>⚠️ Request already processed.</h1>");
+  }
+
+  // TANGGALIN ANG BAN
   bannedDevices.delete(request.hardwareId);
   pendingRequests.delete(id);
 
-  // Send REAL unban signal only when JM clicks the link
+  // REAL UNBAN SIGNAL TO CLIENT
   io.emit("real-admin-unban-signal", { hardwareId: request.hardwareId });
 
   res.send(`
     <div style="font-family:sans-serif;text-align:center;padding:50px;background:#0a0e17;color:#fff;min-height:100vh;">
-      <h1 style="color:#16a34a;font-size:32px;">✅ ₱20 Unban Approved!</h1>
-      <p style="font-size:18px;color:#cbd5e1;">Ang user na may Ref No: <b style="color:#38bdf8;">${request.ref}</b> ay matagumpay nang na-unban sa MeetLoop.</p>
+      <h1 style="color:#16a34a;font-size:32px;">🎉 Unban Approved!</h1>
+      <p style="font-size:18px;color:#cbd5e1;">The user with Ref No: <b style="color:#38bdf8;">${request.ref}</b> has been successfully unbanned.</p>
     </div>
   `);
 });
@@ -214,7 +266,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  // REPORT USER: Violator lang ang maba-ban
+  // REPORT USER
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -238,7 +290,7 @@ io.on("connection", (socket) => {
     socket.emit("report-success");
   });
 
-  // SUBMIT GCASH UNBAN TICKET (WALANG KAKAYAHANG MAG-UNBAN SA SARILI)
+  // SUBMIT GCASH UNBAN TICKET
   socket.on("unban-request", (data) => {
     const ref = String(data.ref || "").trim().replace(/[^0-9]/g, "");
     const name = String(data.name || "Anonymous User").trim();
@@ -251,7 +303,7 @@ io.on("connection", (socket) => {
     const reqId = "req" + Math.floor(Math.random() * 900000 + 100000);
     pendingRequests.set(reqId, { hardwareId: reqHardware, ref, name, socketId: socket.id });
 
-    // I-send sa Telegram mo!
+    // Send notification to JM's Telegram
     sendTelegramNotification(reqId, name, ref);
 
     return socket.emit("unban-pending", {
@@ -294,8 +346,8 @@ app.get("*", (req, res) => {
 /* ================= BIND TO 0.0.0.0 FOR RENDER ================= */
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
-  console.log(`🚀 MeetLoop Server LIVE on port ${PORT} (PH Made 🇵🇭)`);
+  console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
   console.log(`🤖 Telegram Admin Bot: ACTIVE (@MeetLoop_bot)`);
-  console.log(`🛡️ 100% Anti-Bypass Lock: ENFORCED`);
+  console.log(`🛡️ Single-Tab & Anti-Cheat Engine: LOCKED`);
   console.log(`================================================`);
 });
