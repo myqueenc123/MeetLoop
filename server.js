@@ -1,7 +1,7 @@
 /**
  * MeetLoop - Official Production Server Backend
+ * 100% Filipino Made Random Video Chat 🇵🇭
  * High-Speed Telegram Auto-Pairing Bot + WebRTC Matchmaking
- * (Protected from GitGuardian / Anti-Bypass Security Engine)
  */
 
 const express = require("express");
@@ -20,7 +20,7 @@ const io = new Server(server, {
 });
 
 const PORT = process.env.PORT || 3000;
-const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days in Milliseconds
+const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days
 
 // =========================================================================
 // 🤖 TELEGRAM BOT CONFIGURATION (@MeetLoop_bot | Admin ID: 5779976596)
@@ -34,16 +34,11 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* ================= TAMPER-PROOF BAN DATABASE ================= */
-const bannedDevices = new Map(); // Hardware ID & IP Banned
-const pendingRequests = new Map(); // GCash tickets
+/* ================= BAN & TICKET DATABASE ================= */
+const bannedDevices = new Map(); // Hardware Device ID Lock
+const pendingRequests = new Map(); // GCash unban tickets
 
-function getClientIP(socket) {
-  const forwarded = socket.handshake.headers["x-forwarded-for"];
-  return forwarded ? forwarded.split(",")[0].trim() : socket.handshake.address;
-}
-
-// Helper para magpadala ng mensahe sa Telegram (100% Working GET Method)
+// Helper para magpadala ng alert sa Telegram
 function sendTelegramMessage(chatId, text) {
   if (!chatId || !TELEGRAM_BOT_TOKEN) return;
 
@@ -53,7 +48,7 @@ function sendTelegramMessage(chatId, text) {
     let data = "";
     res.on("data", (chunk) => data += chunk);
   }).on("error", (e) => {
-    console.log("❌ Telegram Send Error:", e.message);
+    console.log("❌ Telegram Error:", e.message);
   });
 }
 
@@ -65,14 +60,14 @@ function sendTelegramNotification(reqId, name, ref) {
                   `👤 <b>Sender Name:</b> ${name}\n` +
                   `💳 <b>GCash Ref No:</b> <code>${ref}</code>\n` +
                   `💰 <b>Amount:</b> ₱20 Support Payment\n\n` +
-                  `👉 <b>Tingnan ang GCash app mo. Kung pumasok ang ₱20, i-click ito para ma-unban siya:</b>\n\n` +
+                  `👉 <b>Kung pumasok ang ₱20 sa GCash mo, i-click ang link na ito para ma-unban agad siya:</b>\n\n` +
                   `${approveLink}`;
 
   sendTelegramMessage(ADMIN_CHAT_ID, msgText);
 }
 
 // ==========================================
-// 🔗 1-CLICK APPROVAL ENDPOINT (ADMIN ONLY)
+// 🔗 1-CLICK APPROVAL LINK (ADMIN ONLY)
 // ==========================================
 app.get("/admin/approve", (req, res) => {
   const { id, secret } = req.query;
@@ -86,12 +81,11 @@ app.get("/admin/approve", (req, res) => {
     return res.send("<h1 style='font-family:sans-serif;text-align:center;margin-top:50px;'>⚠️ Request not found or already approved/expired.</h1>");
   }
 
-  // Tanggalin ang ban sa server database
+  // Tanggalin ang ban
   bannedDevices.delete(request.hardwareId);
-  if (request.ip) bannedDevices.delete(request.ip);
   pendingRequests.delete(id);
 
-  // Padalhan ng unban signal ang browser ng user
+  // Padalhan ng unban signal ang user
   io.emit("admin-approved-unban", { hardwareId: request.hardwareId });
 
   res.send(`
@@ -102,31 +96,23 @@ app.get("/admin/approve", (req, res) => {
   `);
 });
 
-function checkDeviceBan(hardwareId, ip = "") {
+function checkDeviceBan(hardwareId) {
+  if (!hardwareId) return null;
   const now = Date.now();
 
-  if (hardwareId && bannedDevices.has(hardwareId)) {
+  if (bannedDevices.has(hardwareId)) {
     const record = bannedDevices.get(hardwareId);
     if (now < record.banUntil) return record;
     bannedDevices.delete(hardwareId);
   }
-
-  if (ip && bannedDevices.has(ip)) {
-    const record = bannedDevices.get(ip);
-    if (now < record.banUntil) return record;
-    bannedDevices.delete(ip);
-  }
-
   return null;
 }
 
-function banDevice(hardwareId, ip, reason, snapshot = null, durationMs = BAN_DURATION_7DAYS) {
+function banDevice(hardwareId, reason, snapshot = null, durationMs = BAN_DURATION_7DAYS) {
+  if (!hardwareId) return null;
   const banUntil = Date.now() + durationMs;
-  const record = { banUntil, reason, snapshot, hardwareId, ip };
-
-  if (hardwareId) bannedDevices.set(hardwareId, record);
-  if (ip) bannedDevices.set(ip, record);
-
+  const record = { banUntil, reason, snapshot, hardwareId };
+  bannedDevices.set(hardwareId, record);
   return record;
 }
 
@@ -164,12 +150,11 @@ function matchUsers() {
 /* ================= SOCKET.IO EVENTS ================= */
 io.on("connection", (socket) => {
   const hardwareId = socket.handshake.query.hardwareId || socket.handshake.query.deviceId;
-  const ip = getClientIP(socket);
 
   io.emit("online-count", io.engine.clientsCount);
 
-  // STRICT SERVER CHECK: Kung banned, i-freeze agad
-  const banInfo = checkDeviceBan(hardwareId, ip);
+  // Ban check on connection
+  const banInfo = checkDeviceBan(hardwareId);
   if (banInfo) {
     socket.emit("ip-banned", {
       banUntil: banInfo.banUntil,
@@ -179,8 +164,7 @@ io.on("connection", (socket) => {
   }
 
   socket.on("skip", () => {
-    // SERVER FIREWALL CHECK
-    const currentBan = checkDeviceBan(hardwareId, ip);
+    const currentBan = checkDeviceBan(hardwareId);
     if (currentBan) {
       return socket.emit("ip-banned", {
         banUntil: currentBan.banUntil,
@@ -207,7 +191,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("signal", (data) => {
-    const currentBan = checkDeviceBan(hardwareId, ip);
+    const currentBan = checkDeviceBan(hardwareId);
     if (currentBan) return;
 
     const partnerId = activePairs.get(socket.id);
@@ -219,17 +203,17 @@ io.on("connection", (socket) => {
     }
   });
 
-  // REPORT USER: 7-Day suspension + snapshot evidence
+  // REPORT USER: Ang violator lang ang maba-ban (HINDI ang nag-report)
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
       const partner = io.sockets.sockets.get(partnerId);
       if (partner) {
         const partnerHw = partner.handshake.query.hardwareId;
-        const partnerIp = getClientIP(partner);
-        const reporterSnapshot = data.snapshot || null;
+        const encounterSnapshot = data.snapshot || null;
 
-        const record = banDevice(partnerHw, partnerIp, data.reason || "Policy Violation", reporterSnapshot, BAN_DURATION_7DAYS);
+        // Ban ONLY the partner's unique hardware ID
+        const record = banDevice(partnerHw, data.reason || "Policy Violation", encounterSnapshot, BAN_DURATION_7DAYS);
 
         partner.emit("ip-banned", {
           banUntil: record.banUntil,
@@ -245,7 +229,7 @@ io.on("connection", (socket) => {
     socket.emit("report-success");
   });
 
-  // SUBMIT GCASH UNBAN TICKET
+  // SUBMIT GCASH TICKET
   socket.on("unban-request", (data) => {
     const ref = String(data.ref || "").trim().replace(/[^0-9]/g, "");
     const name = String(data.name || "Anonymous User").trim();
@@ -256,9 +240,9 @@ io.on("connection", (socket) => {
     }
 
     const reqId = "req" + Math.floor(Math.random() * 900000 + 100000);
-    pendingRequests.set(reqId, { hardwareId: reqHardware, ip, ref, name, socketId: socket.id });
+    pendingRequests.set(reqId, { hardwareId: reqHardware, ref, name, socketId: socket.id });
 
-    // I-send agad sa Telegram ni JM!
+    // I-send agad kay JM sa Telegram
     sendTelegramNotification(reqId, name, ref);
 
     return socket.emit("unban-pending", {
@@ -301,8 +285,7 @@ app.get("*", (req, res) => {
 /* ================= BIND TO 0.0.0.0 FOR RENDER ================= */
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
-  console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`🛡️ Anti-Cheat Ban Security: ACTIVE`);
+  console.log(`🚀 MeetLoop Server LIVE on port ${PORT} (PH Made 🇵🇭)`);
   console.log(`🤖 Telegram Admin Bot: ACTIVE (@MeetLoop_bot)`);
   console.log(`================================================`);
 });
