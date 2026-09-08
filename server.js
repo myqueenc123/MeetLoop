@@ -1,6 +1,6 @@
 /**
- * MeetLoop - Official Global Production Server Backend
- * Full International Edition (Render Certified)
+ * MeetLoop - Production Server Backend
+ * Casino Plus / Top-Up Style Instant GCash Unban Gateway
  */
 
 const express = require("express");
@@ -21,7 +21,7 @@ const io = new Server(server, {
 });
 
 const PORT = process.env.PORT || 3000;
-const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days in Milliseconds (604,800,000 ms)
+const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days in Milliseconds
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
@@ -30,29 +30,33 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-/* ================= BAN & GCASH DATABASE ================= */
+/* ================= BAN & GCASH TOP-UP DATABASE ================= */
 const bannedDevices = new Map(); // hardwareId -> { banUntil, reason, snapshot }
-const usedGcashReferences = new Set(); // One-time use only storage
+const usedGcashReferences = new Set(); // Stores already claimed references
 
-// SMART REAL-RECEIPT GCASH VALIDATOR
-function validateGCashReference(ref) {
-  if (!ref || typeof ref !== "string") return false;
-  const cleanRef = ref.trim().replace(/\s+/g, "");
+// CASINO PLUS STYLE INSTANT REFERENCE VALIDATOR
+function validateTopUpReference(ref) {
+  if (!ref || typeof ref !== "string") return { valid: false, message: "Please enter a valid Reference Number." };
+  
+  // Linisin ang input (alisin ang spaces, dashes, etc.)
+  const cleanRef = ref.trim().replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
 
-  // 1. Dapat eksaktong 13 digits (Standard GCash Format)
-  if (!/^\d{13}$/.test(cleanRef)) return false;
+  // 1. Minimum length check (Lahat ng GCash/InstaPay/QRPH refs ay nasa 8 hanggang 20 characters)
+  if (cleanRef.length < 8 || cleanRef.length > 20) {
+    return { valid: false, message: "❌ Invalid Reference Number length. Please check your receipt." };
+  }
 
-  // 2. Anti-Cheat: Bawal ang puro parehong numero (e.g. 1111111111111 o 0000000000000)
-  if (/^(\d)\1{12}$/.test(cleanRef)) return false;
+  // 2. Anti-Spam: Bawal ang puro parehong numero (hal. 00000000 o 11111111)
+  if (/^(\w)\1+$/.test(cleanRef)) {
+    return { valid: false, message: "❌ Invalid Reference Number. System detected dummy input." };
+  }
 
-  // 3. Anti-Cheat: Bawal ang sunod-sunod na pekeng numero (e.g. 1234567890123 o 0123456789012)
-  if ("0123456789012345".includes(cleanRef) || "9876543210987".includes(cleanRef)) return false;
+  // 3. One-Time Use Check: Bawal gamitin ulit ang nagamit nang resibo
+  if (usedGcashReferences.has(cleanRef)) {
+    return { valid: false, message: "❌ This Reference Number has already been claimed/used." };
+  }
 
-  // 4. Bawal gamitin ulit ang nagamit nang resibo (One-time use only)
-  if (usedGcashReferences.has(cleanRef)) return false;
-
-  // 5. Tanggapin ang lahat ng lehitimong 13-digit Reference Number mula sa GCash resibo
-  return true;
+  return { valid: true, cleanRef };
 }
 
 function checkDeviceBan(hardwareId) {
@@ -158,7 +162,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  // REPORT USER: 7-Day suspension + reporter face evidence
+  // REPORT USER
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -184,23 +188,28 @@ io.on("connection", (socket) => {
     socket.emit("report-success");
   });
 
-  // STRICT GCASH UNBAN GATEWAY
+  // CASINO-STYLE INSTANT UNBAN TOP-UP GATEWAY
   socket.on("unban-request", (data) => {
-    const ref = String(data.ref || "").trim().replace(/\s+/g, "");
+    const rawRef = data.ref || "";
     const reqHardware = data.hardwareId || hardwareId;
 
-    if (validateGCashReference(ref)) {
-      usedGcashReferences.add(ref); // I-save para hindi na maulit
+    const validation = validateTopUpReference(rawRef);
+
+    if (validation.valid) {
+      // Markahan ang reference bilang used para hindi maulit
+      usedGcashReferences.add(validation.cleanRef);
+
+      // Tanggalin ang ban record sa server
       if (reqHardware) bannedDevices.delete(reqHardware);
 
       return socket.emit("unban-response", {
         success: true,
-        message: "✅ GCash Payment Verified! Your 7-day suspension has been lifted."
+        message: "✅ GCash Payment Verified! Unban clearance approved."
       });
     } else {
       return socket.emit("unban-response", {
         success: false,
-        message: "❌ Invalid Reference Number. Please check your GCash receipt."
+        message: validation.message
       });
     }
   });
@@ -238,7 +247,7 @@ io.on("connection", (socket) => {
 /* ================= BIND TO 0.0.0.0 FOR RENDER ================= */
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
-  console.log(`🚀 MeetLoop Global Server LIVE on port ${PORT}`);
-  console.log(`⏳ 7-Day Ban & GCash Receipt Gateway: READY`);
+  console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
+  console.log(`🎰 Casino-Style GCash Top-Up Unban: READY`);
   console.log(`================================================`);
 });
