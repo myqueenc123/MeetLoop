@@ -33,6 +33,23 @@ html,body{
 button,input,select{font:inherit}
 button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
+/* MULTI-TAB WARNING OVERLAY */
+#duplicateTabOverlay{
+  position:fixed;inset:0;z-index:2147483647;background:rgba(10, 14, 23, 0.98);
+  display:none;align-items:center;justify-content:center;padding:16px;text-align:center;
+}
+.tab-lock-card{
+  background:#111827;border:1.5px solid #ef4444;border-radius:20px;
+  max-width:380px;width:100%;padding:26px 20px;box-shadow:0 25px 60px rgba(0,0,0,0.9);
+}
+.tab-lock-icon{font-size:42px;margin-bottom:12px;display:block}
+.tab-lock-title{font-size:18px;font-weight:900;color:#ef4444;margin-bottom:8px}
+.tab-lock-desc{font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:18px}
+.btn-claim-tab{
+  width:100%;height:44px;border:0;border-radius:10px;background:#2563eb;
+  color:#fff;font-size:13px;font-weight:800;cursor:pointer;
+}
+
 /* HEADER */
 header{
   height:52px;display:flex;align-items:center;justify-content:space-between;
@@ -65,6 +82,7 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
+/* NATURAL VIDEO FRAMING */
 video{
   width:100%;height:100%;
   object-fit:cover;
@@ -278,9 +296,9 @@ video{
 
 /* ================= 7-DAY HARD LOCK BAN OVERLAY ================= */
 #banOverlay{
-  position:fixed;inset:0;z-index:2147483647 !important;background:rgba(0,0,0,.97);
-  display:none;align-items:center;justify-content:center;padding:12px;overflow-y:auto;
-  pointer-events:all !important;
+  position:fixed !important;inset:0 !important;z-index:2147483647 !important;
+  background:rgba(0,0,0,0.98) !important;display:none;align-items:center;justify-content:center;
+  padding:12px;overflow-y:auto;pointer-events:all !important;
 }
 .ban-card{
   max-width:440px;width:100%;background:#ffffff;border-radius:22px;
@@ -304,7 +322,7 @@ video{
 .ban-title{font-size:18px;font-weight:900;color:#dc2626}
 .ban-reason{font-size:11.5px;color:#475569;font-weight:700}
 
-/* DISCLAIMER BOX (Inside GCash Pay Section Only) */
+/* DISCLAIMER BOX */
 .ban-disclaimer-box{
   background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;
   padding:14px;text-align:left;font-size:11.5px;line-height:1.5;color:#334155;
@@ -410,6 +428,18 @@ video{
 
 <body>
 
+<!-- MULTI-TAB WARNING OVERLAY -->
+<div id="duplicateTabOverlay">
+  <div class="tab-lock-card">
+    <span class="tab-lock-icon">⚠️</span>
+    <div class="tab-lock-title" id="lblTabLockTitle">Duplicate Tab Detected</div>
+    <div class="tab-lock-desc" id="lblTabLockDesc">
+      MeetLoop is only allowed in one tab. It is already open in another tab.
+    </div>
+    <button type="button" class="btn-claim-tab" id="btnClaimTab">Use This Tab Instead</button>
+  </div>
+</div>
+
 <!-- WELCOME PORTAL -->
 <div id="welcomePortal">
   <div class="portal-box">
@@ -443,12 +473,12 @@ video{
       <div class="ban-snap-frame">
         <canvas id="banCanvas" width="95" height="95"></canvas>
         <div class="ban-snap-brand">MeetLoop</div>
-        <div class="ban-snap-tag">ENCOUNTER EVIDENCE</div>
+        <div class="ban-snap-tag" id="lblEvidenceTag">ENCOUNTER EVIDENCE</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:3px">
         <div class="ban-title" id="banTitle">7-Day Suspension</div>
-        <div class="ban-reason">Reason: <span id="banReasonLabel">Policy Violation</span></div>
-        <div style="font-size:10px;color:#94a3b8;font-weight:600">Reported Encounter Snapshot Logged</div>
+        <div class="ban-reason" id="lblBanReason">Reason: <span id="banReasonLabel">Policy Violation</span></div>
+        <div style="font-size:10px;color:#94a3b8;font-weight:600" id="lblEncounterSnapshot">Reported Encounter Snapshot Logged</div>
       </div>
     </div>
 
@@ -462,7 +492,7 @@ video{
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
           </div>
           <div>
-            <div class="method-title" style="color:#005ce6">Instant 7-Day Unban (₱20 Support)</div>
+            <div class="method-title" style="color:#005ce6" id="lblGcashTitle">Instant 7-Day Unban (₱20 Support)</div>
             <div class="method-desc" id="lblGcashDesc">Pay ₱20 GCash clearance fee & submit Ref No.</div>
           </div>
         </div>
@@ -500,18 +530,20 @@ video{
 
       <!-- DISCLAIMER BOX (Inside GCash view only) -->
       <div class="ban-disclaimer-box">
-        <div class="ban-disclaimer-title">
+        <div class="ban-disclaimer-title" id="lblDisclaimerTitle">
           🚫 Official Ban Clearance Notice
         </div>
-        Your access has been restricted for <b>7 days</b> due to Community Guidelines violation.<br><br>
-        ⚡ <b>Want to return sooner?</b><br>
-        You may request an early unban with a <b>₱20 voluntary support payment</b>.<br><br>
-        💡 <b>Payment is completely optional.</b> You can simply wait until your 7-day ban expires. No payment is required to use MeetLoop.<br><br>
-        <b>— MeetLoop Team 🇵🇭</b>
+        <div id="lblDisclaimerBody">
+          Your access has been restricted for <b>7 days</b> due to Community Guidelines violation.<br><br>
+          ⚡ <b>Want to return sooner?</b><br>
+          You may request an early unban with a <b>₱20 voluntary support payment</b>.<br><br>
+          💡 <b>Payment is completely optional.</b> You can simply wait until your 7-day ban expires. No payment is required to use MeetLoop.<br><br>
+          <b>— MeetLoop Team</b>
+        </div>
       </div>
 
       <div class="gcash-qr-box">
-        <span class="gcash-fee-tag">Fee: ₱20.00 Support Payment</span>
+        <span class="gcash-fee-tag" id="lblFeeTag">Fee: ₱20.00 Support Payment</span>
         <div class="gcash-qr-frame">
           <img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2" class="gcash-qr-img" alt="GCash QR">
         </div>
@@ -522,7 +554,8 @@ video{
 
       <div class="gcash-input-group">
         <input type="text" id="gcashSenderName" class="gcash-input-field" placeholder="Your GCash Name (e.g. Juan)" maxlength="35">
-        <input type="text" id="gcashRefInput" class="gcash-input-field" placeholder="Reference No. from Receipt" maxlength="25">
+        <!-- 🔢 NUMBERS ONLY REFERENCE FIELD -->
+        <input type="tel" id="gcashRefInput" class="gcash-input-field" placeholder="13-Digit Ref No. (Numbers Only)" maxlength="16" inputmode="numeric" pattern="[0-9]*">
         <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="submitGCashUnbanTicket()">Submit for Verification</button>
       </div>
 
@@ -546,7 +579,7 @@ video{
       <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z" fill="#38bdf8"/>
       <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z" fill="#a855f7"/>
     </svg>
-    <div class="brand-text">Meet<span>Loop</span> 🇵🇭</div>
+    <div class="brand-text">Meet<span>Loop</span></div>
   </div>
 
   <select id="languageSelect" class="lang-select">
@@ -650,67 +683,79 @@ video{
 <script>
 "use strict";
 
-/* ================= 1. PERMANENT DEVICE ID ================= */
-function getPermanentDeviceId() {
-  let devId = localStorage.getItem("meetloop_device_id");
-  if (!devId || devId.length < 10) {
-    const raw = "dev_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now().toString(36) + "_" + screen.width + "x" + screen.height;
-    localStorage.setItem("meetloop_device_id", raw);
-    devId = raw;
+/* ================= 1. MULTI-TAB BLOCKER ENGINE ================= */
+const myTabId = "tab_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
+let tabChannel = null;
+
+try {
+  tabChannel = new BroadcastChannel("meetloop_tab_lock");
+  tabChannel.onmessage = (e) => {
+    if (e.data && e.data.type === "CLAIM_MASTER" && e.data.tabId !== myTabId) {
+      showDuplicateTabBlocker();
+    }
+  };
+} catch(e){}
+
+function checkMultiTabConflict() {
+  const activeMaster = localStorage.getItem("meetloop_active_tab");
+  const lastActiveTime = parseInt(localStorage.getItem("meetloop_tab_ping") || "0", 10);
+  
+  if (activeMaster && activeMaster !== myTabId && (Date.now() - lastActiveTime < 4000)) {
+    showDuplicateTabBlocker();
+  } else {
+    claimActiveTab();
   }
-  return devId;
 }
 
-const myHardwareId = getPermanentDeviceId();
+function claimActiveTab() {
+  localStorage.setItem("meetloop_active_tab", myTabId);
+  localStorage.setItem("meetloop_tab_ping", Date.now().toString());
+  document.getElementById("duplicateTabOverlay").style.display = "none";
+  if (tabChannel) tabChannel.postMessage({ type: "CLAIM_MASTER", tabId: myTabId });
+}
+
+function showDuplicateTabBlocker() {
+  stopSession();
+  document.getElementById("duplicateTabOverlay").style.display = "flex";
+}
+
+document.getElementById("btnClaimTab").addEventListener("click", () => {
+  claimActiveTab();
+});
+
+setInterval(() => {
+  if (localStorage.getItem("meetloop_active_tab") === myTabId) {
+    localStorage.setItem("meetloop_tab_ping", Date.now().toString());
+  }
+}, 2000);
+
+window.addEventListener("storage", (e) => {
+  if (e.key === "meetloop_active_tab" && e.newValue && e.newValue !== myTabId) {
+    showDuplicateTabBlocker();
+  }
+});
+
+/* ================= 2. NUMBERS-ONLY GCASH INPUT ENFORCER ================= */
+const gcashRefInput = document.getElementById("gcashRefInput");
+gcashRefInput.addEventListener("input", (e) => {
+  const clean = e.target.value.replace(/[^0-9]/g, "");
+  if (e.target.value !== clean) {
+    e.target.value = clean;
+  }
+});
+gcashRefInput.addEventListener("paste", (e) => {
+  setTimeout(() => {
+    gcashRefInput.value = gcashRefInput.value.replace(/[^0-9]/g, "");
+  }, 10);
+});
+
+/* ================= 3. PERMANENT DEVICE ID ================= */
+const myHardwareId = myTabId;
 let numericId = 0;
 for (let i = 0; i < myHardwareId.length; i++) numericId = (numericId * 31 + myHardwareId.charCodeAt(i)) % 900000000;
 document.getElementById("adminUnbanId").textContent = "" + (100000000 + Math.abs(numericId));
 
-/* ================= 2. INDEXEDDB STORAGE ================= */
-let dbInstance = null;
-function initSecurityDB() {
-  return new Promise((resolve) => {
-    try {
-      const req = indexedDB.open("MeetLoop_SecEngine_V4", 1);
-      req.onupgradeneeded = (e) => {
-        const db = e.target.result;
-        if (!db.objectStoreNames.contains("bans")) db.createObjectStore("bans", { keyPath: "id" });
-      };
-      req.onsuccess = (e) => { dbInstance = e.target.result; resolve(dbInstance); };
-      req.onerror = () => resolve(null);
-    } catch(e) { resolve(null); }
-  });
-}
-
-async function saveBanToDB(banUntil, reason, snapData) {
-  if (!dbInstance) await initSecurityDB();
-  try {
-    const tx = dbInstance.transaction(["bans"], "readwrite");
-    tx.objectStore("bans").put({ id: myHardwareId, banUntil, reason, snapData });
-  } catch(e){}
-}
-
-async function getBanFromDB() {
-  if (!dbInstance) await initSecurityDB();
-  return new Promise((resolve) => {
-    try {
-      const tx = dbInstance.transaction(["bans"], "readonly");
-      const req = tx.objectStore("bans").get(myHardwareId);
-      req.onsuccess = () => resolve(req.result || null);
-      req.onerror = () => resolve(null);
-    } catch(e) { resolve(null); }
-  });
-}
-
-async function removeBanFromDB() {
-  if (!dbInstance) await initSecurityDB();
-  try {
-    const tx = dbInstance.transaction(["bans"], "readwrite");
-    tx.objectStore("bans").delete(myHardwareId);
-  } catch(e){}
-}
-
-/* ================= 3. SOCKET CONNECTION ================= */
+/* ================= 4. SOCKET CONNECTION ================= */
 let socket = null;
 try {
   if (typeof io !== "undefined") {
@@ -751,12 +796,12 @@ let peerConnection = null;
 let dataChannel = null;
 let searching = false;
 let connected = false;
+let isCurrentlyBanned = false;
 let currentFacingMode = "user";
-let banInterval = null;
 let blurTimer = null;
 let pendingCandidates = [];
 
-/* ================= 4. AUTHENTIC OMETV TV STATIC ================= */
+/* ================= 5. AUTHENTIC OMETV TV STATIC ================= */
 function runTVStatic() {
   if (!crtStaticCanvas) return;
   const ctx = crtStaticCanvas.getContext("2d");
@@ -780,7 +825,7 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 5. EVIDENCE SNAPSHOT CAPTURE ================= */
+/* ================= 6. EVIDENCE SNAPSHOT CAPTURE ================= */
 function captureReporterSnapshot() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
@@ -796,46 +841,12 @@ function captureReporterSnapshot() {
   return null;
 }
 
-/* ================= 6. UNBREAKABLE 7-DAY BAN ENGINE ================= */
-async function checkActiveBan() {
-  let banUntil = parseInt(localStorage.getItem("meetloop_banned_until") || "0", 10);
-  let banReason = localStorage.getItem("meetloop_banned_reason") || "Policy Violation";
-  let snapData = localStorage.getItem("meetloop_snap");
-
-  if (!banUntil || isNaN(banUntil) || Date.now() >= banUntil) {
-    const dbRecord = await getBanFromDB();
-    if (dbRecord && dbRecord.banUntil && !isNaN(dbRecord.banUntil) && Date.now() < dbRecord.banUntil) {
-      banUntil = dbRecord.banUntil;
-      banReason = dbRecord.reason;
-      snapData = dbRecord.snapData;
-      localStorage.setItem("meetloop_banned_until", banUntil);
-      localStorage.setItem("meetloop_banned_reason", banReason);
-      if (snapData) localStorage.setItem("meetloop_snap", snapData);
-    }
-  }
-
-  if (banUntil && !isNaN(banUntil) && Date.now() < banUntil) {
-    display7DayBanScreen(banUntil, banReason, snapData);
-    return true;
-  } else {
-    localStorage.removeItem("meetloop_banned_until");
-    localStorage.removeItem("meetloop_banned_reason");
-    await removeBanFromDB();
-    return false;
-  }
-}
-
+/* ================= 7. BAN DISPLAY ENGINE ================= */
 function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap = null) {
+  isCurrentlyBanned = true;
   stopSession();
 
   const finalBanUntil = (!banUntil || isNaN(banUntil)) ? (Date.now() + 7 * 24 * 60 * 60 * 1000) : banUntil;
-  const snapData = customSnap || localStorage.getItem("meetloop_snap");
-
-  localStorage.setItem("meetloop_banned_until", finalBanUntil);
-  localStorage.setItem("meetloop_banned_reason", reason);
-  if (snapData) localStorage.setItem("meetloop_snap", snapData);
-  saveBanToDB(finalBanUntil, reason, snapData);
-
   document.getElementById("banReasonLabel").textContent = reason;
   
   const unbanDate = new Date(finalBanUntil);
@@ -844,14 +855,14 @@ function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap 
 
   const banCanvas = document.getElementById("banCanvas");
   const ctx = banCanvas.getContext("2d");
-  if (snapData) {
+  if (customSnap) {
     const img = new Image();
     img.onload = () => {
       ctx.filter = "blur(2px)";
       ctx.drawImage(img, 0, 0, 95, 95);
       ctx.filter = "none";
     };
-    img.src = snapData;
+    img.src = customSnap;
   } else {
     ctx.fillStyle = "#1e293b"; ctx.fillRect(0, 0, 95, 95);
     ctx.fillStyle = "#94a3b8"; ctx.font = "bold 8.5px sans-serif";
@@ -860,18 +871,6 @@ function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap 
 
   backToMethodSelection();
   document.getElementById("banOverlay").style.display = "flex";
-
-  if (banInterval) clearInterval(banInterval);
-  banInterval = setInterval(async () => {
-    if (Date.now() >= finalBanUntil) {
-      clearInterval(banInterval);
-      localStorage.removeItem("meetloop_banned_until");
-      localStorage.removeItem("meetloop_banned_reason");
-      localStorage.removeItem("meetloop_snap");
-      await removeBanFromDB();
-      document.getElementById("banOverlay").style.display = "none";
-    }
-  }, 10000);
 }
 
 function openGcashPayView() {
@@ -881,10 +880,9 @@ function openGcashPayView() {
   document.getElementById("gcashSenderName").value = "";
   document.getElementById("gcashRefStatus").textContent = "";
   
-  // Reset buttons
   const btn = document.getElementById("gcashVerifyBtn");
   btn.disabled = false;
-  btn.textContent = "Submit for Verification";
+  btn.textContent = document.getElementById("languageSelect").value === "tl" ? "I-submit para sa Veripikasyon" : "Submit for Verification";
   document.getElementById("gcashSenderName").disabled = false;
   document.getElementById("gcashRefInput").disabled = false;
 }
@@ -894,7 +892,7 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 7. SUBMIT GCASH TICKET (100% ZERO AUTO-UNBAN) ================= */
+/* ================= 8. SUBMIT GCASH TICKET (100% HARD LOCKED) ================= */
 function submitGCashUnbanTicket() {
   const nameInput = document.getElementById("gcashSenderName");
   const refInput = document.getElementById("gcashRefInput");
@@ -906,20 +904,18 @@ function submitGCashUnbanTicket() {
 
   if (!refVal || refVal.length < 8) {
     status.style.color = "#dc2626";
-    status.textContent = "❌ Please enter a valid Reference Number from your receipt.";
+    status.textContent = "❌ Please enter a valid Reference Number (numbers only).";
     return;
   }
 
-  // 🔒 HARD LOCK: I-lock ang button at inputs. Mananatiling BANNED ang user!
   btn.disabled = true;
-  btn.textContent = "⏳ NAI-SUBMIT NA — HINTAYIN SI ADMIN SA TELEGRAM";
+  btn.textContent = document.getElementById("languageSelect").value === "tl" ? "⏳ NAI-SUBMIT NA — HINTAYIN SI ADMIN SA TELEGRAM" : "⏳ SUBMITTED — WAITING FOR ADMIN IN TELEGRAM";
   nameInput.disabled = true;
   refInput.disabled = true;
 
   status.style.color = "#0284c7";
-  status.innerHTML = "⏳ <b>Details sent to Telegram Admin!</b><br><span style='color:#dc2626;font-size:11px;'>⚠️ BANNED KA PARIN: I-che-check muna ni Admin sa GCash app bago ka i-unban.</span>";
+  status.innerHTML = "⏳ <b>Details sent to Telegram Admin!</b><br><span style='color:#dc2626;font-size:11px;'>⚠️ BANNED: Admin is verifying your GCash payment via Telegram before lifting the ban.</span>";
 
-  // STRICT GUARANTEE: Tiyaking nananatiling bukas ang ban modal!
   document.getElementById("banOverlay").style.display = "flex";
 
   if (socket && socket.connected) {
@@ -934,32 +930,25 @@ function submitGCashUnbanTicket() {
   }
 }
 
-// 🛡️ REAL-TIME UNBAN LISTENER: Tanging kapag nag-click si JM sa Telegram mag-uunban
+// 🛡️ UNBAN LISTENER
 if (socket) {
   socket.on("unban-pending", (data) => {
     const status = document.getElementById("gcashRefStatus");
     status.style.color = "#0284c7";
-    status.innerHTML = "⏳ <b>Ticket Logged!</b><br>Nai-send na kay Admin sa Telegram. Hintaying i-click ni Admin ang Approve Link.";
-    // Ensure modal stays displayed
+    status.innerHTML = "⏳ <b>Ticket Logged!</b><br>Sent to Telegram Admin. Please wait for the admin to review and approve.";
     document.getElementById("banOverlay").style.display = "flex";
   });
 
-  socket.on("real-admin-unban-signal", async (data) => {
-    // I-unban LAMANG kapag tumugma ang eksaktong Device ID ni JM
+  socket.on("real-admin-unban-signal", (data) => {
     if (data && data.hardwareId && data.hardwareId === myHardwareId) {
-      localStorage.removeItem("meetloop_banned_until");
-      localStorage.removeItem("meetloop_banned_reason");
-      localStorage.removeItem("meetloop_snap");
-      await removeBanFromDB();
-      if (banInterval) clearInterval(banInterval);
-
+      isCurrentlyBanned = false;
       const status = document.getElementById("gcashRefStatus");
       status.style.color = "#16a34a";
-      status.textContent = "✅ ₱20 Payment Approved by Admin! Unbanning device...";
+      status.textContent = "✅ Payment Approved by Admin! Unbanning device...";
 
       setTimeout(() => {
         document.getElementById("banOverlay").style.display = "none";
-        alert("🎉 Admin Approved! Your 7-day suspension has been lifted.");
+        alert("🎉 Admin Approved! Your suspension has been lifted.");
       }, 1000);
     }
   });
@@ -982,7 +971,7 @@ if (socket) {
   });
 }
 
-/* ================= 8. HD LOW-LATENCY OMETV CAMERA ENGINE ================= */
+/* ================= 9. CAMERA ENGINE ================= */
 async function startMedia() {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === "live")) {
     if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
@@ -1033,8 +1022,10 @@ function releaseBlur() {
 }
 
 async function triggerStartNext() {
-  const isBanned = await checkActiveBan();
-  if (isBanned) return;
+  if (isCurrentlyBanned) {
+    document.getElementById("banOverlay").style.display = "flex";
+    return;
+  }
 
   const ok = await startMedia();
   if (!ok) return;
@@ -1050,8 +1041,8 @@ async function triggerStartNext() {
 
   connected = false;
   searching = true;
-  remoteStatus.textContent = "Searching...";
-  mainActionBtn.textContent = "Next";
+  remoteStatus.textContent = document.getElementById("languageSelect").value === "tl" ? "Naghahanap..." : "Searching...";
+  mainActionBtn.textContent = document.getElementById("languageSelect").value === "tl" ? "Susunod" : "Next";
   mainActionBtn.disabled = false;
   stopBtn.disabled = false;
 
@@ -1070,8 +1061,8 @@ function stopSession() {
   if (socket) socket.emit("stop-search");
   closePeerConnection();
 
-  remoteStatus.textContent = "Stopped";
-  mainActionBtn.textContent = "Start";
+  remoteStatus.textContent = document.getElementById("languageSelect").value === "tl" ? "Nakahinto" : "Stopped";
+  mainActionBtn.textContent = document.getElementById("languageSelect").value === "tl" ? "Magsimula" : "Start";
   mainActionBtn.disabled = false;
   stopBtn.disabled = true;
 }
@@ -1155,7 +1146,7 @@ async function createPeer(initiator) {
 
 function setupDataChannel(ch) {
   dataChannel = ch;
-  ch.onmessage = (e) => addChatMessage("Stranger", e.data);
+  ch.onmessage = (e) => addChatMessage(document.getElementById("languageSelect").value === "tl" ? "Kausap" : "Stranger", e.data);
 }
 
 function closePeerConnection() {
@@ -1175,35 +1166,75 @@ function closePeerConnection() {
   pendingCandidates = [];
 }
 
-/* ================= 9. LANGUAGE TRANSLATOR ================= */
+/* ================= 10. REFINED LANGUAGE TRANSLATOR (DEFAULT ENGLISH) ================= */
 const i18n = {
   en: {
     subTitle: "Random Video Chat",
     portalBtn: "START CHATTING",
     report: "Report",
+    stop: "Stop",
+    start: "Start",
+    next: "Next",
     online: "online",
     chatTitle: "Live Chat",
-    chatRules: "• 18+ only. Strict anti-nudity policy.<br>• Real face required in front of camera.",
+    chatRules: "• 18+ only. Strict anti-nudity policy.<br>• Real face required in front of the camera.",
+    chatPlaceholder: "Type a message...",
+    send: "Send",
     selectMethod: "Select Resolution Method:",
+    gcashTitle: "Instant 7-Day Unban (₱20 Support)",
+    gcashDesc: "Pay ₱20 GCash clearance fee & submit Ref No.",
     waitTitle: "Wait 7-Day Suspension Period",
     waitDesc: "Auto unbans when 7 days expire",
     scanText: "Scan QR via GCash, pay ₱20 clearance fee, and enter your details below.",
     searching: "Looking for someone...",
-    expiresHeader: "7-Day Suspension Expiration:"
+    expiresHeader: "7-Day Suspension Expiration:",
+    evidenceTag: "ENCOUNTER EVIDENCE",
+    banReason: "Reason:",
+    encounterSnapshot: "Reported Encounter Snapshot Logged",
+    disclaimerTitle: "🚫 Official Ban Clearance Notice",
+    disclaimerBody: "Your access has been restricted for <b>7 days</b> due to Community Guidelines violation.<br><br>⚡ <b>Want to return sooner?</b><br>You may request an early unban with a <b>₱20 voluntary support payment</b>.<br><br>💡 <b>Payment is completely optional.</b> You can simply wait until your 7-day ban expires. No payment is required to use MeetLoop.<br><br><b>— MeetLoop Team</b>",
+    feeTag: "Fee: ₱20.00 Support Payment",
+    verifyBtn: "Submit for Verification",
+    backMethods: "← Back to Options",
+    tabLockTitle: "Duplicate Tab Detected",
+    tabLockDesc: "MeetLoop is only allowed in one tab. It is already open in another tab.",
+    tabLockBtn: "Use This Tab Instead",
+    namePlaceholder: "Your GCash Name (e.g. Juan)",
+    refPlaceholder: "13-Digit Ref No. (Numbers Only)"
   },
   tl: {
-    subTitle: "Random Video Chat 🇵🇭",
+    subTitle: "Random Video Chat",
     portalBtn: "MAG-START MAG-CHAT",
     report: "I-Report",
+    stop: "Ihinto",
+    start: "Magsimula",
+    next: "Susunod",
     online: "aktibo ngayon",
     chatTitle: "Live Usapan",
-    chatRules: "• Bawal ang 18 pababa. Bawal ang kabastusan.<br>• Totoong mukha ang dapat nakatapat sa camera.",
+    chatRules: "• 18+ lamang. Mahigpit na ipinagbabawal ang kabastusan.<br>• Totoong mukha ang dapat nakatapat sa camera.",
+    chatPlaceholder: "Mag-type ng mensahe...",
+    send: "Ipadala",
     selectMethod: "Pumili ng Paraan para Ma-unban:",
+    gcashTitle: "Instant 7-Araw na Unban (₱20 Support)",
+    gcashDesc: "Magbayad ng ₱20 GCash fee at ilagay ang Ref No.",
     waitTitle: "Maghintay ng 7-Araw na Suspension",
     waitDesc: "Kusang ma-u-unban pagkatapos ng 7 araw",
     scanText: "I-scan sa GCash, magbayad ng ₱20 clearance fee, at ilagay ang detalye sa ibaba.",
     searching: "Naghahanap ng makakausap...",
-    expiresHeader: "Matatapos ang 7-Araw na Suspension sa:"
+    expiresHeader: "Matatapos ang 7-Araw na Suspension sa:",
+    evidenceTag: "EBIDENSYA NG ENCOUNTER",
+    banReason: "Dahilan:",
+    encounterSnapshot: "Nai-save ang Litrato ng Encounter",
+    disclaimerTitle: "🚫 Opisyal na Paalala sa Pagka-ban",
+    disclaimerBody: "Ang iyong access ay pansamantalang na-restrict ng <b>7 araw</b> dahil sa paglabag sa Community Guidelines.<br><br>⚡ <b>Gusto mo bang makabalik agad?</b><br>Maaari kang humiling ng maagang unban gamit ang <b>₱20 voluntary support payment</b>.<br><br>💡 <b>Kusang-loob lamang ang bayad.</b> Maaari kang maghintay hanggang matapos ang 7 araw. Hindi kailangang magbayad para magamit ang MeetLoop.<br><br><b>— MeetLoop Team</b>",
+    feeTag: "Halaga: ₱20.00 Support Payment",
+    verifyBtn: "I-submit para sa Veripikasyon",
+    backMethods: "← Bumalik sa mga Pagpipilian",
+    tabLockTitle: "Naka-open na sa Ibang Tab",
+    tabLockDesc: "Isang tab lamang ang pwedeng gamitin sa MeetLoop. Naka-open na ito sa isa pang tab.",
+    tabLockBtn: "Gamitin ang Tab na Ito",
+    namePlaceholder: "Pangalan sa GCash (hal. Juan)",
+    refPlaceholder: "13-Digit Ref No. (Numero Lamang)"
   }
 };
 
@@ -1212,22 +1243,47 @@ function setLanguage(lang) {
   document.getElementById("lblSubTitle").textContent = t.subTitle;
   document.getElementById("portalStartBtn").textContent = t.portalBtn;
   document.getElementById("reportBtn").textContent = t.report;
+  document.getElementById("stopBtn").textContent = t.stop;
   document.getElementById("lblOnlineText").textContent = t.online;
   document.getElementById("lblChatTitle").textContent = t.chatTitle;
   document.getElementById("lblChatRules").innerHTML = t.chatRules;
+  document.getElementById("chatInput").placeholder = t.chatPlaceholder;
+  document.getElementById("sendBtn").textContent = t.send;
   document.getElementById("lblSelectMethod").textContent = t.selectMethod;
+  document.getElementById("lblGcashTitle").textContent = t.gcashTitle;
+  document.getElementById("lblGcashDesc").textContent = t.gcashDesc;
   document.getElementById("lblWaitTitle").textContent = t.waitTitle;
   document.getElementById("lblWaitDesc").textContent = t.waitDesc;
-  document.getElementById("lblScanText").textContent = t.scanText;
+  document.getElementById("lblScanText").innerHTML = t.scanText;
   document.getElementById("lblSearchText").textContent = t.searching;
   document.getElementById("lblExpiresHeader").textContent = t.expiresHeader;
+  document.getElementById("lblEvidenceTag").textContent = t.evidenceTag;
+  document.getElementById("lblEncounterSnapshot").textContent = t.encounterSnapshot;
+  document.getElementById("lblDisclaimerTitle").textContent = t.disclaimerTitle;
+  document.getElementById("lblDisclaimerBody").innerHTML = t.disclaimerBody;
+  document.getElementById("lblFeeTag").textContent = t.feeTag;
+  document.getElementById("btnBackMethods").textContent = t.backMethods;
+  document.getElementById("lblTabLockTitle").textContent = t.tabLockTitle;
+  document.getElementById("lblTabLockDesc").textContent = t.tabLockDesc;
+  document.getElementById("btnClaimTab").textContent = t.tabLockBtn;
+  document.getElementById("gcashSenderName").placeholder = t.namePlaceholder;
+  document.getElementById("gcashRefInput").placeholder = t.refPlaceholder;
+
+  if (!document.getElementById("gcashVerifyBtn").disabled) {
+    document.getElementById("gcashVerifyBtn").textContent = t.verifyBtn;
+  }
+  if (!searching && !connected) {
+    mainActionBtn.textContent = t.start;
+  } else if (searching) {
+    mainActionBtn.textContent = t.next;
+  }
 }
 
 document.getElementById("languageSelect").addEventListener("change", (e) => {
   setLanguage(e.target.value);
 });
 
-/* ================= 10. SOCKET & SIGNALING EVENTS ================= */
+/* ================= 11. SOCKET SIGNALING ================= */
 if (socket) {
   socket.on("online-count", count => {
     if (standbyUsers) standbyUsers.textContent = Number(count || 1).toLocaleString();
@@ -1239,7 +1295,7 @@ if (socket) {
     crtWrapper.style.display = "block";
     standbyCenter.style.display = "none";
     searchLoader.style.display = "flex";
-    remoteStatus.textContent = "Waiting...";
+    remoteStatus.textContent = document.getElementById("languageSelect").value === "tl" ? "Naghahanap..." : "Searching...";
   });
 
   socket.on("match", async (data) => {
@@ -1283,7 +1339,7 @@ if (socket) {
   });
 
   socket.on("partner-disconnected", () => {
-    addChatMessage("MeetLoop", "Stranger disconnected.");
+    addChatMessage("MeetLoop", document.getElementById("languageSelect").value === "tl" ? "Nadiskonekta ang kausap." : "Stranger disconnected.");
     triggerStartNext();
   });
 
@@ -1304,14 +1360,13 @@ function sendChat() {
   const val = chatInput.value.trim();
   if (!val || !dataChannel || dataChannel.readyState !== "open") return;
   dataChannel.send(val);
-  addChatMessage("You", val);
+  addChatMessage(document.getElementById("languageSelect").value === "tl" ? "Ikaw" : "You", val);
   chatInput.value = "";
 }
 
 document.getElementById("portalStartBtn").addEventListener("click", async () => {
   document.getElementById("welcomePortal").style.display = "none";
-  const isBanned = await checkActiveBan();
-  if (!isBanned) startMedia();
+  if (!isCurrentlyBanned) startMedia();
 });
 
 mainActionBtn.addEventListener("click", triggerStartNext);
@@ -1343,7 +1398,7 @@ flipBtn.addEventListener("click", async () => {
   }
 });
 
-// REPORT: Captures stranger face as evidence
+// REPORT
 reportBtn.addEventListener("click", () => {
   if (!connected) return;
   const snap = captureReporterSnapshot();
@@ -1373,8 +1428,8 @@ document.getElementById("showLocalBtn").addEventListener("click", () => {
   document.getElementById("showLocalBtn").classList.remove("visible");
 });
 
-// STARTUP
-initSecurityDB().then(() => checkActiveBan());
+// STARTUP (DEFAULT ENGLISH)
+checkMultiTabConflict();
 setLanguage("en");
 </script>
 </body>
