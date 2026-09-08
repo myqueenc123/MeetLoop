@@ -2,7 +2,7 @@
  * MeetLoop - Official Production Server Backend
  * 100% Filipino Made Random Video Chat 🇵🇭
  * High-Speed Telegram Auto-Pairing Bot + WebRTC Matchmaking
- * (Bulletproof Anti-Unban Bypass Engine)
+ * (Zero-Cache Anti-Bypass Security Engine)
  */
 
 const express = require("express");
@@ -21,7 +21,7 @@ const io = new Server(server, {
 });
 
 const PORT = process.env.PORT || 3000;
-const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // Exact 7 Days in MS
+const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days in MS
 
 // =========================================================================
 // 🤖 TELEGRAM BOT CONFIGURATION (@MeetLoop_bot | Admin ID: 5779976596)
@@ -31,11 +31,19 @@ const _partB = "AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || (_partA + ":" + _partB);
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || "5779976596";
 
-app.use(express.static(path.join(__dirname, "public")));
+// 🛡️ ANTI-CACHE HEADERS: Para laging fresh at bago ang code sa browser ng user
+app.use((req, res, next) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  next();
+});
+
+app.use(express.static(path.join(__dirname, "public"), { etag: false, maxAge: 0 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* ================= HARDWARE BAN & PENDING DATABASE ================= */
+/* ================= HARDWARE BAN DATABASE ================= */
 const bannedDevices = new Map();
 const pendingRequests = new Map();
 
@@ -82,12 +90,12 @@ app.get("/admin/approve", (req, res) => {
     return res.send("<h1 style='font-family:sans-serif;text-align:center;margin-top:50px;'>⚠️ Request not found or already approved/expired.</h1>");
   }
 
-  // Tanggalin ang ban sa server database
+  // Tanggalin ang ban sa server memory
   bannedDevices.delete(request.hardwareId);
   pendingRequests.delete(id);
 
-  // Padalhan ng unban signal ang browser ng user
-  io.emit("admin-approved-unban", { hardwareId: request.hardwareId });
+  // Send REAL unban signal only when JM clicks the link
+  io.emit("real-admin-unban-signal", { hardwareId: request.hardwareId });
 
   res.send(`
     <div style="font-family:sans-serif;text-align:center;padding:50px;background:#0a0e17;color:#fff;min-height:100vh;">
@@ -110,7 +118,9 @@ function checkDeviceBan(hardwareId) {
 }
 
 function banDevice(hardwareId, reason, snapshot = null, durationMs = BAN_DURATION_7DAYS) {
-  const finalId = hardwareId || ("anon_" + Math.random().toString(36).substr(2, 9));
+  const finalId = String(hardwareId || "").trim();
+  if (!finalId) return null;
+
   const banUntil = Date.now() + durationMs;
   const record = { banUntil, reason, snapshot, hardwareId: finalId };
   bannedDevices.set(finalId, record);
@@ -215,7 +225,6 @@ io.on("connection", (socket) => {
 
         const record = banDevice(partnerHw, data.reason || "Policy Violation", encounterSnapshot, BAN_DURATION_7DAYS);
 
-        // Send ban directly to violator
         partner.emit("ip-banned", {
           banUntil: record.banUntil,
           reason: record.reason,
@@ -229,7 +238,7 @@ io.on("connection", (socket) => {
     socket.emit("report-success");
   });
 
-  // SUBMIT GCASH UNBAN TICKET
+  // SUBMIT GCASH UNBAN TICKET (WALANG KAKAYAHANG MAG-UNBAN SA SARILI)
   socket.on("unban-request", (data) => {
     const ref = String(data.ref || "").trim().replace(/[^0-9]/g, "");
     const name = String(data.name || "Anonymous User").trim();
@@ -287,6 +296,6 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT} (PH Made 🇵🇭)`);
   console.log(`🤖 Telegram Admin Bot: ACTIVE (@MeetLoop_bot)`);
-  console.log(`🛡️ Tamper-Proof Ban System: LOCKED`);
+  console.log(`🛡️ 100% Anti-Bypass Lock: ENFORCED`);
   console.log(`================================================`);
 });
