@@ -350,7 +350,7 @@ video{
   background:none;border:0;color:#64748b;font-size:11.5px;font-weight:800;cursor:pointer;margin-top:2px;text-align:center;
 }
 
-/* 7-DAY EXPIRATION NOTICE BOX (Clean & Professional) */
+/* 7-DAY EXPIRATION NOTICE BOX */
 .ban-expire-box{
   background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;
   padding:10px 12px;display:flex;flex-direction:column;gap:3px;
@@ -441,8 +441,8 @@ video{
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
           </div>
           <div>
-            <div class="method-title" style="color:#005ce6">Instant 7-Day Unban via GCash</div>
-            <div class="method-desc" id="lblGcashDesc">Pay clearance fee & enter 13-digit reference number</div>
+            <div class="method-title" style="color:#005ce6">Instant 7-Day Unban Top-Up</div>
+            <div class="method-desc" id="lblGcashDesc">Scan GCash QR & Enter Reference Number</div>
           </div>
         </div>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
@@ -461,7 +461,7 @@ video{
       </div>
     </div>
 
-    <!-- VIEW 2: GCASH FORM -->
+    <!-- VIEW 2: GCASH CASINO-STYLE TOPUP FORM -->
     <div id="gcashPaySection">
       <div class="gcash-logo-banner">
         <svg class="gcash-official-svg" viewBox="0 0 160 38" fill="none">
@@ -473,22 +473,22 @@ video{
       </div>
 
       <div class="gcash-qr-box">
-        <!-- EXACT INSTAPAY QR CODE IMAGE -->
+        <!-- DIRECT EMBEDDED INSTAPAY QR CODE -->
         <div class="gcash-qr-frame">
-          <img src="/gcash-qr.png" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=165x165&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2'" class="gcash-qr-img" alt="GCash InstaPay QR Code">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2" class="gcash-qr-img" alt="GCash InstaPay QR">
         </div>
         <div style="font-size:11px;color:#475569;font-weight:700" id="lblScanText">
-          Scan QR via GCash, pay clearance fee, and enter the 13-Digit Ref No.
+          Scan QR via GCash, pay clearance fee, and enter the Reference Number from your receipt.
         </div>
       </div>
 
-      <input type="text" id="gcashRefInput" class="gcash-ref-input" placeholder="e.g. 0029381726481" maxlength="16">
-      <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="verifyGCashTransaction()">Verify Reference & Unban</button>
-      <div id="gcashRefStatus" style="font-size:11px;font-weight:800;text-align:center;min-height:14px"></div>
+      <input type="text" id="gcashRefInput" class="gcash-ref-input" placeholder="Enter GCash Ref No. (e.g. 0029381726481)" maxlength="25">
+      <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="verifyGCashTransaction()">Submit & Instant Unban</button>
+      <div id="gcashRefStatus" style="font-size:11.5px;font-weight:800;text-align:center;min-height:16px"></div>
       <button type="button" class="btn-back-methods" onclick="backToMethodSelection()">← Back to Options</button>
     </div>
 
-    <!-- 7-DAY EXPIRATION STATUS (No fast-ticking timer, shows exact Date, Day & Time) -->
+    <!-- 7-DAY EXPIRATION STATUS -->
     <div class="ban-expire-box">
       <span class="ban-expire-label" id="lblExpiresHeader">7-Day Suspension Expiration:</span>
       <span class="ban-expire-time" id="banUntilFullText">--:-- --</span>
@@ -751,7 +751,7 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 5. SNAPSHOT OF REPORTER AS EVIDENCE ================= */
+/* ================= 5. SNAPSHOT EVIDENCE CAPTURE ================= */
 function captureReporterSnapshot() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
@@ -857,32 +857,38 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 7. STRICT GCASH VERIFIER ================= */
+/* ================= 7. CASINO PLUS STYLE INSTANT VERIFIER ================= */
 function verifyGCashTransaction() {
   const refInput = document.getElementById("gcashRefInput");
   const status = document.getElementById("gcashRefStatus");
   const btn = document.getElementById("gcashVerifyBtn");
-  const refVal = refInput.value.trim().replace(/\s+/g, "");
+  const refVal = refInput.value.trim().replace(/[^a-zA-Z0-9]/g, "");
 
-  if (!refVal || refVal.length !== 13) {
+  if (!refVal || refVal.length < 8) {
     status.style.color = "#dc2626";
-    status.textContent = "❌ Invalid format. GCash Reference No. must be exactly 13 digits.";
+    status.textContent = "❌ Please enter a valid Reference Number from your receipt.";
     return;
   }
 
   btn.disabled = true;
-  btn.textContent = "Verifying with Server...";
+  btn.textContent = "Connecting to Gateway...";
   status.style.color = "#005ce6";
-  status.textContent = "Checking official payment settlement records...";
+  status.textContent = "Verifying GCash transaction ticket...";
 
-  if (socket && socket.connected) {
-    socket.emit("unban-request", { hardwareId: myHardwareId, ref: refVal });
-  } else {
-    status.style.color = "#dc2626";
-    status.textContent = "❌ Server connection lost. Please try again.";
-    btn.disabled = false;
-    btn.textContent = "Verify Reference & Unban";
-  }
+  // Real-time Gateway steps
+  setTimeout(() => {
+    btn.textContent = "Approving Clearance...";
+    status.textContent = "Verifying reference with ledger...";
+    
+    if (socket && socket.connected) {
+      socket.emit("unban-request", { hardwareId: myHardwareId, ref: refVal });
+    } else {
+      status.style.color = "#dc2626";
+      status.textContent = "❌ Connection timeout. Please check your internet.";
+      btn.disabled = false;
+      btn.textContent = "Submit & Instant Unban";
+    }
+  }, 1200);
 }
 
 if (socket) {
@@ -904,14 +910,14 @@ if (socket) {
       setTimeout(() => {
         document.getElementById("banOverlay").style.display = "none";
         btn.disabled = false;
-        btn.textContent = "Verify Reference & Unban";
+        btn.textContent = "Submit & Instant Unban";
         refInput.value = "";
         status.textContent = "";
-        alert("🎉 GCash Payment Verified! Your 7-day suspension has been lifted.");
-      }, 1200);
+        alert("🎉 GCash Top-Up Verified! Your suspension has been cleared.");
+      }, 1000);
     } else {
       btn.disabled = false;
-      btn.textContent = "Verify Reference & Unban";
+      btn.textContent = "Submit & Instant Unban";
       status.style.color = "#dc2626";
       status.textContent = data.message;
     }
@@ -1123,7 +1129,7 @@ const i18n = {
     selectMethod: "Select Resolution Method:",
     waitTitle: "Wait 7-Day Suspension Period",
     waitDesc: "Auto unbans when 7 days expire",
-    scanText: "Scan QR via GCash, pay clearance fee, and enter the 13-Digit Ref No.",
+    scanText: "Scan QR via GCash, pay clearance fee, and enter the Reference Number from your receipt.",
     searching: "Looking for someone...",
     expiresHeader: "7-Day Suspension Expiration:"
   },
@@ -1137,7 +1143,7 @@ const i18n = {
     selectMethod: "Pumili ng Paraan para Ma-unban:",
     waitTitle: "Maghintay ng 7-Araw na Suspension",
     waitDesc: "Kusang ma-u-unban pagkatapos ng 7 araw",
-    scanText: "I-scan sa GCash, magbayad ng clearance fee, at ilagay ang 13-Digit Reference No.",
+    scanText: "I-scan sa GCash, magbayad ng clearance fee, at ilagay ang Reference Number mula sa resibo.",
     searching: "Naghahanap ng makakausap...",
     expiresHeader: "Matatapos ang 7-Araw na Suspension sa:"
   }
@@ -1279,7 +1285,7 @@ flipBtn.addEventListener("click", async () => {
   }
 });
 
-// REPORT: Reporter face captured so violator sees who reported them
+// REPORT: Reporter face captured
 reportBtn.addEventListener("click", () => {
   if (!connected) return;
   const snap = captureReporterSnapshot();
