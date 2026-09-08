@@ -1,7 +1,8 @@
 /**
  * MeetLoop - Official Production Server Backend
+ * 100% Filipino Made Random Video Chat 🇵🇭
  * High-Speed Telegram Auto-Pairing Bot + WebRTC Matchmaking
- * (Single-Tab Enforced + Anti-Bypass Security)
+ * (Telegram 1-Click Inline Buttons + Auto-SMS Receiver)
  */
 
 const express = require("express");
@@ -46,116 +47,193 @@ app.use(express.urlencoded({ extended: true }));
 const bannedDevices = new Map();
 const pendingRequests = new Map();
 
-// Helper para magpadala ng alert sa Telegram
-function sendTelegramMessage(chatId, text) {
-  if (!chatId || !TELEGRAM_BOT_TOKEN) return;
+// Helper para magpadala ng raw request sa Telegram API
+function sendTelegramRaw(endpoint, payloadObj) {
+  if (!TELEGRAM_BOT_TOKEN) return;
 
-  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}&parse_mode=HTML&disable_web_page_preview=true`;
+  const payload = JSON.stringify(payloadObj);
+  const options = {
+    hostname: "api.telegram.org",
+    path: `/bot${TELEGRAM_BOT_TOKEN}/${endpoint}`,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": Buffer.byteLength(payload)
+    }
+  };
+
+  const req = https.request(options, (res) => {
+    let d = "";
+    res.on("data", chunk => d += chunk);
+  });
+  req.on("error", e => console.log("Telegram Error:", e.message));
+  req.write(payload);
+  req.end();
+}
+
+// Function: Magpadala ng message na may Interactive 1-Click Buttons sa Telegram
+function sendTelegramWithButtons(chatId, text, reqId) {
+  const payload = {
+    chat_id: chatId,
+    text: text,
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+    reply_markup: {
+      inline_keyboard: [
+        [
+          { text: "🟢 1-CLICK APPROVE", callback_data: `approve_${reqId}` },
+          { text: "🔴 REJECT", callback_data: `reject_${reqId}` }
+        ]
+      ]
+    }
+  };
+  sendTelegramRaw("sendMessage", payload);
+}
+
+// Function: Simple Text Message
+function sendTelegramMessage(chatId, text) {
+  sendTelegramRaw("sendMessage", {
+    chat_id: chatId,
+    text: text,
+    parse_mode: "HTML",
+    disable_web_page_preview: true
+  });
+}
+
+// Function: Ipadala ang Unban Ticket kay JM na may Interactive Buttons
+function sendTelegramNotification(reqId, name, ref) {
+  const msgText = `🚨 <b>MEETLOOP ₱20 UNBAN REQUEST</b>\n\n` +
+                  `👤 <b>Sender:</b> ${name}\n` +
+                  `💳 <b>Ref No:</b> <code>${ref}</code>\n` +
+                  `💰 <b>Amount:</b> ₱20.00\n\n` +
+                  `<i>Pindutin ang 🟢 1-CLICK APPROVE kapag pumasok na ang bayad sa GCash mo:</i>`;
+
+  sendTelegramWithButtons(ADMIN_CHAT_ID, msgText, reqId);
+}
+
+// =========================================================================
+// 📲 GCASH SMS WEBHOOK RECEIVER (Galing sa Cellphone mo)
+// =========================================================================
+app.post("/webhook/gcash-sms", (req, res) => {
+  const secret = req.query.secret || req.body.secret;
+  if (secret !== "MEETLOOP2026") {
+    return res.status(403).send("Unauthorized");
+  }
+
+  // Tanggapin ang text message galing sa SMS forwarder ng phone mo
+  const smsBody = req.body.content || req.body.message || req.body.text || JSON.stringify(req.body);
+  const fromNumber = req.body.from || req.body.sender || "GCash SMS";
+
+  console.log(`[GCASH SMS RECEIVED]: ${smsBody}`);
+
+  const alertText = `💰 <b>GCASH MONEY RECEIVED (PHONE NOTIF)</b>\n\n` +
+                    `📲 <b>From:</b> ${fromNumber}\n` +
+                    `📩 <b>Message:</b>\n<code>${smsBody}</code>`;
+
+  sendTelegramMessage(ADMIN_CHAT_ID, alertText);
+  res.json({ success: true, message: "SMS logged to Telegram" });
+});
+
+// =========================================================================
+// ⚡ TELEGRAM POLLING LISTENER (With 1-Click Button Handler)
+// =========================================================================
+let lastUpdateId = 0;
+function pollTelegramUpdates() {
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=10`;
 
   https.get(url, (res) => {
     let data = "";
     res.on("data", (chunk) => data += chunk);
+    res.on("end", () => {
+      try {
+        const json = JSON.parse(data);
+        if (json.ok && Array.isArray(json.result)) {
+          json.result.forEach((update) => {
+            lastUpdateId = update.update_id;
+
+            // 1. HANDLER KAPAG PININDOT ANG INLINE BUTTONS (APPROVE / REJECT)
+            if (update.callback_query) {
+              const cb = update.callback_query;
+              const cbData = cb.data || "";
+              const messageId = cb.message?.message_id;
+              const chatId = cb.message?.chat?.id;
+
+              if (cbData.startsWith("approve_")) {
+                const reqId = cbData.replace("approve_", "");
+                const request = pendingRequests.get(reqId);
+
+                if (request) {
+                  // UNBAN DEVICE
+                  bannedDevices.delete(request.hardwareId);
+                  pendingRequests.delete(reqId);
+
+                  // Send instant unlock to client browser
+                  io.emit("real-admin-unban-signal", { hardwareId: request.hardwareId });
+
+                  // Update Telegram message
+                  sendTelegramRaw("editMessageText", {
+                    chat_id: chatId,
+                    message_id: messageId,
+                    text: `✅ <b>APPROVED BY ADMIN!</b>\n\n👤 <b>User:</b> ${request.name}\n💳 <b>Ref:</b> <code>${request.ref}</code>\n💰 <b>Amount:</b> ₱20.00\n\n🎉 <i>Matagumpay na na-unban ang user sa MeetLoop!</i>`,
+                    parse_mode: "HTML"
+                  });
+
+                  sendTelegramRaw("answerCallbackQuery", {
+                    callback_query_id: cb.id,
+                    text: "✅ User Unbanned Successfully!",
+                    show_alert: true
+                  });
+                } else {
+                  sendTelegramRaw("answerCallbackQuery", {
+                    callback_query_id: cb.id,
+                    text: "⚠️ Ticket already processed or expired.",
+                    show_alert: true
+                  });
+                }
+              } else if (cbData.startsWith("reject_")) {
+                const reqId = cbData.replace("reject_", "");
+                const request = pendingRequests.get(reqId);
+                pendingRequests.delete(reqId);
+
+                sendTelegramRaw("editMessageText", {
+                  chat_id: chatId,
+                  message_id: messageId,
+                  text: `❌ <b>REJECTED BY ADMIN</b>\n\n👤 <b>User:</b> ${request ? request.name : "Unknown"}\n💳 <b>Ref:</b> <code>${request ? request.ref : ""}</code>\n\n🚫 <i>Hindi na-unban (Walang pumasok na bayad).</i>`,
+                  parse_mode: "HTML"
+                });
+
+                sendTelegramRaw("answerCallbackQuery", {
+                  callback_query_id: cb.id,
+                  text: "❌ Request Rejected!",
+                  show_alert: false
+                });
+              }
+            }
+
+            // 2. HANDLER PARA SA /start CHAT
+            if (update.message && update.message.chat) {
+              const incomingChatId = update.message.chat.id;
+              const senderName = update.message.from?.first_name || "Boss";
+              const text = (update.message.text || "").trim();
+
+              if (text.startsWith("/start")) {
+                const welcomeReply = `👋 <b>Kamusta Jm!</b>\n\n` +
+                                     `✅ <b>100% Connected ang MeetLoop Admin Bot!</b>\n\n` +
+                                     `Dito papasok ang:\n` +
+                                     `1. 📲 <b>GCash SMS Notif mula sa phone mo</b>\n` +
+                                     `2. 🚨 <b>1-Click Approve / Reject Buttons sa bawat ₱20 ticket</b> 🎉`;
+                sendTelegramMessage(incomingChatId, welcomeReply);
+              }
+            }
+          });
+        }
+      } catch (e) {}
+      setTimeout(pollTelegramUpdates, 1000);
+    });
   }).on("error", (e) => {
-    console.log("❌ Telegram Send Error:", e.message);
+    setTimeout(pollTelegramUpdates, 3000);
   });
 }
-
-// Function: Magpadala ng ₱20 Unban Alert sa Telegram mo
-function sendTelegramNotification(reqId, name, ref) {
-  const approveLink = `https://meetloop-om0m.onrender.com/admin/approve?id=${reqId}&secret=MEETLOOP2026`;
-
-  const msgText = `🚨 <b>MEETLOOP ₱20 GCASH UNBAN REQUEST</b>\n\n` +
-                  `👤 <b>Sender Name:</b> ${name}\n` +
-                  `💳 <b>GCash Ref No:</b> <code>${ref}</code>\n` +
-                  `💰 <b>Amount:</b> ₱20 Support Payment\n\n` +
-                  `👉 <b>Kung pumasok ang ₱20 sa GCash mo, i-click ang link na ito para buksan ang Approval Portal:</b>\n\n` +
-                  `${approveLink}`;
-
-  sendTelegramMessage(ADMIN_CHAT_ID, msgText);
-}
-
-// ==========================================
-// 🔒 ADMIN CONFIRMATION PORTAL
-// ==========================================
-app.get("/admin/approve", (req, res) => {
-  const { id, secret } = req.query;
-
-  if (secret !== "MEETLOOP2026") {
-    return res.status(403).send("<h1>Unauthorized</h1>");
-  }
-
-  const request = pendingRequests.get(id);
-  if (!request) {
-    return res.send(`
-      <div style="font-family:sans-serif;text-align:center;padding:50px;background:#0a0e17;color:#fff;min-height:100vh;">
-        <h1 style="color:#ef4444;">⚠️ Ticket Not Found or Already Handled</h1>
-        <p style="color:#94a3b8;">Baka na-approve na ito dati o nag-expire na.</p>
-      </div>
-    `);
-  }
-
-  res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>MeetLoop Admin - Unban Approval</title>
-      <style>
-        body{background:#0a0e17;color:#fff;font-family:system-ui,-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:16px;}
-        .card{background:#111827;border:1.5px solid #1f293d;border-radius:20px;max-width:420px;width:100%;padding:24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.8);}
-        .title{font-size:20px;font-weight:900;color:#38bdf8;margin-bottom:16px;}
-        .info-box{background:#070b14;border:1px solid #1f293d;border-radius:12px;padding:14px;text-align:left;font-size:13px;line-height:1.7;margin-bottom:20px;}
-        .btn-confirm{width:100%;height:50px;border:0;border-radius:12px;background:#16a34a;color:#fff;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 4px 15px rgba(22,163,74,0.4);}
-        .btn-confirm:hover{background:#15803d;}
-      </style>
-    </head>
-    <body>
-      <div class="card">
-        <div class="title">MeetLoop Admin Verification</div>
-        <div class="info-box">
-          <div>👤 <b>Sender Name:</b> <span style="color:#38bdf8;">${request.name}</span></div>
-          <div>💳 <b>GCash Ref No:</b> <code style="color:#facc15;font-size:14px;">${request.ref}</code></div>
-          <div>💰 <b>Amount:</b> <b>₱20.00 GCash</b></div>
-          <div>📱 <b>Device ID:</b> <span style="color:#94a3b8;font-size:11px;">${request.hardwareId}</span></div>
-        </div>
-        <form method="POST" action="/admin/confirm-unban">
-          <input type="hidden" name="id" value="${id}">
-          <input type="hidden" name="secret" value="MEETLOOP2026">
-          <button type="submit" class="btn-confirm">✅ CONFIRM & UNBAN USER NOW</button>
-        </form>
-      </div>
-    </body>
-    </html>
-  `);
-});
-
-// POST ACTION: Confirm Unban
-app.post("/admin/confirm-unban", (req, res) => {
-  const { id, secret } = req.body;
-
-  if (secret !== "MEETLOOP2026") {
-    return res.status(403).send("<h1>Unauthorized</h1>");
-  }
-
-  const request = pendingRequests.get(id);
-  if (!request) {
-    return res.send("<h1 style='font-family:sans-serif;text-align:center;margin-top:50px;color:#fff;background:#0a0e17;min-height:100vh;'>⚠️ Request already processed.</h1>");
-  }
-
-  // TANGGALIN ANG BAN
-  bannedDevices.delete(request.hardwareId);
-  pendingRequests.delete(id);
-
-  // REAL UNBAN SIGNAL TO CLIENT
-  io.emit("real-admin-unban-signal", { hardwareId: request.hardwareId });
-
-  res.send(`
-    <div style="font-family:sans-serif;text-align:center;padding:50px;background:#0a0e17;color:#fff;min-height:100vh;">
-      <h1 style="color:#16a34a;font-size:32px;">🎉 Unban Approved!</h1>
-      <p style="font-size:18px;color:#cbd5e1;">The user with Ref No: <b style="color:#38bdf8;">${request.ref}</b> has been successfully unbanned.</p>
-    </div>
-  `);
-});
 
 function checkDeviceBan(hardwareId) {
   if (!hardwareId) return null;
@@ -303,7 +381,7 @@ io.on("connection", (socket) => {
     const reqId = "req" + Math.floor(Math.random() * 900000 + 100000);
     pendingRequests.set(reqId, { hardwareId: reqHardware, ref, name, socketId: socket.id });
 
-    // Send notification to JM's Telegram
+    // I-send sa Telegram mo na may [ 🟢 1-CLICK APPROVE ] at [ 🔴 REJECT ]
     sendTelegramNotification(reqId, name, ref);
 
     return socket.emit("unban-pending", {
@@ -347,7 +425,8 @@ app.get("*", (req, res) => {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`🤖 Telegram Admin Bot: ACTIVE (@MeetLoop_bot)`);
-  console.log(`🛡️ Single-Tab & Anti-Cheat Engine: LOCKED`);
+  console.log(`🤖 Telegram 1-Click Inline Buttons: ACTIVE`);
+  console.log(`📲 GCash SMS Receiver Webhook: READY`);
   console.log(`================================================`);
+  pollTelegramUpdates();
 });
