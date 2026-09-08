@@ -482,7 +482,7 @@ video{
         </div>
       </div>
 
-      <input type="text" id="gcashRefInput" class="gcash-ref-input" placeholder="Enter GCash Ref No. (e.g. 0029381726481)" maxlength="25">
+      <input type="text" id="gcashRefInput" class="gcash-ref-input" placeholder="Enter GCash Ref No. from Receipt" maxlength="25">
       <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="verifyGCashTransaction()">Submit & Instant Unban</button>
       <div id="gcashRefStatus" style="font-size:11.5px;font-weight:800;text-align:center;min-height:16px"></div>
       <button type="button" class="btn-back-methods" onclick="backToMethodSelection()">← Back to Options</button>
@@ -857,38 +857,32 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 7. CASINO PLUS STYLE INSTANT VERIFIER ================= */
+/* ================= 7. 100% SERVER-VERIFIED GCASH UNBAN ================= */
 function verifyGCashTransaction() {
   const refInput = document.getElementById("gcashRefInput");
   const status = document.getElementById("gcashRefStatus");
   const btn = document.getElementById("gcashVerifyBtn");
-  const refVal = refInput.value.trim().replace(/[^a-zA-Z0-9]/g, "");
+  const refVal = refInput.value.trim().replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
 
-  if (!refVal || refVal.length < 8) {
+  if (!refVal || refVal.length < 6) {
     status.style.color = "#dc2626";
-    status.textContent = "❌ Please enter a valid Reference Number from your receipt.";
+    status.textContent = "❌ Please enter a valid Reference Number.";
     return;
   }
 
   btn.disabled = true;
-  btn.textContent = "Connecting to Gateway...";
+  btn.textContent = "Verifying with Server...";
   status.style.color = "#005ce6";
-  status.textContent = "Verifying GCash transaction ticket...";
+  status.textContent = "Checking GCash settlement database...";
 
-  // Real-time Gateway steps
-  setTimeout(() => {
-    btn.textContent = "Approving Clearance...";
-    status.textContent = "Verifying reference with ledger...";
-    
-    if (socket && socket.connected) {
-      socket.emit("unban-request", { hardwareId: myHardwareId, ref: refVal });
-    } else {
-      status.style.color = "#dc2626";
-      status.textContent = "❌ Connection timeout. Please check your internet.";
-      btn.disabled = false;
-      btn.textContent = "Submit & Instant Unban";
-    }
-  }, 1200);
+  if (socket && socket.connected) {
+    socket.emit("unban-request", { hardwareId: myHardwareId, ref: refVal });
+  } else {
+    status.style.color = "#dc2626";
+    status.textContent = "❌ Server connection lost. Please try again.";
+    btn.disabled = false;
+    btn.textContent = "Submit & Instant Unban";
+  }
 }
 
 if (socket) {
@@ -913,7 +907,7 @@ if (socket) {
         btn.textContent = "Submit & Instant Unban";
         refInput.value = "";
         status.textContent = "";
-        alert("🎉 GCash Top-Up Verified! Your suspension has been cleared.");
+        alert("🎉 GCash Payment Verified! Your 7-day suspension has been lifted.");
       }, 1000);
     } else {
       btn.disabled = false;
