@@ -37,14 +37,15 @@ app.use(express.urlencoded({ extended: true }));
 const bannedDevices = new Map();
 const pendingRequests = new Map();
 
-// Helper para magpadala ng mensahe sa Telegram mo
+// Helper para magpadala ng mensahe sa Telegram (100% Reliable HTML Mode)
 function sendTelegramMessage(chatId, text) {
   if (!chatId || !TELEGRAM_BOT_TOKEN) return;
 
   const payload = JSON.stringify({
     chat_id: chatId,
     text: text,
-    parse_mode: "Markdown"
+    parse_mode: "HTML",
+    disable_web_page_preview: false
   });
 
   const options = {
@@ -60,6 +61,9 @@ function sendTelegramMessage(chatId, text) {
   const req = https.request(options, (res) => {
     let resData = "";
     res.on("data", (chunk) => resData += chunk);
+    res.on("end", () => {
+      console.log("Telegram API Send Result:", resData);
+    });
   });
 
   req.on("error", (e) => console.log("Telegram Send Error:", e.message));
@@ -71,18 +75,28 @@ function sendTelegramMessage(chatId, text) {
 function sendTelegramNotification(reqId, name, ref) {
   const approveLink = `https://meetloop-om0m.onrender.com/admin/approve?id=${reqId}&secret=MEETLOOP2026`;
 
-  const msgText = `🚨 *MEETLOOP ₱20 GCASH UNBAN REQUEST*\n\n` +
-                  `👤 *Sender:* ${name}\n` +
-                  `💳 *Ref No:* \`${ref}\`\n` +
-                  `💰 *Amount:* ₱20 Support Payment\n\n` +
-                  `👉 *Tingnan ang iyong GCash. Kung pumasok ang ₱20, i-click ang link na ito para ma-unban agad siya:* \n\n` +
+  const msgText = `🚨 <b>MEETLOOP ₱20 GCASH UNBAN REQUEST</b>\n\n` +
+                  `👤 <b>Sender:</b> ${name}\n` +
+                  `💳 <b>Ref No:</b> <code>${ref}</code>\n` +
+                  `💰 <b>Amount:</b> ₱20 Support Payment\n\n` +
+                  `👉 <b>Tingnan ang GCash mo. Kung pumasok ang ₱20, i-click ito para ma-unban agad siya:</b>\n\n` +
                   `${approveLink}`;
 
   sendTelegramMessage(ADMIN_CHAT_ID, msgText);
 }
 
 // =========================================================================
-// ⚡ BULLETPROOF TELEGRAM POLLING ENGINE
+// 🧪 INSTANT TEST ROUTE (Para ma-test sa browser)
+// =========================================================================
+app.get("/test-telegram", (req, res) => {
+  const testId = "test" + Math.floor(Math.random() * 90000 + 10000);
+  pendingRequests.set(testId, { hardwareId: "test_hw", ref: "1234567890123", name: "Jm Live Test" });
+  sendTelegramNotification(testId, "Jm Live Test", "1234567890123");
+  res.send("<h1 style='font-family:sans-serif;text-align:center;margin-top:50px;color:#16a34a;'>✅ Test Alert Sent to your Telegram! Tingnan mo ang Telegram app mo.</h1>");
+});
+
+// =========================================================================
+// ⚡ HIGH-SPEED TELEGRAM BOT LISTENER & AUTO-RESPONDER
 // =========================================================================
 let lastUpdateId = 0;
 function pollTelegramUpdates() {
@@ -111,9 +125,9 @@ function pollTelegramUpdates() {
               console.log(`✅ [TELEGRAM] Message from ${senderName} (${incomingChatId}): ${text}`);
 
               if (text.startsWith("/start")) {
-                const welcomeReply = `👋 *Kamusta Jm!*\n\n` +
-                                     `✅ *100% Connected na ang MeetLoop Server mo kay @MeetLoop_bot!*\n\n` +
-                                     `Kapag may user na nagbayad ng *₱20* sa GCash at nag-submit ng Ref No., dito ko agad ipapadala ang alert na may 1-Click Approve Link. 🎉`;
+                const welcomeReply = `👋 <b>Kamusta Jm!</b>\n\n` +
+                                     `✅ <b>100% Connected na ang MeetLoop Server mo kay @MeetLoop_bot!</b>\n\n` +
+                                     `Kapag may user na nagbayad ng <b>₱20</b> sa GCash at nag-submit ng Ref No., dito ko agad ipapadala ang alert na may 1-Click Approve Link. 🎉`;
                 sendTelegramMessage(incomingChatId, welcomeReply);
               }
             }
@@ -301,10 +315,10 @@ io.on("connection", (socket) => {
       return socket.emit("unban-response", { success: false, message: "❌ Please enter a valid Reference Number." });
     }
 
-    const reqId = "req_" + Math.random().toString(36).substr(2, 9);
+    const reqId = "req" + Math.floor(Math.random() * 900000 + 100000);
     pendingRequests.set(reqId, { hardwareId: reqHardware, ref, name, socketId: socket.id });
 
-    // Send instant alert to Telegram
+    // Send instant alert to Telegram (HTML mode)
     sendTelegramNotification(reqId, name, ref);
 
     return socket.emit("unban-pending", {
@@ -351,9 +365,6 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`🤖 Telegram Auto-Responder Bot: ACTIVE (@MeetLoop_bot | Admin ID: ${ADMIN_CHAT_ID})`);
   console.log(`================================================`);
 
-  // Automatic startup greeting sa Telegram mo!
-  sendTelegramMessage(ADMIN_CHAT_ID, `🚀 *MeetLoop Server is LIVE!*\n\nReady na ang bot para sa mga ₱20 unban approvals.`);
-  
-  // Simulan ang bot updates listener
+  // Start polling
   pollTelegramUpdates();
 });
