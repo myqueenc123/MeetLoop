@@ -1,6 +1,6 @@
 /**
- * MeetLoop - 100% Fully Automated 24/7 Production Server
- * Autopilot GCash Unban Gateway + WebRTC Matchmaking
+ * MeetLoop - Production Server Backend
+ * Real GCash SMS Auto-Sync Gateway + WebRTC Matchmaking
  */
 
 const express = require("express");
@@ -21,46 +21,52 @@ const io = new Server(server, {
 });
 
 const PORT = process.env.PORT || 3000;
-const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days in Milliseconds
+const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days
+const WEBHOOK_SECRET = "MEETLOOP_SECURE_KEY_2026"; // Secret key para sa SMS forwarder
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-/* ================= AUTOPILOT BAN & GCASH ENGINE ================= */
+/* ================= REAL GCASH TRANSACTION DATABASE ================= */
 const bannedDevices = new Map(); // hardwareId -> { banUntil, reason, snapshot }
-const usedGcashReferences = new Set(); // Permanenteng nag-iimbak ng mga nagamit nang resibo
+const realPaidTransactions = new Set(); // Dito pumapasok ang mga TOTOONG bayad galing sa GCash SMS mo!
+const usedGcashReferences = new Set(); // Mga nagamit nang resibo
 
-// 100% FULLY AUTOMATIC GCASH RECEIPT VALIDATOR (WALANG MANUAL APPROVAL NA KAILANGAN)
-function autoValidateGCashReceipt(ref) {
-  if (!ref || typeof ref !== "string") {
-    return { valid: false, message: "❌ Please enter a valid Reference Number." };
+// =========================================================================
+// 📲 AUTOMATIC GCASH SMS WEBHOOK RECEIVER (Galing sa Cellphone mo)
+// Kapag may nag-send sa GCash mo, kusa itong ipapasa ng phone mo dito:
+// =========================================================================
+app.post("/api/gcash-sms-webhook", (req, res) => {
+  const { secret, message, ref } = req.body;
+
+  // Security Check
+  if (secret !== WEBHOOK_SECRET) {
+    return res.status(403).json({ success: false, message: "Unauthorized webhook request." });
   }
 
-  const cleanRef = ref.trim().replace(/[^a-zA-Z0-9]/g, "");
+  let extractedRef = ref;
 
-  // 1. Sukat ng GCash Reference Number (Karaniwang 13-digits)
-  if (cleanRef.length < 10 || cleanRef.length > 16) {
-    return { valid: false, message: "❌ Invalid format. Please check your 13-digit GCash Reference Number." };
+  // Kung buong SMS text ang ipinadala ng app, kukunin ng server ang Ref. No.
+  if (message && !extractedRef) {
+    const match = message.match(/Ref(?:erence)?\.?\s*(?:No\.?)?\s*[:.]?\s*([0-9]{10,16})/i);
+    if (match) extractedRef = match[1];
   }
 
-  // 2. Anti-Cheat: Bawal ang puro pare-parehong numero (hal. 0000000000000 o 1111111111111)
-  if (/^(\w)\1+$/.test(cleanRef)) {
-    return { valid: false, message: "❌ Invalid Reference Number. Fake input detected." };
+  if (extractedRef) {
+    const cleanRef = extractedRef.trim().replace(/[^0-9]/g, "");
+    realPaidTransactions.add(cleanRef);
+    console.log(`💰 [GCash Real Payment Received] Ref No: ${cleanRef}`);
+
+    return res.json({
+      success: true,
+      message: `Transaction ${cleanRef} verified and logged into server memory.`,
+      active_paid_codes: realPaidTransactions.size
+    });
   }
 
-  // 3. Anti-Cheat: Bawal ang sunod-sunod na imbento (hal. 1234567890123)
-  if ("0123456789012345".includes(cleanRef) || "9876543210987".includes(cleanRef)) {
-    return { valid: false, message: "❌ Invalid Reference Number. Sequential pattern rejected." };
-  }
-
-  // 4. One-Time Use Protection: Hindi na pwedeng gamitin ulit ang nagamit nang resibo
-  if (usedGcashReferences.has(cleanRef)) {
-    return { valid: false, message: "❌ This Reference Number has already been claimed and used." };
-  }
-
-  // AWTOMATIKONG APPROVED: Tanggapin ang lehitimong Reference Number mula sa resibo
-  return { valid: true, cleanRef };
-}
+  return res.status(400).json({ success: false, message: "No valid reference number found in SMS." });
+});
 
 function checkDeviceBan(hardwareId) {
   if (!hardwareId) return null;
@@ -165,7 +171,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  // REPORT USER: 7-Day suspension + reporter snapshot evidence
+  // REPORT USER
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -190,33 +196,46 @@ io.on("connection", (socket) => {
     socket.emit("report-success");
   });
 
-  // 100% AUTOMATIC INSTANT UNBAN (AUTOPILOT)
+  // =========================================================================
+  // 🔒 STRICT VERIFICATION: Tanging ang nasa Real GCash Transactions lang ang tatanggapin!
+  // =========================================================================
   socket.on("unban-request", (data) => {
-    const rawRef = data.ref || "";
+    const cleanRef = String(data.ref || "").trim().replace(/[^0-9]/g, "");
     const reqHardware = data.hardwareId || hardwareId;
 
-    const result = autoValidateGCashReceipt(rawRef);
+    // 1. Bawal kung nagamit na dati
+    if (usedGcashReferences.has(cleanRef)) {
+      return socket.emit("unban-response", {
+        success: false,
+        message: "❌ This Reference Number has already been used/claimed."
+      });
+    }
 
-    if (result.valid) {
-      // Markahan bilang used ang reference number para hindi na maulit
-      usedGcashReferences.add(result.cleanRef);
+    // 2. Suriin kung pumasok talaga ang bayad sa GCash account mo
+    const isRealPaid = realPaidTransactions.has(cleanRef);
 
-      // KUSANG tanggalin ang ban sa server
+    if (isRealPaid) {
+      // Markahan bilang nagamit na
+      usedGcashReferences.add(cleanRef);
+      realPaidTransactions.delete(cleanRef);
+
+      // Tanggalin ang ban
       if (reqHardware) bannedDevices.delete(reqHardware);
 
       return socket.emit("unban-response", {
         success: true,
-        message: "✅ GCash Payment Verified! Unban clearance approved."
+        message: "✅ Real GCash Payment Confirmed! 7-day suspension lifted."
       });
     } else {
+      // BUMAGSAK: Walang natanggap na bayad sa totoong GCash mo na may ganitong Reference Number
       return socket.emit("unban-response", {
         success: false,
-        message: result.message
+        message: "❌ Payment not found. We have not received any payment with this Reference Number on our GCash account."
       });
     }
   });
 
-  // STOP SEARCH
+  // STOP
   socket.on("stop-search", () => {
     removeFromQueue(socket.id);
     const partnerId = activePairs.get(socket.id);
@@ -253,7 +272,7 @@ app.get("*", (req, res) => {
 /* ================= BIND TO 0.0.0.0 FOR RENDER ================= */
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
-  console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`⚡ 100% Fully Automated 24/7 GCash Unban: ACTIVE`);
+  console.log(`🚀 MeetLoop Real GCash Server LIVE on port ${PORT}`);
+  console.log(`📱 SMS Webhook Endpoint: /api/gcash-sms-webhook`);
   console.log(`================================================`);
 });
