@@ -1,65 +1,121 @@
 /**
- * MeetLoop - Production Server Backend
- * Universal SMS Webhook Receiver + WebRTC Matchmaking
+ * MeetLoop - Official Production Server Backend
+ * Auto-Pairing Telegram Bot Engine + WebRTC Matchmaking
  */
 
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
+const https = require("https");
 
 const app = express();
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  },
+  cors: { origin: "*", methods: ["GET", "POST"] },
   pingTimeout: 60000,
   pingInterval: 25000
 });
 
 const PORT = process.env.PORT || 3000;
-const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days in ms
+const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days
+
+// ==========================================
+// 🤖 ANG IYONG OPISYAL NA TELEGRAM BOT TOKEN:
+// ==========================================
+const TELEGRAM_BOT_TOKEN = "8648356765:AAGgnEY9W8T_rWUEk1DgXHS48oNLOhg0d2s";
+let ADMIN_CHAT_ID = null; // Kusa itong kukunin ng server kapag nag-chat ka sa bot mo!
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* ================= REAL GCASH DATABASE ================= */
+/* ================= BAN & PENDING DATABASE ================= */
 const bannedDevices = new Map();
-const realPaidTransactions = new Set([
-  "4044808505649", // Pre-approved your reference code
-  "0029381726481"
-]);
-const usedGcashReferences = new Set();
+const pendingRequests = new Map();
 
-// =========================================================================
-// 📲 UNIVERSAL GCASH SMS WEBHOOK (Tumatanggap ng kahit anong app format)
-// =========================================================================
-app.all("/api/gcash-sms-webhook", (req, res) => {
-  // Kunin ang message mula sa kahit anong field (body, query, o JSON)
-  const message = req.body?.message || req.query?.message || req.body?.content || req.body?.msg || req.body?.sms || JSON.stringify(req.body);
-  const directRef = req.body?.ref || req.query?.ref;
-
-  let extractedRef = directRef;
-
-  // Hanapin ang 10-16 digit Reference Number sa text
-  if (message && !extractedRef) {
-    const match = String(message).match(/Ref(?:erence)?\.?\s*(?:No\.?)?\s*[:.]?\s*([0-9]{10,16})/i) || String(message).match(/([0-9]{10,16})/);
-    if (match) extractedRef = match[1];
+// FUNCTION: Mag-send ng Alert sa Telegram mo kapag may nagbayad
+function sendTelegramNotification(reqId, name, ref) {
+  if (!ADMIN_CHAT_ID) {
+    console.log("⚠️ Walang Admin Chat ID. Mag-chat muna ng /start sa @MeetLoop_bot");
+    return;
   }
 
-  if (extractedRef) {
-    const cleanRef = String(extractedRef).trim().replace(/[^0-9]/g, "");
-    realPaidTransactions.add(cleanRef);
-    console.log(`💰 [GCASH REAL SMS RECEIVED] Ref No: ${cleanRef}`);
-    return res.status(200).json({ success: true, message: "Transaction logged successfully!", ref: cleanRef });
+  const approveLink = `https://meetloop-om0m.onrender.com/admin/approve?id=${reqId}&secret=MEETLOOP2026`;
+
+  const msgText = `🚨 *MEETLOOP GCASH UNBAN REQUEST*\n\n` +
+                  `👤 *Sender:* ${name}\n` +
+                  `💳 *Ref No:* \`${ref}\`\n\n` +
+                  `👉 *Tingnan ang iyong GCash. Kung pumasok ang bayad, i-click ang link sa ibaba para ma-unban siya:* \n\n` +
+                  `${approveLink}`;
+
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${ADMIN_CHAT_ID}&text=${encodeURIComponent(msgText)}&parse_mode=Markdown`;
+
+  https.get(url, (res) => {}).on("error", (e) => {});
+}
+
+// AUTO-DETECT ADMIN CHAT ID POLLING
+let lastUpdateId = 0;
+function pollTelegramUpdates() {
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=10`;
+
+  https.get(url, (res) => {
+    let data = "";
+    res.on("data", (chunk) => data += chunk);
+    res.on("end", () => {
+      try {
+        const json = JSON.parse(data);
+        if (json.ok && json.result.length > 0) {
+          json.result.forEach((update) => {
+            lastUpdateId = update.update_id;
+            if (update.message && update.message.chat) {
+              ADMIN_CHAT_ID = update.message.chat.id;
+              console.log(`✅ [TELEGRAM BOT CONNECTED] Admin Chat ID Auto-Detected: ${ADMIN_CHAT_ID}`);
+
+              // Mag-reply sa admin
+              const replyUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${ADMIN_CHAT_ID}&text=${encodeURIComponent("✅ Connected to MeetLoop Server! Handa na akong magpadala ng GCash Unban Alerts sa'yo.")}`;
+              https.get(replyUrl, () => {});
+            }
+          });
+        }
+      } catch (err) {}
+      setTimeout(pollTelegramUpdates, 3000);
+    });
+  }).on("error", () => {
+    setTimeout(pollTelegramUpdates, 5000);
+  });
+}
+pollTelegramUpdates();
+
+// ==========================================
+// 🔗 1-CLICK APPROVAL LINK MULA SA TELEGRAM
+// ==========================================
+app.get("/admin/approve", (req, res) => {
+  const { id, secret } = req.query;
+
+  if (secret !== "MEETLOOP2026") {
+    return res.status(403).send("<h1>Unauthorized</h1>");
   }
 
-  // Laging ibalik ang 200 OK para maging SUCCESS ang test ng app
-  return res.status(200).json({ success: true, message: "Webhook active and ready!" });
+  const request = pendingRequests.get(id);
+  if (!request) {
+    return res.send("<h1 style='font-family:sans-serif;'>Request not found or already approved/expired.</h1>");
+  }
+
+  // Tanggalin ang ban
+  bannedDevices.delete(request.hardwareId);
+  pendingRequests.delete(id);
+
+  // Unban signal papunta sa website
+  io.emit("admin-approved-unban", { hardwareId: request.hardwareId });
+
+  res.send(`
+    <div style="font-family:sans-serif;text-align:center;padding:50px;background:#0a0e17;color:#fff;min-height:100vh;">
+      <h1 style="color:#16a34a;font-size:32px;">✅ Unban Approved!</h1>
+      <p style="font-size:18px;color:#cbd5e1;">Ang user na may Ref No: <b style="color:#38bdf8;">${request.ref}</b> ay matagumpay nang na-unban sa MeetLoop.</p>
+    </div>
+  `);
 });
 
 function checkDeviceBan(hardwareId) {
@@ -110,7 +166,7 @@ function matchUsers() {
   }
 }
 
-/* ================= SOCKET.IO EVENTS ================= */
+/* ================= SOCKET.IO ================= */
 io.on("connection", (socket) => {
   const hardwareId = socket.handshake.query.hardwareId || socket.handshake.query.deviceId;
 
@@ -162,6 +218,7 @@ io.on("connection", (socket) => {
     }
   });
 
+  // REPORT USER: 7-Day suspension sa partner + snapshot evidence
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -186,35 +243,25 @@ io.on("connection", (socket) => {
     socket.emit("report-success");
   });
 
-  // STRICT GCASH UNBAN
+  // SUBMIT GCASH TICKET PARA SA TELEGRAM
   socket.on("unban-request", (data) => {
-    const cleanRef = String(data.ref || "").trim().replace(/[^0-9]/g, "");
+    const ref = String(data.ref || "").trim().replace(/[^0-9]/g, "");
+    const name = String(data.name || "Anonymous User").trim();
     const reqHardware = data.hardwareId || hardwareId;
 
-    if (usedGcashReferences.has(cleanRef)) {
-      return socket.emit("unban-response", {
-        success: false,
-        message: "❌ This Reference Number has already been used/claimed."
-      });
+    if (!ref || ref.length < 8) {
+      return socket.emit("unban-response", { success: false, message: "❌ Please enter a valid Reference Number." });
     }
 
-    // Tanggapin kapag natanggap sa SMS ng phone mo o kasama sa listahan
-    if (realPaidTransactions.has(cleanRef)) {
-      usedGcashReferences.add(cleanRef);
-      realPaidTransactions.delete(cleanRef);
+    const reqId = "req_" + Math.random().toString(36).substr(2, 9);
+    pendingRequests.set(reqId, { hardwareId: reqHardware, ref, name, socketId: socket.id });
 
-      if (reqHardware) bannedDevices.delete(reqHardware);
+    // I-send agad sa Telegram bot mo!
+    sendTelegramNotification(reqId, name, ref);
 
-      return socket.emit("unban-response", {
-        success: true,
-        message: "✅ Real GCash Payment Confirmed! 7-day suspension lifted."
-      });
-    } else {
-      return socket.emit("unban-response", {
-        success: false,
-        message: "❌ Payment not found. No matching transaction received on our GCash account."
-      });
-    }
+    return socket.emit("unban-pending", {
+      message: "⏳ Payment details submitted! Admin is verifying your GCash transaction via Telegram. Please wait..."
+    });
   });
 
   socket.on("stop-search", () => {
@@ -251,5 +298,8 @@ app.get("*", (req, res) => {
 
 /* ================= BIND TO 0.0.0.0 FOR RENDER ================= */
 server.listen(PORT, "0.0.0.0", () => {
+  console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
+  console.log(`🤖 Telegram Auto-Pairing Bot: ACTIVE`);
+  console.log(`================================================`);
 });
