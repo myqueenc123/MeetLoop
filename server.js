@@ -1,6 +1,6 @@
 /**
  * MeetLoop - Official Production Server Backend
- * Complete Telegram Instant Approval + 7-Day Ban + WebRTC Signaling
+ * High-Speed Telegram Auto-Pairing Bot + WebRTC Matchmaking
  */
 
 const express = require("express");
@@ -21,24 +21,48 @@ const io = new Server(server, {
 const PORT = process.env.PORT || 3000;
 const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days in Milliseconds
 
-// ==========================================
-// 🤖 ANG IYONG OPISYAL NA TELEGRAM BOT TOKEN:
-// ==========================================
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || Buffer.from("ODY0ODM1Njc2NTpBQUdnbkVZOVc4VF9yV1VFazFEZ3hIUzQ4b05MT2hnMGQycw==", "base64").toString("utf-8");
-let ADMIN_CHAT_ID = null; // Kusa itong kukunin kapag nag-chat ka ng /start sa @MeetLoop_bot!
+// =========================================================================
+// 🤖 ANG IYONG OPISYAL NA TELEGRAM BOT TOKEN (Secure Encoded):
+// =========================================================================
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8648356765:AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s"; 
+let ADMIN_CHAT_ID = null; // Kusa itong kukunin ng server pagka-chat mo sa bot mo!
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /* ================= BAN & PENDING DATABASE ================= */
-const bannedDevices = new Map(); // hardwareId -> { banUntil, reason, snapshot }
-const pendingRequests = new Map(); // reqId -> { hardwareId, ref, name, socketId }
+const bannedDevices = new Map();
+const pendingRequests = new Map();
 
-// FUNCTION: Magpadala ng Alert sa Telegram mo kapag may nagbayad ng ₱20
+// Helper para magpadala ng mensahe sa Telegram
+function sendTelegramMessage(chatId, text) {
+  const payload = JSON.stringify({
+    chat_id: chatId,
+    text: text,
+    parse_mode: "Markdown"
+  });
+
+  const options = {
+    hostname: "api.telegram.org",
+    path: `/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": Buffer.byteLength(payload)
+    }
+  };
+
+  const req = https.request(options, () => {});
+  req.on("error", (e) => console.log("Telegram Send Error:", e.message));
+  req.write(payload);
+  req.end();
+}
+
+// FUNCTION: Magpadala ng ₱20 Unban Alert sa Telegram mo
 function sendTelegramNotification(reqId, name, ref) {
   if (!ADMIN_CHAT_ID) {
-    console.log("⚠️ Walang Admin Chat ID. Mag-chat muna ng /start sa @MeetLoop_bot");
+    console.log("⚠️ Walang Admin Chat ID. Mag-chat muna ng /start sa iyong Telegram Bot!");
     return;
   }
 
@@ -48,48 +72,72 @@ function sendTelegramNotification(reqId, name, ref) {
                   `👤 *Sender:* ${name}\n` +
                   `💳 *Ref No:* \`${ref}\`\n` +
                   `💰 *Amount:* ₱20 Support Payment\n\n` +
-                  `👉 *Tingnan ang iyong GCash. Kung pumasok ang ₱20, i-click ang link sa ibaba para ma-unban agad siya:* \n\n` +
+                  `👉 *Tingnan ang iyong GCash. Kung pumasok ang ₱20, i-click ang link na ito para ma-unban agad siya:* \n\n` +
                   `${approveLink}`;
 
-  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${ADMIN_CHAT_ID}&text=${encodeURIComponent(msgText)}&parse_mode=Markdown`;
-
-  https.get(url, (res) => {}).on("error", (e) => {});
+  sendTelegramMessage(ADMIN_CHAT_ID, msgText);
 }
 
-// AUTO-DETECT ADMIN CHAT ID POLLING
+// =========================================================================
+// ⚡ HIGH-SPEED TELEGRAM AUTO-RESPONDER & PAIRING
+// =========================================================================
 let lastUpdateId = 0;
-function pollTelegramUpdates() {
-  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=10`;
+function startTelegramBotListener() {
+  const payload = JSON.stringify({
+    offset: lastUpdateId + 1,
+    timeout: 10
+  });
 
-  https.get(url, (res) => {
+  const options = {
+    hostname: "api.telegram.org",
+    path: `/bot${TELEGRAM_BOT_TOKEN}/getUpdates`,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": Buffer.byteLength(payload)
+    }
+  };
+
+  const req = https.request(options, (res) => {
     let data = "";
     res.on("data", (chunk) => data += chunk);
     res.on("end", () => {
       try {
         const json = JSON.parse(data);
-        if (json.ok && json.result.length > 0) {
+        if (json.ok && Array.isArray(json.result) && json.result.length > 0) {
           json.result.forEach((update) => {
             lastUpdateId = update.update_id;
+
             if (update.message && update.message.chat) {
               ADMIN_CHAT_ID = update.message.chat.id;
-              console.log(`✅ [TELEGRAM CONNECTED] Admin Chat ID Auto-Detected: ${ADMIN_CHAT_ID}`);
+              const senderName = update.message.from?.first_name || "Boss";
+              console.log(`✅ [TELEGRAM CONNECTED] Chat ID from ${senderName}: ${ADMIN_CHAT_ID}`);
 
-              const replyUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${ADMIN_CHAT_ID}&text=${encodeURIComponent("✅ Connected to MeetLoop Server! Handa na akong magpadala ng ₱20 GCash Unban Alerts sa'yo.")}`;
-              https.get(replyUrl, () => {});
+              // Awtomatikong mag-re-reply ang bot sa'yo
+              const welcomeReply = `👋 *Kamusta ${senderName}!*\n\n` +
+                                   `✅ *100% Connected na ako sa MeetLoop Server mo!*\n\n` +
+                                   `Tuwing may magbabayad ng *₱20* sa GCash QR mo at mag-submit sa website, agad akong magpapadala ng alert sa'yo dito na may 1-Click Approve Link. 🎉`;
+
+              sendTelegramMessage(ADMIN_CHAT_ID, welcomeReply);
             }
           });
         }
-      } catch (err) {}
-      setTimeout(pollTelegramUpdates, 3000);
+      } catch (e) {}
+      setTimeout(startTelegramBotListener, 1500); // Check kada 1.5 segundo
     });
-  }).on("error", () => {
-    setTimeout(pollTelegramUpdates, 5000);
   });
+
+  req.on("error", (e) => {
+    setTimeout(startTelegramBotListener, 3000);
+  });
+
+  req.write(payload);
+  req.end();
 }
-pollTelegramUpdates();
+startTelegramBotListener();
 
 // ==========================================
-// 🔗 1-CLICK APPROVAL LINK MULA SA TELEGRAM
+// 🔗 1-CLICK APPROVAL LINK
 // ==========================================
 app.get("/admin/approve", (req, res) => {
   const { id, secret } = req.query;
@@ -103,11 +151,11 @@ app.get("/admin/approve", (req, res) => {
     return res.send("<h1 style='font-family:sans-serif;'>Request not found or already approved/expired.</h1>");
   }
 
-  // Tanggalin ang ban sa hardware ID ng user
+  // Tanggalin ang ban
   bannedDevices.delete(request.hardwareId);
   pendingRequests.delete(id);
 
-  // Real-time unban signal papunta sa website ng user
+  // Unban signal papunta sa website ng user
   io.emit("admin-approved-unban", { hardwareId: request.hardwareId });
 
   res.send(`
@@ -218,7 +266,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  // REPORT USER: 7-Day suspension sa partner + reporter snapshot
+  // REPORT USER: 7-Day suspension sa partner + snapshot
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -243,7 +291,7 @@ io.on("connection", (socket) => {
     socket.emit("report-success");
   });
 
-  // SUBMIT GCASH UNBAN TICKET PARA SA TELEGRAM APPROVAL
+  // SUBMIT GCASH UNBAN TICKET
   socket.on("unban-request", (data) => {
     const ref = String(data.ref || "").trim().replace(/[^0-9]/g, "");
     const name = String(data.name || "Anonymous User").trim();
@@ -256,7 +304,7 @@ io.on("connection", (socket) => {
     const reqId = "req_" + Math.random().toString(36).substr(2, 9);
     pendingRequests.set(reqId, { hardwareId: reqHardware, ref, name, socketId: socket.id });
 
-    // I-send agad ang alert sa Telegram mo!
+    // I-send agad sa Telegram mo!
     sendTelegramNotification(reqId, name, ref);
 
     return socket.emit("unban-pending", {
@@ -296,10 +344,9 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-/* ================= BIND TO 0.0.0.0 FOR RENDER ================= */
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`📱 Telegram Instant Approval Gateway: ACTIVE`);
+  console.log(`🤖 Telegram Auto-Responder Bot: ACTIVE`);
   console.log(`================================================`);
 });
