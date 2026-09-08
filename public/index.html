@@ -62,7 +62,7 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
-/* OMETV NATURAL VIDEO FRAMING (No extreme zoom, no lag) */
+/* OMETV NATURAL VIDEO FRAMING */
 video{
   width:100%;height:100%;
   object-fit:cover;
@@ -274,10 +274,11 @@ video{
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 }
 
-/* 7-DAY BAN OVERLAY */
+/* ================= 7-DAY HARD LOCK BAN OVERLAY ================= */
 #banOverlay{
-  position:fixed;inset:0;z-index:99999999;background:rgba(0,0,0,.96);
+  position:fixed;inset:0;z-index:999999999;background:rgba(0,0,0,.96);
   display:none;align-items:center;justify-content:center;padding:12px;overflow-y:auto;
+  pointer-events:all;
 }
 .ban-card{
   max-width:440px;width:100%;background:#ffffff;border-radius:22px;
@@ -301,16 +302,13 @@ video{
 .ban-title{font-size:18px;font-weight:900;color:#dc2626}
 .ban-reason{font-size:11.5px;color:#475569;font-weight:700}
 
-/* OFFICIAL DISCLAIMER BOX (Inside GCash view only) */
+/* DISCLAIMER BOX (Inside GCash Pay Section Only) */
 .ban-disclaimer-box{
   background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;
   padding:14px;text-align:left;font-size:11.5px;line-height:1.5;color:#334155;
 }
 .ban-disclaimer-title{
   color:#dc2626;font-size:13px;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:5px;
-}
-.ban-disclaimer-highlight{
-  background:#fee2e2;color:#991b1b;padding:2px 6px;border-radius:4px;font-weight:800;
 }
 
 .method-choice-container{display:flex;flex-direction:column;gap:9px}
@@ -433,7 +431,7 @@ video{
   </div>
 </div>
 
-<!-- 7-DAY BAN OVERLAY -->
+<!-- 7-DAY BAN OVERLAY (HARD LOCK) -->
 <div id="banOverlay">
   <div class="ban-card">
     <div class="ban-top">
@@ -495,7 +493,7 @@ video{
         </svg>
       </div>
 
-      <!-- DYNAMIC DISCLAIMER BOX (Lalabas lang sa GCash view) -->
+      <!-- DYNAMIC DISCLAIMER BOX (Inside GCash pay only) -->
       <div class="ban-disclaimer-box">
         <div class="ban-disclaimer-title">
           🚫 Official Ban Clearance Notice
@@ -647,31 +645,18 @@ video{
 <script>
 "use strict";
 
-/* ================= 1. HARDWARE FINGERPRINT ================= */
-function generateHardwareFingerprint() {
-  const parts = [
-    screen.width + "x" + screen.height + "x" + screen.colorDepth,
-    navigator.hardwareConcurrency || 4,
-    navigator.maxTouchPoints || 0,
-    Intl.DateTimeFormat().resolvedOptions().timeZone || "",
-    navigator.language || ""
-  ];
-
-  try {
-    const gl = document.createElement("canvas").getContext("webgl");
-    if (gl) {
-      const dbg = gl.getExtension("WEBGL_debug_renderer_info");
-      if (dbg) parts.push(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL));
-    }
-  } catch(e){}
-
-  const raw = parts.join("###");
-  let hash = 0;
-  for (let i = 0; i < raw.length; i++) hash = Math.imul(31, hash) + raw.charCodeAt(i) | 0;
-  return "hw_" + Math.abs(hash).toString(16) + "_" + screen.width + "x" + screen.height;
+/* ================= 1. PERMANENT TAMPER-PROOF DEVICE ID ================= */
+function getPermanentDeviceId() {
+  let devId = localStorage.getItem("meetloop_device_id");
+  if (!devId || devId.length < 10) {
+    const raw = "dev_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now().toString(36) + "_" + screen.width + "x" + screen.height;
+    localStorage.setItem("meetloop_device_id", raw);
+    devId = raw;
+  }
+  return devId;
 }
 
-const myHardwareId = generateHardwareFingerprint();
+const myHardwareId = getPermanentDeviceId();
 let numericId = 0;
 for (let i = 0; i < myHardwareId.length; i++) numericId = (numericId * 31 + myHardwareId.charCodeAt(i)) % 900000000;
 document.getElementById("adminUnbanId").textContent = "" + (100000000 + Math.abs(numericId));
@@ -681,7 +666,7 @@ let dbInstance = null;
 function initSecurityDB() {
   return new Promise((resolve) => {
     try {
-      const req = indexedDB.open("MeetLoop_SecEngine", 1);
+      const req = indexedDB.open("MeetLoop_SecEngine_V2", 1);
       req.onupgradeneeded = (e) => {
         const db = e.target.result;
         if (!db.objectStoreNames.contains("bans")) db.createObjectStore("bans", { keyPath: "id" });
@@ -790,13 +775,12 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 5. EVIDENCE SNAPSHOT CAPTURE (Captures Stranger Face) ================= */
+/* ================= 5. EVIDENCE SNAPSHOT CAPTURE ================= */
 function captureReporterSnapshot() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
   const ctx = canvas.getContext("2d");
 
-  // Kuhain ang mukha ng kausap (Stranger) bilang solidong ebidensya
   if (remoteVideo && remoteVideo.videoWidth > 0) {
     ctx.drawImage(remoteVideo, 0, 0, 180, 180);
     return canvas.toDataURL("image/jpeg", 0.75);
@@ -807,15 +791,15 @@ function captureReporterSnapshot() {
   return null;
 }
 
-/* ================= 6. 7-DAY BAN ENGINE (UNBREAKABLE) ================= */
+/* ================= 6. UNBREAKABLE 7-DAY BAN ENGINE ================= */
 async function checkActiveBan() {
   let banUntil = parseInt(localStorage.getItem("meetloop_banned_until") || "0", 10);
   let banReason = localStorage.getItem("meetloop_banned_reason") || "Policy Violation";
   let snapData = localStorage.getItem("meetloop_snap");
 
-  if (!banUntil || Date.now() >= banUntil) {
+  if (!banUntil || isNaN(banUntil) || Date.now() >= banUntil) {
     const dbRecord = await getBanFromDB();
-    if (dbRecord && dbRecord.banUntil && Date.now() < dbRecord.banUntil) {
+    if (dbRecord && dbRecord.banUntil && !isNaN(dbRecord.banUntil) && Date.now() < dbRecord.banUntil) {
       banUntil = dbRecord.banUntil;
       banReason = dbRecord.reason;
       snapData = dbRecord.snapData;
@@ -825,7 +809,7 @@ async function checkActiveBan() {
     }
   }
 
-  if (banUntil && Date.now() < banUntil) {
+  if (banUntil && !isNaN(banUntil) && Date.now() < banUntil) {
     display7DayBanScreen(banUntil, banReason, snapData);
     return true;
   } else {
@@ -839,19 +823,20 @@ async function checkActiveBan() {
 function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap = null) {
   stopSession();
 
+  const finalBanUntil = (!banUntil || isNaN(banUntil)) ? (Date.now() + 7 * 24 * 60 * 60 * 1000) : banUntil;
   const snapData = customSnap || localStorage.getItem("meetloop_snap");
-  localStorage.setItem("meetloop_banned_until", banUntil);
+
+  localStorage.setItem("meetloop_banned_until", finalBanUntil);
   localStorage.setItem("meetloop_banned_reason", reason);
   if (snapData) localStorage.setItem("meetloop_snap", snapData);
-  saveBanToDB(banUntil, reason, snapData);
+  saveBanToDB(finalBanUntil, reason, snapData);
 
   document.getElementById("banReasonLabel").textContent = reason;
   
-  const unbanDate = new Date(banUntil);
+  const unbanDate = new Date(finalBanUntil);
   const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
   document.getElementById("banUntilFullText").textContent = unbanDate.toLocaleDateString([], options);
 
-  // I-render ang litrato ng encounter
   const banCanvas = document.getElementById("banCanvas");
   const ctx = banCanvas.getContext("2d");
   if (snapData) {
@@ -873,7 +858,7 @@ function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap 
 
   if (banInterval) clearInterval(banInterval);
   banInterval = setInterval(async () => {
-    if (Date.now() >= banUntil) {
+    if (Date.now() >= finalBanUntil) {
       clearInterval(banInterval);
       localStorage.removeItem("meetloop_banned_until");
       localStorage.removeItem("meetloop_banned_reason");
@@ -899,7 +884,7 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 7. SUBMIT GCASH TICKET ================= */
+/* ================= 7. SUBMIT GCASH TICKET (NO AUTO UNBAN) ================= */
 function submitGCashUnbanTicket() {
   const nameInput = document.getElementById("gcashSenderName");
   const refInput = document.getElementById("gcashRefInput");
@@ -918,7 +903,7 @@ function submitGCashUnbanTicket() {
   btn.disabled = true;
   btn.textContent = "⏳ Verification in Progress...";
   status.style.color = "#0284c7";
-  status.textContent = "Details sent to Telegram Admin! Waiting for approval...";
+  status.textContent = "Details sent to Telegram Admin! Waiting for admin approval...";
 
   if (socket && socket.connected) {
     socket.emit("unban-request", { hardwareId: myHardwareId, name: nameVal, ref: refVal });
@@ -930,7 +915,7 @@ function submitGCashUnbanTicket() {
   }
 }
 
-// REAL-TIME UNBAN LISTENER
+// REAL-TIME UNBAN LISTENER (EXCLUSIVELY UNLOCKED BY ADMIN TELEGRAM APPROVAL LINK)
 if (socket) {
   socket.on("unban-pending", (data) => {
     const status = document.getElementById("gcashRefStatus");
@@ -942,6 +927,7 @@ if (socket) {
   });
 
   socket.on("admin-approved-unban", async (data) => {
+    // Only unban the exact matching Device ID
     if (data.hardwareId === myHardwareId) {
       localStorage.removeItem("meetloop_banned_until");
       localStorage.removeItem("meetloop_banned_reason");
@@ -985,7 +971,6 @@ async function startMedia() {
     return true;
   }
 
-  // Optimized OmeTV Natural Frame (Zero Zoom / Zero Lag)
   const constraints = {
     video: {
       width: { ideal: 640, max: 1280 },
