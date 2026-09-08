@@ -69,7 +69,7 @@ video{
   background:#030712;display:block;
 }
 
-/* ================= AUTHENTIC OMETV CRT SCREEN WRAPPER ================= */
+/* CRT SCREEN & OVERLAY */
 .crt-screen-wrapper{
   position:absolute;inset:0;z-index:2;
   overflow:hidden;background:#050811;
@@ -77,7 +77,7 @@ video{
 }
 #crtStaticCanvas{
   position:absolute;inset:0;width:100%;height:100%;
-  opacity:0.35;filter:contrast(200%) brightness(95%);
+  opacity:0.30;filter:contrast(200%) brightness(95%);
   display:block;
 }
 .crt-overlay-vignette{
@@ -94,7 +94,7 @@ video{
   text-align:center;padding:0 12px;user-select:none;pointer-events:none;
 }
 .standby-logo{
-  width:115px;height:115px;margin-bottom:12px;
+  width:110px;height:110px;margin-bottom:12px;
   filter:drop-shadow(0 0 25px rgba(56,189,248,.6));
   animation:floatLogo 3s ease-in-out infinite alternate;
 }
@@ -124,13 +124,13 @@ video{
   background:rgba(15, 23, 42, 0.92);
   border:1.5px solid rgba(56, 189, 248, 0.35);
   backdrop-filter:blur(10px);
-  padding:22px 28px;border-radius:20px;text-align:center;
+  padding:20px 26px;border-radius:20px;text-align:center;
   box-shadow:0 15px 40px rgba(0,0,0,.85), 0 0 25px rgba(56, 189, 248, 0.2);
   animation:popIn .2s ease-out;
 }
 @keyframes popIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
 .search-spinner{
-  width:40px;height:40px;margin:0 auto 12px;
+  width:38px;height:38px;margin:0 auto 10px;
   border:3.5px solid rgba(255,255,255,.15);border-top-color:#38bdf8;
   border-radius:50%;animation:spin .75s linear infinite;
 }
@@ -139,17 +139,17 @@ video{
 
 /* BLUR SHIELD */
 #remoteVideo.remote-blur{
-  filter:blur(35px) brightness(0.85);
-  -webkit-filter:blur(35px) brightness(0.85);
+  filter:blur(30px) brightness(0.9);
+  -webkit-filter:blur(30px) brightness(0.9);
   transition:none;
 }
 #remoteVideo.remote-clear{
   filter:blur(0px) brightness(1.0);
   -webkit-filter:blur(0px) brightness(1.0);
-  transition:filter 0.5s ease-out, -webkit-filter 0.5s ease-out;
+  transition:filter 0.35s ease-out, -webkit-filter 0.35s ease-out;
 }
 
-/* COMPACT VOLUME */
+/* AUDIO BADGE */
 .remote-audio-badge{
   position:absolute;bottom:10px;left:10px;z-index:5;
   background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);
@@ -223,7 +223,6 @@ video{
   background:#1e293b;border-radius:8px;font-size:11px;line-height:1.4;color:#f8fafc;
 }
 .chat-rules-card{background:#1e1b4b;border:1px solid #4338ca;font-size:11px;line-height:1.5}
-.chat-rules-badge{background:#dc2626;color:#fff;font-size:9px;font-weight:900;padding:2px 5px;border-radius:4px;margin-bottom:4px;display:inline-block}
 
 .chat-foot{display:flex;gap:6px;padding:8px;border-top:1px solid var(--panel-border)}
 .chat-input{
@@ -278,7 +277,7 @@ video{
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 }
 
-/* ================= 7-DAY BAN OVERLAY ================= */
+/* 7-DAY BAN OVERLAY */
 #banOverlay{
   position:fixed;inset:0;z-index:9999999;background:rgba(0,0,0,.94);
   display:none;align-items:center;justify-content:center;padding:12px;overflow-y:auto;
@@ -305,7 +304,6 @@ video{
 .ban-title{font-size:18px;font-weight:900;color:#dc2626}
 .ban-reason{font-size:11.5px;color:#475569;font-weight:700}
 
-/* ================= OFFICIAL DISCLAIMER BOX ================= */
 .ban-disclaimer-box{
   background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;
   padding:14px;text-align:left;font-size:11.5px;line-height:1.5;color:#334155;
@@ -453,7 +451,6 @@ video{
       </div>
     </div>
 
-    <!-- OFFICIAL DISCLAIMER NOTICE -->
     <div class="ban-disclaimer-box">
       <div class="ban-disclaimer-title">
         🚫 You’ve been temporarily banned
@@ -488,7 +485,7 @@ video{
 
       <!-- Option B: Direct Telegram Support Chat (@MeetLoop_bot) -->
       <a href="https://t.me/MeetLoop_bot" target="_blank" class="telegram-support-btn">
-        <svg width="18" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.99-1.74 6.66-2.89 8-3.46 3.82-1.6 4.62-1.88 5.14-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.21-.03.36z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.99-1.74 6.66-2.89 8-3.46 3.82-1.6 4.62-1.88 5.14-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.21-.03.36z"/></svg>
         <span>Message Telegram Support (@MeetLoop_bot)</span>
       </a>
 
@@ -570,7 +567,7 @@ video{
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" class="remote-blur" autoplay playsinline webkit-playsinline></video>
 
-        <!-- AUTHENTIC OMETV CRT SCREEN WRAPPER -->
+        <!-- CRT SCREEN WRAPPER -->
         <div class="crt-screen-wrapper" id="crtWrapper">
           <canvas id="crtStaticCanvas"></canvas>
           <div class="crt-overlay-vignette"></div>
@@ -776,7 +773,7 @@ let banInterval = null;
 let blurTimer = null;
 let pendingCandidates = [];
 
-/* ================= 4. AUTHENTIC OMETV TV STATIC GENERATOR ================= */
+/* ================= 4. AUTHENTIC OMETV TV STATIC ================= */
 function runTVStatic() {
   if (!crtStaticCanvas) return;
   const ctx = crtStaticCanvas.getContext("2d");
@@ -800,7 +797,7 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 5. SNAPSHOT EVIDENCE CAPTURE (Fixed: Stranger Face First) ================= */
+/* ================= 5. EVIDENCE SNAPSHOT ================= */
 function captureReporterSnapshot() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
@@ -905,7 +902,7 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 7. SUBMIT GCASH UNBAN TICKET ================= */
+/* ================= 7. SUBMIT GCASH TICKET ================= */
 function submitGCashUnbanTicket() {
   const nameInput = document.getElementById("gcashSenderName");
   const refInput = document.getElementById("gcashRefInput");
@@ -960,7 +957,7 @@ if (socket) {
 
       setTimeout(() => {
         document.getElementById("banOverlay").style.display = "none";
-        alert("🎉 Admin Approved! Your 7-day suspension has been successfully lifted.");
+        alert("🎉 Admin Approved! Your 7-day suspension has been lifted.");
       }, 1000);
     }
   });
@@ -981,7 +978,7 @@ if (socket) {
   });
 }
 
-/* ================= 8. WEBRTC MEDIA ENGINE ================= */
+/* ================= 8. HD OMETV WEBRTC ENGINE ================= */
 async function startMedia() {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === "live")) {
     if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
@@ -991,10 +988,12 @@ async function startMedia() {
   }
 
   const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent) || window.innerWidth <= 850;
+  
+  // High-Definition OmeTV Camera Constraints
   const constraints = {
     video: {
-      width: isMobile ? { ideal: 640 } : { ideal: 1280 },
-      height: isMobile ? { ideal: 480 } : { ideal: 720 },
+      width: { ideal: 1280, min: 640 },
+      height: { ideal: 720, min: 480 },
       frameRate: { ideal: 30, min: 24 },
       facingMode: { ideal: currentFacingMode }
     },
@@ -1029,7 +1028,7 @@ function releaseBlur() {
   blurTimer = setTimeout(() => {
     remoteVideo.classList.remove("remote-blur");
     remoteVideo.classList.add("remote-clear");
-  }, 400);
+  }, 300);
 }
 
 async function triggerStartNext() {
@@ -1076,12 +1075,26 @@ function stopSession() {
   stopBtn.disabled = true;
 }
 
+// MULTI-STUN + TURN RELAY (Garantisadong Lulusot sa lahat ng Network)
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
     { urls: "stun:stun1.l.google.com:19302" },
-    { urls: "stun:stun2.l.google.com:19302" }
-  ]
+    { urls: "stun:stun2.l.google.com:19302" },
+    { urls: "stun:stun3.l.google.com:19302" },
+    { urls: "stun:stun4.l.google.com:19302" },
+    {
+      urls: "turn:standard.relay.metered.ca:80",
+      username: "0974f7094bbb79185dd1d4ce",
+      credential: "jqFOtepU3tMVTfEX"
+    },
+    {
+      urls: "turn:standard.relay.metered.ca:443",
+      username: "0974f7094bbb79185dd1d4ce",
+      credential: "jqFOtepU3tMVTfEX"
+    }
+  ],
+  iceCandidatePoolSize: 10
 };
 
 async function createPeer(initiator) {
@@ -1108,9 +1121,8 @@ async function createPeer(initiator) {
     searchLoader.style.display = "none";
     remoteStatus.textContent = "Live";
 
-    const stream = (e.streams && e.streams[0]) ? e.streams[0] : null;
-    if (stream) {
-      remoteVideo.srcObject = stream;
+    if (e.streams && e.streams[0]) {
+      remoteVideo.srcObject = e.streams[0];
     } else {
       if (!remoteVideo.srcObject) remoteVideo.srcObject = new MediaStream();
       remoteVideo.srcObject.addTrack(e.track);
