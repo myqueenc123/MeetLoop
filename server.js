@@ -38,7 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 const bannedDevices = new Map();
 const pendingRequests = new Map();
 
-// Helper para magpadala ng mensahe sa Telegram (100% Guaranteed GET Method)
+// Helper para magpadala ng mensahe sa Telegram
 function sendTelegramMessage(chatId, text) {
   if (!chatId || !TELEGRAM_BOT_TOKEN) return;
 
@@ -48,7 +48,7 @@ function sendTelegramMessage(chatId, text) {
     let data = "";
     res.on("data", (chunk) => data += chunk);
     res.on("end", () => {
-      console.log("✅ Telegram Alert Result:", data);
+      console.log("✅ Telegram Alert Sent:", data);
     });
   }).on("error", (e) => {
     console.log("❌ Telegram Send Error:", e.message);
@@ -169,7 +169,7 @@ function banDevice(hardwareId, reason, snapshot = null, durationMs = BAN_DURATIO
   return record;
 }
 
-/* ================= MATCHMAKING ENGINE ================= */
+/* ================= RELIABLE MATCHMAKING ENGINE ================= */
 let waitingQueue = [];
 const activePairs = new Map();
 
@@ -181,6 +181,8 @@ function matchUsers() {
   while (waitingQueue.length >= 2) {
     const user1Id = waitingQueue.shift();
     const user2Id = waitingQueue.shift();
+
+    if (user1Id === user2Id) continue; // Prevent matching oneself
 
     const s1 = io.sockets.sockets.get(user1Id);
     const s2 = io.sockets.sockets.get(user2Id);
@@ -288,7 +290,7 @@ io.on("connection", (socket) => {
     const reqId = "req" + Math.floor(Math.random() * 900000 + 100000);
     pendingRequests.set(reqId, { hardwareId: reqHardware, ref, name, socketId: socket.id });
 
-    // Send instant alert to Telegram (GET Method)
+    // Send instant alert to Telegram
     sendTelegramNotification(reqId, name, ref);
 
     return socket.emit("unban-pending", {
@@ -335,6 +337,5 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`🤖 Telegram Auto-Responder Bot: ACTIVE (@MeetLoop_bot | Admin ID: ${ADMIN_CHAT_ID})`);
   console.log(`================================================`);
 
-  // Start polling
   pollTelegramUpdates();
 });
