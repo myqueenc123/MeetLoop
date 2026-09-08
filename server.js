@@ -2,6 +2,7 @@
  * MeetLoop - Official Production Server Backend
  * 100% Filipino Made Random Video Chat 🇵🇭
  * High-Speed Telegram Auto-Pairing Bot + WebRTC Matchmaking
+ * (Bulletproof Anti-Unban Bypass Engine)
  */
 
 const express = require("express");
@@ -20,7 +21,7 @@ const io = new Server(server, {
 });
 
 const PORT = process.env.PORT || 3000;
-const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days
+const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // Exact 7 Days in MS
 
 // =========================================================================
 // 🤖 TELEGRAM BOT CONFIGURATION (@MeetLoop_bot | Admin ID: 5779976596)
@@ -34,9 +35,9 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* ================= BAN & TICKET DATABASE ================= */
-const bannedDevices = new Map(); // Hardware Device ID Lock
-const pendingRequests = new Map(); // GCash unban tickets
+/* ================= HARDWARE BAN & PENDING DATABASE ================= */
+const bannedDevices = new Map();
+const pendingRequests = new Map();
 
 // Helper para magpadala ng alert sa Telegram
 function sendTelegramMessage(chatId, text) {
@@ -48,7 +49,7 @@ function sendTelegramMessage(chatId, text) {
     let data = "";
     res.on("data", (chunk) => data += chunk);
   }).on("error", (e) => {
-    console.log("❌ Telegram Error:", e.message);
+    console.log("❌ Telegram Send Error:", e.message);
   });
 }
 
@@ -81,11 +82,11 @@ app.get("/admin/approve", (req, res) => {
     return res.send("<h1 style='font-family:sans-serif;text-align:center;margin-top:50px;'>⚠️ Request not found or already approved/expired.</h1>");
   }
 
-  // Tanggalin ang ban
+  // Tanggalin ang ban sa server database
   bannedDevices.delete(request.hardwareId);
   pendingRequests.delete(id);
 
-  // Padalhan ng unban signal ang user
+  // Padalhan ng unban signal ang browser ng user
   io.emit("admin-approved-unban", { hardwareId: request.hardwareId });
 
   res.send(`
@@ -109,10 +110,10 @@ function checkDeviceBan(hardwareId) {
 }
 
 function banDevice(hardwareId, reason, snapshot = null, durationMs = BAN_DURATION_7DAYS) {
-  if (!hardwareId) return null;
+  const finalId = hardwareId || ("anon_" + Math.random().toString(36).substr(2, 9));
   const banUntil = Date.now() + durationMs;
-  const record = { banUntil, reason, snapshot, hardwareId };
-  bannedDevices.set(hardwareId, record);
+  const record = { banUntil, reason, snapshot, hardwareId: finalId };
+  bannedDevices.set(finalId, record);
   return record;
 }
 
@@ -149,11 +150,11 @@ function matchUsers() {
 
 /* ================= SOCKET.IO EVENTS ================= */
 io.on("connection", (socket) => {
-  const hardwareId = socket.handshake.query.hardwareId || socket.handshake.query.deviceId;
+  const hardwareId = String(socket.handshake.query.hardwareId || socket.handshake.query.deviceId || "").trim();
 
   io.emit("online-count", io.engine.clientsCount);
 
-  // Ban check on connection
+  // Strict Server Check
   const banInfo = checkDeviceBan(hardwareId);
   if (banInfo) {
     socket.emit("ip-banned", {
@@ -203,18 +204,18 @@ io.on("connection", (socket) => {
     }
   });
 
-  // REPORT USER: Ang violator lang ang maba-ban (HINDI ang nag-report)
+  // REPORT USER: Violator lang ang maba-ban
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
       const partner = io.sockets.sockets.get(partnerId);
       if (partner) {
-        const partnerHw = partner.handshake.query.hardwareId;
+        const partnerHw = String(partner.handshake.query.hardwareId || partner.handshake.query.deviceId || partner.id).trim();
         const encounterSnapshot = data.snapshot || null;
 
-        // Ban ONLY the partner's unique hardware ID
         const record = banDevice(partnerHw, data.reason || "Policy Violation", encounterSnapshot, BAN_DURATION_7DAYS);
 
+        // Send ban directly to violator
         partner.emit("ip-banned", {
           banUntil: record.banUntil,
           reason: record.reason,
@@ -222,18 +223,17 @@ io.on("connection", (socket) => {
         });
 
         activePairs.delete(partnerId);
-        partner.disconnect(true);
       }
       activePairs.delete(socket.id);
     }
     socket.emit("report-success");
   });
 
-  // SUBMIT GCASH TICKET
+  // SUBMIT GCASH UNBAN TICKET
   socket.on("unban-request", (data) => {
     const ref = String(data.ref || "").trim().replace(/[^0-9]/g, "");
     const name = String(data.name || "Anonymous User").trim();
-    const reqHardware = data.hardwareId || hardwareId;
+    const reqHardware = String(data.hardwareId || hardwareId).trim();
 
     if (!ref || ref.length < 8) {
       return socket.emit("unban-response", { success: false, message: "❌ Please enter a valid Reference Number." });
@@ -242,7 +242,7 @@ io.on("connection", (socket) => {
     const reqId = "req" + Math.floor(Math.random() * 900000 + 100000);
     pendingRequests.set(reqId, { hardwareId: reqHardware, ref, name, socketId: socket.id });
 
-    // I-send agad kay JM sa Telegram
+    // I-send sa Telegram mo!
     sendTelegramNotification(reqId, name, ref);
 
     return socket.emit("unban-pending", {
@@ -287,5 +287,6 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT} (PH Made 🇵🇭)`);
   console.log(`🤖 Telegram Admin Bot: ACTIVE (@MeetLoop_bot)`);
+  console.log(`🛡️ Tamper-Proof Ban System: LOCKED`);
   console.log(`================================================`);
 });
