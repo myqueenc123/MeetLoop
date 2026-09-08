@@ -1,6 +1,6 @@
 /**
- * MeetLoop - Production Server Backend
- * Casino Plus / Top-Up Style Instant GCash Unban Gateway
+ * MeetLoop - Secure Production Server Backend
+ * 100% Anti-Fraud Locked GCash Gateway + Admin Control Engine
  */
 
 const express = require("express");
@@ -22,42 +22,46 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 3000;
 const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days in Milliseconds
+const ADMIN_SECRET_KEY = "MEETLOOP2026"; // Ang iyong Secret Admin Password
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-/* ================= BAN & GCASH TOP-UP DATABASE ================= */
+/* ================= BAN & STRICT GCASH DATABASE ================= */
 const bannedDevices = new Map(); // hardwareId -> { banUntil, reason, snapshot }
-const usedGcashReferences = new Set(); // Stores already claimed references
 
-// CASINO PLUS STYLE INSTANT REFERENCE VALIDATOR
-function validateTopUpReference(ref) {
-  if (!ref || typeof ref !== "string") return { valid: false, message: "Please enter a valid Reference Number." };
-  
-  // Linisin ang input (alisin ang spaces, dashes, etc.)
+// ITO ANG WHITELIST: Tanging ang mga Reference Codes lamang na nandito ang tatanggapin ng server!
+const authorizedPaidReferences = new Set([
+  "0029381726481", // Sample Approved Code
+  "9981247856123", // Sample Approved Code
+  "8887776665554"  // Sample Approved Code
+]);
+
+const usedGcashReferences = new Set();
+
+/* ================= ADMIN INSTANT ADD-REFERENCE ROUTE ================= */
+// Kapag may nagbayad sa GCash mo, i-open mo lang ito sa browser:
+// https://meetloop.onrender.com/admin/add?secret=MEETLOOP2026&ref=ILAGAY_ANG_REF_NO_DITO
+app.get("/admin/add", (req, res) => {
+  const { secret, ref } = req.query;
+
+  if (secret !== ADMIN_SECRET_KEY) {
+    return res.status(403).json({ success: false, message: "Unauthorized: Invalid Admin Secret Key." });
+  }
+
+  if (!ref || ref.trim().length < 6) {
+    return res.status(400).json({ success: false, message: "Invalid Reference Number provided." });
+  }
+
   const cleanRef = ref.trim().replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+  authorizedPaidReferences.add(cleanRef);
 
-  // 1. Minimum length check (Lahat ng GCash/InstaPay/QRPH refs ay nasa 8 hanggang 20 characters)
-  if (cleanRef.length < 8 || cleanRef.length > 20) {
-    return { valid: false, message: "❌ Invalid Reference Number length. Please check your receipt." };
-  }
-
-  // 2. Anti-Spam: Bawal ang puro parehong numero (hal. 00000000 o 11111111)
-  if (/^(\w)\1+$/.test(cleanRef)) {
-    return { valid: false, message: "❌ Invalid Reference Number. System detected dummy input." };
-  }
-
-  // 3. One-Time Use Check: Bawal gamitin ulit ang nagamit nang resibo
-  if (usedGcashReferences.has(cleanRef)) {
-    return { valid: false, message: "❌ This Reference Number has already been claimed/used." };
-  }
-
-  return { valid: true, cleanRef };
-}
+  return res.json({
+    success: true,
+    message: `Reference Code [${cleanRef}] has been APPROVED. User can now unban their device!`,
+    total_active_approved_codes: authorizedPaidReferences.size
+  });
+});
 
 function checkDeviceBan(hardwareId) {
   if (!hardwareId) return null;
@@ -80,7 +84,7 @@ function banDevice(hardwareId, reason, snapshot = null, durationMs = BAN_DURATIO
 
 /* ================= MATCHMAKING ENGINE ================= */
 let waitingQueue = [];
-const activePairs = new Map(); // socket.id -> partnerSocket.id
+const activePairs = new Map();
 
 function removeFromQueue(socketId) {
   waitingQueue = waitingQueue.filter(id => id !== socketId);
@@ -107,13 +111,13 @@ function matchUsers() {
   }
 }
 
-/* ================= SOCKET.IO EVENTS ================= */
+/* ================= SOCKET EVENTS ================= */
 io.on("connection", (socket) => {
   const hardwareId = socket.handshake.query.hardwareId || socket.handshake.query.deviceId;
 
   io.emit("online-count", io.engine.clientsCount);
 
-  // Check 7-day ban upon connection
+  // Check ban upon connection
   const banInfo = checkDeviceBan(hardwareId);
   if (banInfo) {
     socket.emit("ip-banned", {
@@ -171,7 +175,6 @@ io.on("connection", (socket) => {
         const partnerHw = partner.handshake.query.hardwareId;
         const reporterSnapshot = data.snapshot || null;
 
-        // 7-Day Suspension sa violator
         const record = banDevice(partnerHw, data.reason || "Policy Violation", reporterSnapshot, BAN_DURATION_7DAYS);
 
         partner.emit("ip-banned", {
@@ -188,28 +191,37 @@ io.on("connection", (socket) => {
     socket.emit("report-success");
   });
 
-  // CASINO-STYLE INSTANT UNBAN TOP-UP GATEWAY
+  // 100% LOCKED SERVER-SIDE GCASH UNBAN VALIDATION
   socket.on("unban-request", (data) => {
-    const rawRef = data.ref || "";
+    const rawRef = String(data.ref || "").trim().replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
     const reqHardware = data.hardwareId || hardwareId;
 
-    const validation = validateTopUpReference(rawRef);
+    // 1. Check kung nagamit na dati
+    if (usedGcashReferences.has(rawRef)) {
+      return socket.emit("unban-response", {
+        success: false,
+        message: "❌ This Reference Number has already been used/expired."
+      });
+    }
 
-    if (validation.valid) {
-      // Markahan ang reference bilang used para hindi maulit
-      usedGcashReferences.add(validation.cleanRef);
+    // 2. Check kung APPROVED sa Admin Whitelist Database
+    if (authorizedPaidReferences.has(rawRef)) {
+      // Markahan bilang used at alisin sa active list (One-Time Use Only)
+      usedGcashReferences.add(rawRef);
+      authorizedPaidReferences.delete(rawRef);
 
-      // Tanggalin ang ban record sa server
+      // Tanggalin ang ban
       if (reqHardware) bannedDevices.delete(reqHardware);
 
       return socket.emit("unban-response", {
         success: true,
-        message: "✅ GCash Payment Verified! Unban clearance approved."
+        message: "✅ GCash Payment Verified! Your 7-day suspension has been lifted."
       });
     } else {
+      // BAWAL ANG FAKE NUMBERS: Automatic Rejection
       return socket.emit("unban-response", {
         success: false,
-        message: validation.message
+        message: "❌ Payment not found. Please wait for verification or check your Reference No."
       });
     }
   });
@@ -244,10 +256,14 @@ io.on("connection", (socket) => {
   });
 });
 
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 /* ================= BIND TO 0.0.0.0 FOR RENDER ================= */
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`🎰 Casino-Style GCash Top-Up Unban: READY`);
+  console.log(`🔒 100% Anti-Fraud Locked GCash Gateway: READY`);
   console.log(`================================================`);
 });
