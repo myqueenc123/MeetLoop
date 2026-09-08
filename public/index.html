@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="theme-color" content="#0a0e17">
 
 <title>MeetLoop - Random Video Chat</title>
@@ -62,7 +65,6 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
-/* OMETV NATURAL VIDEO FRAMING */
 video{
   width:100%;height:100%;
   object-fit:cover;
@@ -274,7 +276,7 @@ video{
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 }
 
-/* ================= HARD LOCK BAN OVERLAY (MAX Z-INDEX) ================= */
+/* ================= 7-DAY HARD LOCK BAN OVERLAY ================= */
 #banOverlay{
   position:fixed;inset:0;z-index:2147483647 !important;background:rgba(0,0,0,.97);
   display:none;align-items:center;justify-content:center;padding:12px;overflow-y:auto;
@@ -669,7 +671,7 @@ let dbInstance = null;
 function initSecurityDB() {
   return new Promise((resolve) => {
     try {
-      const req = indexedDB.open("MeetLoop_SecEngine_V3", 1);
+      const req = indexedDB.open("MeetLoop_SecEngine_V4", 1);
       req.onupgradeneeded = (e) => {
         const db = e.target.result;
         if (!db.objectStoreNames.contains("bans")) db.createObjectStore("bans", { keyPath: "id" });
@@ -879,7 +881,7 @@ function openGcashPayView() {
   document.getElementById("gcashSenderName").value = "";
   document.getElementById("gcashRefStatus").textContent = "";
   
-  // Reset fields & buttons
+  // Reset buttons
   const btn = document.getElementById("gcashVerifyBtn");
   btn.disabled = false;
   btn.textContent = "Submit for Verification";
@@ -892,7 +894,7 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 7. SUBMIT GCASH TICKET (100% MANUAL ADMIN UNBAN ONLY) ================= */
+/* ================= 7. SUBMIT GCASH TICKET (100% ZERO AUTO-UNBAN) ================= */
 function submitGCashUnbanTicket() {
   const nameInput = document.getElementById("gcashSenderName");
   const refInput = document.getElementById("gcashRefInput");
@@ -908,14 +910,17 @@ function submitGCashUnbanTicket() {
     return;
   }
 
-  // HARD LOCK: I-lock ang button at inputs para hindi makalusot ang user
+  // 🔒 HARD LOCK: I-lock ang button at inputs. Mananatiling BANNED ang user!
   btn.disabled = true;
-  btn.textContent = "⏳ NAI-SUBMIT NA — WAITING FOR TELEGRAM APPROVAL";
+  btn.textContent = "⏳ NAI-SUBMIT NA — HINTAYIN SI ADMIN SA TELEGRAM";
   nameInput.disabled = true;
   refInput.disabled = true;
 
   status.style.color = "#0284c7";
-  status.innerHTML = "⏳ <b>Details sent to Telegram Admin!</b><br><span style='color:#dc2626;font-size:10.5px;'>⚠️ Hindi ka pa unbanned. I-che-check muna ni Admin ang Ref No. sa Telegram bago ka ma-unban.</span>";
+  status.innerHTML = "⏳ <b>Details sent to Telegram Admin!</b><br><span style='color:#dc2626;font-size:11px;'>⚠️ BANNED KA PARIN: I-che-check muna ni Admin sa GCash app bago ka i-unban.</span>";
+
+  // STRICT GUARANTEE: Tiyaking nananatiling bukas ang ban modal!
+  document.getElementById("banOverlay").style.display = "flex";
 
   if (socket && socket.connected) {
     socket.emit("unban-request", { hardwareId: myHardwareId, name: nameVal, ref: refVal });
@@ -929,17 +934,19 @@ function submitGCashUnbanTicket() {
   }
 }
 
-// REAL-TIME UNBAN LISTENER (ONLY UNBANNED IF JM CLICKS APPROVE IN TELEGRAM)
+// 🛡️ REAL-TIME UNBAN LISTENER: Tanging kapag nag-click si JM sa Telegram mag-uunban
 if (socket) {
   socket.on("unban-pending", (data) => {
     const status = document.getElementById("gcashRefStatus");
     status.style.color = "#0284c7";
     status.innerHTML = "⏳ <b>Ticket Logged!</b><br>Nai-send na kay Admin sa Telegram. Hintaying i-click ni Admin ang Approve Link.";
+    // Ensure modal stays displayed
+    document.getElementById("banOverlay").style.display = "flex";
   });
 
-  socket.on("admin-approved-unban", async (data) => {
-    // I-unban LAMANG kapag tumugma ang eksaktong Device ID
-    if (data.hardwareId && data.hardwareId === myHardwareId) {
+  socket.on("real-admin-unban-signal", async (data) => {
+    // I-unban LAMANG kapag tumugma ang eksaktong Device ID ni JM
+    if (data && data.hardwareId && data.hardwareId === myHardwareId) {
       localStorage.removeItem("meetloop_banned_until");
       localStorage.removeItem("meetloop_banned_reason");
       localStorage.removeItem("meetloop_snap");
