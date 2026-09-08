@@ -82,16 +82,15 @@ function sendTelegramNotification(reqId, name, ref) {
 }
 
 // =========================================================================
-// ⚡ HIGH-SPEED TELEGRAM BOT LISTENER & AUTO-RESPONDER
+// ⚡ BULLETPROOF TELEGRAM POLLING ENGINE
 // =========================================================================
 let lastUpdateId = 0;
-function startTelegramBotListener() {
-  const urlPath = `/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=20`;
-
+function pollTelegramUpdates() {
   const options = {
     hostname: "api.telegram.org",
-    path: urlPath,
-    method: "GET"
+    path: `/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=10`,
+    method: "GET",
+    timeout: 15000
   };
 
   const req = https.request(options, (res) => {
@@ -107,13 +106,13 @@ function startTelegramBotListener() {
             if (update.message && update.message.chat) {
               const incomingChatId = update.message.chat.id;
               const senderName = update.message.from?.first_name || "Boss";
-              const text = update.message.text || "";
+              const text = (update.message.text || "").trim();
 
-              console.log(`✅ [TELEGRAM] Message from ${senderName} (ID: ${incomingChatId}): ${text}`);
+              console.log(`✅ [TELEGRAM] Message from ${senderName} (${incomingChatId}): ${text}`);
 
               if (text.startsWith("/start")) {
                 const welcomeReply = `👋 *Kamusta Jm!*\n\n` +
-                                     `✅ *100% Connected na ang bot (@MeetLoop_bot) sa MeetLoop Server mo!*\n\n` +
+                                     `✅ *100% Connected na ang MeetLoop Server mo kay @MeetLoop_bot!*\n\n` +
                                      `Kapag may user na nagbayad ng *₱20* sa GCash at nag-submit ng Ref No., dito ko agad ipapadala ang alert na may 1-Click Approve Link. 🎉`;
                 sendTelegramMessage(incomingChatId, welcomeReply);
               }
@@ -121,17 +120,21 @@ function startTelegramBotListener() {
           });
         }
       } catch (e) {}
-      setTimeout(startTelegramBotListener, 1000);
+      setTimeout(pollTelegramUpdates, 1000);
     });
   });
 
+  req.on("timeout", () => {
+    req.destroy();
+    setTimeout(pollTelegramUpdates, 1500);
+  });
+
   req.on("error", (e) => {
-    setTimeout(startTelegramBotListener, 3000);
+    setTimeout(pollTelegramUpdates, 3000);
   });
 
   req.end();
 }
-startTelegramBotListener();
 
 // ==========================================
 // 🔗 1-CLICK APPROVAL ENDPOINT
@@ -347,4 +350,10 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
   console.log(`🤖 Telegram Auto-Responder Bot: ACTIVE (@MeetLoop_bot | Admin ID: ${ADMIN_CHAT_ID})`);
   console.log(`================================================`);
+
+  // Automatic startup greeting sa Telegram mo!
+  sendTelegramMessage(ADMIN_CHAT_ID, `🚀 *MeetLoop Server is LIVE!*\n\nReady na ang bot para sa mga ₱20 unban approvals.`);
+  
+  // Simulan ang bot updates listener
+  pollTelegramUpdates();
 });
