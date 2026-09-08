@@ -58,15 +58,16 @@ header{
   position:relative;flex:1;min-height:0;display:flex;gap:10px;
 }
 .cam-box{
-  position:relative;flex:1;min-width:0;min-height:0;background:#030712;
+  position:relative;flex:1;min-width:0;min-height:0;background:#000000;
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
+/* OMETV NATURAL VIDEO FRAMING (No extreme zoom, no lag) */
 video{
   width:100%;height:100%;
   object-fit:cover;
   object-position:center;
-  background:#030712;display:block;
+  background:#000000;display:block;
 }
 
 /* CRT SCREEN WRAPPER */
@@ -77,13 +78,13 @@ video{
 }
 #crtStaticCanvas{
   position:absolute;inset:0;width:100%;height:100%;
-  opacity:0.30;filter:contrast(200%) brightness(95%);
+  opacity:0.25;filter:contrast(180%);
   display:block;
 }
 .crt-overlay-vignette{
   position:absolute;inset:0;
-  background:radial-gradient(circle, rgba(0,0,0,0) 50%, rgba(0,0,0,0.85) 100%),
-             repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1.5px, transparent 1.5px, transparent 3px);
+  background:radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.8) 100%),
+             repeating-linear-gradient(0deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 1.5px, transparent 1.5px, transparent 3px);
   pointer-events:none;
 }
 
@@ -94,7 +95,7 @@ video{
   text-align:center;padding:0 12px;user-select:none;pointer-events:none;
 }
 .standby-logo{
-  width:110px;height:110px;margin-bottom:12px;
+  width:105px;height:105px;margin-bottom:12px;
   filter:drop-shadow(0 0 25px rgba(56,189,248,.6));
   animation:floatLogo 3s ease-in-out infinite alternate;
 }
@@ -104,8 +105,7 @@ video{
 .standby-online-tag{
   background:rgba(15,23,42,0.88);border:1px solid rgba(255,255,255,.15);
   padding:6px 16px;border-radius:20px;font-size:13px;font-weight:800;color:#cbd5e1;
-  display:flex;align-items:center;gap:8px;backdrop-filter:blur(8px);
-  box-shadow:0 4px 20px rgba(0,0,0,0.6);
+  display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,0.6);
 }
 .online-dot{
   width:8px;height:8px;border-radius:50%;background:var(--green);
@@ -117,20 +117,18 @@ video{
 .search-loader{
   position:absolute;inset:0;z-index:4;display:none;
   align-items:center;justify-content:center;
-  background:transparent;
-  user-select:none;
+  background:transparent;user-select:none;
 }
 .search-card{
-  background:rgba(15, 23, 42, 0.92);
+  background:rgba(15, 23, 42, 0.94);
   border:1.5px solid rgba(56, 189, 248, 0.35);
-  backdrop-filter:blur(10px);
   padding:20px 26px;border-radius:20px;text-align:center;
   box-shadow:0 15px 40px rgba(0,0,0,.85), 0 0 25px rgba(56, 189, 248, 0.2);
   animation:popIn .2s ease-out;
 }
 @keyframes popIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
 .search-spinner{
-  width:38px;height:38px;margin:0 auto 10px;
+  width:36px;height:36px;margin:0 auto 10px;
   border:3.5px solid rgba(255,255,255,.15);border-top-color:#38bdf8;
   border-radius:50%;animation:spin .75s linear infinite;
 }
@@ -139,22 +137,21 @@ video{
 
 /* BLUR SHIELD */
 #remoteVideo.remote-blur{
-  filter:blur(30px) brightness(0.9);
-  -webkit-filter:blur(30px) brightness(0.9);
+  filter:blur(25px) brightness(0.9);
+  -webkit-filter:blur(25px) brightness(0.9);
   transition:none;
 }
 #remoteVideo.remote-clear{
   filter:blur(0px) brightness(1.0);
   -webkit-filter:blur(0px) brightness(1.0);
-  transition:filter 0.35s ease-out, -webkit-filter 0.35s ease-out;
+  transition:filter 0.25s ease-out, -webkit-filter 0.25s ease-out;
 }
 
 /* AUDIO BADGE */
 .remote-audio-badge{
   position:absolute;bottom:10px;left:10px;z-index:5;
-  background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);
-  border:1px solid rgba(255,255,255,0.15);padding:4px 8px;border-radius:20px;
-  display:flex;align-items:center;gap:6px;
+  background:rgba(0,0,0,0.7);padding:4px 8px;border-radius:20px;
+  display:flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,0.15);
 }
 .audio-speaker-btn{
   width:16px;height:16px;fill:#cbd5e1;cursor:pointer;flex-shrink:0;
@@ -277,7 +274,7 @@ video{
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 }
 
-/* 7-DAY BAN OVERLAY (HARD LOCK) */
+/* 7-DAY BAN OVERLAY */
 #banOverlay{
   position:fixed;inset:0;z-index:99999999;background:rgba(0,0,0,.96);
   display:none;align-items:center;justify-content:center;padding:12px;overflow-y:auto;
@@ -304,6 +301,7 @@ video{
 .ban-title{font-size:18px;font-weight:900;color:#dc2626}
 .ban-reason{font-size:11.5px;color:#475569;font-weight:700}
 
+/* OFFICIAL DISCLAIMER BOX (Inside GCash view only) */
 .ban-disclaimer-box{
   background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;
   padding:14px;text-align:left;font-size:11.5px;line-height:1.5;color:#334155;
@@ -435,7 +433,7 @@ video{
   </div>
 </div>
 
-<!-- 7-DAY BAN OVERLAY (HARD LOCK) -->
+<!-- 7-DAY BAN OVERLAY -->
 <div id="banOverlay">
   <div class="ban-card">
     <div class="ban-top">
@@ -449,20 +447,6 @@ video{
         <div class="ban-reason">Reason: <span id="banReasonLabel">Policy Violation</span></div>
         <div style="font-size:10px;color:#94a3b8;font-weight:600">Reported Encounter Snapshot Logged</div>
       </div>
-    </div>
-
-    <div class="ban-disclaimer-box">
-      <div class="ban-disclaimer-title">
-        🚫 You’ve been temporarily banned
-      </div>
-      Your access to MeetLoop has been restricted for <b>7 days</b> due to a violation of our Community Guidelines.<br><br>
-      ⏳ <b>Ban duration:</b> <span class="ban-disclaimer-highlight">7 days</span><br>
-      Your access will be automatically restored when your ban expires.<br><br>
-      ⚡ <b>Want to return sooner?</b><br>
-      You may request an early unban with a <b>₱20 voluntary support payment</b>.<br><br>
-      💡 <b>Payment is completely optional.</b> You can simply wait until your 7-day ban expires. No payment is required to use MeetLoop.<br><br>
-      Thank you for helping us keep MeetLoop safe, respectful, and enjoyable for everyone.<br>
-      <b>— MeetLoop Team</b>
     </div>
 
     <!-- VIEW 1: METHOD OPTIONS -->
@@ -500,7 +484,7 @@ video{
       </div>
     </div>
 
-    <!-- VIEW 2: GCASH TOPUP FORM -->
+    <!-- VIEW 2: GCASH TOPUP FORM (Includes Official Disclaimer) -->
     <div id="gcashPaySection">
       <div class="gcash-logo-banner">
         <svg class="gcash-official-svg" viewBox="0 0 160 38" fill="none">
@@ -509,6 +493,18 @@ video{
           <path d="M30 12C32.5 14 34 16.5 34 19C34 21.5 32.5 24 30 26L31.8 28.2C34.9 25.6 37 22.3 37 19C37 15.7 34.9 12.4 31.8 9.8L30 12Z" fill="#ffffff"/>
           <text x="44" y="26" fill="#ffffff" font-weight="900" font-size="20.5">GCash</text>
         </svg>
+      </div>
+
+      <!-- DYNAMIC DISCLAIMER BOX (Lalabas lang sa GCash view) -->
+      <div class="ban-disclaimer-box">
+        <div class="ban-disclaimer-title">
+          🚫 Official Ban Clearance Notice
+        </div>
+        Your access has been restricted for <b>7 days</b> due to Community Guidelines violation.<br><br>
+        ⚡ <b>Want to return sooner?</b><br>
+        You may request an early unban with a <b>₱20 voluntary support payment</b>.<br><br>
+        💡 <b>Payment is completely optional.</b> You can simply wait until your 7-day ban expires. No payment is required to use MeetLoop.<br><br>
+        <b>— MeetLoop Team 🇵🇭</b>
       </div>
 
       <div class="gcash-qr-box">
@@ -547,7 +543,7 @@ video{
       <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z" fill="#38bdf8"/>
       <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z" fill="#a855f7"/>
     </svg>
-    <div class="brand-text">Meet<span>Loop</span></div>
+    <div class="brand-text">Meet<span>Loop</span> 🇵🇭</div>
   </div>
 
   <select id="languageSelect" class="lang-select">
@@ -794,12 +790,13 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 5. EVIDENCE SNAPSHOT ================= */
+/* ================= 5. EVIDENCE SNAPSHOT CAPTURE (Captures Stranger Face) ================= */
 function captureReporterSnapshot() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
   const ctx = canvas.getContext("2d");
 
+  // Kuhain ang mukha ng kausap (Stranger) bilang solidong ebidensya
   if (remoteVideo && remoteVideo.videoWidth > 0) {
     ctx.drawImage(remoteVideo, 0, 0, 180, 180);
     return canvas.toDataURL("image/jpeg", 0.75);
@@ -854,12 +851,13 @@ function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap 
   const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
   document.getElementById("banUntilFullText").textContent = unbanDate.toLocaleDateString([], options);
 
+  // I-render ang litrato ng encounter
   const banCanvas = document.getElementById("banCanvas");
   const ctx = banCanvas.getContext("2d");
   if (snapData) {
     const img = new Image();
     img.onload = () => {
-      ctx.filter = "blur(3px)";
+      ctx.filter = "blur(2px)";
       ctx.drawImage(img, 0, 0, 95, 95);
       ctx.filter = "none";
     };
@@ -901,7 +899,7 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 7. SUBMIT GCASH TICKET (MANUAL ADMIN UNBAN ONLY) ================= */
+/* ================= 7. SUBMIT GCASH TICKET ================= */
 function submitGCashUnbanTicket() {
   const nameInput = document.getElementById("gcashSenderName");
   const refInput = document.getElementById("gcashRefInput");
@@ -932,7 +930,7 @@ function submitGCashUnbanTicket() {
   }
 }
 
-// REAL-TIME UNBAN LISTENER (ONLY TRIGGERED ON TELEGRAM APPROVAL CLICK)
+// REAL-TIME UNBAN LISTENER
 if (socket) {
   socket.on("unban-pending", (data) => {
     const status = document.getElementById("gcashRefStatus");
@@ -957,7 +955,7 @@ if (socket) {
 
       setTimeout(() => {
         document.getElementById("banOverlay").style.display = "none";
-        alert("🎉 Admin Approved! Your 7-day suspension has been successfully lifted.");
+        alert("🎉 Admin Approved! Your 7-day suspension has been lifted.");
       }, 1000);
     }
   });
@@ -978,7 +976,7 @@ if (socket) {
   });
 }
 
-/* ================= 8. HD OMETV WEBRTC ENGINE ================= */
+/* ================= 8. HD LOW-LATENCY OMETV CAMERA ENGINE ================= */
 async function startMedia() {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === "live")) {
     if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
@@ -987,11 +985,12 @@ async function startMedia() {
     return true;
   }
 
+  // Optimized OmeTV Natural Frame (Zero Zoom / Zero Lag)
   const constraints = {
     video: {
-      width: { ideal: 1280, min: 640 },
-      height: { ideal: 720, min: 480 },
-      frameRate: { ideal: 30, min: 24 },
+      width: { ideal: 640, max: 1280 },
+      height: { ideal: 480, max: 720 },
+      frameRate: { ideal: 30, max: 30 },
       facingMode: { ideal: currentFacingMode }
     },
     audio: {
@@ -1025,7 +1024,7 @@ function releaseBlur() {
   blurTimer = setTimeout(() => {
     remoteVideo.classList.remove("remote-blur");
     remoteVideo.classList.add("remote-clear");
-  }, 300);
+  }, 200);
 }
 
 async function triggerStartNext() {
@@ -1077,15 +1076,8 @@ const rtcConfig = {
     { urls: "stun:stun.l.google.com:19302" },
     { urls: "stun:stun1.l.google.com:19302" },
     { urls: "stun:stun2.l.google.com:19302" },
-    { urls: "stun:stun3.l.google.com:19302" },
-    { urls: "stun:stun4.l.google.com:19302" },
     {
       urls: "turn:standard.relay.metered.ca:80",
-      username: "0974f7094bbb79185dd1d4ce",
-      credential: "jqFOtepU3tMVTfEX"
-    },
-    {
-      urls: "turn:standard.relay.metered.ca:443",
       username: "0974f7094bbb79185dd1d4ce",
       credential: "jqFOtepU3tMVTfEX"
     }
@@ -1125,6 +1117,7 @@ async function createPeer(initiator) {
     }
 
     remoteVideo.play().catch(()=>{});
+    releaseBlur();
   };
 
   peerConnection.onconnectionstatechange = () => {
@@ -1194,7 +1187,7 @@ const i18n = {
     expiresHeader: "7-Day Suspension Expiration:"
   },
   tl: {
-    subTitle: "Random Video Chat",
+    subTitle: "Random Video Chat 🇵🇭",
     portalBtn: "MAG-START MAG-CHAT",
     report: "I-Report",
     online: "aktibo ngayon",
