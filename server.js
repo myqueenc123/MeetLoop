@@ -1,7 +1,7 @@
 /**
  * MeetLoop - Official Production Server Backend
  * High-Speed Telegram Auto-Pairing Bot + WebRTC Matchmaking
- * (Protected from GitGuardian / Secret Scanners)
+ * (Protected from GitGuardian / Anti-Bypass Security Engine)
  */
 
 const express = require("express");
@@ -34,11 +34,16 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* ================= BAN & PENDING DATABASE ================= */
-const bannedDevices = new Map();
-const pendingRequests = new Map();
+/* ================= TAMPER-PROOF BAN DATABASE ================= */
+const bannedDevices = new Map(); // Hardware ID & IP Banned
+const pendingRequests = new Map(); // GCash tickets
 
-// Helper para magpadala ng mensahe sa Telegram
+function getClientIP(socket) {
+  const forwarded = socket.handshake.headers["x-forwarded-for"];
+  return forwarded ? forwarded.split(",")[0].trim() : socket.handshake.address;
+}
+
+// Helper para magpadala ng mensahe sa Telegram (100% Working GET Method)
 function sendTelegramMessage(chatId, text) {
   if (!chatId || !TELEGRAM_BOT_TOKEN) return;
 
@@ -47,9 +52,6 @@ function sendTelegramMessage(chatId, text) {
   https.get(url, (res) => {
     let data = "";
     res.on("data", (chunk) => data += chunk);
-    res.on("end", () => {
-      console.log("✅ Telegram Alert Sent:", data);
-    });
   }).on("error", (e) => {
     console.log("❌ Telegram Send Error:", e.message);
   });
@@ -60,68 +62,17 @@ function sendTelegramNotification(reqId, name, ref) {
   const approveLink = `https://meetloop-om0m.onrender.com/admin/approve?id=${reqId}&secret=MEETLOOP2026`;
 
   const msgText = `🚨 <b>MEETLOOP ₱20 GCASH UNBAN REQUEST</b>\n\n` +
-                  `👤 <b>Sender:</b> ${name}\n` +
-                  `💳 <b>Ref No:</b> <code>${ref}</code>\n` +
+                  `👤 <b>Sender Name:</b> ${name}\n` +
+                  `💳 <b>GCash Ref No:</b> <code>${ref}</code>\n` +
                   `💰 <b>Amount:</b> ₱20 Support Payment\n\n` +
-                  `👉 <b>Kung pumasok ang ₱20 sa GCash mo, i-click ang link na ito para ma-unban agad siya:</b>\n\n` +
+                  `👉 <b>Tingnan ang GCash app mo. Kung pumasok ang ₱20, i-click ito para ma-unban siya:</b>\n\n` +
                   `${approveLink}`;
 
   sendTelegramMessage(ADMIN_CHAT_ID, msgText);
 }
 
-// =========================================================================
-// 🧪 INSTANT TEST ROUTE (Para ma-test sa browser)
-// =========================================================================
-app.get("/test-telegram", (req, res) => {
-  const testId = "test" + Math.floor(Math.random() * 90000 + 10000);
-  pendingRequests.set(testId, { hardwareId: "test_hw", ref: "1234567890123", name: "Jm Live Test" });
-  sendTelegramNotification(testId, "Jm Live Test", "1234567890123");
-  res.send("<h1 style='font-family:sans-serif;text-align:center;margin-top:50px;color:#16a34a;'>✅ Test Alert Sent! Tingnan mo ang Telegram mo.</h1>");
-});
-
-// =========================================================================
-// ⚡ TELEGRAM AUTO-POLLING LISTENER
-// =========================================================================
-let lastUpdateId = 0;
-function pollTelegramUpdates() {
-  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=10`;
-
-  https.get(url, (res) => {
-    let data = "";
-    res.on("data", (chunk) => data += chunk);
-    res.on("end", () => {
-      try {
-        const json = JSON.parse(data);
-        if (json.ok && Array.isArray(json.result)) {
-          json.result.forEach((update) => {
-            lastUpdateId = update.update_id;
-
-            if (update.message && update.message.chat) {
-              const incomingChatId = update.message.chat.id;
-              const senderName = update.message.from?.first_name || "Boss";
-              const text = (update.message.text || "").trim();
-
-              console.log(`✅ [TELEGRAM] Message from ${senderName} (${incomingChatId}): ${text}`);
-
-              if (text.startsWith("/start")) {
-                const welcomeReply = `👋 <b>Kamusta Jm!</b>\n\n` +
-                                     `✅ <b>100% Connected na ang MeetLoop Server mo kay @MeetLoop_bot!</b>\n\n` +
-                                     `Kapag may user na nagbayad ng <b>₱20</b> sa GCash at nag-submit ng Ref No., dito ko agad ipapadala ang alert na may 1-Click Approve Link. 🎉`;
-                sendTelegramMessage(incomingChatId, welcomeReply);
-              }
-            }
-          });
-        }
-      } catch (e) {}
-      setTimeout(pollTelegramUpdates, 1000);
-    });
-  }).on("error", (e) => {
-    setTimeout(pollTelegramUpdates, 3000);
-  });
-}
-
 // ==========================================
-// 🔗 1-CLICK APPROVAL ENDPOINT
+// 🔗 1-CLICK APPROVAL ENDPOINT (ADMIN ONLY)
 // ==========================================
 app.get("/admin/approve", (req, res) => {
   const { id, secret } = req.query;
@@ -132,14 +83,15 @@ app.get("/admin/approve", (req, res) => {
 
   const request = pendingRequests.get(id);
   if (!request) {
-    return res.send("<h1 style='font-family:sans-serif;'>Request not found or already approved/expired.</h1>");
+    return res.send("<h1 style='font-family:sans-serif;text-align:center;margin-top:50px;'>⚠️ Request not found or already approved/expired.</h1>");
   }
 
-  // Tanggalin ang ban
+  // Tanggalin ang ban sa server database
   bannedDevices.delete(request.hardwareId);
+  if (request.ip) bannedDevices.delete(request.ip);
   pendingRequests.delete(id);
 
-  // Real-time unban signal papunta sa browser ng user
+  // Padalhan ng unban signal ang browser ng user
   io.emit("admin-approved-unban", { hardwareId: request.hardwareId });
 
   res.send(`
@@ -150,26 +102,35 @@ app.get("/admin/approve", (req, res) => {
   `);
 });
 
-function checkDeviceBan(hardwareId) {
-  if (!hardwareId) return null;
+function checkDeviceBan(hardwareId, ip = "") {
   const now = Date.now();
-  if (bannedDevices.has(hardwareId)) {
+
+  if (hardwareId && bannedDevices.has(hardwareId)) {
     const record = bannedDevices.get(hardwareId);
     if (now < record.banUntil) return record;
     bannedDevices.delete(hardwareId);
   }
+
+  if (ip && bannedDevices.has(ip)) {
+    const record = bannedDevices.get(ip);
+    if (now < record.banUntil) return record;
+    bannedDevices.delete(ip);
+  }
+
   return null;
 }
 
-function banDevice(hardwareId, reason, snapshot = null, durationMs = BAN_DURATION_7DAYS) {
-  if (!hardwareId) return null;
+function banDevice(hardwareId, ip, reason, snapshot = null, durationMs = BAN_DURATION_7DAYS) {
   const banUntil = Date.now() + durationMs;
-  const record = { banUntil, reason, snapshot };
-  bannedDevices.set(hardwareId, record);
+  const record = { banUntil, reason, snapshot, hardwareId, ip };
+
+  if (hardwareId) bannedDevices.set(hardwareId, record);
+  if (ip) bannedDevices.set(ip, record);
+
   return record;
 }
 
-/* ================= RELIABLE MATCHMAKING ENGINE ================= */
+/* ================= MATCHMAKING ENGINE ================= */
 let waitingQueue = [];
 const activePairs = new Map();
 
@@ -182,7 +143,7 @@ function matchUsers() {
     const user1Id = waitingQueue.shift();
     const user2Id = waitingQueue.shift();
 
-    if (user1Id === user2Id) continue; // Prevent matching oneself
+    if (user1Id === user2Id) continue;
 
     const s1 = io.sockets.sockets.get(user1Id);
     const s2 = io.sockets.sockets.get(user2Id);
@@ -203,10 +164,12 @@ function matchUsers() {
 /* ================= SOCKET.IO EVENTS ================= */
 io.on("connection", (socket) => {
   const hardwareId = socket.handshake.query.hardwareId || socket.handshake.query.deviceId;
+  const ip = getClientIP(socket);
 
   io.emit("online-count", io.engine.clientsCount);
 
-  const banInfo = checkDeviceBan(hardwareId);
+  // STRICT SERVER CHECK: Kung banned, i-freeze agad
+  const banInfo = checkDeviceBan(hardwareId, ip);
   if (banInfo) {
     socket.emit("ip-banned", {
       banUntil: banInfo.banUntil,
@@ -216,7 +179,8 @@ io.on("connection", (socket) => {
   }
 
   socket.on("skip", () => {
-    const currentBan = checkDeviceBan(hardwareId);
+    // SERVER FIREWALL CHECK
+    const currentBan = checkDeviceBan(hardwareId, ip);
     if (currentBan) {
       return socket.emit("ip-banned", {
         banUntil: currentBan.banUntil,
@@ -243,6 +207,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("signal", (data) => {
+    const currentBan = checkDeviceBan(hardwareId, ip);
+    if (currentBan) return;
+
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
       const partner = io.sockets.sockets.get(partnerId);
@@ -252,16 +219,17 @@ io.on("connection", (socket) => {
     }
   });
 
-  // REPORT USER: 7-Day suspension sa partner + stranger snapshot evidence
+  // REPORT USER: 7-Day suspension + snapshot evidence
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
       const partner = io.sockets.sockets.get(partnerId);
       if (partner) {
         const partnerHw = partner.handshake.query.hardwareId;
+        const partnerIp = getClientIP(partner);
         const reporterSnapshot = data.snapshot || null;
 
-        const record = banDevice(partnerHw, data.reason || "Policy Violation", reporterSnapshot, BAN_DURATION_7DAYS);
+        const record = banDevice(partnerHw, partnerIp, data.reason || "Policy Violation", reporterSnapshot, BAN_DURATION_7DAYS);
 
         partner.emit("ip-banned", {
           banUntil: record.banUntil,
@@ -288,13 +256,13 @@ io.on("connection", (socket) => {
     }
 
     const reqId = "req" + Math.floor(Math.random() * 900000 + 100000);
-    pendingRequests.set(reqId, { hardwareId: reqHardware, ref, name, socketId: socket.id });
+    pendingRequests.set(reqId, { hardwareId: reqHardware, ip, ref, name, socketId: socket.id });
 
-    // Send instant alert to Telegram
+    // I-send agad sa Telegram ni JM!
     sendTelegramNotification(reqId, name, ref);
 
     return socket.emit("unban-pending", {
-      message: "⏳ Payment details submitted! Admin is verifying your ₱20 GCash transaction via Telegram. Please wait..."
+      message: "⏳ Payment submitted! Waiting for Admin verification in Telegram..."
     });
   });
 
@@ -334,8 +302,7 @@ app.get("*", (req, res) => {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`🤖 Telegram Auto-Responder Bot: ACTIVE (@MeetLoop_bot | Admin ID: ${ADMIN_CHAT_ID})`);
+  console.log(`🛡️ Anti-Cheat Ban Security: ACTIVE`);
+  console.log(`🤖 Telegram Admin Bot: ACTIVE (@MeetLoop_bot)`);
   console.log(`================================================`);
-
-  pollTelegramUpdates();
 });
