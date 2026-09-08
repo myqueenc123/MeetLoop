@@ -453,7 +453,7 @@ video{
       </div>
     </div>
 
-    <!-- ================= OFFICIAL DISCLAIMER NOTICE ================= -->
+    <!-- OFFICIAL DISCLAIMER NOTICE -->
     <div class="ban-disclaimer-box">
       <div class="ban-disclaimer-title">
         🚫 You’ve been temporarily banned
@@ -486,10 +486,10 @@ video{
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
 
-      <!-- Option B: Direct Telegram Support Chat -->
-      <a href="https://t.me/MeetLoop_bot" target="_blank" class="telegram-support-btn">
+      <!-- Option B: Direct Telegram Support Chat (@MeetLoopPayBot) -->
+      <a href="https://t.me/MeetLoopPayBot" target="_blank" class="telegram-support-btn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.99-1.74 6.66-2.89 8-3.46 3.82-1.6 4.62-1.88 5.14-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.21-.03.36z"/></svg>
-        <span>Message Telegram Support (@MeetLoop_bot)</span>
+        <span>Message Telegram Support (@MeetLoopPayBot)</span>
       </a>
 
       <!-- Option C: Wait Cooldown -->
@@ -519,9 +519,8 @@ video{
 
       <div class="gcash-qr-box">
         <span class="gcash-fee-tag">Fee: ₱20.00 Support Payment</span>
-        <!-- DIRECT EMBEDDED INSTAPAY QR CODE -->
         <div class="gcash-qr-frame">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2" class="gcash-qr-img" alt="GCash InstaPay QR">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2" class="gcash-qr-img" alt="GCash QR">
         </div>
         <div style="font-size:11px;color:#475569;font-weight:700" id="lblScanText">
           Scan QR via GCash, pay <b>₱20</b> clearance fee, and enter your details below.
@@ -530,7 +529,7 @@ video{
 
       <div class="gcash-input-group">
         <input type="text" id="gcashSenderName" class="gcash-input-field" placeholder="Your GCash Name / Number (e.g. Juan 09171234567)" maxlength="35">
-        <input type="text" id="gcashRefInput" class="gcash-input-field" placeholder="13-Digit Reference No. from Receipt" maxlength="25">
+        <input type="text" id="gcashRefInput" class="gcash-input-field" placeholder="Reference No. from Receipt" maxlength="25">
         <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="submitGCashUnbanTicket()">Submit for Verification</button>
       </div>
 
@@ -591,7 +590,7 @@ video{
           </div>
         </div>
 
-        <!-- OMETV SEARCHING CARD -->
+        <!-- SEARCHING CARD -->
         <div class="search-loader" id="searchLoader">
           <div class="search-card">
             <div class="search-spinner"></div>
@@ -801,17 +800,18 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 5. SNAPSHOT EVIDENCE CAPTURE ================= */
+/* ================= 5. SNAPSHOT EVIDENCE CAPTURE (Fixed: Stranger Face First) ================= */
 function captureReporterSnapshot() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
   const ctx = canvas.getContext("2d");
 
-  if (localVideo && localVideo.videoWidth > 0) {
-    ctx.drawImage(localVideo, 0, 0, 180, 180);
-    return canvas.toDataURL("image/jpeg", 0.75);
-  } else if (remoteVideo && remoteVideo.videoWidth > 0) {
+  // Inuna ang Stranger's Video para sa tamang ebidensya
+  if (remoteVideo && remoteVideo.videoWidth > 0) {
     ctx.drawImage(remoteVideo, 0, 0, 180, 180);
+    return canvas.toDataURL("image/jpeg", 0.75);
+  } else if (localVideo && localVideo.videoWidth > 0) {
+    ctx.drawImage(localVideo, 0, 0, 180, 180);
     return canvas.toDataURL("image/jpeg", 0.75);
   }
   return null;
@@ -857,12 +857,10 @@ function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap 
 
   document.getElementById("banReasonLabel").textContent = reason;
   
-  // Format exact 7-Day Unban Date & Time (e.g. Friday, Sep 15, 2026 at 2:30 AM)
   const unbanDate = new Date(banUntil);
   const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
   document.getElementById("banUntilFullText").textContent = unbanDate.toLocaleDateString([], options);
 
-  // I-render ang litrato ng kausap na nag-report
   const banCanvas = document.getElementById("banCanvas");
   const ctx = banCanvas.getContext("2d");
   if (snapData) {
@@ -939,7 +937,7 @@ function submitGCashUnbanTicket() {
   }
 }
 
-// REAL-TIME UNBAN LISTENER (Automatic unlock on Telegram Approve click)
+// REAL-TIME UNBAN LISTENER
 if (socket) {
   socket.on("unban-pending", (data) => {
     const status = document.getElementById("gcashRefStatus");
@@ -977,6 +975,10 @@ if (socket) {
       status.style.color = "#dc2626";
       status.textContent = data.message;
     }
+  });
+
+  socket.on("report-success", () => {
+    addChatMessage("MeetLoop", "User reported successfully.");
   });
 }
 
@@ -1079,12 +1081,7 @@ const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
     { urls: "stun:stun1.l.google.com:19302" },
-    { urls: "stun:stun2.l.google.com:19302" },
-    {
-      urls: "turn:standard.relay.metered.ca:80",
-      username: "0974f7094bbb79185dd1d4ce",
-      credential: "jqFOtepU3tMVTfEX"
-    }
+    { urls: "stun:stun2.l.google.com:19302" }
   ]
 };
 
@@ -1341,7 +1338,7 @@ flipBtn.addEventListener("click", async () => {
   }
 });
 
-// REPORT: Reporter face captured as evidence
+// REPORT: Captures stranger face as evidence
 reportBtn.addEventListener("click", () => {
   if (!connected) return;
   const snap = captureReporterSnapshot();
@@ -1354,10 +1351,12 @@ audioSlider.addEventListener("input", (e) => {
   const v = parseFloat(e.target.value);
   if (remoteVideo) remoteVideo.volume = v;
 });
+
 speakerIcon.addEventListener("click", () => {
-  const v = audioSlider.value > 0 ? 0 : 1.0;
-  audioSlider.value = v;
-  if (remoteVideo) remoteVideo.volume = v;
+  const current = parseFloat(audioSlider.value);
+  const nextVal = current > 0 ? 0 : 1.0;
+  audioSlider.value = nextVal;
+  if (remoteVideo) remoteVideo.volume = nextVal;
 });
 
 document.getElementById("hideLocalBtn").addEventListener("click", () => {
