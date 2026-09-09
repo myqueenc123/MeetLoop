@@ -2,7 +2,7 @@
  * MeetLoop - Official Production Server Backend
  * 100% Filipino Made Random Video Chat 🇵🇭
  * High-Speed Telegram Auto-Pairing Bot + WebRTC Matchmaking
- * (Telegram 1-Click Inline Buttons + Auto-SMS Receiver)
+ * (Telegram 1-Click Inline Buttons + Universal GCash Notification Receiver)
  */
 
 const express = require("express");
@@ -39,15 +39,24 @@ app.use((req, res, next) => {
   next();
 });
 
+// Middleware for parsing JSON, URL-encoded, and Plain Text Bodies
 app.use(express.static(path.join(__dirname, "public"), { etag: false, maxAge: 0 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(express.text({ limit: "10mb" }));
 
 /* ================= HARDWARE BAN DATABASE ================= */
 const bannedDevices = new Map();
 const pendingRequests = new Map();
 
-// Helper para magpadala ng raw request sa Telegram API
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
 function sendTelegramRaw(endpoint, payloadObj) {
   if (!TELEGRAM_BOT_TOKEN) return;
 
@@ -66,12 +75,11 @@ function sendTelegramRaw(endpoint, payloadObj) {
     let d = "";
     res.on("data", chunk => d += chunk);
   });
-  req.on("error", e => console.log("Telegram Error:", e.message));
+  req.on("error", e => console.error("Telegram API Error:", e.message));
   req.write(payload);
   req.end();
 }
 
-// Function: Magpadala ng message na may Interactive 1-Click Buttons sa Telegram
 function sendTelegramWithButtons(chatId, text, reqId) {
   const payload = {
     chat_id: chatId,
@@ -90,7 +98,6 @@ function sendTelegramWithButtons(chatId, text, reqId) {
   sendTelegramRaw("sendMessage", payload);
 }
 
-// Function: Simple Text Message
 function sendTelegramMessage(chatId, text) {
   sendTelegramRaw("sendMessage", {
     chat_id: chatId,
@@ -100,11 +107,10 @@ function sendTelegramMessage(chatId, text) {
   });
 }
 
-// Function: Ipadala ang Unban Ticket kay JM na may Interactive Buttons
 function sendTelegramNotification(reqId, name, ref) {
   const msgText = `🚨 <b>MEETLOOP ₱20 UNBAN REQUEST</b>\n\n` +
-                  `👤 <b>Sender:</b> ${name}\n` +
-                  `💳 <b>Ref No:</b> <code>${ref}</code>\n` +
+                  `👤 <b>Sender:</b> ${escapeHtml(name)}\n` +
+                  `💳 <b>Ref No:</b> <code>${escapeHtml(ref)}</code>\n` +
                   `💰 <b>Amount:</b> ₱20.00\n\n` +
                   `<i>Pindutin ang 🟢 1-CLICK APPROVE kapag pumasok na ang bayad sa GCash mo:</i>`;
 
@@ -112,39 +118,70 @@ function sendTelegramNotification(reqId, name, ref) {
 }
 
 // =========================================================================
-// 📲 GCASH SMS WEBHOOK RECEIVER (Galing sa Cellphone mo)
+// 📲 UNIVERSAL GCASH / MACRODROID WEBHOOK RECEIVER
 // =========================================================================
-app.post("/webhook/gcash-sms", (req, res) => {
-  const secret = req.query.secret || req.body.secret;
-  if (secret !== "MEETLOOP2026") {
+app.all("/webhook/gcash-sms", (req, res) => {
+  const body = req.body || {};
+  const query = req.query || {};
+
+  const secret = query.secret || body.secret || req.headers["x-secret"];
+  if (secret && secret !== "MEETLOOP2026") {
     return res.status(403).send("Unauthorized");
   }
 
-  // Tanggapin ang text message galing sa SMS forwarder ng phone mo
-  const smsBody = req.body.content || req.body.message || req.body.text || JSON.stringify(req.body);
-  const fromNumber = req.body.from || req.body.sender || "GCash SMS";
+  let fullMessage = "";
+  let senderInfo = body.from || body.sender || body.title || body.notification_title || query.from || "GCash App";
 
-  console.log(`[GCASH SMS RECEIVED]: ${smsBody}`);
+  if (typeof body === "string") {
+    fullMessage = body;
+  } else if (body.content) {
+    fullMessage = body.content;
+  } else if (body.not_text) {
+    fullMessage = body.not_text;
+  } else if (body.notification_text) {
+    fullMessage = body.notification_text;
+  } else if (body.message) {
+    fullMessage = body.message;
+  } else if (body.text) {
+    fullMessage = body.text;
+  } else if (body.body) {
+    fullMessage = body.body;
+  } else if (query.content || query.message || query.text) {
+    fullMessage = query.content || query.message || query.text;
+  } else {
+    fullMessage = JSON.stringify(body, null, 2);
+  }
 
-  const alertText = `💰 <b>GCASH MONEY RECEIVED (PHONE NOTIF)</b>\n\n` +
-                    `📲 <b>From:</b> ${fromNumber}\n` +
-                    `📩 <b>Message:</b>\n<code>${smsBody}</code>`;
+  fullMessage = String(fullMessage || "").trim();
+
+  console.log(`[GCASH NOTIFICATION RECEIVED]:\nFrom: ${senderInfo}\nMessage: ${fullMessage}`);
+
+  const alertText = `💰 <b>GCASH NOTIFICATION RECEIVED!</b>\n\n` +
+                    `📲 <b>App / Sender:</b> ${escapeHtml(senderInfo)}\n` +
+                    `📩 <b>Full Message:</b>\n<code>${escapeHtml(fullMessage || "Walang laman na text na naipasa")}</code>\n\n` +
+                    `⏰ <i>Oras: ${new Date().toLocaleTimeString("en-PH", { timeZone: "Asia/Manila" })}</i>`;
 
   sendTelegramMessage(ADMIN_CHAT_ID, alertText);
-  res.json({ success: true, message: "SMS logged to Telegram" });
+  res.json({ success: true, message: "GCash notification logged to Telegram" });
 });
 
 // =========================================================================
 // ⚡ TELEGRAM POLLING LISTENER (With 1-Click Button Handler)
 // =========================================================================
 let lastUpdateId = 0;
+let isPolling = false;
+
 function pollTelegramUpdates() {
-  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=10`;
+  if (isPolling) return;
+  isPolling = true;
+
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=15`;
 
   https.get(url, (res) => {
     let data = "";
     res.on("data", (chunk) => data += chunk);
     res.on("end", () => {
+      isPolling = false;
       try {
         const json = JSON.parse(data);
         if (json.ok && Array.isArray(json.result)) {
@@ -163,7 +200,6 @@ function pollTelegramUpdates() {
                 const request = pendingRequests.get(reqId);
 
                 if (request) {
-                  // UNBAN DEVICE
                   bannedDevices.delete(request.hardwareId);
                   pendingRequests.delete(reqId);
 
@@ -174,7 +210,7 @@ function pollTelegramUpdates() {
                   sendTelegramRaw("editMessageText", {
                     chat_id: chatId,
                     message_id: messageId,
-                    text: `✅ <b>APPROVED BY ADMIN!</b>\n\n👤 <b>User:</b> ${request.name}\n💳 <b>Ref:</b> <code>${request.ref}</code>\n💰 <b>Amount:</b> ₱20.00\n\n🎉 <i>Matagumpay na na-unban ang user sa MeetLoop!</i>`,
+                    text: `✅ <b>APPROVED BY ADMIN!</b>\n\n👤 <b>User:</b> ${escapeHtml(request.name)}\n💳 <b>Ref:</b> <code>${escapeHtml(request.ref)}</code>\n💰 <b>Amount:</b> ₱20.00\n\n🎉 <i>Matagumpay na na-unban ang user sa MeetLoop!</i>`,
                     parse_mode: "HTML"
                   });
 
@@ -198,7 +234,7 @@ function pollTelegramUpdates() {
                 sendTelegramRaw("editMessageText", {
                   chat_id: chatId,
                   message_id: messageId,
-                  text: `❌ <b>REJECTED BY ADMIN</b>\n\n👤 <b>User:</b> ${request ? request.name : "Unknown"}\n💳 <b>Ref:</b> <code>${request ? request.ref : ""}</code>\n\n🚫 <i>Hindi na-unban (Walang pumasok na bayad).</i>`,
+                  text: `❌ <b>REJECTED BY ADMIN</b>\n\n👤 <b>User:</b> ${escapeHtml(request ? request.name : "Unknown")}\n💳 <b>Ref:</b> <code>${escapeHtml(request ? request.ref : "")}</code>\n\n🚫 <i>Hindi na-unban (Walang pumasok na bayad).</i>`,
                   parse_mode: "HTML"
                 });
 
@@ -213,7 +249,6 @@ function pollTelegramUpdates() {
             // 2. HANDLER PARA SA /start CHAT
             if (update.message && update.message.chat) {
               const incomingChatId = update.message.chat.id;
-              const senderName = update.message.from?.first_name || "Boss";
               const text = (update.message.text || "").trim();
 
               if (text.startsWith("/start")) {
@@ -227,10 +262,13 @@ function pollTelegramUpdates() {
             }
           });
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error("Telegram parse error:", e.message);
+      }
       setTimeout(pollTelegramUpdates, 1000);
     });
   }).on("error", (e) => {
+    isPolling = false;
     setTimeout(pollTelegramUpdates, 3000);
   });
 }
@@ -265,6 +303,19 @@ function removeFromQueue(socketId) {
   waitingQueue = waitingQueue.filter(id => id !== socketId);
 }
 
+function cleanupUserSession(socketId) {
+  removeFromQueue(socketId);
+  const partnerId = activePairs.get(socketId);
+  if (partnerId) {
+    const partner = io.sockets.sockets.get(partnerId);
+    if (partner) {
+      partner.emit("partner-disconnected");
+      activePairs.delete(partnerId);
+    }
+    activePairs.delete(socketId);
+  }
+}
+
 function matchUsers() {
   while (waitingQueue.length >= 2) {
     const user1Id = waitingQueue.shift();
@@ -275,15 +326,15 @@ function matchUsers() {
     const s1 = io.sockets.sockets.get(user1Id);
     const s2 = io.sockets.sockets.get(user2Id);
 
-    if (s1 && s2 && s1.connected && s2.connected) {
+    if (s1?.connected && s2?.connected) {
       activePairs.set(user1Id, user2Id);
       activePairs.set(user2Id, user1Id);
 
       s1.emit("match", { initiator: true });
       s2.emit("match", { initiator: false });
     } else {
-      if (s1 && s1.connected) waitingQueue.push(user1Id);
-      if (s2 && s2.connected) waitingQueue.push(user2Id);
+      if (s1?.connected) waitingQueue.push(user1Id);
+      if (s2?.connected) waitingQueue.push(user2Id);
     }
   }
 }
@@ -294,7 +345,7 @@ io.on("connection", (socket) => {
 
   io.emit("online-count", io.engine.clientsCount);
 
-  // Strict Server Check
+  // Strict Server Ban Check
   const banInfo = checkDeviceBan(hardwareId);
   if (banInfo) {
     socket.emit("ip-banned", {
@@ -314,17 +365,7 @@ io.on("connection", (socket) => {
       });
     }
 
-    const partnerId = activePairs.get(socket.id);
-    if (partnerId) {
-      const partner = io.sockets.sockets.get(partnerId);
-      if (partner) {
-        partner.emit("partner-disconnected");
-        activePairs.delete(partnerId);
-      }
-      activePairs.delete(socket.id);
-    }
-
-    removeFromQueue(socket.id);
+    cleanupUserSession(socket.id);
     waitingQueue.push(socket.id);
     socket.emit("waiting");
 
@@ -381,7 +422,6 @@ io.on("connection", (socket) => {
     const reqId = "req" + Math.floor(Math.random() * 900000 + 100000);
     pendingRequests.set(reqId, { hardwareId: reqHardware, ref, name, socketId: socket.id });
 
-    // I-send sa Telegram mo na may [ 🟢 1-CLICK APPROVE ] at [ 🔴 REJECT ]
     sendTelegramNotification(reqId, name, ref);
 
     return socket.emit("unban-pending", {
@@ -390,29 +430,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("stop-search", () => {
-    removeFromQueue(socket.id);
-    const partnerId = activePairs.get(socket.id);
-    if (partnerId) {
-      const partner = io.sockets.sockets.get(partnerId);
-      if (partner) {
-        partner.emit("partner-disconnected");
-        activePairs.delete(partnerId);
-      }
-      activePairs.delete(socket.id);
-    }
+    cleanupUserSession(socket.id);
   });
 
   socket.on("disconnect", () => {
-    removeFromQueue(socket.id);
-    const partnerId = activePairs.get(socket.id);
-    if (partnerId) {
-      const partner = io.sockets.sockets.get(partnerId);
-      if (partner) {
-        partner.emit("partner-disconnected");
-        activePairs.delete(partnerId);
-      }
-      activePairs.delete(socket.id);
-    }
+    cleanupUserSession(socket.id);
     io.emit("online-count", io.engine.clientsCount);
   });
 });
