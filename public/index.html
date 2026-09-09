@@ -527,7 +527,7 @@ video{
         </svg>
       </div>
 
-      <!-- DISCLAIMER BOX (Inside GCash view only) -->
+      <!-- DISCLAIMER BOX -->
       <div class="ban-disclaimer-box">
         <div class="ban-disclaimer-title" id="lblDisclaimerTitle">
           🚫 Official Ban Clearance Notice
@@ -553,7 +553,6 @@ video{
 
       <div class="gcash-input-group">
         <input type="text" id="gcashSenderName" class="gcash-input-field" placeholder="Your GCash Name (e.g. Juan)" maxlength="35">
-        <!-- 🔢 NUMBERS ONLY REFERENCE FIELD -->
         <input type="tel" id="gcashRefInput" class="gcash-input-field" placeholder="13-Digit Ref No. (Numbers Only)" maxlength="16" inputmode="numeric" pattern="[0-9]*">
         <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="submitGCashUnbanTicket()">Submit for Verification</button>
       </div>
@@ -682,7 +681,17 @@ video{
 <script>
 "use strict";
 
-/* ================= 1. MULTI-TAB BLOCKER ENGINE ================= */
+/* ================= 1. PERSISTENT HARDWARE ID ENGINE ================= */
+function getPersistentDeviceId() {
+  let devId = localStorage.getItem("meetloop_device_id");
+  if (!devId) {
+    devId = "dev_" + Math.random().toString(36).substring(2, 11) + "_" + Date.now();
+    localStorage.setItem("meetloop_device_id", devId);
+  }
+  return devId;
+}
+
+const myHardwareId = getPersistentDeviceId();
 const myTabId = "tab_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
 let tabChannel = null;
 
@@ -748,8 +757,7 @@ gcashRefInput.addEventListener("paste", (e) => {
   }, 10);
 });
 
-/* ================= 3. PERMANENT DEVICE ID ================= */
-const myHardwareId = myTabId;
+/* ================= 3. NUMERIC ID DISPLAY ================= */
 let numericId = 0;
 for (let i = 0; i < myHardwareId.length; i++) numericId = (numericId * 31 + myHardwareId.charCodeAt(i)) % 900000000;
 document.getElementById("adminUnbanId").textContent = "" + (100000000 + Math.abs(numericId));
@@ -800,7 +808,7 @@ let currentFacingMode = "user";
 let blurTimer = null;
 let pendingCandidates = [];
 
-/* ================= 5. AUTHENTIC OMETV TV STATIC ================= */
+/* ================= 5. AUTHENTIC TV STATIC ================= */
 function runTVStatic() {
   if (!crtStaticCanvas) return;
   const ctx = crtStaticCanvas.getContext("2d");
@@ -891,7 +899,7 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 8. SUBMIT GCASH TICKET (100% HARD LOCKED) ================= */
+/* ================= 8. SUBMIT GCASH TICKET ================= */
 function submitGCashUnbanTicket() {
   const nameInput = document.getElementById("gcashSenderName");
   const refInput = document.getElementById("gcashRefInput");
@@ -929,7 +937,6 @@ function submitGCashUnbanTicket() {
   }
 }
 
-// 🛡️ UNBAN LISTENER (ONLY TRIGGERED WHEN JM APPROVES IN TELEGRAM)
 if (socket) {
   socket.on("unban-pending", (data) => {
     const status = document.getElementById("gcashRefStatus");
@@ -1165,7 +1172,7 @@ function closePeerConnection() {
   pendingCandidates = [];
 }
 
-/* ================= 10. REFINED LANGUAGE TRANSLATOR (DEFAULT ENGLISH) ================= */
+/* ================= 10. LANGUAGE TRANSLATOR ================= */
 const i18n = {
   en: {
     subTitle: "Random Video Chat",
@@ -1397,7 +1404,6 @@ flipBtn.addEventListener("click", async () => {
   }
 });
 
-// REPORT
 reportBtn.addEventListener("click", () => {
   if (!connected) return;
   const snap = captureReporterSnapshot();
@@ -1427,7 +1433,6 @@ document.getElementById("showLocalBtn").addEventListener("click", () => {
   document.getElementById("showLocalBtn").classList.remove("visible");
 });
 
-// STARTUP (DEFAULT ENGLISH)
 checkMultiTabConflict();
 setLanguage("en");
 </script>
