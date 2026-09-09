@@ -2,7 +2,7 @@
  * MeetLoop - Official Production Server Backend
  * 100% Filipino Made Random Video Chat 🇵🇭
  * High-Speed Telegram Auto-Pairing Bot + WebRTC Matchmaking
- * (Instant Auto-Unban Phone Matcher + Anti-Spam Lock + 1-Click Telegram Inline Buttons)
+ * (Instant Phone-Number Auto Matcher + Anti-Spam Lock + 1-Click Telegram Inline Buttons)
  */
 
 const express = require("express");
@@ -21,9 +21,11 @@ const io = new Server(server, {
 });
 
 const PORT = process.env.PORT || 3000;
-const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000;
+const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days in MS
 
-// ================= TELEGRAM BOT CONFIG =================
+// =========================================================================
+// 🤖 TELEGRAM BOT CONFIGURATION (@MeetLoop_bot | Admin ID: 5779976596)
+// =========================================================================
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8648356765:AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || "5779976596";
 
@@ -35,16 +37,17 @@ app.use((req, res, next) => {
   next();
 });
 
+// Middleware para saluhin ang lahat ng data format mula sa SMS Forwarder
 app.use(express.static(path.join(__dirname, "public"), { etag: false, maxAge: 0 }));
 app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 app.use(express.text({ type: "*/*", limit: "15mb" }));
 
-/* ================= DATABASES & RATE LIMITERS ================= */
+/* ================= DATABASES & CACHE ================= */
 const bannedDevices = new Map();
-const pendingRequests = new Map();
-const receivedGCashMessages = [];
-const rateLimitMap = new Map();
+const pendingRequests = new Map(); // Tickets na naghihintay ng matching phone number
+const receivedGCashMessages = [];  // Naka-save na mga numero at notification galing sa phone
+const rateLimitMap = new Map();    // Anti-Spam protection
 
 function escapeHtml(str) {
   if (!str) return "";
@@ -112,29 +115,42 @@ function sendTelegramWithButtons(chatId, text, reqId) {
   sendTelegramRaw("sendMessage", payload);
 }
 
+// Function para i-unban ang user kapag nag-match ang number
 function executeUnbanUser(hardwareId, phone, name, auto = false) {
   bannedDevices.delete(hardwareId);
+
+  // Send instant unlock signal sa client browser
   io.emit("real-admin-unban-signal", { hardwareId: hardwareId });
 
   if (auto) {
     const successMsg = `⚡ <b>AUTO-UNBAN SUCCESSFUL!</b> 🎉\n\n` +
                        `👤 <b>User:</b> ${escapeHtml(name)}\n` +
                        `📱 <b>Matched Mobile No:</b> <code>${escapeHtml(phone)}</code>\n` +
-                       `💰 <b>Amount:</b> ₱10.00 / ₱20.00\n\n` +
+                       `💰 <b>Amount:</b> ₱10.00 / ₱20.00 Support Payment\n\n` +
                        `<i>Kusang binuksan ng system ang ban dahil nagtugma ang GCash Number sa phone notif at website!</i>`;
     sendTelegramMessage(ADMIN_CHAT_ID, successMsg);
   }
 }
 
-function isPhoneMatch(gcashText, userPhone) {
-  if (!gcashText || !userPhone) return false;
+// Function para i-check kung nagtutugma ang numero (Direct, Last 4 digits, o Masked Number)
+function isPhoneMatch(gcashPayloadText, userPhone) {
+  if (!gcashPayloadText || !userPhone) return false;
+  
   const cleanUserPhone = userPhone.replace(/[^0-9]/g, "");
   const last4 = cleanUserPhone.slice(-4);
   const first4 = cleanUserPhone.slice(0, 4);
 
-  if (gcashText.includes(cleanUserPhone)) return true;
-  if (cleanUserPhone.length >= 10 && gcashText.includes(last4) && gcashText.includes(first4)) return true;
-  if (last4 && last4.length === 4 && gcashText.includes(last4)) return true;
+  // 1. Direct Full Match (e.g. 09983813724)
+  if (gcashPayloadText.includes(cleanUserPhone)) return true;
+
+  // 2. 10-Digit match (e.g. 9983813724 nang walang 0 sa unahan)
+  if (cleanUserPhone.length >= 10 && gcashPayloadText.includes(cleanUserPhone.slice(-10))) return true;
+
+  // 3. Masked match (e.g. 0998***3724)
+  if (cleanUserPhone.length >= 10 && gcashPayloadText.includes(last4) && gcashPayloadText.includes(first4)) return true;
+
+  // 4. Last 4 digits match kung may kasamang GCash context
+  if (last4 && last4.length === 4 && gcashPayloadText.includes(last4)) return true;
 
   return false;
 }
@@ -150,13 +166,13 @@ app.all("/webhook/gcash-sms", (req, res) => {
   if (typeof rawData === "string") {
     try {
       const parsedJson = JSON.parse(rawData);
-      parsedContent = parsedJson.content || parsedJson.not_text || parsedJson.notification_text || parsedJson.message || rawData;
+      parsedContent = parsedJson.content || parsedJson.not_text || parsedJson.notification_text || parsedJson.message || parsedJson.msg || rawData;
       senderTitle = parsedJson.from || parsedJson.title || senderTitle;
     } catch(e) {
       parsedContent = rawData;
     }
   } else if (typeof rawData === "object" && rawData !== null) {
-    parsedContent = rawData.content || rawData.not_text || rawData.notification_text || rawData.message || rawData.text || rawData.body || JSON.stringify(rawData);
+    parsedContent = rawData.content || rawData.not_text || rawData.notification_text || rawData.message || rawData.msg || rawData.text || rawData.body || JSON.stringify(rawData);
     senderTitle = rawData.from || rawData.sender || rawData.title || senderTitle;
   }
 
@@ -164,22 +180,19 @@ app.all("/webhook/gcash-sms", (req, res) => {
     parsedContent = req.query.content || req.query.message || req.query.text;
   }
 
-  // Linisin ang mga empty variables na literal strings
-  parsedContent = String(parsedContent || "")
-    .replace(/\[not_sub_text\]/g, "")
-    .replace(/\[not_big_text\]/g, "")
-    .replace(/\[not_text\]/g, "")
-    .replace(/\|\s*\|/g, "|")
-    .trim();
+  // Pagsamahin ang Sender Info at Message Content para sa matching
+  const fullPayloadString = `${senderTitle} ${parsedContent}`.trim();
 
-  console.log(`[GCASH NOTIF RECEIVED]:\n${parsedContent}`);
+  console.log(`[GCASH FORWARDER RECEIVED]:\n${fullPayloadString}`);
 
-  receivedGCashMessages.push({ text: parsedContent, time: Date.now() });
+  // I-save sa memory cache ng payments
+  receivedGCashMessages.push({ text: fullPayloadString, time: Date.now() });
   if (receivedGCashMessages.length > 50) receivedGCashMessages.shift();
 
+  // 🔍 AUTO-CHECK: Hanapin kung may naghihintay na unban ticket na kapareho ang Mobile Number!
   let autoUnbanned = false;
   for (const [reqId, request] of pendingRequests.entries()) {
-    if (isPhoneMatch(parsedContent, request.phone)) {
+    if (isPhoneMatch(fullPayloadString, request.phone)) {
       executeUnbanUser(request.hardwareId, request.phone, request.name, true);
       pendingRequests.delete(reqId);
       autoUnbanned = true;
@@ -189,8 +202,8 @@ app.all("/webhook/gcash-sms", (req, res) => {
 
   if (!autoUnbanned) {
     const alertText = `💰 <b>GCASH NOTIFICATION RECEIVED!</b>\n\n` +
-                      `📲 <b>App / Sender:</b> ${escapeHtml(senderTitle)}\n` +
-                      `📩 <b>Full Message:</b>\n<code>${escapeHtml(parsedContent || "Walang text content")}</code>\n\n` +
+                      `📲 <b>Sender:</b> ${escapeHtml(senderTitle)}\n` +
+                      `📩 <b>Details:</b>\n<code>${escapeHtml(parsedContent || "New Payment Notification")}</code>\n\n` +
                       `⏰ <i>Oras: ${new Date().toLocaleTimeString("en-PH", { timeZone: "Asia/Manila" })}</i>`;
 
     sendTelegramMessage(ADMIN_CHAT_ID, alertText);
@@ -222,6 +235,7 @@ function pollTelegramUpdates() {
           json.result.forEach((update) => {
             lastUpdateId = update.update_id;
 
+            // 1. HANDLER KAPAG PININDOT ANG INLINE BUTTONS (APPROVE / REJECT)
             if (update.callback_query) {
               const cb = update.callback_query;
               const cbData = cb.data || "";
@@ -239,7 +253,7 @@ function pollTelegramUpdates() {
                   sendTelegramRaw("editMessageText", {
                     chat_id: chatId,
                     message_id: messageId,
-                    text: `✅ <b>APPROVED BY ADMIN!</b>\n\n👤 <b>User:</b> ${escapeHtml(request.name)}\n📱 <b>Mobile No:</b> <code>${escapeHtml(request.phone)}</code>\n💰 <b>Amount:</b> Clearance Fee\n\n🎉 <i>Matagumpay na na-unban ang user sa MeetLoop!</i>`,
+                    text: `✅ <b>APPROVED BY ADMIN!</b>\n\n👤 <b>User:</b> ${escapeHtml(request.name)}\n📱 <b>Mobile No:</b> <code>${escapeHtml(request.phone)}</code>\n💰 <b>Status:</b> Clearance Fee Verified\n\n🎉 <i>Matagumpay na na-unban ang user sa MeetLoop!</i>`,
                     parse_mode: "HTML"
                   });
 
@@ -275,6 +289,7 @@ function pollTelegramUpdates() {
               }
             }
 
+            // 2. HANDLER PARA SA /start CHAT
             if (update.message && update.message.chat) {
               const incomingChatId = update.message.chat.id;
               const text = (update.message.text || "").trim();
@@ -283,9 +298,9 @@ function pollTelegramUpdates() {
                 const welcomeReply = `👋 <b>Kamusta Jm!</b>\n\n` +
                                      `✅ <b>MeetLoop Auto Mobile-Matcher Bot is Active!</b>\n\n` +
                                      `Dito papasok ang:\n` +
-                                     `1. 📲 <b>GCash SMS Notif mula sa phone mo</b>\n` +
-                                     `2. ⚡ <b>Automatic Unban kapag pareho ang Mobile Number</b>\n` +
-                                     `3. 🛡️ <b>Anti-Spam 60s cooldown limit enabled</b>\n` +
+                                     `1. 📲 <b>GCash SMS/Notif mula sa SMS Forwarder</b>\n` +
+                                     `2. ⚡ <b>Automatic Unban kapag nag-match ang Mobile Number</b>\n` +
+                                     `3. 🛡️ <b>Anti-Spam 60s cooldown limit</b>\n` +
                                      `4. 🚨 <b>1-Click Approve / Reject Buttons sa bawat ticket</b> 🎉`;
                 sendTelegramMessage(incomingChatId, welcomeReply);
               }
@@ -373,6 +388,7 @@ io.on("connection", (socket) => {
 
   io.emit("online-count", io.engine.clientsCount);
 
+  // Strict Server Ban Check
   const banInfo = checkDeviceBan(hardwareId);
   if (banInfo) {
     socket.emit("ip-banned", {
@@ -412,6 +428,7 @@ io.on("connection", (socket) => {
     }
   });
 
+  // REPORT USER
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -435,6 +452,7 @@ io.on("connection", (socket) => {
     socket.emit("report-success");
   });
 
+  // SUBMIT GCASH UNBAN TICKET WITH NUMBER MATCHING & RATE LIMITER
   socket.on("unban-request", (data) => {
     const phone = String(data.phone || "").trim().replace(/[^0-9]/g, "");
     const name = String(data.name || "Anonymous User").trim();
@@ -444,12 +462,14 @@ io.on("connection", (socket) => {
       return socket.emit("unban-response", { success: false, message: "❌ Please enter a valid 11-digit Mobile Number." });
     }
 
+    // 🛡️ ANTI-SPAM: 1 submit every 60 seconds per device
     const lastSubmitTime = rateLimitMap.get(reqHardware) || 0;
     if (Date.now() - lastSubmitTime < 60000) {
       return socket.emit("unban-response", { success: false, message: "⚠️ Please wait before submitting another request." });
     }
     rateLimitMap.set(reqHardware, Date.now());
 
+    // 🔥 INSTANT MATCH: Kung pumasok na kanina ang GCash alert na may ganitong numero!
     for (const item of receivedGCashMessages) {
       if (isPhoneMatch(item.text, phone)) {
         executeUnbanUser(reqHardware, phone, name, true);
@@ -460,11 +480,12 @@ io.on("connection", (socket) => {
     const reqId = "req" + Math.floor(Math.random() * 900000 + 100000);
     pendingRequests.set(reqId, { hardwareId: reqHardware, phone, name, socketId: socket.id });
 
+    // I-send sa Telegram mo na may [ 🟢 1-CLICK APPROVE ]
     const msgText = `🚨 <b>MEETLOOP UNBAN REQUEST</b>\n\n` +
                     `👤 <b>Sender:</b> ${escapeHtml(name)}\n` +
                     `📱 <b>Mobile No:</b> <code>${escapeHtml(phone)}</code>\n` +
                     `💰 <b>Amount:</b> Clearance Fee\n\n` +
-                    `<i>Kapag pumasok ang GCash notif na naglalaman ng number na ito, automatic itong ma-u-unban. O pwede mong pindutin ang 🟢 1-CLICK APPROVE:</i>`;
+                    `<i>Kapag pumasok ang GCash alert na may ganitong number, automatic itong ma-u-unban. O pwede mong pindutin ang 🟢 1-CLICK APPROVE:</i>`;
 
     sendTelegramWithButtons(ADMIN_CHAT_ID, msgText, reqId);
 
