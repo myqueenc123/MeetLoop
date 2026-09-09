@@ -491,8 +491,8 @@ video{
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
           </div>
           <div>
-            <div class="method-title" style="color:#005ce6" id="lblGcashTitle">Instant 7-Day Unban (₱20 Support)</div>
-            <div class="method-desc" id="lblGcashDesc">Pay ₱20 GCash clearance fee & submit Ref No.</div>
+            <div class="method-title" style="color:#005ce6" id="lblGcashTitle">Instant 7-Day Unban (₱10 Support)</div>
+            <div class="method-desc" id="lblGcashDesc">Pay ₱10 GCash clearance fee & submit Mobile No.</div>
           </div>
         </div>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
@@ -535,25 +535,26 @@ video{
         <div id="lblDisclaimerBody">
           Your access has been restricted for <b>7 days</b> due to Community Guidelines violation.<br><br>
           ⚡ <b>Want to return sooner?</b><br>
-          You may request an early unban with a <b>₱20 voluntary support payment</b>.<br><br>
+          You may request an early unban with a <b>₱10 voluntary support payment</b>.<br><br>
           💡 <b>Payment is completely optional.</b> You can simply wait until your 7-day ban expires. No payment is required to use MeetLoop.<br><br>
           <b>— MeetLoop Team</b>
         </div>
       </div>
 
       <div class="gcash-qr-box">
-        <span class="gcash-fee-tag" id="lblFeeTag">Fee: ₱20.00 Support Payment</span>
+        <span class="gcash-fee-tag" id="lblFeeTag">Fee: ₱10.00 Support Payment</span>
         <div class="gcash-qr-frame">
           <img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2" class="gcash-qr-img" alt="GCash QR">
         </div>
         <div style="font-size:11px;color:#475569;font-weight:700" id="lblScanText">
-          Scan QR via GCash, pay <b>₱20</b> clearance fee, and enter your details below.
+          Scan QR via GCash, pay <b>₱10</b> clearance fee, and enter your details below.
         </div>
       </div>
 
       <div class="gcash-input-group">
         <input type="text" id="gcashSenderName" class="gcash-input-field" placeholder="Your GCash Name (e.g. Juan)" maxlength="35">
-        <input type="tel" id="gcashRefInput" class="gcash-input-field" placeholder="13-Digit Ref No. (Numbers Only)" maxlength="16" inputmode="numeric" pattern="[0-9]*">
+        <!-- 🔢 MOBILE NUMBER FIELD -->
+        <input type="tel" id="gcashPhoneInput" class="gcash-input-field" placeholder="Your GCash Mobile No. (e.g. 09171234567)" maxlength="13" inputmode="numeric" pattern="[0-9]*">
         <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="submitGCashUnbanTicket()">Submit for Verification</button>
       </div>
 
@@ -743,18 +744,13 @@ window.addEventListener("storage", (e) => {
   }
 });
 
-/* ================= 2. NUMBERS-ONLY GCASH INPUT ENFORCER ================= */
-const gcashRefInput = document.getElementById("gcashRefInput");
-gcashRefInput.addEventListener("input", (e) => {
+/* ================= 2. NUMBERS-ONLY PHONE INPUT ENFORCER ================= */
+const gcashPhoneInput = document.getElementById("gcashPhoneInput");
+gcashPhoneInput.addEventListener("input", (e) => {
   const clean = e.target.value.replace(/[^0-9]/g, "");
   if (e.target.value !== clean) {
     e.target.value = clean;
   }
-});
-gcashRefInput.addEventListener("paste", (e) => {
-  setTimeout(() => {
-    gcashRefInput.value = gcashRefInput.value.replace(/[^0-9]/g, "");
-  }, 10);
 });
 
 /* ================= 3. NUMERIC ID DISPLAY ================= */
@@ -807,6 +803,7 @@ let isCurrentlyBanned = false;
 let currentFacingMode = "user";
 let blurTimer = null;
 let pendingCandidates = [];
+let cooldownTimer = null;
 
 /* ================= 5. AUTHENTIC TV STATIC ================= */
 function runTVStatic() {
@@ -883,15 +880,17 @@ function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap 
 function openGcashPayView() {
   document.getElementById("selectMethodSection").style.display = "none";
   document.getElementById("gcashPaySection").style.display = "flex";
-  document.getElementById("gcashRefInput").value = "";
+  document.getElementById("gcashPhoneInput").value = "";
   document.getElementById("gcashSenderName").value = "";
   document.getElementById("gcashRefStatus").textContent = "";
   
-  const btn = document.getElementById("gcashVerifyBtn");
-  btn.disabled = false;
-  btn.textContent = document.getElementById("languageSelect").value === "tl" ? "I-submit para sa Veripikasyon" : "Submit for Verification";
-  document.getElementById("gcashSenderName").disabled = false;
-  document.getElementById("gcashRefInput").disabled = false;
+  if (!cooldownTimer) {
+    const btn = document.getElementById("gcashVerifyBtn");
+    btn.disabled = false;
+    btn.textContent = document.getElementById("languageSelect").value === "tl" ? "I-submit para sa Veripikasyon" : "Submit for Verification";
+    document.getElementById("gcashSenderName").disabled = false;
+    document.getElementById("gcashPhoneInput").disabled = false;
+  }
 }
 
 function backToMethodSelection() {
@@ -899,41 +898,62 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 8. SUBMIT GCASH TICKET ================= */
-function submitGCashUnbanTicket() {
-  const nameInput = document.getElementById("gcashSenderName");
-  const refInput = document.getElementById("gcashRefInput");
-  const status = document.getElementById("gcashRefStatus");
+/* ================= 8. SUBMIT GCASH TICKET (WITH SPAM COOLDOWN) ================= */
+function startSubmitCooldown(seconds = 60) {
   const btn = document.getElementById("gcashVerifyBtn");
+  const nameInput = document.getElementById("gcashSenderName");
+  const phoneInput = document.getElementById("gcashPhoneInput");
+
+  btn.disabled = true;
+  nameInput.disabled = true;
+  phoneInput.disabled = true;
+
+  let timeLeft = seconds;
+  if (cooldownTimer) clearInterval(cooldownTimer);
+
+  cooldownTimer = setInterval(() => {
+    timeLeft--;
+    if (timeLeft <= 0) {
+      clearInterval(cooldownTimer);
+      cooldownTimer = null;
+      btn.disabled = false;
+      nameInput.disabled = false;
+      phoneInput.disabled = false;
+      btn.textContent = document.getElementById("languageSelect").value === "tl" ? "I-submit Ulit" : "Submit Again";
+    } else {
+      btn.textContent = `⏳ Submitting Locked (${timeLeft}s)`;
+    }
+  }, 1000);
+}
+
+function submitGCashUnbanTicket() {
+  if (cooldownTimer) return;
+
+  const nameInput = document.getElementById("gcashSenderName");
+  const phoneInput = document.getElementById("gcashPhoneInput");
+  const status = document.getElementById("gcashRefStatus");
 
   const nameVal = nameInput.value.trim();
-  const refVal = refInput.value.trim().replace(/[^0-9]/g, "");
+  const phoneVal = phoneInput.value.trim().replace(/[^0-9]/g, "");
 
-  if (!refVal || refVal.length < 8) {
+  if (!phoneVal || phoneVal.length < 10) {
     status.style.color = "#dc2626";
-    status.textContent = "❌ Please enter a valid Reference Number (numbers only).";
+    status.textContent = "❌ Please enter a valid 11-digit GCash Mobile Number (e.g. 09171234567).";
     return;
   }
 
-  btn.disabled = true;
-  btn.textContent = document.getElementById("languageSelect").value === "tl" ? "⏳ NAI-SUBMIT NA — HINTAYIN SI ADMIN SA TELEGRAM" : "⏳ SUBMITTED — WAITING FOR ADMIN IN TELEGRAM";
-  nameInput.disabled = true;
-  refInput.disabled = true;
+  startSubmitCooldown(60); // 1-minute anti-spam cooldown
 
   status.style.color = "#0284c7";
-  status.innerHTML = "⏳ <b>Details sent to Telegram Admin!</b><br><span style='color:#dc2626;font-size:11px;'>⚠️ BANNED: Admin is verifying your GCash payment via Telegram before lifting the ban.</span>";
+  status.innerHTML = "⏳ <b>Details submitted!</b><br><span style='color:#0284c7;font-size:11px;'>Checking GCash payment notification for matching Mobile Number...</span>";
 
   document.getElementById("banOverlay").style.display = "flex";
 
   if (socket && socket.connected) {
-    socket.emit("unban-request", { hardwareId: myHardwareId, name: nameVal, ref: refVal });
+    socket.emit("unban-request", { hardwareId: myHardwareId, name: nameVal, phone: phoneVal });
   } else {
     status.style.color = "#dc2626";
     status.textContent = "❌ Server connection lost. Please reload and try again.";
-    btn.disabled = false;
-    btn.textContent = "Submit for Verification";
-    nameInput.disabled = false;
-    refInput.disabled = false;
   }
 }
 
@@ -941,32 +961,29 @@ if (socket) {
   socket.on("unban-pending", (data) => {
     const status = document.getElementById("gcashRefStatus");
     status.style.color = "#0284c7";
-    status.innerHTML = "⏳ <b>Ticket Logged!</b><br>Sent to Telegram Admin. Please wait for the admin to review and approve.";
+    status.innerHTML = "⏳ <b>Ticket Logged!</b><br>Sent to Telegram. Once GCash notification arrives with the same number, unban is automatic!";
     document.getElementById("banOverlay").style.display = "flex";
   });
 
   socket.on("real-admin-unban-signal", (data) => {
     if (data && data.hardwareId && data.hardwareId === myHardwareId) {
       isCurrentlyBanned = false;
+      if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
+      
       const status = document.getElementById("gcashRefStatus");
       status.style.color = "#16a34a";
-      status.textContent = "✅ Payment Approved by Admin! Unbanning device...";
+      status.textContent = "✅ Number Matched! Unbanning device now...";
 
       setTimeout(() => {
         document.getElementById("banOverlay").style.display = "none";
-        alert("🎉 Admin Approved! Your suspension has been lifted.");
+        alert("🎉 SUCCESS! Your ₱10 GCash payment was verified. Suspension lifted!");
       }, 1000);
     }
   });
 
   socket.on("unban-response", (data) => {
     const status = document.getElementById("gcashRefStatus");
-    const btn = document.getElementById("gcashVerifyBtn");
     if (!data.success) {
-      btn.disabled = false;
-      btn.textContent = "Submit for Verification";
-      document.getElementById("gcashSenderName").disabled = false;
-      document.getElementById("gcashRefInput").disabled = false;
       status.style.color = "#dc2626";
       status.textContent = data.message;
     }
@@ -1187,26 +1204,26 @@ const i18n = {
     chatPlaceholder: "Type a message...",
     send: "Send",
     selectMethod: "Select Resolution Method:",
-    gcashTitle: "Instant 7-Day Unban (₱20 Support)",
-    gcashDesc: "Pay ₱20 GCash clearance fee & submit Ref No.",
+    gcashTitle: "Instant 7-Day Unban (₱10 Support)",
+    gcashDesc: "Pay ₱10 GCash clearance fee & submit Mobile No.",
     waitTitle: "Wait 7-Day Suspension Period",
     waitDesc: "Auto unbans when 7 days expire",
-    scanText: "Scan QR via GCash, pay ₱20 clearance fee, and enter your details below.",
+    scanText: "Scan QR via GCash, pay ₱10 clearance fee, and enter your details below.",
     searching: "Looking for someone...",
     expiresHeader: "7-Day Suspension Expiration:",
     evidenceTag: "ENCOUNTER EVIDENCE",
     banReason: "Reason:",
     encounterSnapshot: "Reported Encounter Snapshot Logged",
     disclaimerTitle: "🚫 Official Ban Clearance Notice",
-    disclaimerBody: "Your access has been restricted for <b>7 days</b> due to Community Guidelines violation.<br><br>⚡ <b>Want to return sooner?</b><br>You may request an early unban with a <b>₱20 voluntary support payment</b>.<br><br>💡 <b>Payment is completely optional.</b> You can simply wait until your 7-day ban expires. No payment is required to use MeetLoop.<br><br><b>— MeetLoop Team</b>",
-    feeTag: "Fee: ₱20.00 Support Payment",
+    disclaimerBody: "Your access has been restricted for <b>7 days</b> due to Community Guidelines violation.<br><br>⚡ <b>Want to return sooner?</b><br>You may request an early unban with a <b>₱10 voluntary support payment</b>.<br><br>💡 <b>Payment is completely optional.</b> You can simply wait until your 7-day ban expires. No payment is required to use MeetLoop.<br><br><b>— MeetLoop Team</b>",
+    feeTag: "Fee: ₱10.00 Support Payment",
     verifyBtn: "Submit for Verification",
     backMethods: "← Back to Options",
     tabLockTitle: "Duplicate Tab Detected",
     tabLockDesc: "MeetLoop is only allowed in one tab. It is already open in another tab.",
     tabLockBtn: "Use This Tab Instead",
     namePlaceholder: "Your GCash Name (e.g. Juan)",
-    refPlaceholder: "13-Digit Ref No. (Numbers Only)"
+    phonePlaceholder: "Your GCash Mobile No. (e.g. 09171234567)"
   },
   tl: {
     subTitle: "Random Video Chat",
@@ -1221,26 +1238,26 @@ const i18n = {
     chatPlaceholder: "Mag-type ng mensahe...",
     send: "Ipadala",
     selectMethod: "Pumili ng Paraan para Ma-unban:",
-    gcashTitle: "Instant 7-Araw na Unban (₱20 Support)",
-    gcashDesc: "Magbayad ng ₱20 GCash fee at ilagay ang Ref No.",
+    gcashTitle: "Instant 7-Araw na Unban (₱10 Support)",
+    gcashDesc: "Magbayad ng ₱10 GCash fee at ilagay ang Mobile No.",
     waitTitle: "Maghintay ng 7-Araw na Suspension",
     waitDesc: "Kusang ma-u-unban pagkatapos ng 7 araw",
-    scanText: "I-scan sa GCash, magbayad ng ₱20 clearance fee, at ilagay ang detalye sa ibaba.",
+    scanText: "I-scan sa GCash, magbayad ng ₱10 clearance fee, at ilagay ang detalye sa ibaba.",
     searching: "Naghahanap ng makakausap...",
     expiresHeader: "Matatapos ang 7-Araw na Suspension sa:",
     evidenceTag: "EBIDENSYA NG ENCOUNTER",
     banReason: "Dahilan:",
     encounterSnapshot: "Nai-save ang Litrato ng Encounter",
     disclaimerTitle: "🚫 Opisyal na Paalala sa Pagka-ban",
-    disclaimerBody: "Ang iyong access ay pansamantalang na-restrict ng <b>7 araw</b> dahil sa paglabag sa Community Guidelines.<br><br>⚡ <b>Gusto mo bang makabalik agad?</b><br>Maaari kang humiling ng maagang unban gamit ang <b>₱20 voluntary support payment</b>.<br><br>💡 <b>Kusang-loob lamang ang bayad.</b> Maaari kang maghintay hanggang matapos ang 7 araw. Hindi kailangang magbayad para magamit ang MeetLoop.<br><br><b>— MeetLoop Team</b>",
-    feeTag: "Halaga: ₱20.00 Support Payment",
+    disclaimerBody: "Ang iyong access ay pansamantalang na-restrict ng <b>7 araw</b> dahil sa paglabag sa Community Guidelines.<br><br>⚡ <b>Gusto mo bang makabalik agad?</b><br>Maaari kang humiling ng maagang unban gamit ang <b>₱10 voluntary support payment</b>.<br><br>💡 <b>Kusang-loob lamang ang bayad.</b> Maaari kang maghintay hanggang matapos ang 7 araw. Hindi kailangang magbayad para magamit ang MeetLoop.<br><br><b>— MeetLoop Team</b>",
+    feeTag: "Halaga: ₱10.00 Support Payment",
     verifyBtn: "I-submit para sa Veripikasyon",
     backMethods: "← Bumalik sa mga Pagpipilian",
     tabLockTitle: "Naka-open na sa Ibang Tab",
     tabLockDesc: "Isang tab lamang ang pwedeng gamitin sa MeetLoop. Naka-open na ito sa isa pang tab.",
     tabLockBtn: "Gamitin ang Tab na Ito",
     namePlaceholder: "Pangalan sa GCash (hal. Juan)",
-    refPlaceholder: "13-Digit Ref No. (Numero Lamang)"
+    phonePlaceholder: "Numero sa GCash (hal. 09171234567)"
   }
 };
 
@@ -1273,9 +1290,9 @@ function setLanguage(lang) {
   document.getElementById("lblTabLockDesc").textContent = t.tabLockDesc;
   document.getElementById("btnClaimTab").textContent = t.tabLockBtn;
   document.getElementById("gcashSenderName").placeholder = t.namePlaceholder;
-  document.getElementById("gcashRefInput").placeholder = t.refPlaceholder;
+  document.getElementById("gcashPhoneInput").placeholder = t.phonePlaceholder;
 
-  if (!document.getElementById("gcashVerifyBtn").disabled) {
+  if (!cooldownTimer && !document.getElementById("gcashVerifyBtn").disabled) {
     document.getElementById("gcashVerifyBtn").textContent = t.verifyBtn;
   }
   if (!searching && !connected) {
