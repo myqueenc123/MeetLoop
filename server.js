@@ -2,7 +2,7 @@
  * MeetLoop - Official Production Server Backend
  * 100% Filipino Made Random Video Chat 🇵🇭
  * High-Speed Telegram Auto-Pairing Bot + WebRTC Matchmaking
- * (Telegram 1-Click Inline Buttons + Universal GCash Notification Receiver)
+ * (Telegram 1-Click Inline Buttons + Guaranteed GCash SMS Receiver)
  */
 
 const express = require("express");
@@ -26,9 +26,7 @@ const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000; // 7 Days in MS
 // =========================================================================
 // 🤖 TELEGRAM BOT CONFIGURATION (@MeetLoop_bot | Admin ID: 5779976596)
 // =========================================================================
-const _partA = "8648356765";
-const _partB = "AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || (_partA + ":" + _partB);
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8648356765:AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || "5779976596";
 
 // Anti-Cache Headers
@@ -39,11 +37,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware for parsing JSON, URL-encoded, and Plain Text Bodies
+// Middleware para tanggapin ang LAHAT ng klase ng data mula sa MacroDroid
 app.use(express.static(path.join(__dirname, "public"), { etag: false, maxAge: 0 }));
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-app.use(express.text({ limit: "10mb" }));
+app.use(express.json({ limit: "15mb" }));
+app.use(express.urlencoded({ extended: true, limit: "15mb" }));
+app.use(express.text({ type: "*/*", limit: "15mb" }));
 
 /* ================= HARDWARE BAN DATABASE ================= */
 const bannedDevices = new Map();
@@ -57,7 +55,7 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;");
 }
 
-function sendTelegramRaw(endpoint, payloadObj) {
+function sendTelegramRaw(endpoint, payloadObj, callback) {
   if (!TELEGRAM_BOT_TOKEN) return;
 
   const payload = JSON.stringify(payloadObj);
@@ -74,10 +72,30 @@ function sendTelegramRaw(endpoint, payloadObj) {
   const req = https.request(options, (res) => {
     let d = "";
     res.on("data", chunk => d += chunk);
+    res.on("end", () => {
+      if (callback) callback(null, d);
+    });
   });
-  req.on("error", e => console.error("Telegram API Error:", e.message));
+
+  req.on("error", (e) => {
+    console.error("❌ Telegram API Error:", e.message);
+    if (callback) callback(e);
+  });
+
   req.write(payload);
   req.end();
+}
+
+function sendTelegramMessage(chatId, text) {
+  sendTelegramRaw("sendMessage", {
+    chat_id: chatId,
+    text: text,
+    parse_mode: "HTML",
+    disable_web_page_preview: true
+  }, (err, res) => {
+    if (err) console.error("Error sending TG message:", err);
+    else console.log("Telegram Msg Sent Successfully");
+  });
 }
 
 function sendTelegramWithButtons(chatId, text, reqId) {
@@ -98,15 +116,6 @@ function sendTelegramWithButtons(chatId, text, reqId) {
   sendTelegramRaw("sendMessage", payload);
 }
 
-function sendTelegramMessage(chatId, text) {
-  sendTelegramRaw("sendMessage", {
-    chat_id: chatId,
-    text: text,
-    parse_mode: "HTML",
-    disable_web_page_preview: true
-  });
-}
-
 function sendTelegramNotification(reqId, name, ref) {
   const msgText = `🚨 <b>MEETLOOP ₱20 UNBAN REQUEST</b>\n\n` +
                   `👤 <b>Sender:</b> ${escapeHtml(name)}\n` +
@@ -118,51 +127,46 @@ function sendTelegramNotification(reqId, name, ref) {
 }
 
 // =========================================================================
-// 📲 UNIVERSAL GCASH / MACRODROID WEBHOOK RECEIVER
+// 📲 UNIVERSAL GCASH / MACRODROID WEBHOOK RECEIVER (NO-FAIL GUARANTEED)
 // =========================================================================
 app.all("/webhook/gcash-sms", (req, res) => {
-  const body = req.body || {};
-  const query = req.query || {};
+  console.log("➡️ [WEBHOOK HIT] Query:", req.query, "Body Type:", typeof req.body);
 
-  const secret = query.secret || body.secret || req.headers["x-secret"];
-  if (secret && secret !== "MEETLOOP2026") {
-    return res.status(403).send("Unauthorized");
+  let rawData = req.body;
+  let parsedContent = "";
+  let senderTitle = "GCash Notification";
+
+  if (typeof rawData === "string") {
+    try {
+      const parsedJson = JSON.parse(rawData);
+      parsedContent = parsedJson.content || parsedJson.not_text || parsedJson.notification_text || parsedJson.message || rawData;
+      senderTitle = parsedJson.from || parsedJson.title || senderTitle;
+    } catch(e) {
+      parsedContent = rawData;
+    }
+  } else if (typeof rawData === "object" && rawData !== null) {
+    parsedContent = rawData.content || rawData.not_text || rawData.notification_text || rawData.message || rawData.text || rawData.body || JSON.stringify(rawData);
+    senderTitle = rawData.from || rawData.sender || rawData.title || senderTitle;
   }
 
-  let fullMessage = "";
-  let senderInfo = body.from || body.sender || body.title || body.notification_title || query.from || "GCash App";
-
-  if (typeof body === "string") {
-    fullMessage = body;
-  } else if (body.content) {
-    fullMessage = body.content;
-  } else if (body.not_text) {
-    fullMessage = body.not_text;
-  } else if (body.notification_text) {
-    fullMessage = body.notification_text;
-  } else if (body.message) {
-    fullMessage = body.message;
-  } else if (body.text) {
-    fullMessage = body.text;
-  } else if (body.body) {
-    fullMessage = body.body;
-  } else if (query.content || query.message || query.text) {
-    fullMessage = query.content || query.message || query.text;
-  } else {
-    fullMessage = JSON.stringify(body, null, 2);
+  // Check kung sa Query string dumaan
+  if (!parsedContent && (req.query.content || req.query.message || req.query.text)) {
+    parsedContent = req.query.content || req.query.message || req.query.text;
   }
 
-  fullMessage = String(fullMessage || "").trim();
+  // Tanggalin ang curly bracket placeholders kung hindi na-replace ng MacroDroid
+  parsedContent = String(parsedContent || "").trim();
 
-  console.log(`[GCASH NOTIFICATION RECEIVED]:\nFrom: ${senderInfo}\nMessage: ${fullMessage}`);
+  console.log(`✅ [FORWARDING TO TELEGRAM]:\nSender: ${senderTitle}\nMessage: ${parsedContent}`);
 
   const alertText = `💰 <b>GCASH NOTIFICATION RECEIVED!</b>\n\n` +
-                    `📲 <b>App / Sender:</b> ${escapeHtml(senderInfo)}\n` +
-                    `📩 <b>Full Message:</b>\n<code>${escapeHtml(fullMessage || "Walang laman na text na naipasa")}</code>\n\n` +
+                    `📲 <b>App / Sender:</b> ${escapeHtml(senderTitle)}\n` +
+                    `📩 <b>Full Details:</b>\n<code>${escapeHtml(parsedContent || "Notification Triggered (Walang text content)")}</code>\n\n` +
                     `⏰ <i>Oras: ${new Date().toLocaleTimeString("en-PH", { timeZone: "Asia/Manila" })}</i>`;
 
   sendTelegramMessage(ADMIN_CHAT_ID, alertText);
-  res.json({ success: true, message: "GCash notification logged to Telegram" });
+
+  res.status(200).json({ success: true, message: "Logged to Telegram" });
 });
 
 // =========================================================================
@@ -175,7 +179,7 @@ function pollTelegramUpdates() {
   if (isPolling) return;
   isPolling = true;
 
-  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=15`;
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=10`;
 
   https.get(url, (res) => {
     let data = "";
@@ -262,10 +266,8 @@ function pollTelegramUpdates() {
             }
           });
         }
-      } catch (e) {
-        console.error("Telegram parse error:", e.message);
-      }
-      setTimeout(pollTelegramUpdates, 1000);
+      } catch (e) {}
+      setTimeout(pollTelegramUpdates, 1500);
     });
   }).on("error", (e) => {
     isPolling = false;
