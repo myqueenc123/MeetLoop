@@ -53,7 +53,7 @@ header{
   position:relative;z-index:20;flex-shrink:0;
 }
 .brand{display:flex;align-items:center;gap:8px;text-decoration:none;user-select:none;cursor:pointer}
-.brand-text{font-size:19px;font-weight:900;color:#fff}
+.brand-text{font-size:19px;font-weight:900;letter-spacing:-0.5px;color:#fff}
 .brand-text span{color:#38bdf8}
 .lang-select{
   background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.2);
@@ -113,7 +113,7 @@ video{
   width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);
 }
 
-/* CLEAN SPINNER ONLY (NO BOX & NO TEXT) */
+/* CLEAN LOADING SPINNER */
 .search-loader{
   position:absolute;inset:0;z-index:4;display:none;align-items:center;justify-content:center;user-select:none;
 }
@@ -253,193 +253,7 @@ video{
 .ban-expire-box{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
 .ban-expire-label{font-size:11px;font-weight:800;color:#dc2626}
 .ban-expire-time{font-size:12px;font-weight:800;color:#0f172a}
-.ban-id-chip{font-size:10px;color:#64748b;font-family:monospace}
-
-#welcomePortal{
-  position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px;
-  background:linear-gradient(rgba(10, 14, 23, 0.75), rgba(10, 14, 23, 0.85)), url('/meetloop-bg.png') center/cover no-repeat;
-  backdrop-filter:blur(8px);
-}
-.portal-box{max-width:420px;width:100%;padding:28px 20px;text-align:center;background:rgba(17, 24, 39, 0.95);border-radius:24px;border:1.5px solid rgba(255,255,255,.12);box-shadow:0 25px 60px rgba(0,0,0,.9)}
-.portal-logo-svg{width:75px;height:75px;margin:0 auto 12px;display:block}
-.portal-btn{width:100%;height:48px;border-radius:12px;border:0;background:linear-gradient(135deg,#0284c7,#2563eb);color:#fff;font-size:14px;font-weight:800;cursor:pointer;margin-top:12px}
-.portal-rules{text-align:left;font-size:12px;color:#cbd5e1;line-height:1.6;margin:16px 0;background:#1f293d;padding:14px;border-radius:12px}
-
-/* REPORT MODAL */
-#reportModal{
-  position:fixed;inset:0;z-index:2147483640;background:rgba(0,0,0,0.85);
-  display:none;align-items:center;justify-content:center;padding:16px;
-}
-.report-modal-card{
-  background:#111827;border:1.5px solid rgba(255,255,255,0.15);border-radius:20px;
-  max-width:380px;width:100%;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,0.9);
-}
-.report-title{font-size:16px;font-weight:900;color:#ef4444;margin-bottom:6px;display:flex;align-items:center;gap:6px}
-.report-desc{font-size:11.5px;color:#94a3b8;margin-bottom:14px}
-.report-select{
-  width:100%;height:42px;background:#0f172a;border:1.5px solid #334155;border-radius:10px;
-  color:#f8fafc;font-size:12.5px;font-weight:700;padding:0 10px;outline:none;margin-bottom:16px;
-}
-.report-actions{display:flex;gap:8px}
-.btn-submit-report{flex:1;height:42px;background:#dc2626;color:#fff;border:0;border-radius:10px;font-weight:800;font-size:12.5px;cursor:pointer}
-.btn-cancel-report{flex:1;height:42px;background:#1e293b;color:#94a3b8;border:0;border-radius:10px;font-weight:800;font-size:12.5px;cursor:pointer}
-</style>
-</head>
-
-<body>
-
-<!-- STRICT 1-TAB OVERLAY -->
-<div id="duplicateTabOverlay">
-  <div class="tab-lock-card">
-    <span style="font-size:42px;display:block;margin-bottom:12px">⚠️</span>
-    <div style="font-size:18px;font-weight:900;color:#ef4444;margin-bottom:8px" id="lblTabLockTitle">Duplicate Tab Detected</div>
-    <div style="font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:18px" id="lblTabLockDesc">MeetLoop is only allowed in 1 tab session.</div>
-    <button type="button" class="btn-claim-tab" id="btnClaimTab">Use This Tab Instead</button>
-  </div>
-</div>
-
-<!-- REPORT MODAL -->
-<div id="reportModal">
-  <div class="report-modal-card">
-    <div class="report-title">🚨 <span id="lblReportModalTitle">Report User</span></div>
-    <div class="report-desc" id="lblReportModalDesc">Select the violation reason for reporting this user:</div>
-    <select id="reportReasonSelect" class="report-select">
-      <option value="Nudity / Sexual Content">🔞 Nudity / Sexual Content</option>
-      <option value="Harassment / Bullying">🛑 Harassment / Bullying</option>
-      <option value="Hate Speech">🗣️ Hate Speech</option>
-      <option value="Threats / Violence">⚠️ Threats / Violence</option>
-      <option value="Spam / Advertising">📢 Spam / Advertising</option>
-      <option value="Scam / Fraud">💳 Scam / Fraud</option>
-      <option value="Underage User">🚸 Underage User</option>
-      <option value="Inappropriate Behavior">🚫 Inappropriate Behavior</option>
-      <option value="Impersonation">🎭 Impersonation</option>
-      <option value="Other">❓ Other</option>
-    </select>
-    <div class="report-actions">
-      <button type="button" class="btn-cancel-report" id="btnCancelReport" onclick="closeReportModal()">Cancel</button>
-      <button type="button" class="btn-submit-report" id="btnConfirmReport" onclick="confirmReportUser()">Submit Report</button>
-    </div>
-  </div>
-</div>
-
-<!-- WELCOME PORTAL -->
-<div id="welcomePortal">
-  <div class="portal-box">
-    <svg class="portal-logo-svg" viewBox="0 0 100 100">
-      <defs>
-        <linearGradient id="pG1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#2563eb"/></linearGradient>
-        <linearGradient id="pG2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#ec4899"/></linearGradient>
-      </defs>
-      <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 Z" fill="url(#pG1)"/>
-      <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 Z" fill="url(#pG2)"/>
-    </svg>
-    <h1 style="font-size:24px;font-weight:900;color:#fff">MeetLoop</h1>
-    <p style="font-size:12px;color:var(--text-muted);font-weight:700;margin-top:2px" id="lblSubTitle">Random Video Chat</p>
-
-    <ul class="portal-rules">
-      <li id="r1"><b>18+ Required:</b> Minors are strictly prohibited.</li>
-      <li id="r2"><b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.</li>
-      <li id="r3"><b>Human Face Only:</b> Look directly at the camera.</li>
-      <li id="r4"><b>Instant Blur Shield:</b> Safe transition on every switch.</li>
-    </ul>
-
-    <button class="portal-btn" id="portalStartBtn" type="button">START CHATTING</button>
-  </div>
-</div>
-
-<!-- 7-DAY HARD LOCK BAN OVERLAY -->
-<div id="banOverlay">
-  <div class="ban-card">
-    <div class="ban-top">
-      <div class="ban-snap-frame">
-        <canvas id="banCanvas" width="95" height="95"></canvas>
-        <div class="ban-snap-brand">MeetLoop</div>
-        <div class="ban-snap-tag" id="lblEvidenceTag">ENCOUNTER EVIDENCE</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:3px">
-        <div class="ban-title" id="banTitle">7-Day Suspension</div>
-        <div class="ban-reason" id="lblBanReason">Reason: <span id="banReasonLabel">Policy Violation</span></div>
-        <div style="font-size:10px;color:#94a3b8;font-weight:600" id="lblEncounterSnapshot">Reported Encounter Snapshot Logged</div>
-      </div>
-    </div>
-
-    <!-- VIEW 1: METHOD OPTIONS -->
-    <div id="selectMethodSection" class="method-choice-container">
-      <div style="font-size:12px;font-weight:800;color:#334155" id="lblSelectMethod">Select Resolution Method:</div>
-
-      <div class="method-card" onclick="openGcashPayView()">
-        <div class="method-card-left">
-          <div class="method-icon-wrap" style="background:#005ce6;color:#fff">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-          </div>
-          <div>
-            <div class="method-title" style="color:#005ce6" id="lblGcashTitle">Instant 7-Day Unban (₱10 Support)</div>
-            <div class="method-desc" id="lblGcashDesc">Pay ₱10 GCash clearance fee & submit Mobile No.</div>
-          </div>
-        </div>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-
-      <a href="https://t.me/MeetLoop_bot" target="_blank" class="telegram-support-btn" id="lblTelegramSupport">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.99-1.74 6.66-2.89 8-3.46 3.82-1.6 4.62-1.88 5.14-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.21-.03.36z"/></svg>
-        <span>Message Telegram Support (@MeetLoop_bot)</span>
-      </a>
-
-      <div class="method-card" style="cursor:default">
-        <div class="method-card-left">
-          <div class="method-icon-wrap" style="background:#f1f5f9;color:#64748b">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </div>
-          <div>
-            <div class="method-title" id="lblWaitTitle">Wait 7-Day Suspension Period</div>
-            <div class="method-desc" id="lblWaitDesc">Auto unbans when 7 days expire</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- VIEW 2: GCASH TOPUP FORM -->
-    <div id="gcashPaySection">
-      <div class="gcash-logo-banner">
-        <svg class="gcash-official-svg" viewBox="0 0 160 38" fill="none">
-          <path d="M19 8C12.9 8 8 12.9 8 19C8 25.1 12.9 30 19 30C23.2 30 26.8 27.7 28.6 24.2L24.8 22.3C23.7 24.7 21.5 26.2 19 26.2C15 26.2 11.8 23 11.8 19C11.8 15 15 11.8 19 11.8C21.6 11.8 23.8 13.4 24.9 15.8L28.7 13.9C26.9 10.3 23.3 8 19 8Z" fill="#ffffff"/>
-          <text x="44" y="26" fill="#ffffff" font-weight="900" font-size="20.5">GCash</text>
-        </svg>
-      </div>
-
-      <div class="ban-disclaimer-box">
-        <div class="ban-disclaimer-title" id="lblDisclaimerTitle">🚫 Official Ban Clearance Notice</div>
-        <div id="lblDisclaimerBody">
-          Your access has been restricted for <b>7 days</b> due to Community Guidelines violation.<br><br>
-          ⚡ <b>Want to return sooner?</b><br>
-          You may request an early unban with a <b>₱10 voluntary support payment</b>.<br><br>
-          💡 <b>Payment is completely optional.</b> You can simply wait until your 7-day ban expires. No payment is required to use MeetLoop.<br><br>
-          <b>— MeetLoop Team</b>
-        </div>
-      </div>
-
-      <div class="gcash-qr-box">
-        <span class="gcash-fee-tag" id="lblFeeTag">Fee: ₱10.00 Support Payment</span>
-        <div class="gcash-qr-frame">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2" class="gcash-qr-img" alt="GCash QR">
-        </div>
-        <div style="font-size:11px;color:#475569;font-weight:700" id="lblScanText">Scan QR via GCash, pay ₱10 clearance fee, and enter details below.</div>
-      </div>
-
-      <div class="gcash-input-group">
-        <input type="tel" id="gcashPhoneInput" class="gcash-input-field" placeholder="Your GCash Mobile No. (e.g. 09123456789)" maxlength="13" inputmode="numeric">
-        <input type="tel" id="gcashRefInput" class="gcash-input-field" placeholder="13-Digit GCash Ref No. (e.g. 2004123456789)" maxlength="16" inputmode="numeric">
-        <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="submitGCashUnbanTicket()">Submit for Verification</button>
-      </div>
-
-      <div id="gcashRefStatus" style="font-size:11.5px;font-weight:800;text-align:center;min-height:16px;line-height:1.4"></div>
-      <button type="button" class="btn-back-methods" id="btnBackMethods" onclick="backToMethodSelection()">← Back to Options</button>
-    </div>
-
-    <div class="ban-expire-box">
-      <span class="ban-expire-label" id="lblExpiresHeader">7-Day Suspension Expiration:</span>
-      <span class="ban-expire-time" id="banUntilFullText">--:-- --</span>
-      <div class="ban-id-chip"><span id="lblDeviceBanId">Device Ban ID:</span> <span id="adminUnbanId">--</span></div>
+.ban-id-chip"><span id="lblDeviceBanId">Device Ban ID:</span> <span id="adminUnbanId">--</span></div>
     </div>
   </div>
 </div>
@@ -492,7 +306,7 @@ video{
           </div>
         </div>
 
-        <!-- 🌟 CLEAN SPINNER ONLY (NO BOX & NO TEXT) -->
+        <!-- 🌟 CLEAN SPINNER ONLY -->
         <div class="search-loader" id="searchLoader">
           <div class="search-spinner"></div>
         </div>
@@ -532,7 +346,6 @@ video{
     <div class="chat-stream" id="chatStream">
       <div class="chat-msg">
         <div class="chat-author">System</div>
-        <!-- 🌟 UPDATED OFFICIAL SYSTEM RULES CARD -->
         <div class="chat-bubble chat-rules-card" id="lblChatRules">
           👋 <b>Welcome to MeetLoop!</b><br><br>
           🔞 <b>18+ only</b> — You must be 18 or older.<br>
@@ -547,6 +360,30 @@ video{
     <div class="chat-foot">
       <input type="text" id="chatInput" class="chat-input" placeholder="Type a message..." maxlength="250">
       <button type="button" class="chat-send-btn" id="sendBtn">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- REPORT MODAL -->
+<div id="reportModal" style="position:fixed;inset:0;z-index:2147483640;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#111827;border:1.5px solid rgba(255,255,255,0.15);border-radius:20px;max-width:380px;width:100%;padding:20px;">
+    <div style="font-size:16px;font-weight:900;color:#ef4444;margin-bottom:6px;">🚨 Report User</div>
+    <div style="font-size:11.5px;color:#94a3b8;margin-bottom:14px;">Select the violation reason:</div>
+    <select id="reportReasonSelect" style="width:100%;height:42px;background:#0f172a;border:1.5px solid #334155;border-radius:10px;color:#f8fafc;font-size:12.5px;font-weight:700;padding:0 10px;outline:none;margin-bottom:16px;">
+      <option value="Nudity / Sexual Content">🔞 Nudity / Sexual Content</option>
+      <option value="Harassment / Bullying">🛑 Harassment / Bullying</option>
+      <option value="Hate Speech">🗣️ Hate Speech</option>
+      <option value="Threats / Violence">⚠️ Threats / Violence</option>
+      <option value="Spam / Advertising">📢 Spam / Advertising</option>
+      <option value="Scam / Fraud">💳 Scam / Fraud</option>
+      <option value="Underage User">🚸 Underage User</option>
+      <option value="Inappropriate Behavior">🚫 Inappropriate Behavior</option>
+      <option value="Impersonation">🎭 Impersonation</option>
+      <option value="Other">❓ Other</option>
+    </select>
+    <div style="display:flex;gap:8px;">
+      <button type="button" style="flex:1;height:42px;background:#1e293b;color:#94a3b8;border:0;border-radius:10px;font-weight:800;font-size:12.5px;cursor:pointer;" onclick="closeReportModal()">Cancel</button>
+      <button type="button" style="flex:1;height:42px;background:#dc2626;color:#fff;border:0;border-radius:10px;font-weight:800;font-size:12.5px;cursor:pointer;" onclick="confirmReportUser()">Submit Report</button>
     </div>
   </div>
 </div>
@@ -672,7 +509,7 @@ const gcashRefInput = document.getElementById("gcashRefInput");
   });
 });
 
-/* ================= 3. SOCKET CONNECTION & LISTENERS ================= */
+/* ================= 3. SOCKET CONNECTION & AUTO-RECOVERY ================= */
 let socket = null;
 try {
   if (typeof io !== "undefined") {
@@ -719,6 +556,11 @@ let cooldownTimer = null;
 let lastCapturedStrangerSnapshot = null;
 
 if (socket) {
+  // 🟢 AGAD MAG-CHECK KUNG NA-UNBAN NA HABANG NAKASARA ANG TAB
+  socket.on("connect", () => {
+    socket.emit("check-ban-status", { hardwareId: myHardwareId });
+  });
+
   socket.on("online-count", (count) => {
     const realCount = Math.max(1, Number(count || 1));
     if (standbyUsers) standbyUsers.textContent = realCount.toLocaleString();
@@ -782,6 +624,7 @@ if (socket) {
     document.getElementById("banOverlay").style.display = "flex";
   });
 
+  // ⚡ INSTANT UNBAN SIGNAL HANDLER
   socket.on("real-admin-unban-signal", (data) => {
     if (data && data.hardwareId && data.hardwareId === myHardwareId) {
       isCurrentlyBanned = false;
@@ -819,6 +662,13 @@ if (socket) {
   });
 }
 
+/* ================= 4. PERIODIC AUTO-CHECK UNBAN STATUS ================= */
+setInterval(() => {
+  if (isCurrentlyBanned && socket && socket.connected) {
+    socket.emit("check-ban-status", { hardwareId: myHardwareId });
+  }
+}, 2500);
+
 function runTVStatic() {
   if (!crtStaticCanvas) return;
   const ctx = crtStaticCanvas.getContext("2d");
@@ -842,13 +692,11 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 4. CAPTURE STRANGER PICTURE ACCURATELY ================= */
 function captureStrangerSnapshot() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
   const ctx = canvas.getContext("2d");
 
-  // 100% PRIORITY: Kukunin ang mukha ng KAUSAP mula sa remote video
   if (remoteVideo && remoteVideo.videoWidth > 0) {
     ctx.drawImage(remoteVideo, 0, 0, 180, 180);
     return canvas.toDataURL("image/jpeg", 0.75);
@@ -1147,7 +995,7 @@ function closePeerConnection() {
   pendingCandidates = [];
 }
 
-/* ================= 5. TRANSLATIONS (DEFAULT ENGLISH) ================= */
+/* ================= 5. TRANSLATIONS DICTIONARY ================= */
 const i18n = {
   en: {
     subTitle: "Random Video Chat", portalBtn: "START CHATTING", report: "Report", stop: "Stop", start: "Start", next: "Next", stopped: "Stopped",
@@ -1401,7 +1249,7 @@ document.getElementById("languageSelect").addEventListener("change", (e) => {
 /* ================= 6. REPORT MODAL HANDLERS ================= */
 function openReportModal() {
   if (!connected) return;
-  lastCapturedStrangerSnapshot = captureStrangerSnapshot(); // Capture Stranger Face!
+  lastCapturedStrangerSnapshot = captureStrangerSnapshot();
   document.getElementById("reportModal").style.display = "flex";
 }
 
