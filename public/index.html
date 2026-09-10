@@ -97,6 +97,12 @@ video{
   position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;padding:0 12px;user-select:none;pointer-events:none;
 }
+.standby-logo{
+  width:105px;height:105px;margin-bottom:12px;
+  filter:drop-shadow(0 0 25px rgba(56,189,248,.6));
+  animation:floatLogo 3s ease-in-out infinite alternate;
+}
+@keyframes floatLogo{from{transform:translateY(0)}to{transform:translateY(-6px)}}
 .standby-title{font-size:30px;font-weight:900;letter-spacing:-0.5px;color:#fff}
 .standby-online-tag{
   background:rgba(15,23,42,0.88);border:1px solid rgba(255,255,255,.15);
@@ -107,7 +113,7 @@ video{
   width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);
 }
 
-/* CLEAN SPINNER ONLY */
+/* CLEAN SPINNER ONLY (NO BOX & NO TEXT) */
 .search-loader{
   position:absolute;inset:0;z-index:4;display:none;align-items:center;justify-content:center;user-select:none;
 }
@@ -486,6 +492,7 @@ video{
           </div>
         </div>
 
+        <!-- 🌟 CLEAN SPINNER ONLY (NO BOX & NO TEXT) -->
         <div class="search-loader" id="searchLoader">
           <div class="search-spinner"></div>
         </div>
@@ -525,13 +532,14 @@ video{
     <div class="chat-stream" id="chatStream">
       <div class="chat-msg">
         <div class="chat-author">System</div>
+        <!-- 🌟 UPDATED OFFICIAL SYSTEM RULES CARD -->
         <div class="chat-bubble chat-rules-card" id="lblChatRules">
           👋 <b>Welcome to MeetLoop!</b><br><br>
           🔞 <b>18+ only</b> — You must be 18 or older.<br>
           🚫 <b>No nudity, sexual content, hate speech, or harassment.</b><br>
           📹 <b>Show yourself on camera</b> — no pre-recorded or fake video.<br>
-          💬 <b>Respect everyone</b> — MeetLoop is not a dating site.<br>
-          ⚠️ <b>Violations will result in an immediate 7-day ban.</b><br><br>
+          💬 <b>Respect everyone</b> — MeetLoop is not a dating site. Please don't ask for gender or personal information.<br>
+          ⚠️ <b>Violations may result in a temporary or permanent ban.</b><br><br>
           Have fun, stay respectful, and enjoy your conversation! 🌎
         </div>
       </div>
@@ -547,7 +555,7 @@ video{
 <script>
 "use strict";
 
-/* ================= 1. STRICT 1-TAB ONLY & BAN CLIENT ENGINE ================= */
+/* ================= 1. STRICT 1-TAB ONLY & PERSISTENT BAN ENGINE ================= */
 const myTabId = "tab_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
 let tabChannel = null;
 let isMasterTab = false;
@@ -664,7 +672,7 @@ const gcashRefInput = document.getElementById("gcashRefInput");
   });
 });
 
-/* ================= 3. SOCKET CONNECTION & SIGNALING ================= */
+/* ================= 3. SOCKET CONNECTION & LISTENERS ================= */
 let socket = null;
 try {
   if (typeof io !== "undefined") {
@@ -711,10 +719,6 @@ let cooldownTimer = null;
 let lastCapturedStrangerSnapshot = null;
 
 if (socket) {
-  socket.on("connect", () => {
-    socket.emit("check-ban-status", { hardwareId: myHardwareId });
-  });
-
   socket.on("online-count", (count) => {
     const realCount = Math.max(1, Number(count || 1));
     if (standbyUsers) standbyUsers.textContent = realCount.toLocaleString();
@@ -740,33 +744,26 @@ if (socket) {
       if (data.type === "offer") {
         if (!peerConnection) await createPeer(false);
         await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-        
         while (pendingCandidates.length > 0) {
-          const c = pendingCandidates.shift();
-          await peerConnection.addIceCandidate(c).catch(()=>{});
+          await peerConnection.addIceCandidate(pendingCandidates.shift()).catch(()=>{});
         }
-        
         const ans = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(ans);
         socket.emit("signal", { type: "answer", answer: ans });
       } else if (data.type === "answer" && peerConnection) {
         await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-        
         while (pendingCandidates.length > 0) {
-          const c = pendingCandidates.shift();
-          await peerConnection.addIceCandidate(c).catch(()=>{});
+          await peerConnection.addIceCandidate(pendingCandidates.shift()).catch(()=>{});
         }
       } else if (data.type === "candidate") {
         const candidate = new RTCIceCandidate(data.candidate);
-        if (peerConnection && peerConnection.remoteDescription && peerConnection.remoteDescription.type) {
+        if (peerConnection && peerConnection.remoteDescription) {
           await peerConnection.addIceCandidate(candidate).catch(()=>{});
         } else {
           pendingCandidates.push(candidate);
         }
       }
-    } catch(err){
-      console.error("Signaling Error:", err);
-    }
+    } catch(err){}
   });
 
   socket.on("partner-disconnected", () => {
@@ -786,26 +783,27 @@ if (socket) {
   });
 
   socket.on("real-admin-unban-signal", (data) => {
-    isCurrentlyBanned = false;
-    localStorage.removeItem("meetloop_ban_until");
-    localStorage.removeItem("meetloop_ban_reason");
-    localStorage.removeItem("meetloop_ban_snapshot");
-    if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
-    submitAttempts = 0;
-
-    const status = document.getElementById("gcashRefStatus");
-    if (status) {
+    if (data && data.hardwareId && data.hardwareId === myHardwareId) {
+      isCurrentlyBanned = false;
+      localStorage.removeItem("meetloop_ban_until");
+      localStorage.removeItem("meetloop_ban_reason");
+      localStorage.removeItem("meetloop_ban_snapshot");
+      if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
+      submitAttempts = 0;
+      
+      const status = document.getElementById("gcashRefStatus");
       status.style.color = "#16a34a";
       status.textContent = "✅ " + getTranslatedText("unbanSuccess");
+
+      myHardwareId = getPersistentDeviceId(true);
+      updateNumericDisplayId();
+      if (tabChannel) tabChannel.postMessage({ type: "UNBAN_EVENT" });
+
+      setTimeout(() => {
+        document.getElementById("banOverlay").style.display = "none";
+        alert("🎉 " + getTranslatedText("unbanAlert"));
+      }, 800);
     }
-
-    myHardwareId = getPersistentDeviceId(true);
-    updateNumericDisplayId();
-    if (tabChannel) tabChannel.postMessage({ type: "UNBAN_EVENT" });
-
-    setTimeout(() => {
-      document.getElementById("banOverlay").style.display = "none";
-    }, 600);
   });
 
   socket.on("unban-response", (data) => {
@@ -844,297 +842,13 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 4. RELIABLE WEBRTC & MEDIA ================= */
-// 🌐 GLOBAL HIGH-SPEED STUN + FREE TURN RELAY (Garantisadong makakatawid sa Mobile Data / NAT)
-const rtcConfig = {
-  iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun1.l.google.com:19302" },
-    { urls: "stun:stun2.l.google.com:19302" },
-    { urls: "stun:stun.cloudflare.com:3478" },
-    {
-      urls: "turn:openrelay.metered.ca:80",
-      username: "openrelayproject",
-      credential: "openrelayproject"
-    },
-    {
-      urls: "turn:openrelay.metered.ca:443",
-      username: "openrelayproject",
-      credential: "openrelayproject"
-    },
-    {
-      urls: "turn:openrelay.metered.ca:443?transport=tcp",
-      username: "openrelayproject",
-      credential: "openrelayproject"
-    }
-  ],
-  iceCandidatePoolSize: 10
-};
-
-async function getMediaStreamWithFallback(facing) {
-  try {
-    return await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: facing,
-        width: { ideal: 640, max: 1280 },
-        height: { ideal: 480, max: 720 },
-        frameRate: { ideal: 30, max: 30 }
-      },
-      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
-    });
-  } catch (e1) {
-    try {
-      return await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: facing },
-        audio: true
-      });
-    } catch (e2) {
-      return await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: false
-      });
-    }
-  }
-}
-
-async function startMedia() {
-  if (isCurrentlyBanned) {
-    document.getElementById("banOverlay").style.display = "flex";
-    return false;
-  }
-
-  if (localStream && localStream.getVideoTracks().some(t => t.readyState === "live")) {
-    if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
-    try { await localVideo.play(); } catch(e){}
-    return true;
-  }
-
-  try {
-    localStream = await getMediaStreamWithFallback(currentFacingMode);
-    localVideo.srcObject = localStream;
-    localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
-    try { await localVideo.play(); } catch(e){}
-    return true;
-  } catch (err) {
-    alert("⚠️ Camera / Mic Permission Error!\n\nPakipindot ang lock icon sa browser address bar at i-allow ang Camera at Microphone.");
-    return false;
-  }
-}
-
-async function switchCameraFacing() {
-  currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
-  if (localStream) {
-    localStream.getVideoTracks().forEach(track => track.stop());
-  }
-
-  try {
-    const newStream = await getMediaStreamWithFallback(currentFacingMode);
-    const newVideoTrack = newStream.getVideoTracks()[0];
-
-    if (localStream && newVideoTrack) {
-      const oldTracks = localStream.getVideoTracks();
-      oldTracks.forEach(t => localStream.removeTrack(t));
-      localStream.addTrack(newVideoTrack);
-    } else {
-      localStream = newStream;
-    }
-
-    localVideo.srcObject = localStream;
-    localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
-    try { await localVideo.play(); } catch(e){}
-
-    if (peerConnection && newVideoTrack) {
-      const videoSender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
-      if (videoSender) {
-        await videoSender.replaceTrack(newVideoTrack);
-      }
-    }
-  } catch (err) {
-    console.error("Camera flip failed:", err);
-  }
-}
-
-function enableBlur() {
-  if (blurTimer) clearTimeout(blurTimer);
-  remoteVideo.classList.remove("remote-clear");
-  remoteVideo.classList.add("remote-blur");
-}
-
-function releaseBlur() {
-  if (blurTimer) clearTimeout(blurTimer);
-  blurTimer = setTimeout(() => {
-    remoteVideo.classList.remove("remote-blur");
-    remoteVideo.classList.add("remote-clear");
-  }, 150);
-}
-
-function revealRemoteStream(stream) {
-  // ⚡ ITAGO ANG MGA NAKATAKIP NA OVERLAY
-  crtWrapper.style.display = "none";
-  standbyCenter.style.display = "none";
-  searchLoader.style.display = "none";
-  remoteStatus.textContent = "Live";
-  reportBtn.disabled = false;
-
-  if (remoteVideo.srcObject !== stream) {
-    remoteVideo.srcObject = stream;
-  }
-
-  // Auto-play unblocker
-  const playPromise = remoteVideo.play();
-  if (playPromise !== undefined) {
-    playPromise.then(() => {
-      releaseBlur();
-    }).catch(() => {
-      // Kung na-block ng audio policy, i-mute sandali para mag-play ang video
-      remoteVideo.muted = true;
-      remoteVideo.play().then(() => {
-        releaseBlur();
-        remoteVideo.muted = false;
-      }).catch(()=>{});
-    });
-  }
-}
-
-async function createPeer(initiator) {
-  closePeerConnection();
-  pendingCandidates = [];
-
-  const ok = await startMedia();
-  if (!ok) return;
-
-  peerConnection = new RTCPeerConnection(rtcConfig);
-
-  // Idagdag ang sariling tracks sa PeerConnection bago mag-create ng offer/answer
-  if (localStream) {
-    localStream.getTracks().forEach(track => {
-      peerConnection.addTrack(track, localStream);
-    });
-  }
-
-  peerConnection.onicecandidate = (e) => {
-    if (e.candidate && socket && socket.connected) {
-      socket.emit("signal", { type: "candidate", candidate: e.candidate });
-    }
-  };
-
-  peerConnection.ontrack = (e) => {
-    if (e.streams && e.streams[0]) {
-      revealRemoteStream(e.streams[0]);
-    } else {
-      let inboundStream = remoteVideo.srcObject;
-      if (!inboundStream || !(inboundStream instanceof MediaStream)) {
-        inboundStream = new MediaStream();
-      }
-      inboundStream.addTrack(e.track);
-      revealRemoteStream(inboundStream);
-    }
-  };
-
-  peerConnection.onconnectionstatechange = () => {
-    const state = peerConnection?.connectionState;
-    if (state === "connected") {
-      connected = true;
-      searching = false;
-      if (remoteVideo.srcObject) {
-        revealRemoteStream(remoteVideo.srcObject);
-      }
-    } else if (state === "disconnected" || state === "failed") {
-      triggerStartNext();
-    }
-  };
-
-  if (initiator) {
-    dataChannel = peerConnection.createDataChannel("chat");
-    setupDataChannel(dataChannel);
-    try {
-      const offer = await peerConnection.createOffer({
-        offerToReceiveVideo: true,
-        offerToReceiveAudio: true
-      });
-      await peerConnection.setLocalDescription(offer);
-      socket.emit("signal", { type: "offer", offer: offer });
-    } catch(err){
-      console.error("Create Offer Error:", err);
-    }
-  } else {
-    peerConnection.ondatachannel = (e) => setupDataChannel(e.channel);
-  }
-}
-
-function setupDataChannel(ch) {
-  dataChannel = ch;
-  ch.onmessage = (e) => addChatMessage(getTranslatedText("stranger"), e.data);
-}
-
-function closePeerConnection() {
-  if (dataChannel) { try{ dataChannel.close(); }catch(e){} dataChannel = null; }
-  if (peerConnection) {
-    try {
-      peerConnection.ontrack = null;
-      peerConnection.onicecandidate = null;
-      peerConnection.onconnectionstatechange = null;
-      peerConnection.close();
-    }catch(e){}
-    peerConnection = null;
-  }
-  if (remoteVideo.srcObject) {
-    remoteVideo.srcObject = null;
-  }
-  pendingCandidates = [];
-}
-
-async function triggerStartNext() {
-  if (isCurrentlyBanned) {
-    document.getElementById("banOverlay").style.display = "flex";
-    return;
-  }
-
-  const ok = await startMedia();
-  if (!ok) return;
-
-  mainActionBtn.disabled = true;
-  crtWrapper.style.display = "block";
-  standbyCenter.style.display = "none";
-  searchLoader.style.display = "flex";
-  enableBlur();
-
-  closePeerConnection();
-
-  connected = false;
-  searching = true;
-  remoteStatus.textContent = getTranslatedText("searching");
-  mainActionBtn.textContent = getTranslatedText("next");
-  mainActionBtn.disabled = false;
-  stopBtn.disabled = false;
-
-  if (socket && socket.connected) socket.emit("skip");
-}
-
-function stopSession() {
-  searching = false;
-  connected = false;
-
-  crtWrapper.style.display = "block";
-  standbyCenter.style.display = "flex";
-  searchLoader.style.display = "none";
-  enableBlur();
-
-  if (socket) socket.emit("stop-search");
-  closePeerConnection();
-
-  remoteStatus.textContent = getTranslatedText("stopped");
-  mainActionBtn.textContent = getTranslatedText("start");
-  mainActionBtn.disabled = false;
-  stopBtn.disabled = true;
-}
-
-/* ================= 5. SNAPSHOT CAPTURING & BAN UI ================= */
+/* ================= 4. CAPTURE STRANGER PICTURE ACCURATELY ================= */
 function captureStrangerSnapshot() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
   const ctx = canvas.getContext("2d");
 
+  // 100% PRIORITY: Kukunin ang mukha ng KAUSAP mula sa remote video
   if (remoteVideo && remoteVideo.videoWidth > 0) {
     ctx.drawImage(remoteVideo, 0, 0, 180, 180);
     return canvas.toDataURL("image/jpeg", 0.75);
@@ -1183,7 +897,7 @@ function openGcashPayView() {
   document.getElementById("gcashPhoneInput").value = "";
   document.getElementById("gcashRefInput").value = "";
   document.getElementById("gcashRefStatus").textContent = "";
-
+  
   if (!cooldownTimer) {
     const btn = document.getElementById("gcashVerifyBtn");
     btn.disabled = false;
@@ -1263,7 +977,177 @@ function submitGCashUnbanTicket() {
   }
 }
 
-/* ================= 6. TRANSLATIONS ================= */
+async function startMedia() {
+  if (isCurrentlyBanned) {
+    document.getElementById("banOverlay").style.display = "flex";
+    return false;
+  }
+
+  if (localStream && localStream.getVideoTracks().some(t => t.readyState === "live")) {
+    if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
+    try { await localVideo.play(); } catch(e){}
+    return true;
+  }
+
+  const constraints = {
+    video: { width: { ideal: 640, max: 1280 }, height: { ideal: 480, max: 720 }, frameRate: { ideal: 30, max: 30 }, facingMode: { ideal: currentFacingMode } },
+    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+  };
+
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia(constraints);
+    localVideo.srcObject = localStream;
+    localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
+    try { await localVideo.play(); } catch(e){}
+    return true;
+  } catch(err) {
+    return false;
+  }
+}
+
+function enableBlur() {
+  if (blurTimer) clearTimeout(blurTimer);
+  remoteVideo.classList.remove("remote-clear");
+  remoteVideo.classList.add("remote-blur");
+}
+
+function releaseBlur() {
+  if (blurTimer) clearTimeout(blurTimer);
+  blurTimer = setTimeout(() => {
+    remoteVideo.classList.remove("remote-blur");
+    remoteVideo.classList.add("remote-clear");
+  }, 200);
+}
+
+async function triggerStartNext() {
+  if (isCurrentlyBanned) {
+    document.getElementById("banOverlay").style.display = "flex";
+    return;
+  }
+
+  const ok = await startMedia();
+  if (!ok) return;
+
+  mainActionBtn.disabled = true;
+  crtWrapper.style.display = "block";
+  standbyCenter.style.display = "none";
+  searchLoader.style.display = "flex";
+  enableBlur();
+
+  closePeerConnection();
+
+  connected = false;
+  searching = true;
+  remoteStatus.textContent = getTranslatedText("searching");
+  mainActionBtn.textContent = getTranslatedText("next");
+  mainActionBtn.disabled = false;
+  stopBtn.disabled = false;
+
+  if (socket && socket.connected) socket.emit("skip");
+}
+
+function stopSession() {
+  searching = false;
+  connected = false;
+
+  crtWrapper.style.display = "block";
+  standbyCenter.style.display = "flex";
+  searchLoader.style.display = "none";
+  enableBlur();
+
+  if (socket) socket.emit("stop-search");
+  closePeerConnection();
+
+  remoteStatus.textContent = getTranslatedText("stopped");
+  mainActionBtn.textContent = getTranslatedText("start");
+  mainActionBtn.disabled = false;
+  stopBtn.disabled = true;
+}
+
+const rtcConfig = {
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" },
+    { urls: "turn:standard.relay.metered.ca:80", username: "0974f7094bbb79185dd1d4ce", credential: "jqFOtepU3tMVTfEX" }
+  ]
+};
+
+async function createPeer(initiator) {
+  closePeerConnection();
+  pendingCandidates = [];
+  peerConnection = new RTCPeerConnection(rtcConfig);
+
+  if (localStream) {
+    localStream.getTracks().forEach(track => { peerConnection.addTrack(track, localStream); });
+  }
+
+  peerConnection.onicecandidate = (e) => {
+    if (e.candidate && socket && socket.connected) {
+      socket.emit("signal", { type: "candidate", candidate: e.candidate });
+    }
+  };
+
+  peerConnection.ontrack = (e) => {
+    crtWrapper.style.display = "none";
+    standbyCenter.style.display = "none";
+    searchLoader.style.display = "none";
+    remoteStatus.textContent = "Live";
+
+    if (e.streams && e.streams[0]) {
+      remoteVideo.srcObject = e.streams[0];
+    } else {
+      if (!remoteVideo.srcObject) remoteVideo.srcObject = new MediaStream();
+      remoteVideo.srcObject.addTrack(e.track);
+    }
+    remoteVideo.play().catch(()=>{});
+    releaseBlur();
+  };
+
+  peerConnection.onconnectionstatechange = () => {
+    if (peerConnection?.connectionState === "connected") {
+      connected = true; searching = false;
+      crtWrapper.style.display = "none"; standbyCenter.style.display = "none"; searchLoader.style.display = "none";
+      reportBtn.disabled = false;
+      releaseBlur();
+    } else if (peerConnection?.connectionState === "disconnected" || peerConnection?.connectionState === "failed") {
+      triggerStartNext();
+    }
+  };
+
+  if (initiator) {
+    dataChannel = peerConnection.createDataChannel("chat");
+    setupDataChannel(dataChannel);
+    try {
+      const offer = await peerConnection.createOffer({ offerToReceiveVideo: true, offerToReceiveAudio: true });
+      await peerConnection.setLocalDescription(offer);
+      socket.emit("signal", { type: "offer", offer: offer });
+    } catch(err){}
+  } else {
+    peerConnection.ondatachannel = (e) => setupDataChannel(e.channel);
+  }
+}
+
+function setupDataChannel(ch) {
+  dataChannel = ch;
+  ch.onmessage = (e) => addChatMessage(getTranslatedText("stranger"), e.data);
+}
+
+function closePeerConnection() {
+  if (dataChannel) { try{ dataChannel.close(); }catch(e){} dataChannel = null; }
+  if (peerConnection) {
+    try {
+      peerConnection.ontrack = null;
+      peerConnection.onicecandidate = null;
+      peerConnection.onconnectionstatechange = null;
+      peerConnection.close();
+    }catch(e){}
+    peerConnection = null;
+  }
+  if (remoteVideo.srcObject) remoteVideo.srcObject = null;
+  pendingCandidates = [];
+}
+
+/* ================= 5. TRANSLATIONS (DEFAULT ENGLISH) ================= */
 const i18n = {
   en: {
     subTitle: "Random Video Chat", portalBtn: "START CHATTING", report: "Report", stop: "Stop", start: "Start", next: "Next", stopped: "Stopped",
@@ -1514,10 +1398,10 @@ document.getElementById("languageSelect").addEventListener("change", (e) => {
   setLanguage(e.target.value);
 });
 
-/* ================= 7. REPORT MODAL HANDLERS ================= */
+/* ================= 6. REPORT MODAL HANDLERS ================= */
 function openReportModal() {
   if (!connected) return;
-  lastCapturedStrangerSnapshot = captureStrangerSnapshot();
+  lastCapturedStrangerSnapshot = captureStrangerSnapshot(); // Capture Stranger Face!
   document.getElementById("reportModal").style.display = "flex";
 }
 
@@ -1536,7 +1420,7 @@ function confirmReportUser() {
   triggerStartNext();
 }
 
-/* ================= 8. CHAT & UI EVENTS ================= */
+/* ================= 7. CHAT & UI EVENTS ================= */
 function addChatMessage(author, msg) {
   const div = document.createElement("div");
   div.className = "chat-msg";
@@ -1567,13 +1451,22 @@ chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preven
 
 micBtn.addEventListener("click", () => {
   const t = localStream?.getAudioTracks()[0];
-  if (t) {
-    t.enabled = !t.enabled;
-    micBtn.textContent = t.enabled ? getTranslatedText("micOn") : getTranslatedText("micOff");
+  if (t) { 
+    t.enabled = !t.enabled; 
+    micBtn.textContent = t.enabled ? getTranslatedText("micOn") : getTranslatedText("micOff"); 
   }
 });
 
-flipBtn.addEventListener("click", switchCameraFacing);
+flipBtn.addEventListener("click", async () => {
+  currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+  const oldTrack = localStream?.getVideoTracks()[0];
+  if (oldTrack) oldTrack.stop();
+  await startMedia();
+  if (peerConnection && localStream) {
+    const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
+    if (sender) sender.replaceTrack(localStream.getVideoTracks()[0]);
+  }
+});
 
 reportBtn.addEventListener("click", openReportModal);
 
@@ -1598,7 +1491,7 @@ document.getElementById("showLocalBtn").addEventListener("click", () => {
   document.getElementById("showLocalBtn").classList.remove("visible");
 });
 
-// INITIAL BOOTSTRAP
+// STARTUP (DEFAULT ENGLISH)
 checkMultiTabConflict();
 const initialLang = localStorage.getItem("meetloop_lang") || "en";
 setLanguage(initialLang);
