@@ -2,7 +2,7 @@
  * MeetLoop - Official Production Server Backend
  * 100% Filipino Made Random Video Chat 🇵🇭
  * High-Speed Telegram Auto-Pairing Bot + WebRTC Matchmaking
- * (Instant Bulletproof Phone Auto-Matcher + 4-Tries Cooldown Sync + Strict 1-Tab Session)
+ * (Accurate Live Online Counter + Bulletproof Phone Auto-Matcher)
  */
 
 const express = require("express");
@@ -368,11 +368,16 @@ function matchUsers() {
   }
 }
 
+function broadcastOnlineCount() {
+  const count = Math.max(1, io.engine.clientsCount);
+  io.emit("online-count", count);
+}
+
 /* ================= SOCKET.IO EVENTS ================= */
 io.on("connection", (socket) => {
   const hardwareId = String(socket.handshake.query.hardwareId || socket.handshake.query.deviceId || "").trim();
 
-  io.emit("online-count", io.engine.clientsCount);
+  broadcastOnlineCount();
 
   const banInfo = checkDeviceBan(hardwareId);
   if (banInfo) {
@@ -491,7 +496,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     cleanupUserSession(socket.id);
-    io.emit("online-count", io.engine.clientsCount);
+    broadcastOnlineCount();
   });
 });
 
@@ -502,6 +507,7 @@ app.get("*", (req, res) => {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
+  console.log(`👥 Accurate Real-Time Online Counter: ACTIVE`);
   console.log(`📱 Bulletproof Mobile Auto-Matcher: ACTIVE`);
   console.log(`🛡️ 4-Attempts & 30s Cooldown Limiter: ACTIVE`);
   console.log(`⚡ Strict 1-Tab Session Lock: ACTIVE`);
