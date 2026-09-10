@@ -33,7 +33,7 @@ html,body{
 button,input,select{font:inherit}
 button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
-/* MULTI-TAB WARNING OVERLAY */
+/* STRICT MULTI-TAB OVERLAY */
 #duplicateTabOverlay{
   position:fixed;inset:0;z-index:2147483647;background:rgba(10, 14, 23, 0.98);
   display:none;align-items:center;justify-content:center;padding:16px;text-align:center;
@@ -119,12 +119,12 @@ video{
   animation:floatLogo 3s ease-in-out infinite alternate;
 }
 @keyframes floatLogo{from{transform:translateY(0)}to{transform:translateY(-6px)}}
-.standby-title{font-size:30px;font-weight:900;letter-spacing:-0.5px;color:#fff;margin-bottom:8px}
+.standby-title{font-size:30px;font-weight:900;letter-spacing:-0.5px;color:#fff}
 
 .standby-online-tag{
   background:rgba(15,23,42,0.88);border:1px solid rgba(255,255,255,.15);
   padding:6px 16px;border-radius:20px;font-size:13px;font-weight:800;color:#cbd5e1;
-  display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,0.6);
+  display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,0.6);margin-top:8px;
 }
 .online-dot{
   width:8px;height:8px;border-radius:50%;background:var(--green);
@@ -427,13 +427,13 @@ video{
 
 <body>
 
-<!-- MULTI-TAB WARNING OVERLAY -->
+<!-- STRICT 1-TAB ONLY OVERLAY -->
 <div id="duplicateTabOverlay">
   <div class="tab-lock-card">
     <span class="tab-lock-icon">⚠️</span>
     <div class="tab-lock-title" id="lblTabLockTitle">Duplicate Tab Detected</div>
     <div class="tab-lock-desc" id="lblTabLockDesc">
-      MeetLoop is only allowed in one tab. It is already open in another tab.
+      MeetLoop is only allowed in 1 tab session.
     </div>
     <button type="button" class="btn-claim-tab" id="btnClaimTab">Use This Tab Instead</button>
   </div>
@@ -516,7 +516,7 @@ video{
       </div>
     </div>
 
-    <!-- VIEW 2: GCASH TOPUP FORM (SAMPLE PLACEHOLDER 09123456789) -->
+    <!-- VIEW 2: GCASH TOPUP FORM (4 TRIES + 30s COOLDOWN) -->
     <div id="gcashPaySection">
       <div class="gcash-logo-banner">
         <svg class="gcash-official-svg" viewBox="0 0 160 38" fill="none">
@@ -552,7 +552,7 @@ video{
       </div>
 
       <div class="gcash-input-group">
-        <!-- 🔢 MOBILE NUMBER FIELD (RANDOM PLACEHOLDER 09123456789) -->
+        <!-- 🔢 MOBILE NUMBER FIELD -->
         <input type="tel" id="gcashPhoneInput" class="gcash-input-field" placeholder="Your GCash Mobile No. (e.g. 09123456789)" maxlength="13" inputmode="numeric" pattern="[0-9]*">
         
         <!-- 🔢 REFERENCE NUMBER FIELD -->
@@ -685,7 +685,11 @@ video{
 <script>
 "use strict";
 
-/* ================= 1. DYNAMIC DEVICE ID & MULTI-TAB ENGINE ================= */
+/* ================= 1. STRICT 1-TAB ONLY SESSION ENGINE ================= */
+const myTabId = "tab_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
+let tabChannel = null;
+let isMasterTab = false;
+
 function getPersistentDeviceId(forceNew = false) {
   let devId = localStorage.getItem("meetloop_device_id");
   if (!devId || forceNew) {
@@ -696,17 +700,6 @@ function getPersistentDeviceId(forceNew = false) {
 }
 
 let myHardwareId = getPersistentDeviceId();
-const myTabId = "tab_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
-let tabChannel = null;
-
-try {
-  tabChannel = new BroadcastChannel("meetloop_tab_lock");
-  tabChannel.onmessage = (e) => {
-    if (e.data && e.data.type === "CLAIM_MASTER" && e.data.tabId !== myTabId) {
-      showDuplicateTabBlocker();
-    }
-  };
-} catch(e){}
 
 function updateNumericDisplayId() {
   let numericId = 0;
@@ -715,18 +708,35 @@ function updateNumericDisplayId() {
 }
 updateNumericDisplayId();
 
+try {
+  tabChannel = new BroadcastChannel("meetloop_tab_lock");
+  tabChannel.onmessage = (e) => {
+    if (e.data && e.data.type === "CLAIM_MASTER") {
+      if (e.data.tabId !== myTabId) {
+        isMasterTab = false;
+        showDuplicateTabBlocker();
+      }
+    } else if (e.data && e.data.type === "UNBAN_EVENT") {
+      isCurrentlyBanned = false;
+      document.getElementById("banOverlay").style.display = "none";
+    }
+  };
+} catch(e){}
+
 function checkMultiTabConflict() {
   const activeMaster = localStorage.getItem("meetloop_active_tab");
   const lastActiveTime = parseInt(localStorage.getItem("meetloop_tab_ping") || "0", 10);
-  
-  if (activeMaster && activeMaster !== myTabId && (Date.now() - lastActiveTime < 4000)) {
-    showDuplicateTabBlocker();
-  } else {
+  const now = Date.now();
+
+  if (!activeMaster || activeMaster === myTabId || (now - lastActiveTime > 3000)) {
     claimActiveTab();
+  } else {
+    showDuplicateTabBlocker();
   }
 }
 
 function claimActiveTab() {
+  isMasterTab = true;
   localStorage.setItem("meetloop_active_tab", myTabId);
   localStorage.setItem("meetloop_tab_ping", Date.now().toString());
   document.getElementById("duplicateTabOverlay").style.display = "none";
@@ -743,14 +753,22 @@ document.getElementById("btnClaimTab").addEventListener("click", () => {
 });
 
 setInterval(() => {
-  if (localStorage.getItem("meetloop_active_tab") === myTabId) {
+  if (isMasterTab && localStorage.getItem("meetloop_active_tab") === myTabId) {
     localStorage.setItem("meetloop_tab_ping", Date.now().toString());
   }
-}, 2000);
+}, 1200);
 
 window.addEventListener("storage", (e) => {
   if (e.key === "meetloop_active_tab" && e.newValue && e.newValue !== myTabId) {
+    isMasterTab = false;
     showDuplicateTabBlocker();
+  }
+});
+
+window.addEventListener("pagehide", () => {
+  if (isMasterTab) {
+    localStorage.removeItem("meetloop_active_tab");
+    localStorage.removeItem("meetloop_tab_ping");
   }
 });
 
@@ -810,6 +828,8 @@ let isCurrentlyBanned = false;
 let currentFacingMode = "user";
 let blurTimer = null;
 let pendingCandidates = [];
+
+let submitAttempts = 0;
 let cooldownTimer = null;
 
 /* ================= 4. AUTHENTIC TV STATIC ================= */
@@ -905,17 +925,18 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 7. SUBMIT GCASH TICKET ================= */
-function startSubmitCooldown(seconds = 60) {
+/* ================= 7. SUBMIT GCASH TICKET (4 TRIES + 30s COOLDOWN) ================= */
+function start30SecondCooldown() {
   const btn = document.getElementById("gcashVerifyBtn");
   const phoneInput = document.getElementById("gcashPhoneInput");
   const refInput = document.getElementById("gcashRefInput");
+  const status = document.getElementById("gcashRefStatus");
 
   btn.disabled = true;
   phoneInput.disabled = true;
   refInput.disabled = true;
 
-  let timeLeft = seconds;
+  let timeLeft = 30;
   if (cooldownTimer) clearInterval(cooldownTimer);
 
   cooldownTimer = setInterval(() => {
@@ -923,12 +944,17 @@ function startSubmitCooldown(seconds = 60) {
     if (timeLeft <= 0) {
       clearInterval(cooldownTimer);
       cooldownTimer = null;
+      submitAttempts = 0;
       btn.disabled = false;
       phoneInput.disabled = false;
       refInput.disabled = false;
-      btn.textContent = document.getElementById("languageSelect").value === "tl" ? "I-submit Ulit" : "Submit Again";
+      btn.textContent = document.getElementById("languageSelect").value === "tl" ? "I-submit Ulit (4 Tries Left)" : "Submit Again (4 Tries Left)";
+      status.style.color = "#16a34a";
+      status.textContent = "✅ Cooldown ended. You may now submit your details again.";
     } else {
-      btn.textContent = `⏳ Submitting Locked (${timeLeft}s)`;
+      btn.textContent = `⏳ Locked: Wait ${timeLeft}s`;
+      status.style.color = "#dc2626";
+      status.innerHTML = `⚠️ <b>Max 4 tries reached!</b><br>Please wait <b>${timeLeft}s</b> before submitting again...`;
     }
   }, 1000);
 }
@@ -949,16 +975,16 @@ function submitGCashUnbanTicket() {
     return;
   }
 
-  if (!refVal || refVal.length < 8) {
-    status.style.color = "#dc2626";
-    status.textContent = "❌ Please enter a valid 13-Digit GCash Reference Number.";
+  submitAttempts++;
+
+  if (submitAttempts >= 4) {
+    start30SecondCooldown();
     return;
   }
 
-  startSubmitCooldown(60);
-
+  const remaining = 4 - submitAttempts;
   status.style.color = "#0284c7";
-  status.innerHTML = "⏳ <b>Details submitted!</b><br><span style='color:#0284c7;font-size:11px;'>Matching Mobile Number & Reference Number with GCash payment notification...</span>";
+  status.innerHTML = `⏳ <b>Matching details... (${remaining} tries left)</b><br><span style='font-size:11px;'>Checking GCash payment notification for matching Mobile Number...</span>`;
 
   document.getElementById("banOverlay").style.display = "flex";
 
@@ -974,7 +1000,7 @@ if (socket) {
   socket.on("unban-pending", (data) => {
     const status = document.getElementById("gcashRefStatus");
     status.style.color = "#0284c7";
-    status.innerHTML = "⏳ <b>Ticket Logged!</b><br>Sent to verification system. Once GCash notification arrives with matching number, unban is automatic!";
+    status.innerHTML = `⏳ <b>Details Logged (${4 - submitAttempts} tries left)</b><br>Sent to verification system. Once GCash notification arrives with matching number, unban is automatic!`;
     document.getElementById("banOverlay").style.display = "flex";
   });
 
@@ -982,6 +1008,7 @@ if (socket) {
     if (data && data.hardwareId && data.hardwareId === myHardwareId) {
       isCurrentlyBanned = false;
       if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
+      submitAttempts = 0;
       
       const status = document.getElementById("gcashRefStatus");
       status.style.color = "#16a34a";
@@ -989,11 +1016,12 @@ if (socket) {
 
       myHardwareId = getPersistentDeviceId(true);
       updateNumericDisplayId();
+      if (tabChannel) tabChannel.postMessage({ type: "UNBAN_EVENT" });
 
       setTimeout(() => {
         document.getElementById("banOverlay").style.display = "none";
         alert("🎉 SUCCESS! Your ₱10 GCash payment was verified. Suspension lifted!");
-      }, 1000);
+      }, 800);
     }
   });
 
@@ -1236,7 +1264,7 @@ const i18n = {
     verifyBtn: "Submit for Verification",
     backMethods: "← Back to Options",
     tabLockTitle: "Duplicate Tab Detected",
-    tabLockDesc: "MeetLoop is only allowed in one tab. It is already open in another tab.",
+    tabLockDesc: "MeetLoop is only allowed in 1 tab session.",
     tabLockBtn: "Use This Tab Instead",
     phonePlaceholder: "Your GCash Mobile No. (e.g. 09123456789)",
     refPlaceholder: "13-Digit GCash Ref No. (e.g. 2004123456789)"
@@ -1270,7 +1298,7 @@ const i18n = {
     verifyBtn: "I-submit para sa Veripikasyon",
     backMethods: "← Bumalik sa mga Pagpipilian",
     tabLockTitle: "Naka-open na sa Ibang Tab",
-    tabLockDesc: "Isang tab lamang ang pwedeng gamitin sa MeetLoop. Naka-open na ito sa isa pang tab.",
+    tabLockDesc: "Isang tab session lamang ang pwedeng gamitin.",
     tabLockBtn: "Gamitin ang Tab na Ito",
     phonePlaceholder: "Numero sa GCash (hal. 09123456789)",
     refPlaceholder: "13-Digit GCash Ref No. (hal. 2004123456789)"
@@ -1322,150 +1350,7 @@ document.getElementById("languageSelect").addEventListener("change", (e) => {
   setLanguage(e.target.value);
 });
 
-/* ================= 10. SOCKET SIGNALING ================= */
-if (socket) {
-  socket.on("online-count", count => {
-    if (standbyUsers) standbyUsers.textContent = Number(count || 1).toLocaleString();
-  });
-
-  socket.on("waiting", () => {
-    searching = true;
-    enableBlur();
-    crtWrapper.style.display = "block";
-    standbyCenter.style.display = "none";
-    searchLoader.style.display = "flex";
-    remoteStatus.textContent = document.getElementById("languageSelect").value === "tl" ? "Naghahanap..." : "Searching...";
-  });
-
-  socket.on("match", async (data) => {
-    searching = false;
-    enableBlur();
-    await createPeer(Boolean(data?.initiator));
-  });
-
-  socket.on("signal", async (data) => {
-    try {
-      if (data.type === "offer") {
-        if (!peerConnection) await createPeer(false);
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-        
-        while (pendingCandidates.length > 0) {
-          const cand = pendingCandidates.shift();
-          await peerConnection.addIceCandidate(cand).catch(()=>{});
-        }
-
-        const ans = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(ans);
-        socket.emit("signal", { type: "answer", answer: ans });
-
-      } else if (data.type === "answer" && peerConnection) {
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-        
-        while (pendingCandidates.length > 0) {
-          const cand = pendingCandidates.shift();
-          await peerConnection.addIceCandidate(cand).catch(()=>{});
-        }
-
-      } else if (data.type === "candidate") {
-        const candidate = new RTCIceCandidate(data.candidate);
-        if (peerConnection && peerConnection.remoteDescription) {
-          await peerConnection.addIceCandidate(candidate).catch(()=>{});
-        } else {
-          pendingCandidates.push(candidate);
-        }
-      }
-    } catch(err){}
-  });
-
-  socket.on("partner-disconnected", () => {
-    addChatMessage("MeetLoop", document.getElementById("languageSelect").value === "tl" ? "Nadiskonekta ang kausap." : "Stranger disconnected.");
-    triggerStartNext();
-  });
-
-  socket.on("ip-banned", data => {
-    display7DayBanScreen(data.banUntil, data.reason, data.snapshot);
-  });
-}
-
-function addChatMessage(author, msg) {
-  const div = document.createElement("div");
-  div.className = "chat-msg";
-  div.innerHTML = `<div class="chat-author">${author}</div><div class="chat-bubble">${msg.replace(/[&<>'"]/g, "")}</div>`;
-  chatStream.appendChild(div);
-  chatStream.scrollTop = chatStream.scrollHeight;
-}
-
-function sendChat() {
-  const val = chatInput.value.trim();
-  if (!val || !dataChannel || dataChannel.readyState !== "open") return;
-  dataChannel.send(val);
-  addChatMessage(document.getElementById("languageSelect").value === "tl" ? "Ikaw" : "You", val);
-  chatInput.value = "";
-}
-
-document.getElementById("portalStartBtn").addEventListener("click", async () => {
-  document.getElementById("welcomePortal").style.display = "none";
-  if (!isCurrentlyBanned) startMedia();
-});
-
-mainActionBtn.addEventListener("click", triggerStartNext);
-stopBtn.addEventListener("click", stopSession);
-sendBtn.addEventListener("click", sendChat);
-chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); sendChat(); } });
-
-micBtn.addEventListener("click", () => {
-  const t = localStream?.getAudioTracks()[0];
-  if (t) { t.enabled = !t.enabled; micBtn.textContent = t.enabled ? "Mic On" : "Mic Off"; }
-});
-camBtn.addEventListener("click", () => {
-  const t = localStream?.getVideoTracks()[0];
-  if (t) {
-    t.enabled = !t.enabled;
-    camBtn.textContent = t.enabled ? "Cam On" : "Cam Off";
-    camOffCover.style.display = t.enabled ? "none" : "flex";
-  }
-});
-
-flipBtn.addEventListener("click", async () => {
-  currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
-  const oldTrack = localStream?.getVideoTracks()[0];
-  if (oldTrack) oldTrack.stop();
-  await startMedia();
-  if (peerConnection && localStream) {
-    const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
-    if (sender) sender.replaceTrack(localStream.getVideoTracks()[0]);
-  }
-});
-
-reportBtn.addEventListener("click", () => {
-  if (!connected) return;
-  const snap = captureReporterSnapshot();
-  if (socket) socket.emit("report-user", { reason: "Policy Violation", snapshot: snap });
-  reportBtn.disabled = true;
-  triggerStartNext();
-});
-
-audioSlider.addEventListener("input", (e) => {
-  const v = parseFloat(e.target.value);
-  if (remoteVideo) remoteVideo.volume = v;
-});
-
-speakerIcon.addEventListener("click", () => {
-  const current = parseFloat(audioSlider.value);
-  const nextVal = current > 0 ? 0 : 1.0;
-  audioSlider.value = nextVal;
-  if (remoteVideo) remoteVideo.volume = nextVal;
-});
-
-document.getElementById("hideLocalBtn").addEventListener("click", () => {
-  localCamBox.classList.add("hidden-cam");
-  document.getElementById("showLocalBtn").classList.add("visible");
-});
-document.getElementById("showLocalBtn").addEventListener("click", () => {
-  localCamBox.classList.remove("hidden-cam");
-  document.getElementById("showLocalBtn").classList.remove("visible");
-});
-
+/* ================= 10. INITIALIZATION ================= */
 checkMultiTabConflict();
 setLanguage("en");
 </script>
