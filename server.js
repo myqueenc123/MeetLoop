@@ -2,7 +2,7 @@
  * MeetLoop - Official Production Server Backend
  * 100% Filipino Made Random Video Chat 🇵🇭
  * High-Speed Telegram Auto-Pairing Bot + WebRTC Matchmaking
- * (Accurate Live Online Counter + Bulletproof Phone Auto-Matcher)
+ * (Instant Bulletproof Phone Auto-Matcher + Real-Time Online Counter)
  */
 
 const express = require("express");
@@ -42,8 +42,8 @@ app.use(express.text({ type: "*/*", limit: "15mb" }));
 
 /* ================= DATABASES & ATTEMPT TRACKER ================= */
 const bannedDevices = new Map();
-const pendingRequests = new Map();
-const receivedGCashPayments = [];
+const pendingRequests = new Map(); // HardwareId -> { hardwareId, phone, ref, socketId }
+const receivedGCashPayments = [];  // Naka-store na verified payments mula sa phone
 const attemptTracker = new Map();
 
 function escapeHtml(str) {
@@ -112,21 +112,31 @@ function sendTelegramWithButtons(chatId, text, reqId) {
   sendTelegramRaw("sendMessage", payload);
 }
 
+// ⚡ BULLETPROOF UNBAN EXECUTOR
 function executeUnbanUser(hardwareId, phone, auto = false) {
-  console.log(`🔓 [UNBAN SUCCESS]: HardwareID=${hardwareId}, Phone=${phone}`);
+  console.log(`🔓 [UNBAN SUCCESS]: HardwareID=${hardwareId}, Phone=${phone}, Auto=${auto}`);
   
   bannedDevices.delete(hardwareId);
   attemptTracker.delete(hardwareId);
 
+  // Send instant unlock signal sa client browser
   io.emit("real-admin-unban-signal", { hardwareId: hardwareId });
 
   if (auto) {
     const successMsg = `⚡ <b>AUTO-UNBAN SUCCESSFUL!</b> 🎉\n\n` +
                        `📱 <b>Matched Mobile No:</b> <code>${escapeHtml(phone)}</code>\n` +
-                       `💰 <b>Amount:</b> ₱10.00 GCash Payment\n\n` +
-                       `<i>Kusang binuksan ng system ang ban dahil nagtugma ang Number sa GCash notif at website! Fresh ID reset na ang user.</i>`;
+                       `💰 <b>Amount:</b> GCash Payment Verified\n\n` +
+                       `<i>Kusang binuksan ng system ang ban dahil nagtugma ang Number sa GCash alert at website! Fresh ID reset na ang user.</i>`;
     sendTelegramMessage(ADMIN_CHAT_ID, successMsg);
   }
+}
+
+// 🔍 ADVANCED NUMBER EXTRACTOR & MATCHER (Hahanapin ang 09... number kahit may tuldok o iba pang text)
+function extractAllPhoneNumbers(text) {
+  if (!text) return [];
+  const matches = text.match(/(09\d{9}|9\d{9}|\b\d{10,12}\b)/g);
+  if (!matches) return [];
+  return matches.map(num => num.replace(/[^0-9]/g, ""));
 }
 
 function isPhoneMatch(gcashText, userPhone) {
@@ -135,14 +145,24 @@ function isPhoneMatch(gcashText, userPhone) {
   const cleanUser = String(userPhone).replace(/[^0-9]/g, "");
   if (!cleanUser || cleanUser.length < 7) return false;
 
-  const last7 = cleanUser.slice(-7);
-  const last4 = cleanUser.slice(-4);
-  const first4 = cleanUser.slice(0, 4);
-
+  // 1. Check direct raw text inclusion
   if (gcashText.includes(cleanUser)) return true;
-  if (cleanUser.length >= 10 && gcashText.includes(cleanUser.slice(-10))) return true;
+
+  // 2. Check 10-digit format (e.g. 9983813724)
+  const user10Digit = cleanUser.slice(-10);
+  if (gcashText.includes(user10Digit)) return true;
+
+  // 3. Check extracted numbers array
+  const extractedNumbers = extractAllPhoneNumbers(gcashText);
+  for (const num of extractedNumbers) {
+    if (num === cleanUser || num.endsWith(user10Digit) || cleanUser.endsWith(num.slice(-10))) {
+      return true;
+    }
+  }
+
+  // 4. Check last 7 digits fallback
+  const last7 = cleanUser.slice(-7);
   if (last7 && gcashText.includes(last7)) return true;
-  if (cleanUser.length >= 10 && gcashText.includes(last4) && gcashText.includes(first4)) return true;
 
   return false;
 }
@@ -175,12 +195,15 @@ app.all("/webhook/gcash-sms", (req, res) => {
   const fullPayloadString = `${senderTitle} ${parsedContent}`.trim();
   console.log(`[GCASH FORWARDER RECEIVED]:\n${fullPayloadString}`);
 
+  // I-save sa cache ng verified payments
   receivedGCashPayments.push({ text: fullPayloadString, time: Date.now(), used: false });
   if (receivedGCashPayments.length > 50) receivedGCashPayments.shift();
 
+  // 🔍 AUTO-CHECK: Hanapin kung may naghihintay na unban ticket sa website na kapareho ang Mobile Number!
   let autoUnbanned = false;
   for (const [reqId, request] of pendingRequests.entries()) {
     if (isPhoneMatch(fullPayloadString, request.phone) || (request.ref && fullPayloadString.includes(request.ref))) {
+      console.log(`🎯 [INSTANT MATCH SUCCESS]: Matched user ${request.phone}`);
       executeUnbanUser(request.hardwareId, request.phone, true);
       pendingRequests.delete(reqId);
       autoUnbanned = true;
@@ -441,6 +464,7 @@ io.on("connection", (socket) => {
     socket.emit("report-success");
   });
 
+  // SUBMIT GCASH UNBAN TICKET
   socket.on("unban-request", (data) => {
     const phone = String(data.phone || "").trim().replace(/[^0-9]/g, "");
     const ref = String(data.ref || "").trim().replace(/[^0-9]/g, "");
@@ -466,8 +490,10 @@ io.on("connection", (socket) => {
     }
     attemptTracker.set(reqHardware, tracker);
 
+    // 🔥 INSTANT MATCH CHECK (Kung pumasok na kanina ang GCash notification!)
     for (const item of receivedGCashPayments) {
       if (!item.used && (isPhoneMatch(item.text, phone) || (ref && item.text.includes(ref)))) {
+        console.log(`🎯 [INSTANT MATCH IN CACHE]: User ${phone} matched with cache`);
         item.used = true;
         executeUnbanUser(reqHardware, phone, true);
         return;
@@ -508,7 +534,7 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
   console.log(`👥 Accurate Real-Time Online Counter: ACTIVE`);
-  console.log(`📱 Bulletproof Mobile Auto-Matcher: ACTIVE`);
+  console.log(`📱 Advanced Regex Mobile Auto-Matcher: ACTIVE`);
   console.log(`🛡️ 4-Attempts & 30s Cooldown Limiter: ACTIVE`);
   console.log(`⚡ Strict 1-Tab Session Lock: ACTIVE`);
   console.log(`================================================`);
