@@ -516,7 +516,7 @@ video{
       </div>
     </div>
 
-    <!-- VIEW 2: GCASH TOPUP FORM (NUMBER & REF ONLY - NO NAME) -->
+    <!-- VIEW 2: GCASH TOPUP FORM (SAMPLE PLACEHOLDER 09123456789) -->
     <div id="gcashPaySection">
       <div class="gcash-logo-banner">
         <svg class="gcash-official-svg" viewBox="0 0 160 38" fill="none">
@@ -552,10 +552,10 @@ video{
       </div>
 
       <div class="gcash-input-group">
-        <!-- 🔢 MOBILE NUMBER FIELD (REQUIRED) -->
-        <input type="tel" id="gcashPhoneInput" class="gcash-input-field" placeholder="Your GCash Mobile No. (e.g. 09983813724)" maxlength="13" inputmode="numeric" pattern="[0-9]*">
+        <!-- 🔢 MOBILE NUMBER FIELD (RANDOM PLACEHOLDER 09123456789) -->
+        <input type="tel" id="gcashPhoneInput" class="gcash-input-field" placeholder="Your GCash Mobile No. (e.g. 09123456789)" maxlength="13" inputmode="numeric" pattern="[0-9]*">
         
-        <!-- 🔢 REFERENCE NUMBER FIELD (REQUIRED) -->
+        <!-- 🔢 REFERENCE NUMBER FIELD -->
         <input type="tel" id="gcashRefInput" class="gcash-input-field" placeholder="13-Digit GCash Ref No. (e.g. 2004123456789)" maxlength="16" inputmode="numeric" pattern="[0-9]*">
         
         <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="submitGCashUnbanTicket()">Submit for Verification</button>
@@ -905,7 +905,7 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 7. SUBMIT GCASH TICKET (NUMBER & REF NO ONLY) ================= */
+/* ================= 7. SUBMIT GCASH TICKET ================= */
 function startSubmitCooldown(seconds = 60) {
   const btn = document.getElementById("gcashVerifyBtn");
   const phoneInput = document.getElementById("gcashPhoneInput");
@@ -945,7 +945,7 @@ function submitGCashUnbanTicket() {
 
   if (!phoneVal || phoneVal.length < 10) {
     status.style.color = "#dc2626";
-    status.textContent = "❌ Please enter a valid 11-digit GCash Mobile Number (e.g. 09983813724).";
+    status.textContent = "❌ Please enter a valid 11-digit GCash Mobile Number (e.g. 09123456789).";
     return;
   }
 
@@ -987,7 +987,6 @@ if (socket) {
       status.style.color = "#16a34a";
       status.textContent = "✅ Payment Verified & Matched! Resetting Device ID...";
 
-      // 🔄 I-RESET ANG DEVICE ID PARA FRESH AT HINDI NA MAULIT ANG LUMANG RESIBO SA SUSUNOD!
       myHardwareId = getPersistentDeviceId(true);
       updateNumericDisplayId();
 
@@ -1239,7 +1238,7 @@ const i18n = {
     tabLockTitle: "Duplicate Tab Detected",
     tabLockDesc: "MeetLoop is only allowed in one tab. It is already open in another tab.",
     tabLockBtn: "Use This Tab Instead",
-    phonePlaceholder: "Your GCash Mobile No. (e.g. 09983813724)",
+    phonePlaceholder: "Your GCash Mobile No. (e.g. 09123456789)",
     refPlaceholder: "13-Digit GCash Ref No. (e.g. 2004123456789)"
   },
   tl: {
@@ -1273,7 +1272,7 @@ const i18n = {
     tabLockTitle: "Naka-open na sa Ibang Tab",
     tabLockDesc: "Isang tab lamang ang pwedeng gamitin sa MeetLoop. Naka-open na ito sa isa pang tab.",
     tabLockBtn: "Gamitin ang Tab na Ito",
-    phonePlaceholder: "Numero sa GCash (hal. 09983813724)",
+    phonePlaceholder: "Numero sa GCash (hal. 09123456789)",
     refPlaceholder: "13-Digit GCash Ref No. (hal. 2004123456789)"
   }
 };
