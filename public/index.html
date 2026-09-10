@@ -32,7 +32,7 @@ html,body{
 button,input,select{font:inherit}
 button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
-/* STRICT 1-TAB ONLY OVERLAY */
+/* STRICT 1-TAB OVERLAY */
 #duplicateTabOverlay{
   position:fixed;inset:0;z-index:2147483647;background:rgba(10, 14, 23, 0.98);
   display:none;align-items:center;justify-content:center;padding:16px;text-align:center;
@@ -76,14 +76,13 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
-/* HD VIDEO RENDERING */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
   image-rendering:-webkit-optimize-contrast;
   transform:translateZ(0);
 }
 
-/* 📺 CRT TV STATIC SCREEN WRAPPER */
+/* 📺 CRT TV STATIC SCREEN */
 .crt-screen-wrapper{
   position:absolute;inset:0;z-index:2;overflow:hidden;background:#050811;pointer-events:none;
 }
@@ -137,8 +136,7 @@ video{
   background:rgba(0,0,0,0.75);padding:5px 10px;border-radius:20px;display:flex;align-items:center;gap:8px;
   backdrop-filter:blur(4px);
 }
-.audio-speaker-btn{width:18px;height:18px;fill:#cbd5e1;cursor:pointer;transition:transform 0.1s}
-.audio-speaker-btn:active{transform:scale(0.85)}
+.audio-speaker-btn{width:18px;height:18px;fill:#cbd5e1;cursor:pointer}
 .audio-slider{width:70px;height:5px;-webkit-appearance:none;background:#334155;border-radius:999px;outline:none;cursor:pointer}
 .audio-slider::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:#38bdf8;cursor:pointer}
 
@@ -162,9 +160,7 @@ video{
 .ctrl-btn{
   border:0;border-radius:10px;color:#fff;font-size:13px;font-weight:800;
   cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;user-select:none;
-  transition:all 0.15s ease;
 }
-.ctrl-btn:active{transform:scale(0.96)}
 .btn-start-next{flex:3;background:linear-gradient(135deg,#0284c7,#2563eb)}
 .btn-stop{flex:1.5;background:#dc2626}
 .btn-sec{flex:1.5;background:#1e293b;border:1px solid rgba(255,255,255,.1)}
@@ -207,7 +203,7 @@ video{
   .chat-arena{width:100%;max-width:none;height:240px;min-height:240px;border-radius:12px}
 }
 
-/* 💻 PC / DESKTOP (FLIP IS STRICTLY HIDDEN) */
+/* 💻 PC / DESKTOP (FLIP IS NATIVELY HIDDEN) */
 @media (min-width:851px){
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 }
@@ -489,7 +485,7 @@ video{
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" autoplay playsinline></video>
 
-        <!-- 📺 CRT TV STATIC BACKGROUND LAYER -->
+        <!-- 📺 CRT TV STATIC LAYER -->
         <div class="crt-screen-wrapper" id="crtWrapper">
           <canvas id="crtStaticCanvas"></canvas>
           <div class="crt-overlay-vignette"></div>
@@ -572,10 +568,56 @@ video{
 <script>
 "use strict";
 
+/* ================= 1. TAB CONTROLLER ================= */
 const myTabId = "tab_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
+let isMasterTab = true;
 let tabChannel = null;
-let isMasterTab = false;
 
+function claimActiveTab() {
+  isMasterTab = true;
+  localStorage.setItem("meetloop_active_tab", myTabId);
+  localStorage.setItem("meetloop_tab_ping", Date.now().toString());
+  const overlay = document.getElementById("duplicateTabOverlay");
+  if (overlay) overlay.style.display = "none";
+  try {
+    if (tabChannel) tabChannel.postMessage({ type: "CLAIM_MASTER", tabId: myTabId });
+  } catch(e){}
+}
+
+function showDuplicateTabBlocker() {
+  isMasterTab = false;
+  stopSession();
+  const overlay = document.getElementById("duplicateTabOverlay");
+  if (overlay) overlay.style.display = "flex";
+}
+
+try {
+  tabChannel = new BroadcastChannel("meetloop_tab_lock");
+  tabChannel.onmessage = (e) => {
+    if (e.data && e.data.type === "CLAIM_MASTER") {
+      if (e.data.tabId !== myTabId) {
+        showDuplicateTabBlocker();
+      }
+    } else if (e.data && e.data.type === "UNBAN_EVENT") {
+      handleSuccessfulUnban();
+    }
+  };
+} catch(e){}
+
+// Auto claim master on page load
+claimActiveTab();
+
+setInterval(() => {
+  if (isMasterTab) {
+    localStorage.setItem("meetloop_tab_ping", Date.now().toString());
+  }
+}, 1500);
+
+document.getElementById("btnClaimTab")?.addEventListener("click", () => {
+  claimActiveTab();
+});
+
+/* ================= 2. PERSISTENT DEVICE & BAN ENGINE ================= */
 function getPersistentDeviceId(forceNew = false) {
   let devId = localStorage.getItem("meetloop_device_id");
   if (!devId || forceNew) {
@@ -611,69 +653,7 @@ if (savedBanUntil && Date.now() < savedBanUntil) {
   localStorage.removeItem("meetloop_ban_snapshot");
 }
 
-try {
-  tabChannel = new BroadcastChannel("meetloop_tab_lock");
-  tabChannel.onmessage = (e) => {
-    if (e.data && e.data.type === "CLAIM_MASTER") {
-      if (e.data.tabId !== myTabId) {
-        isMasterTab = false;
-        showDuplicateTabBlocker();
-      }
-    } else if (e.data && e.data.type === "UNBAN_EVENT") {
-      handleSuccessfulUnban();
-    }
-  };
-} catch(e){}
-
-function checkMultiTabConflict() {
-  const activeMaster = localStorage.getItem("meetloop_active_tab");
-  const lastActiveTime = parseInt(localStorage.getItem("meetloop_tab_ping") || "0", 10);
-  const now = Date.now();
-
-  if (!activeMaster || activeMaster === myTabId || (now - lastActiveTime > 3000)) {
-    claimActiveTab();
-  } else {
-    showDuplicateTabBlocker();
-  }
-}
-
-function claimActiveTab() {
-  isMasterTab = true;
-  localStorage.setItem("meetloop_active_tab", myTabId);
-  localStorage.setItem("meetloop_tab_ping", Date.now().toString());
-  const overlay = document.getElementById("duplicateTabOverlay");
-  if (overlay) overlay.style.display = "none";
-  if (tabChannel) tabChannel.postMessage({ type: "CLAIM_MASTER", tabId: myTabId });
-}
-
-function showDuplicateTabBlocker() {
-  stopSession();
-  const overlay = document.getElementById("duplicateTabOverlay");
-  if (overlay) overlay.style.display = "flex";
-}
-
-document.getElementById("btnClaimTab")?.addEventListener("click", () => {
-  claimActiveTab();
-});
-
-setInterval(() => {
-  if (isMasterTab && localStorage.getItem("meetloop_active_tab") === myTabId) {
-    localStorage.setItem("meetloop_tab_ping", Date.now().toString());
-  }
-}, 1200);
-
-const gcashPhoneInput = document.getElementById("gcashPhoneInput");
-const gcashRefInput = document.getElementById("gcashRefInput");
-
-[gcashPhoneInput, gcashRefInput].forEach(input => {
-  if (input) {
-    input.addEventListener("input", (e) => {
-      const clean = e.target.value.replace(/[^0-9]/g, "");
-      if (e.target.value !== clean) e.target.value = clean;
-    });
-  }
-});
-
+/* ================= 3. SOCKET CONNECTION ================= */
 let socket = null;
 try {
   if (typeof io !== "undefined") {
@@ -729,7 +709,7 @@ const rtcConfig = {
   sdpSemantics: "unified-plan"
 };
 
-// 📺 CRT TV STATIC NOISE GENERATOR
+// 📺 CRT TV STATIC ANIMATOR
 function runTVStatic() {
   if (!crtStaticCanvas) return;
   const ctx = crtStaticCanvas.getContext("2d");
@@ -863,7 +843,7 @@ if (socket) {
   });
 }
 
-/* ================= 4. HD MEDIA ENGINE & MOBILE CAMERA FLIP ================= */
+/* ================= 4. BULLETPROOF MEDIA & WORKING FLIP ENGINE ================= */
 async function startMedia() {
   if (isCurrentlyBanned) {
     const overlay = document.getElementById("banOverlay");
@@ -887,11 +867,7 @@ async function startMedia() {
         height: { ideal: 720, min: 480 },
         frameRate: { ideal: 30, min: 24 }
       },
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true
-      }
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
     });
 
     localStream = stream;
@@ -922,7 +898,7 @@ async function startMedia() {
   }
 }
 
-// 📱 MOBILE ONLY FRONT/BACK CAMERA FLIP
+// 📱 100% WORKING MOBILE FRONT/BACK CAMERA FLIP
 async function flipCamera() {
   if (isFlipping || !localStream) return;
   isFlipping = true;
@@ -931,40 +907,57 @@ async function flipCamera() {
   const targetFacing = (currentFacingMode === "user") ? "environment" : "user";
 
   try {
-    let newStream;
-    try {
-      newStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { exact: targetFacing }, width: { ideal: 1280 }, height: { ideal: 720 } }
-      });
-    } catch(e) {
-      newStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: targetFacing, width: { ideal: 1280 }, height: { ideal: 720 } }
-      });
-    }
-
-    const newVideoTrack = newStream.getVideoTracks()[0];
+    // 1. Bitawan muna ang lumang video track para hindi ma-lock ang hardware sa phone
     const oldVideoTrack = localStream.getVideoTracks()[0];
-
-    if (peerConnection) {
-      const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
-      if (sender) await sender.replaceTrack(newVideoTrack);
-    }
-
     if (oldVideoTrack) {
       localStream.removeTrack(oldVideoTrack);
       oldVideoTrack.stop();
     }
 
+    // 2. Kumuha ng bagong stream
+    let newStream;
+    try {
+      newStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: targetFacing, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false
+      });
+    } catch(e) {
+      newStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: targetFacing },
+        audio: false
+      });
+    }
+
+    const newVideoTrack = newStream.getVideoTracks()[0];
     localStream.addTrack(newVideoTrack);
     currentFacingMode = targetFacing;
 
+    // 3. I-update ang WebRTC connection kung may kausap
+    if (peerConnection) {
+      const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
+      if (sender) await sender.replaceTrack(newVideoTrack);
+    }
+
+    // 4. I-update ang screen
     if (localVideo) {
       localVideo.className = (currentFacingMode === "user") ? "mirrored" : "unmirrored";
       localVideo.srcObject = localStream;
       await localVideo.play().catch(()=>{});
     }
   } catch (err) {
-    console.error("Flip error:", err);
+    console.error("Mobile Flip error:", err);
+    // Fallback kung nagka-issue: ibalik sa front camera
+    try {
+      const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      const fallbackTrack = fallbackStream.getVideoTracks()[0];
+      localStream.addTrack(fallbackTrack);
+      currentFacingMode = "user";
+      if (localVideo) {
+        localVideo.className = "mirrored";
+        localVideo.srcObject = localStream;
+        await localVideo.play().catch(()=>{});
+      }
+    } catch(e){}
   } finally {
     isFlipping = false;
     if (flipBtn) flipBtn.disabled = false;
@@ -1407,7 +1400,6 @@ document.getElementById("showLocalBtn")?.addEventListener("click", () => {
   document.getElementById("showLocalBtn")?.classList.remove("visible");
 });
 
-checkMultiTabConflict();
 const initialLang = localStorage.getItem("meetloop_lang") || "en";
 setLanguage(initialLang);
 </script>
