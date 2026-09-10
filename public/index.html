@@ -97,12 +97,6 @@ video{
   position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;padding:0 12px;user-select:none;pointer-events:none;
 }
-.standby-logo{
-  width:105px;height:105px;margin-bottom:12px;
-  filter:drop-shadow(0 0 25px rgba(56,189,248,.6));
-  animation:floatLogo 3s ease-in-out infinite alternate;
-}
-@keyframes floatLogo{from{transform:translateY(0)}to{transform:translateY(-6px)}}
 .standby-title{font-size:30px;font-weight:900;letter-spacing:-0.5px;color:#fff}
 .standby-online-tag{
   background:rgba(15,23,42,0.88);border:1px solid rgba(255,255,255,.15);
@@ -113,7 +107,6 @@ video{
   width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);
 }
 
-/* CLEAN SPINNER ONLY (NO BOX & NO TEXT) */
 .search-loader{
   position:absolute;inset:0;z-index:4;display:none;align-items:center;justify-content:center;user-select:none;
 }
@@ -492,7 +485,6 @@ video{
           </div>
         </div>
 
-        <!-- CLEAN SPINNER ONLY -->
         <div class="search-loader" id="searchLoader">
           <div class="search-spinner"></div>
         </div>
@@ -707,6 +699,7 @@ let dataChannel = null;
 let searching = false;
 let connected = false;
 let currentFacingMode = "user";
+let isFlipping = false;
 let blurTimer = null;
 let pendingCandidates = [];
 let submitAttempts = 0;
@@ -730,7 +723,6 @@ function handleSuccessfulUnban() {
 
 if (socket) {
   socket.on("connect", () => {
-    // 🔄 Offline Recovery Check: Kung na-unban habang nakasara ang tab!
     socket.emit("check-ban-status", { hardwareId: myHardwareId });
   });
 
@@ -797,7 +789,6 @@ if (socket) {
     document.getElementById("banOverlay").style.display = "flex";
   });
 
-  // ⚡ INSTANT UNBAN SIGNAL (ONLINE O PAGKABALIK)
   socket.on("real-admin-unban-signal", (data) => {
     if (data && (!data.hardwareId || data.hardwareId === myHardwareId)) {
       if (isCurrentlyBanned || localStorage.getItem("meetloop_ban_until")) {
@@ -843,7 +834,97 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 4. BAN & RESOLUTION METHODS ================= */
+/* ================= 4. BULLETPROOF MEDIA & CAMERA HANDLING (NO BLACK SCREEN) ================= */
+async function startMedia() {
+  if (isCurrentlyBanned) {
+    document.getElementById("banOverlay").style.display = "flex";
+    return false;
+  }
+
+  // Kung may umiiral nang buhay na stream, gamitin ito
+  if (localStream && localStream.getVideoTracks().some(t => t.readyState === "live")) {
+    if (localVideo.srcObject !== localStream) {
+      localVideo.srcObject = localStream;
+      localVideo.play().catch(()=>{});
+    }
+    return true;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: currentFacingMode, width: { ideal: 640 }, height: { ideal: 480 } },
+      audio: { echoCancellation: true, noiseSuppression: true }
+    });
+
+    localStream = stream;
+    localVideo.srcObject = localStream;
+    localVideo.className = (currentFacingMode === "user") ? "mirrored" : "unmirrored";
+    await localVideo.play().catch(()=>{});
+    return true;
+  } catch (err) {
+    console.error("Camera access error:", err);
+    // Fallback kung nagka-issue sa exact resolution
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      localVideo.srcObject = localStream;
+      await localVideo.play().catch(()=>{});
+      return true;
+    } catch(e) {
+      return false;
+    }
+  }
+}
+
+// 🔄 100% RELIABLE CAMERA FLIP (WALANG BLACK SCREEN)
+async function flipCamera() {
+  if (isFlipping || !localStream) return;
+  isFlipping = true;
+  flipBtn.disabled = true;
+
+  const targetFacing = (currentFacingMode === "user") ? "environment" : "user";
+
+  try {
+    const newStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { exact: targetFacing } }
+    }).catch(async () => {
+      // Fallback kung walang exact mode
+      return await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: targetFacing }
+      });
+    });
+
+    const newVideoTrack = newStream.getVideoTracks()[0];
+    const oldVideoTrack = localStream.getVideoTracks()[0];
+
+    // Palitan sa WebRTC Peer connection
+    if (peerConnection) {
+      const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
+      if (sender) {
+        await sender.replaceTrack(newVideoTrack);
+      }
+    }
+
+    // Tanggalin at patayin ang lumang video track
+    if (oldVideoTrack) {
+      localStream.removeTrack(oldVideoTrack);
+      oldVideoTrack.stop();
+    }
+
+    // Idagdag ang bagong video track sa local stream
+    localStream.addTrack(newVideoTrack);
+    currentFacingMode = targetFacing;
+
+    localVideo.className = (currentFacingMode === "user") ? "mirrored" : "unmirrored";
+    localVideo.srcObject = localStream;
+    await localVideo.play().catch(()=>{});
+  } catch (err) {
+    console.error("Flip camera error:", err);
+  } finally {
+    isFlipping = false;
+    flipBtn.disabled = false;
+  }
+}
+
 function captureStrangerSnapshot() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
@@ -974,34 +1055,6 @@ function submitGCashUnbanTicket() {
   } else {
     status.style.color = "#dc2626";
     status.textContent = "❌ Server connection lost. Please reload and try again.";
-  }
-}
-
-async function startMedia() {
-  if (isCurrentlyBanned) {
-    document.getElementById("banOverlay").style.display = "flex";
-    return false;
-  }
-
-  if (localStream && localStream.getVideoTracks().some(t => t.readyState === "live")) {
-    if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
-    try { await localVideo.play(); } catch(e){}
-    return true;
-  }
-
-  const constraints = {
-    video: { width: { ideal: 640, max: 1280 }, height: { ideal: 480, max: 720 }, frameRate: { ideal: 30, max: 30 }, facingMode: { ideal: currentFacingMode } },
-    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
-  };
-
-  try {
-    localStream = await navigator.mediaDevices.getUserMedia(constraints);
-    localVideo.srcObject = localStream;
-    localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
-    try { await localVideo.play(); } catch(e){}
-    return true;
-  } catch(err) {
-    return false;
   }
 }
 
@@ -1456,16 +1509,8 @@ micBtn.addEventListener("click", () => {
   }
 });
 
-flipBtn.addEventListener("click", async () => {
-  currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
-  const oldTrack = localStream?.getVideoTracks()[0];
-  if (oldTrack) oldTrack.stop();
-  await startMedia();
-  if (peerConnection && localStream) {
-    const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
-    if (sender) sender.replaceTrack(localStream.getVideoTracks()[0]);
-  }
-});
+// Flip Button Event
+flipBtn.addEventListener("click", flipCamera);
 
 reportBtn.addEventListener("click", openReportModal);
 
@@ -1481,19 +1526,4 @@ speakerIcon.addEventListener("click", () => {
   if (remoteVideo) remoteVideo.volume = nextVal;
 });
 
-document.getElementById("hideLocalBtn").addEventListener("click", () => {
-  localCamBox.classList.add("hidden-cam");
-  document.getElementById("showLocalBtn").classList.add("visible");
-});
-document.getElementById("showLocalBtn").addEventListener("click", () => {
-  localCamBox.classList.remove("hidden-cam");
-  document.getElementById("showLocalBtn").classList.remove("visible");
-});
-
-// STARTUP
-checkMultiTabConflict();
-const initialLang = localStorage.getItem("meetloop_lang") || "en";
-setLanguage(initialLang);
-</script>
-</body>
-</html>
+document.getElementById("hideLocalBtn").addEventListener("click"
