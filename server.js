@@ -2,7 +2,7 @@
  * MeetLoop - Official Production Server Backend
  * 100% Filipino Made Random Video Chat 🇵🇭
  * High-Speed Telegram Auto-Pairing Bot + WebRTC Matchmaking
- * (Instant Bulletproof Phone Auto-Matcher + Real-Time Online Counter)
+ * (Instant Bulletproof Phone Auto-Matcher + Time Ledger + Real-Time Online Counter)
  */
 
 const express = require("express");
@@ -40,10 +40,10 @@ app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 app.use(express.text({ type: "*/*", limit: "15mb" }));
 
-/* ================= DATABASES & ATTEMPT TRACKER ================= */
+/* ================= DATABASES & TIME LEDGER ================= */
 const bannedDevices = new Map();
-const pendingRequests = new Map(); // HardwareId -> { hardwareId, phone, ref, socketId }
-const receivedGCashPayments = [];  // Naka-store na verified payments mula sa phone
+const pendingRequests = new Map();
+const receivedGCashPayments = []; // Stores: { text, phone, time, used }
 const attemptTracker = new Map();
 
 function escapeHtml(str) {
@@ -131,7 +131,7 @@ function executeUnbanUser(hardwareId, phone, auto = false) {
   }
 }
 
-// 🔍 ADVANCED NUMBER EXTRACTOR & MATCHER (Hahanapin ang 09... number kahit may tuldok o iba pang text)
+// 🔍 EXTRACT PHONE NUMBERS (Clean digits only)
 function extractAllPhoneNumbers(text) {
   if (!text) return [];
   const matches = text.match(/(09\d{9}|9\d{9}|\b\d{10,12}\b)/g);
@@ -145,14 +145,9 @@ function isPhoneMatch(gcashText, userPhone) {
   const cleanUser = String(userPhone).replace(/[^0-9]/g, "");
   if (!cleanUser || cleanUser.length < 7) return false;
 
-  // 1. Check direct raw text inclusion
-  if (gcashText.includes(cleanUser)) return true;
-
-  // 2. Check 10-digit format (e.g. 9983813724)
   const user10Digit = cleanUser.slice(-10);
-  if (gcashText.includes(user10Digit)) return true;
+  if (gcashText.includes(cleanUser) || gcashText.includes(user10Digit)) return true;
 
-  // 3. Check extracted numbers array
   const extractedNumbers = extractAllPhoneNumbers(gcashText);
   for (const num of extractedNumbers) {
     if (num === cleanUser || num.endsWith(user10Digit) || cleanUser.endsWith(num.slice(-10))) {
@@ -160,7 +155,6 @@ function isPhoneMatch(gcashText, userPhone) {
     }
   }
 
-  // 4. Check last 7 digits fallback
   const last7 = cleanUser.slice(-7);
   if (last7 && gcashText.includes(last7)) return true;
 
@@ -195,7 +189,7 @@ app.all("/webhook/gcash-sms", (req, res) => {
   const fullPayloadString = `${senderTitle} ${parsedContent}`.trim();
   console.log(`[GCASH FORWARDER RECEIVED]:\n${fullPayloadString}`);
 
-  // I-save sa cache ng verified payments
+  // I-save sa cache ng verified payments kasama ang timestamp
   receivedGCashPayments.push({ text: fullPayloadString, time: Date.now(), used: false });
   if (receivedGCashPayments.length > 50) receivedGCashPayments.shift();
 
@@ -490,7 +484,7 @@ io.on("connection", (socket) => {
     }
     attemptTracker.set(reqHardware, tracker);
 
-    // 🔥 INSTANT MATCH CHECK (Kung pumasok na kanina ang GCash notification!)
+    // 🔥 INSTANT MATCH CHECK: Kung nauna ang GCash payment kaysa sa submit ng user!
     for (const item of receivedGCashPayments) {
       if (!item.used && (isPhoneMatch(item.text, phone) || (ref && item.text.includes(ref)))) {
         console.log(`🎯 [INSTANT MATCH IN CACHE]: User ${phone} matched with cache`);
