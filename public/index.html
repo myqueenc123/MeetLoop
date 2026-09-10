@@ -97,12 +97,6 @@ video{
   position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;padding:0 12px;user-select:none;pointer-events:none;
 }
-.standby-logo{
-  width:105px;height:105px;margin-bottom:12px;
-  filter:drop-shadow(0 0 25px rgba(56,189,248,.6));
-  animation:floatLogo 3s ease-in-out infinite alternate;
-}
-@keyframes floatLogo{from{transform:translateY(0)}to{transform:translateY(-6px)}}
 .standby-title{font-size:30px;font-weight:900;letter-spacing:-0.5px;color:#fff}
 .standby-online-tag{
   background:rgba(15,23,42,0.88);border:1px solid rgba(255,255,255,.15);
@@ -113,7 +107,7 @@ video{
   width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);
 }
 
-/* CLEAN SPINNER ONLY (NO BOX & NO TEXT) */
+/* CLEAN SPINNER ONLY */
 .search-loader{
   position:absolute;inset:0;z-index:4;display:none;align-items:center;justify-content:center;user-select:none;
 }
@@ -492,7 +486,6 @@ video{
           </div>
         </div>
 
-        <!-- 🌟 CLEAN SPINNER ONLY (NO BOX & NO TEXT) -->
         <div class="search-loader" id="searchLoader">
           <div class="search-spinner"></div>
         </div>
@@ -532,14 +525,13 @@ video{
     <div class="chat-stream" id="chatStream">
       <div class="chat-msg">
         <div class="chat-author">System</div>
-        <!-- 🌟 UPDATED OFFICIAL SYSTEM RULES CARD -->
         <div class="chat-bubble chat-rules-card" id="lblChatRules">
           👋 <b>Welcome to MeetLoop!</b><br><br>
           🔞 <b>18+ only</b> — You must be 18 or older.<br>
           🚫 <b>No nudity, sexual content, hate speech, or harassment.</b><br>
           📹 <b>Show yourself on camera</b> — no pre-recorded or fake video.<br>
-          💬 <b>Respect everyone</b> — MeetLoop is not a dating site. Please don't ask for gender or personal information.<br>
-          ⚠️ <b>Violations may result in a temporary or permanent ban.</b><br><br>
+          💬 <b>Respect everyone</b> — MeetLoop is not a dating site.<br>
+          ⚠️ <b>Violations will result in an immediate 7-day ban.</b><br><br>
           Have fun, stay respectful, and enjoy your conversation! 🌎
         </div>
       </div>
@@ -555,7 +547,7 @@ video{
 <script>
 "use strict";
 
-/* ================= 1. STRICT 1-TAB ONLY & PERSISTENT BAN ENGINE ================= */
+/* ================= 1. STRICT 1-TAB ONLY & BAN CLIENT ENGINE ================= */
 const myTabId = "tab_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
 let tabChannel = null;
 let isMasterTab = false;
@@ -672,7 +664,7 @@ const gcashRefInput = document.getElementById("gcashRefInput");
   });
 });
 
-/* ================= 3. SOCKET CONNECTION & LISTENERS ================= */
+/* ================= 3. SOCKET CONNECTION & AUTO STATUS SYNC ================= */
 let socket = null;
 try {
   if (typeof io !== "undefined") {
@@ -719,6 +711,11 @@ let cooldownTimer = null;
 let lastCapturedStrangerSnapshot = null;
 
 if (socket) {
+  // ⚡ AUTO-SYNC ON CONNECT
+  socket.on("connect", () => {
+    socket.emit("check-ban-status", { hardwareId: myHardwareId });
+  });
+
   socket.on("online-count", (count) => {
     const realCount = Math.max(1, Number(count || 1));
     if (standbyUsers) standbyUsers.textContent = realCount.toLocaleString();
@@ -783,27 +780,26 @@ if (socket) {
   });
 
   socket.on("real-admin-unban-signal", (data) => {
-    if (data && data.hardwareId && data.hardwareId === myHardwareId) {
-      isCurrentlyBanned = false;
-      localStorage.removeItem("meetloop_ban_until");
-      localStorage.removeItem("meetloop_ban_reason");
-      localStorage.removeItem("meetloop_ban_snapshot");
-      if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
-      submitAttempts = 0;
-      
-      const status = document.getElementById("gcashRefStatus");
+    isCurrentlyBanned = false;
+    localStorage.removeItem("meetloop_ban_until");
+    localStorage.removeItem("meetloop_ban_reason");
+    localStorage.removeItem("meetloop_ban_snapshot");
+    if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
+    submitAttempts = 0;
+
+    const status = document.getElementById("gcashRefStatus");
+    if (status) {
       status.style.color = "#16a34a";
       status.textContent = "✅ " + getTranslatedText("unbanSuccess");
-
-      myHardwareId = getPersistentDeviceId(true);
-      updateNumericDisplayId();
-      if (tabChannel) tabChannel.postMessage({ type: "UNBAN_EVENT" });
-
-      setTimeout(() => {
-        document.getElementById("banOverlay").style.display = "none";
-        alert("🎉 " + getTranslatedText("unbanAlert"));
-      }, 800);
     }
+
+    myHardwareId = getPersistentDeviceId(true);
+    updateNumericDisplayId();
+    if (tabChannel) tabChannel.postMessage({ type: "UNBAN_EVENT" });
+
+    setTimeout(() => {
+      document.getElementById("banOverlay").style.display = "none";
+    }, 600);
   });
 
   socket.on("unban-response", (data) => {
@@ -842,13 +838,12 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 4. CAPTURE STRANGER PICTURE ACCURATELY ================= */
+/* ================= 4. SNAPSHOT CAPTURING ================= */
 function captureStrangerSnapshot() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
   const ctx = canvas.getContext("2d");
 
-  // 100% PRIORITY: Kukunin ang mukha ng KAUSAP mula sa remote video
   if (remoteVideo && remoteVideo.videoWidth > 0) {
     ctx.drawImage(remoteVideo, 0, 0, 180, 180);
     return canvas.toDataURL("image/jpeg", 0.75);
@@ -897,7 +892,7 @@ function openGcashPayView() {
   document.getElementById("gcashPhoneInput").value = "";
   document.getElementById("gcashRefInput").value = "";
   document.getElementById("gcashRefStatus").textContent = "";
-  
+
   if (!cooldownTimer) {
     const btn = document.getElementById("gcashVerifyBtn");
     btn.disabled = false;
@@ -1067,8 +1062,7 @@ function stopSession() {
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun1.l.google.com:19302" },
-    { urls: "turn:standard.relay.metered.ca:80", username: "0974f7094bbb79185dd1d4ce", credential: "jqFOtepU3tMVTfEX" }
+    { urls: "stun:stun1.l.google.com:19302" }
   ]
 };
 
@@ -1401,7 +1395,7 @@ document.getElementById("languageSelect").addEventListener("change", (e) => {
 /* ================= 6. REPORT MODAL HANDLERS ================= */
 function openReportModal() {
   if (!connected) return;
-  lastCapturedStrangerSnapshot = captureStrangerSnapshot(); // Capture Stranger Face!
+  lastCapturedStrangerSnapshot = captureStrangerSnapshot();
   document.getElementById("reportModal").style.display = "flex";
 }
 
@@ -1451,9 +1445,9 @@ chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preven
 
 micBtn.addEventListener("click", () => {
   const t = localStream?.getAudioTracks()[0];
-  if (t) { 
-    t.enabled = !t.enabled; 
-    micBtn.textContent = t.enabled ? getTranslatedText("micOn") : getTranslatedText("micOff"); 
+  if (t) {
+    t.enabled = !t.enabled;
+    micBtn.textContent = t.enabled ? getTranslatedText("micOn") : getTranslatedText("micOff");
   }
 });
 
@@ -1491,7 +1485,7 @@ document.getElementById("showLocalBtn").addEventListener("click", () => {
   document.getElementById("showLocalBtn").classList.remove("visible");
 });
 
-// STARTUP (DEFAULT ENGLISH)
+// INITIAL BOOTSTRAP
 checkMultiTabConflict();
 const initialLang = localStorage.getItem("meetloop_lang") || "en";
 setLanguage(initialLang);
