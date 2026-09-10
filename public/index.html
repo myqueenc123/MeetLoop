@@ -834,14 +834,14 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 4. BULLETPROOF MEDIA & CAMERA HANDLING (NO BLACK SCREEN) ================= */
+/* ================= 4. BULLETPROOF MEDIA & CAMERA HANDLING ================= */
 async function startMedia() {
   if (isCurrentlyBanned) {
     document.getElementById("banOverlay").style.display = "flex";
     return false;
   }
 
-  // Kung may umiiral nang buhay na stream, gamitin ito
+  // Kung bukas na at may video track, gamitin agad
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === "live")) {
     if (localVideo.srcObject !== localStream) {
       localVideo.srcObject = localStream;
@@ -850,10 +850,11 @@ async function startMedia() {
     return true;
   }
 
+  // Subukan kumuha ng Camera + Mic
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: currentFacingMode, width: { ideal: 640 }, height: { ideal: 480 } },
-      audio: { echoCancellation: true, noiseSuppression: true }
+      audio: true
     });
 
     localStream = stream;
@@ -862,20 +863,24 @@ async function startMedia() {
     await localVideo.play().catch(()=>{});
     return true;
   } catch (err) {
-    console.error("Camera access error:", err);
-    // Fallback kung nagka-issue sa exact resolution
+    console.warn("Retrying with flexible constraints...", err);
+    // Fallback kung walang mic o restricted ang exact constraints
     try {
-      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      localStream = stream;
       localVideo.srcObject = localStream;
+      localVideo.className = (currentFacingMode === "user") ? "mirrored" : "unmirrored";
       await localVideo.play().catch(()=>{});
       return true;
-    } catch(e) {
+    } catch (finalErr) {
+      console.error("Camera permission error:", finalErr);
+      alert("⚠️ Please allow Camera and Microphone permission in your browser settings to start chatting!");
       return false;
     }
   }
 }
 
-// 🔄 100% RELIABLE CAMERA FLIP (WALANG BLACK SCREEN)
+// 🔄 100% RELIABLE CAMERA FLIP
 async function flipCamera() {
   if (isFlipping || !localStream) return;
   isFlipping = true;
@@ -884,19 +889,20 @@ async function flipCamera() {
   const targetFacing = (currentFacingMode === "user") ? "environment" : "user";
 
   try {
-    const newStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { exact: targetFacing } }
-    }).catch(async () => {
-      // Fallback kung walang exact mode
-      return await navigator.mediaDevices.getUserMedia({
+    let newStream;
+    try {
+      newStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: targetFacing } }
+      });
+    } catch(e) {
+      newStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: targetFacing }
       });
-    });
+    }
 
     const newVideoTrack = newStream.getVideoTracks()[0];
     const oldVideoTrack = localStream.getVideoTracks()[0];
 
-    // Palitan sa WebRTC Peer connection
     if (peerConnection) {
       const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
       if (sender) {
@@ -904,13 +910,11 @@ async function flipCamera() {
       }
     }
 
-    // Tanggalin at patayin ang lumang video track
     if (oldVideoTrack) {
       localStream.removeTrack(oldVideoTrack);
       oldVideoTrack.stop();
     }
 
-    // Idagdag ang bagong video track sa local stream
     localStream.addTrack(newVideoTrack);
     currentFacingMode = targetFacing;
 
@@ -1489,11 +1493,10 @@ function sendChat() {
   chatInput.value = "";
 }
 
+// 🟢 FIX: Pag-click ng START CHATTING ay diretso agad sa Matchmaking Search!
 document.getElementById("portalStartBtn").addEventListener("click", async () => {
   document.getElementById("welcomePortal").style.display = "none";
-  if (!isCurrentlyBanned) {
-    await startMedia();
-  }
+  await triggerStartNext();
 });
 
 mainActionBtn.addEventListener("click", triggerStartNext);
@@ -1509,9 +1512,7 @@ micBtn.addEventListener("click", () => {
   }
 });
 
-// Flip Button Event
 flipBtn.addEventListener("click", flipCamera);
-
 reportBtn.addEventListener("click", openReportModal);
 
 audioSlider.addEventListener("input", (e) => {
@@ -1526,4 +1527,19 @@ speakerIcon.addEventListener("click", () => {
   if (remoteVideo) remoteVideo.volume = nextVal;
 });
 
-document.getElementById("hideLocalBtn").addEventListener("click"
+document.getElementById("hideLocalBtn").addEventListener("click", () => {
+  localCamBox.classList.add("hidden-cam");
+  document.getElementById("showLocalBtn").classList.add("visible");
+});
+document.getElementById("showLocalBtn").addEventListener("click", () => {
+  localCamBox.classList.remove("hidden-cam");
+  document.getElementById("showLocalBtn").classList.remove("visible");
+});
+
+// STARTUP
+checkMultiTabConflict();
+const initialLang = localStorage.getItem("meetloop_lang") || "en";
+setLanguage(initialLang);
+</script>
+</body>
+</html>
