@@ -516,7 +516,7 @@ video{
       </div>
     </div>
 
-    <!-- VIEW 2: GCASH TOPUP FORM (4 TRIES + 30s COOLDOWN) -->
+    <!-- VIEW 2: GCASH TOPUP FORM -->
     <div id="gcashPaySection">
       <div class="gcash-logo-banner">
         <svg class="gcash-official-svg" viewBox="0 0 160 38" fill="none">
@@ -604,7 +604,7 @@ video{
           <div class="crt-overlay-vignette"></div>
         </div>
 
-        <!-- STANDBY VIEW -->
+        <!-- STANDBY VIEW WITH WORKING LIVE USER COUNTER -->
         <div id="standbyCenter" class="standby-center">
           <svg class="standby-logo" viewBox="0 0 100 100">
             <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z" fill="#38bdf8"/>
@@ -614,7 +614,7 @@ video{
           
           <div class="standby-online-tag">
             <span class="online-dot"></span>
-            <span id="standbyUsers">1</span> <span id="lblOnlineText">online</span>
+            <span id="standbyUsers">1</span> <span id="lblOnlineText">online users</span>
           </div>
         </div>
 
@@ -783,7 +783,7 @@ const gcashRefInput = document.getElementById("gcashRefInput");
   });
 });
 
-/* ================= 3. SOCKET CONNECTION ================= */
+/* ================= 3. SOCKET CONNECTION & LIVE REAL-TIME LISTENERS ================= */
 let socket = null;
 try {
   if (typeof io !== "undefined") {
@@ -831,6 +831,114 @@ let pendingCandidates = [];
 
 let submitAttempts = 0;
 let cooldownTimer = null;
+
+// 🟢 LIVE USER COUNTER LISTENER (Real-Time Update)
+if (socket) {
+  socket.on("online-count", (count) => {
+    const realCount = Math.max(1, Number(count || 1));
+    if (standbyUsers) {
+      standbyUsers.textContent = realCount.toLocaleString();
+    }
+  });
+
+  socket.on("waiting", () => {
+    searching = true;
+    enableBlur();
+    crtWrapper.style.display = "block";
+    standbyCenter.style.display = "none";
+    searchLoader.style.display = "flex";
+    remoteStatus.textContent = document.getElementById("languageSelect").value === "tl" ? "Naghahanap..." : "Searching...";
+  });
+
+  socket.on("match", async (data) => {
+    searching = false;
+    enableBlur();
+    await createPeer(Boolean(data?.initiator));
+  });
+
+  socket.on("signal", async (data) => {
+    try {
+      if (data.type === "offer") {
+        if (!peerConnection) await createPeer(false);
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+        
+        while (pendingCandidates.length > 0) {
+          const cand = pendingCandidates.shift();
+          await peerConnection.addIceCandidate(cand).catch(()=>{});
+        }
+
+        const ans = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(ans);
+        socket.emit("signal", { type: "answer", answer: ans });
+
+      } else if (data.type === "answer" && peerConnection) {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+        
+        while (pendingCandidates.length > 0) {
+          const cand = pendingCandidates.shift();
+          await peerConnection.addIceCandidate(cand).catch(()=>{});
+        }
+
+      } else if (data.type === "candidate") {
+        const candidate = new RTCIceCandidate(data.candidate);
+        if (peerConnection && peerConnection.remoteDescription) {
+          await peerConnection.addIceCandidate(candidate).catch(()=>{});
+        } else {
+          pendingCandidates.push(candidate);
+        }
+      }
+    } catch(err){}
+  });
+
+  socket.on("partner-disconnected", () => {
+    addChatMessage("MeetLoop", document.getElementById("languageSelect").value === "tl" ? "Nadiskonekta ang kausap." : "Stranger disconnected.");
+    triggerStartNext();
+  });
+
+  socket.on("ip-banned", (data) => {
+    display7DayBanScreen(data.banUntil, data.reason, data.snapshot);
+  });
+
+  socket.on("unban-pending", (data) => {
+    const status = document.getElementById("gcashRefStatus");
+    status.style.color = "#0284c7";
+    status.innerHTML = `⏳ <b>Details Logged (${4 - submitAttempts} tries left)</b><br>Sent to verification system. Once GCash notification arrives with matching number, unban is automatic!`;
+    document.getElementById("banOverlay").style.display = "flex";
+  });
+
+  socket.on("real-admin-unban-signal", (data) => {
+    if (data && data.hardwareId && data.hardwareId === myHardwareId) {
+      isCurrentlyBanned = false;
+      if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
+      submitAttempts = 0;
+      
+      const status = document.getElementById("gcashRefStatus");
+      status.style.color = "#16a34a";
+      status.textContent = "✅ Payment Verified & Matched! Resetting Device ID...";
+
+      myHardwareId = getPersistentDeviceId(true);
+      updateNumericDisplayId();
+      if (tabChannel) tabChannel.postMessage({ type: "UNBAN_EVENT" });
+
+      setTimeout(() => {
+        document.getElementById("banOverlay").style.display = "none";
+        alert("🎉 SUCCESS! Your ₱10 GCash payment was verified. Suspension lifted!");
+      }, 800);
+    }
+  });
+
+  socket.on("unban-response", (data) => {
+    const status = document.getElementById("gcashRefStatus");
+    if (!data.success) {
+      status.style.color = "#dc2626";
+      status.textContent = data.message;
+    }
+  });
+
+  socket.on("report-success", () => {
+    addChatMessage("MeetLoop", "User reported successfully.");
+  });
+}
 
 /* ================= 4. AUTHENTIC TV STATIC ================= */
 function runTVStatic() {
@@ -925,7 +1033,7 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 7. SUBMIT GCASH TICKET (4 TRIES + 30s COOLDOWN) ================= */
+/* ================= 7. SUBMIT GCASH TICKET ================= */
 function start30SecondCooldown() {
   const btn = document.getElementById("gcashVerifyBtn");
   const phoneInput = document.getElementById("gcashPhoneInput");
@@ -994,48 +1102,6 @@ function submitGCashUnbanTicket() {
     status.style.color = "#dc2626";
     status.textContent = "❌ Server connection lost. Please reload and try again.";
   }
-}
-
-if (socket) {
-  socket.on("unban-pending", (data) => {
-    const status = document.getElementById("gcashRefStatus");
-    status.style.color = "#0284c7";
-    status.innerHTML = `⏳ <b>Details Logged (${4 - submitAttempts} tries left)</b><br>Sent to verification system. Once GCash notification arrives with matching number, unban is automatic!`;
-    document.getElementById("banOverlay").style.display = "flex";
-  });
-
-  socket.on("real-admin-unban-signal", (data) => {
-    if (data && data.hardwareId && data.hardwareId === myHardwareId) {
-      isCurrentlyBanned = false;
-      if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
-      submitAttempts = 0;
-      
-      const status = document.getElementById("gcashRefStatus");
-      status.style.color = "#16a34a";
-      status.textContent = "✅ Payment Verified & Matched! Resetting Device ID...";
-
-      myHardwareId = getPersistentDeviceId(true);
-      updateNumericDisplayId();
-      if (tabChannel) tabChannel.postMessage({ type: "UNBAN_EVENT" });
-
-      setTimeout(() => {
-        document.getElementById("banOverlay").style.display = "none";
-        alert("🎉 SUCCESS! Your ₱10 GCash payment was verified. Suspension lifted!");
-      }, 800);
-    }
-  });
-
-  socket.on("unban-response", (data) => {
-    const status = document.getElementById("gcashRefStatus");
-    if (!data.success) {
-      status.style.color = "#dc2626";
-      status.textContent = data.message;
-    }
-  });
-
-  socket.on("report-success", () => {
-    addChatMessage("MeetLoop", "User reported successfully.");
-  });
 }
 
 /* ================= 8. CAMERA ENGINE ================= */
@@ -1242,7 +1308,7 @@ const i18n = {
     stop: "Stop",
     start: "Start",
     next: "Next",
-    online: "online",
+    onlineUsers: "online users",
     chatTitle: "Live Chat",
     chatRules: "• 18+ only. Strict anti-nudity policy.<br>• Real face required in front of the camera.",
     chatPlaceholder: "Type a message...",
@@ -1276,7 +1342,7 @@ const i18n = {
     stop: "Ihinto",
     start: "Magsimula",
     next: "Susunod",
-    online: "aktibo ngayon",
+    onlineUsers: "aktibong users",
     chatTitle: "Live Usapan",
     chatRules: "• 18+ lamang. Mahigpit na ipinagbabawal ang kabastusan.<br>• Totoong mukha ang dapat nakatapat sa camera.",
     chatPlaceholder: "Mag-type ng mensahe...",
@@ -1311,7 +1377,7 @@ function setLanguage(lang) {
   document.getElementById("portalStartBtn").textContent = t.portalBtn;
   document.getElementById("reportBtn").textContent = t.report;
   document.getElementById("stopBtn").textContent = t.stop;
-  document.getElementById("lblOnlineText").textContent = t.online;
+  document.getElementById("lblOnlineText").textContent = t.onlineUsers;
   document.getElementById("lblChatTitle").textContent = t.chatTitle;
   document.getElementById("lblChatRules").innerHTML = t.chatRules;
   document.getElementById("chatInput").placeholder = t.chatPlaceholder;
@@ -1367,7 +1433,7 @@ function sendChat() {
   chatInput.value = "";
 }
 
-// 🟢 START CHATTING BUTTON EVENT
+// START CHATTING
 document.getElementById("portalStartBtn").addEventListener("click", async () => {
   document.getElementById("welcomePortal").style.display = "none";
   if (!isCurrentlyBanned) {
