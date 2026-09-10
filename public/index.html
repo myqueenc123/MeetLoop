@@ -492,7 +492,7 @@ video{
           </div>
         </div>
 
-        <!-- 🌟 CLEAN SPINNER ONLY (NO BOX & NO TEXT) -->
+        <!-- CLEAN SPINNER ONLY -->
         <div class="search-loader" id="searchLoader">
           <div class="search-spinner"></div>
         </div>
@@ -532,7 +532,6 @@ video{
     <div class="chat-stream" id="chatStream">
       <div class="chat-msg">
         <div class="chat-author">System</div>
-        <!-- 🌟 UPDATED OFFICIAL SYSTEM RULES CARD -->
         <div class="chat-bubble chat-rules-card" id="lblChatRules">
           👋 <b>Welcome to MeetLoop!</b><br><br>
           🔞 <b>18+ only</b> — You must be 18 or older.<br>
@@ -579,9 +578,9 @@ function updateNumericDisplayId() {
 updateNumericDisplayId();
 
 let isCurrentlyBanned = false;
-const savedBanUntil = parseInt(localStorage.getItem("meetloop_ban_until") || "0", 10);
-const savedBanReason = localStorage.getItem("meetloop_ban_reason") || "Policy Violation";
-const savedBanSnapshot = localStorage.getItem("meetloop_ban_snapshot") || null;
+let savedBanUntil = parseInt(localStorage.getItem("meetloop_ban_until") || "0", 10);
+let savedBanReason = localStorage.getItem("meetloop_ban_reason") || "Policy Violation";
+let savedBanSnapshot = localStorage.getItem("meetloop_ban_snapshot") || null;
 
 if (savedBanUntil && Date.now() < savedBanUntil) {
   isCurrentlyBanned = true;
@@ -603,11 +602,7 @@ try {
         showDuplicateTabBlocker();
       }
     } else if (e.data && e.data.type === "UNBAN_EVENT") {
-      isCurrentlyBanned = false;
-      localStorage.removeItem("meetloop_ban_until");
-      localStorage.removeItem("meetloop_ban_reason");
-      localStorage.removeItem("meetloop_ban_snapshot");
-      document.getElementById("banOverlay").style.display = "none";
+      handleSuccessfulUnban();
     }
   };
 } catch(e){}
@@ -672,7 +667,7 @@ const gcashRefInput = document.getElementById("gcashRefInput");
   });
 });
 
-/* ================= 3. SOCKET CONNECTION & LISTENERS ================= */
+/* ================= 3. SOCKET CONNECTION & OFFLINE-RECOVERY ================= */
 let socket = null;
 try {
   if (typeof io !== "undefined") {
@@ -718,7 +713,27 @@ let submitAttempts = 0;
 let cooldownTimer = null;
 let lastCapturedStrangerSnapshot = null;
 
+function handleSuccessfulUnban() {
+  isCurrentlyBanned = false;
+  localStorage.removeItem("meetloop_ban_until");
+  localStorage.removeItem("meetloop_ban_reason");
+  localStorage.removeItem("meetloop_ban_snapshot");
+  if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
+  submitAttempts = 0;
+  
+  const status = document.getElementById("gcashRefStatus");
+  status.style.color = "#16a34a";
+  status.textContent = "✅ " + getTranslatedText("unbanSuccess");
+
+  document.getElementById("banOverlay").style.display = "none";
+}
+
 if (socket) {
+  socket.on("connect", () => {
+    // 🔄 Offline Recovery Check: Kung na-unban habang nakasara ang tab!
+    socket.emit("check-ban-status", { hardwareId: myHardwareId });
+  });
+
   socket.on("online-count", (count) => {
     const realCount = Math.max(1, Number(count || 1));
     if (standbyUsers) standbyUsers.textContent = realCount.toLocaleString();
@@ -778,31 +793,17 @@ if (socket) {
   socket.on("unban-pending", (data) => {
     const status = document.getElementById("gcashRefStatus");
     status.style.color = "#0284c7";
-    status.innerHTML = `⏳ <b>${getTranslatedText("detailsLogged")} (${4 - submitAttempts} ${getTranslatedText("triesLeft")})</b>`;
+    status.innerHTML = `⏳ <b>${getTranslatedText("detailsLogged")} (${4 - submitAttempts} ${getTranslatedText("triesLeft")})</b><br><small style="color:#64748b">Maaari mong isara ang tab pagkatapos magbayad.</small>`;
     document.getElementById("banOverlay").style.display = "flex";
   });
 
+  // ⚡ INSTANT UNBAN SIGNAL (ONLINE O PAGKABALIK)
   socket.on("real-admin-unban-signal", (data) => {
-    if (data && data.hardwareId && data.hardwareId === myHardwareId) {
-      isCurrentlyBanned = false;
-      localStorage.removeItem("meetloop_ban_until");
-      localStorage.removeItem("meetloop_ban_reason");
-      localStorage.removeItem("meetloop_ban_snapshot");
-      if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
-      submitAttempts = 0;
-      
-      const status = document.getElementById("gcashRefStatus");
-      status.style.color = "#16a34a";
-      status.textContent = "✅ " + getTranslatedText("unbanSuccess");
-
-      myHardwareId = getPersistentDeviceId(true);
-      updateNumericDisplayId();
-      if (tabChannel) tabChannel.postMessage({ type: "UNBAN_EVENT" });
-
-      setTimeout(() => {
-        document.getElementById("banOverlay").style.display = "none";
-        alert("🎉 " + getTranslatedText("unbanAlert"));
-      }, 800);
+    if (data && (!data.hardwareId || data.hardwareId === myHardwareId)) {
+      if (isCurrentlyBanned || localStorage.getItem("meetloop_ban_until")) {
+        handleSuccessfulUnban();
+        if (tabChannel) tabChannel.postMessage({ type: "UNBAN_EVENT" });
+      }
     }
   });
 
@@ -842,13 +843,12 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 4. CAPTURE STRANGER PICTURE ACCURATELY ================= */
+/* ================= 4. BAN & RESOLUTION METHODS ================= */
 function captureStrangerSnapshot() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
   const ctx = canvas.getContext("2d");
 
-  // 100% PRIORITY: Kukunin ang mukha ng KAUSAP mula sa remote video
   if (remoteVideo && remoteVideo.videoWidth > 0) {
     ctx.drawImage(remoteVideo, 0, 0, 180, 180);
     return canvas.toDataURL("image/jpeg", 0.75);
@@ -1067,8 +1067,7 @@ function stopSession() {
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun1.l.google.com:19302" },
-    { urls: "turn:standard.relay.metered.ca:80", username: "0974f7094bbb79185dd1d4ce", credential: "jqFOtepU3tMVTfEX" }
+    { urls: "stun:stun1.l.google.com:19302" }
   ]
 };
 
@@ -1147,7 +1146,7 @@ function closePeerConnection() {
   pendingCandidates = [];
 }
 
-/* ================= 5. TRANSLATIONS (DEFAULT ENGLISH) ================= */
+/* ================= 5. TRANSLATIONS ================= */
 const i18n = {
   en: {
     subTitle: "Random Video Chat", portalBtn: "START CHATTING", report: "Report", stop: "Stop", start: "Start", next: "Next", stopped: "Stopped",
@@ -1401,7 +1400,7 @@ document.getElementById("languageSelect").addEventListener("change", (e) => {
 /* ================= 6. REPORT MODAL HANDLERS ================= */
 function openReportModal() {
   if (!connected) return;
-  lastCapturedStrangerSnapshot = captureStrangerSnapshot(); // Capture Stranger Face!
+  lastCapturedStrangerSnapshot = captureStrangerSnapshot();
   document.getElementById("reportModal").style.display = "flex";
 }
 
@@ -1491,7 +1490,7 @@ document.getElementById("showLocalBtn").addEventListener("click", () => {
   document.getElementById("showLocalBtn").classList.remove("visible");
 });
 
-// STARTUP (DEFAULT ENGLISH)
+// STARTUP
 checkMultiTabConflict();
 const initialLang = localStorage.getItem("meetloop_lang") || "en";
 setLanguage(initialLang);
