@@ -516,7 +516,7 @@ video{
       </div>
     </div>
 
-    <!-- VIEW 2: GCASH TOPUP FORM -->
+    <!-- VIEW 2: GCASH TOPUP FORM (NUMBER & REF ONLY - NO NAME) -->
     <div id="gcashPaySection">
       <div class="gcash-logo-banner">
         <svg class="gcash-official-svg" viewBox="0 0 160 38" fill="none">
@@ -547,14 +547,17 @@ video{
           <img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2" class="gcash-qr-img" alt="GCash QR">
         </div>
         <div style="font-size:11px;color:#475569;font-weight:700" id="lblScanText">
-          Scan QR via GCash, pay <b>₱10</b> clearance fee, and enter your details below.
+          Scan QR via GCash, pay <b>₱10</b> clearance fee, and enter your payment details below.
         </div>
       </div>
 
       <div class="gcash-input-group">
-        <input type="text" id="gcashSenderName" class="gcash-input-field" placeholder="Your GCash Name (e.g. Juan)" maxlength="35">
-        <!-- 🔢 MOBILE NUMBER FIELD -->
-        <input type="tel" id="gcashPhoneInput" class="gcash-input-field" placeholder="Your GCash Mobile No. (e.g. 09171234567)" maxlength="13" inputmode="numeric" pattern="[0-9]*">
+        <!-- 🔢 MOBILE NUMBER FIELD (REQUIRED) -->
+        <input type="tel" id="gcashPhoneInput" class="gcash-input-field" placeholder="Your GCash Mobile No. (e.g. 09983813724)" maxlength="13" inputmode="numeric" pattern="[0-9]*">
+        
+        <!-- 🔢 REFERENCE NUMBER FIELD (REQUIRED) -->
+        <input type="tel" id="gcashRefInput" class="gcash-input-field" placeholder="13-Digit GCash Ref No. (e.g. 2004123456789)" maxlength="16" inputmode="numeric" pattern="[0-9]*">
+        
         <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="submitGCashUnbanTicket()">Submit for Verification</button>
       </div>
 
@@ -566,7 +569,7 @@ video{
     <div class="ban-expire-box">
       <span class="ban-expire-label" id="lblExpiresHeader">7-Day Suspension Expiration:</span>
       <span class="ban-expire-time" id="banUntilFullText">--:-- --</span>
-      <div class="ban-id-chip">Device ID: <span id="adminUnbanId">167214235</span></div>
+      <div class="ban-id-chip">Device Ban ID: <span id="adminUnbanId">--</span></div>
     </div>
   </div>
 </div>
@@ -682,17 +685,17 @@ video{
 <script>
 "use strict";
 
-/* ================= 1. PERSISTENT HARDWARE ID ENGINE ================= */
-function getPersistentDeviceId() {
+/* ================= 1. DYNAMIC DEVICE ID & MULTI-TAB ENGINE ================= */
+function getPersistentDeviceId(forceNew = false) {
   let devId = localStorage.getItem("meetloop_device_id");
-  if (!devId) {
+  if (!devId || forceNew) {
     devId = "dev_" + Math.random().toString(36).substring(2, 11) + "_" + Date.now();
     localStorage.setItem("meetloop_device_id", devId);
   }
   return devId;
 }
 
-const myHardwareId = getPersistentDeviceId();
+let myHardwareId = getPersistentDeviceId();
 const myTabId = "tab_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
 let tabChannel = null;
 
@@ -704,6 +707,13 @@ try {
     }
   };
 } catch(e){}
+
+function updateNumericDisplayId() {
+  let numericId = 0;
+  for (let i = 0; i < myHardwareId.length; i++) numericId = (numericId * 31 + myHardwareId.charCodeAt(i)) % 900000000;
+  document.getElementById("adminUnbanId").textContent = "" + (100000000 + Math.abs(numericId));
+}
+updateNumericDisplayId();
 
 function checkMultiTabConflict() {
   const activeMaster = localStorage.getItem("meetloop_active_tab");
@@ -744,21 +754,18 @@ window.addEventListener("storage", (e) => {
   }
 });
 
-/* ================= 2. NUMBERS-ONLY PHONE INPUT ENFORCER ================= */
+/* ================= 2. NUMBERS-ONLY INPUT ENFORCERS ================= */
 const gcashPhoneInput = document.getElementById("gcashPhoneInput");
-gcashPhoneInput.addEventListener("input", (e) => {
-  const clean = e.target.value.replace(/[^0-9]/g, "");
-  if (e.target.value !== clean) {
-    e.target.value = clean;
-  }
+const gcashRefInput = document.getElementById("gcashRefInput");
+
+[gcashPhoneInput, gcashRefInput].forEach(input => {
+  input.addEventListener("input", (e) => {
+    const clean = e.target.value.replace(/[^0-9]/g, "");
+    if (e.target.value !== clean) e.target.value = clean;
+  });
 });
 
-/* ================= 3. NUMERIC ID DISPLAY ================= */
-let numericId = 0;
-for (let i = 0; i < myHardwareId.length; i++) numericId = (numericId * 31 + myHardwareId.charCodeAt(i)) % 900000000;
-document.getElementById("adminUnbanId").textContent = "" + (100000000 + Math.abs(numericId));
-
-/* ================= 4. SOCKET CONNECTION ================= */
+/* ================= 3. SOCKET CONNECTION ================= */
 let socket = null;
 try {
   if (typeof io !== "undefined") {
@@ -805,7 +812,7 @@ let blurTimer = null;
 let pendingCandidates = [];
 let cooldownTimer = null;
 
-/* ================= 5. AUTHENTIC TV STATIC ================= */
+/* ================= 4. AUTHENTIC TV STATIC ================= */
 function runTVStatic() {
   if (!crtStaticCanvas) return;
   const ctx = crtStaticCanvas.getContext("2d");
@@ -829,7 +836,7 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 6. EVIDENCE SNAPSHOT CAPTURE ================= */
+/* ================= 5. EVIDENCE SNAPSHOT CAPTURE ================= */
 function captureReporterSnapshot() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
@@ -845,7 +852,7 @@ function captureReporterSnapshot() {
   return null;
 }
 
-/* ================= 7. BAN DISPLAY ENGINE ================= */
+/* ================= 6. BAN DISPLAY ENGINE ================= */
 function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap = null) {
   isCurrentlyBanned = true;
   stopSession();
@@ -881,15 +888,15 @@ function openGcashPayView() {
   document.getElementById("selectMethodSection").style.display = "none";
   document.getElementById("gcashPaySection").style.display = "flex";
   document.getElementById("gcashPhoneInput").value = "";
-  document.getElementById("gcashSenderName").value = "";
+  document.getElementById("gcashRefInput").value = "";
   document.getElementById("gcashRefStatus").textContent = "";
   
   if (!cooldownTimer) {
     const btn = document.getElementById("gcashVerifyBtn");
     btn.disabled = false;
     btn.textContent = document.getElementById("languageSelect").value === "tl" ? "I-submit para sa Veripikasyon" : "Submit for Verification";
-    document.getElementById("gcashSenderName").disabled = false;
     document.getElementById("gcashPhoneInput").disabled = false;
+    document.getElementById("gcashRefInput").disabled = false;
   }
 }
 
@@ -898,15 +905,15 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-/* ================= 8. SUBMIT GCASH TICKET (WITH SPAM COOLDOWN) ================= */
+/* ================= 7. SUBMIT GCASH TICKET (NUMBER & REF NO ONLY) ================= */
 function startSubmitCooldown(seconds = 60) {
   const btn = document.getElementById("gcashVerifyBtn");
-  const nameInput = document.getElementById("gcashSenderName");
   const phoneInput = document.getElementById("gcashPhoneInput");
+  const refInput = document.getElementById("gcashRefInput");
 
   btn.disabled = true;
-  nameInput.disabled = true;
   phoneInput.disabled = true;
+  refInput.disabled = true;
 
   let timeLeft = seconds;
   if (cooldownTimer) clearInterval(cooldownTimer);
@@ -917,8 +924,8 @@ function startSubmitCooldown(seconds = 60) {
       clearInterval(cooldownTimer);
       cooldownTimer = null;
       btn.disabled = false;
-      nameInput.disabled = false;
       phoneInput.disabled = false;
+      refInput.disabled = false;
       btn.textContent = document.getElementById("languageSelect").value === "tl" ? "I-submit Ulit" : "Submit Again";
     } else {
       btn.textContent = `⏳ Submitting Locked (${timeLeft}s)`;
@@ -929,28 +936,34 @@ function startSubmitCooldown(seconds = 60) {
 function submitGCashUnbanTicket() {
   if (cooldownTimer) return;
 
-  const nameInput = document.getElementById("gcashSenderName");
   const phoneInput = document.getElementById("gcashPhoneInput");
+  const refInput = document.getElementById("gcashRefInput");
   const status = document.getElementById("gcashRefStatus");
 
-  const nameVal = nameInput.value.trim();
   const phoneVal = phoneInput.value.trim().replace(/[^0-9]/g, "");
+  const refVal = refInput.value.trim().replace(/[^0-9]/g, "");
 
   if (!phoneVal || phoneVal.length < 10) {
     status.style.color = "#dc2626";
-    status.textContent = "❌ Please enter a valid 11-digit GCash Mobile Number (e.g. 09171234567).";
+    status.textContent = "❌ Please enter a valid 11-digit GCash Mobile Number (e.g. 09983813724).";
     return;
   }
 
-  startSubmitCooldown(60); // 1-minute anti-spam cooldown
+  if (!refVal || refVal.length < 8) {
+    status.style.color = "#dc2626";
+    status.textContent = "❌ Please enter a valid 13-Digit GCash Reference Number.";
+    return;
+  }
+
+  startSubmitCooldown(60);
 
   status.style.color = "#0284c7";
-  status.innerHTML = "⏳ <b>Details submitted!</b><br><span style='color:#0284c7;font-size:11px;'>Checking GCash payment notification for matching Mobile Number...</span>";
+  status.innerHTML = "⏳ <b>Details submitted!</b><br><span style='color:#0284c7;font-size:11px;'>Matching Mobile Number & Reference Number with GCash payment notification...</span>";
 
   document.getElementById("banOverlay").style.display = "flex";
 
   if (socket && socket.connected) {
-    socket.emit("unban-request", { hardwareId: myHardwareId, name: nameVal, phone: phoneVal });
+    socket.emit("unban-request", { hardwareId: myHardwareId, phone: phoneVal, ref: refVal });
   } else {
     status.style.color = "#dc2626";
     status.textContent = "❌ Server connection lost. Please reload and try again.";
@@ -961,7 +974,7 @@ if (socket) {
   socket.on("unban-pending", (data) => {
     const status = document.getElementById("gcashRefStatus");
     status.style.color = "#0284c7";
-    status.innerHTML = "⏳ <b>Ticket Logged!</b><br>Sent to Telegram. Once GCash notification arrives with the same number, unban is automatic!";
+    status.innerHTML = "⏳ <b>Ticket Logged!</b><br>Sent to verification system. Once GCash notification arrives with matching number, unban is automatic!";
     document.getElementById("banOverlay").style.display = "flex";
   });
 
@@ -972,7 +985,11 @@ if (socket) {
       
       const status = document.getElementById("gcashRefStatus");
       status.style.color = "#16a34a";
-      status.textContent = "✅ Number Matched! Unbanning device now...";
+      status.textContent = "✅ Payment Verified & Matched! Resetting Device ID...";
+
+      // 🔄 I-RESET ANG DEVICE ID PARA FRESH AT HINDI NA MAULIT ANG LUMANG RESIBO SA SUSUNOD!
+      myHardwareId = getPersistentDeviceId(true);
+      updateNumericDisplayId();
 
       setTimeout(() => {
         document.getElementById("banOverlay").style.display = "none";
@@ -994,7 +1011,7 @@ if (socket) {
   });
 }
 
-/* ================= 9. CAMERA ENGINE ================= */
+/* ================= 8. CAMERA ENGINE ================= */
 async function startMedia() {
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === "live")) {
     if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
@@ -1189,7 +1206,7 @@ function closePeerConnection() {
   pendingCandidates = [];
 }
 
-/* ================= 10. LANGUAGE TRANSLATOR ================= */
+/* ================= 9. LANGUAGE TRANSLATOR ================= */
 const i18n = {
   en: {
     subTitle: "Random Video Chat",
@@ -1222,8 +1239,8 @@ const i18n = {
     tabLockTitle: "Duplicate Tab Detected",
     tabLockDesc: "MeetLoop is only allowed in one tab. It is already open in another tab.",
     tabLockBtn: "Use This Tab Instead",
-    namePlaceholder: "Your GCash Name (e.g. Juan)",
-    phonePlaceholder: "Your GCash Mobile No. (e.g. 09171234567)"
+    phonePlaceholder: "Your GCash Mobile No. (e.g. 09983813724)",
+    refPlaceholder: "13-Digit GCash Ref No. (e.g. 2004123456789)"
   },
   tl: {
     subTitle: "Random Video Chat",
@@ -1256,8 +1273,8 @@ const i18n = {
     tabLockTitle: "Naka-open na sa Ibang Tab",
     tabLockDesc: "Isang tab lamang ang pwedeng gamitin sa MeetLoop. Naka-open na ito sa isa pang tab.",
     tabLockBtn: "Gamitin ang Tab na Ito",
-    namePlaceholder: "Pangalan sa GCash (hal. Juan)",
-    phonePlaceholder: "Numero sa GCash (hal. 09171234567)"
+    phonePlaceholder: "Numero sa GCash (hal. 09983813724)",
+    refPlaceholder: "13-Digit GCash Ref No. (hal. 2004123456789)"
   }
 };
 
@@ -1289,8 +1306,8 @@ function setLanguage(lang) {
   document.getElementById("lblTabLockTitle").textContent = t.tabLockTitle;
   document.getElementById("lblTabLockDesc").textContent = t.tabLockDesc;
   document.getElementById("btnClaimTab").textContent = t.tabLockBtn;
-  document.getElementById("gcashSenderName").placeholder = t.namePlaceholder;
   document.getElementById("gcashPhoneInput").placeholder = t.phonePlaceholder;
+  document.getElementById("gcashRefInput").placeholder = t.refPlaceholder;
 
   if (!cooldownTimer && !document.getElementById("gcashVerifyBtn").disabled) {
     document.getElementById("gcashVerifyBtn").textContent = t.verifyBtn;
@@ -1306,7 +1323,7 @@ document.getElementById("languageSelect").addEventListener("change", (e) => {
   setLanguage(e.target.value);
 });
 
-/* ================= 11. SOCKET SIGNALING ================= */
+/* ================= 10. SOCKET SIGNALING ================= */
 if (socket) {
   socket.on("online-count", count => {
     if (standbyUsers) standbyUsers.textContent = Number(count || 1).toLocaleString();
