@@ -2,7 +2,7 @@
  * MeetLoop - Official Production Server Backend
  * 100% Filipino Made Random Video Chat 🇵🇭
  * High-Speed Telegram Auto-Pairing Bot + WebRTC Matchmaking
- * (Instant Bulletproof Phone Auto-Matcher + 4-Tries Cooldown Sync + Clean Multi-Tab Session)
+ * (Instant Bulletproof Phone Auto-Matcher + 4-Tries Cooldown Sync + Strict 1-Tab Session)
  */
 
 const express = require("express");
