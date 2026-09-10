@@ -703,7 +703,7 @@ let submitAttempts = 0;
 let cooldownTimer = null;
 let lastCapturedStrangerSnapshot = null;
 
-// ⚡ GLOBAL BULLETPROOF ICE SERVERS (STUN + METERED TURN RELAYS)
+// ⚡ GLOBAL BULLETPROOF ICE SERVERS
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
@@ -946,7 +946,6 @@ async function createPeer(initiator) {
   };
 
   peerConnection.ontrack = (e) => {
-    // 🌟 100% DISPLAY KAUSAP CAMERA AGAD
     crtWrapper.style.display = "none";
     standbyCenter.style.display = "none";
     searchLoader.style.display = "none";
@@ -959,7 +958,6 @@ async function createPeer(initiator) {
       remoteVideo.srcObject.addTrack(e.track);
     }
 
-    // Autoplay fallback kung na-block ng browser ang sound
     remoteVideo.play().catch(() => {
       remoteVideo.muted = true;
       remoteVideo.play().catch(()=>{});
@@ -1348,10 +1346,13 @@ function sendChat() {
   chatInput.value = "";
 }
 
-// 🟢 START CHATTING DIRECT TRIGGER
+// 🟢 FIX: BUBUKSAN LANG ANG LOCAL CAMERA, MANANATILI SA STANDBY (WALANG AUTO-SEARCH)
 document.getElementById("portalStartBtn").addEventListener("click", async () => {
   document.getElementById("welcomePortal").style.display = "none";
-  await triggerStartNext();
+  if (!isCurrentlyBanned) {
+    await startMedia();
+    stopSession();
+  }
 });
 
 mainActionBtn.addEventListener("click", triggerStartNext);
