@@ -516,7 +516,7 @@ video{
       </div>
     </div>
 
-    <!-- VIEW 2: GCASH TOPUP FORM (4 TRIES + 30s COOLDOWN) -->
+    <!-- VIEW 2: GCASH TOPUP FORM -->
     <div id="gcashPaySection">
       <div class="gcash-logo-banner">
         <svg class="gcash-official-svg" viewBox="0 0 160 38" fill="none">
@@ -685,7 +685,7 @@ video{
 <script>
 "use strict";
 
-/* ================= 1. STRICT 1-TAB ONLY SESSION ENGINE ================= */
+/* ================= 1. STRICT 1-TAB ONLY & PERSISTENT BAN LOCK ================= */
 const myTabId = "tab_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
 let tabChannel = null;
 let isMasterTab = false;
@@ -708,6 +708,21 @@ function updateNumericDisplayId() {
 }
 updateNumericDisplayId();
 
+// 🔒 STRICT BAN CHECK SA REFRESH
+let isCurrentlyBanned = false;
+const savedBanUntil = parseInt(localStorage.getItem("meetloop_ban_until") || "0", 10);
+const savedBanReason = localStorage.getItem("meetloop_ban_reason") || "Policy Violation";
+
+if (savedBanUntil && Date.now() < savedBanUntil) {
+  isCurrentlyBanned = true;
+  setTimeout(() => {
+    display7DayBanScreen(savedBanUntil, savedBanReason);
+  }, 100);
+} else {
+  localStorage.removeItem("meetloop_ban_until");
+  localStorage.removeItem("meetloop_ban_reason");
+}
+
 try {
   tabChannel = new BroadcastChannel("meetloop_tab_lock");
   tabChannel.onmessage = (e) => {
@@ -718,6 +733,8 @@ try {
       }
     } else if (e.data && e.data.type === "UNBAN_EVENT") {
       isCurrentlyBanned = false;
+      localStorage.removeItem("meetloop_ban_until");
+      localStorage.removeItem("meetloop_ban_reason");
       document.getElementById("banOverlay").style.display = "none";
     }
   };
@@ -824,7 +841,6 @@ let peerConnection = null;
 let dataChannel = null;
 let searching = false;
 let connected = false;
-let isCurrentlyBanned = false;
 let currentFacingMode = "user";
 let blurTimer = null;
 let pendingCandidates = [];
@@ -832,7 +848,6 @@ let pendingCandidates = [];
 let submitAttempts = 0;
 let cooldownTimer = null;
 
-// 🟢 LIVE ACCURATE REAL-TIME USER COUNTER
 if (socket) {
   socket.on("online-count", (count) => {
     const realCount = Math.max(1, Number(count || 1));
@@ -909,6 +924,8 @@ if (socket) {
   socket.on("real-admin-unban-signal", (data) => {
     if (data && data.hardwareId && data.hardwareId === myHardwareId) {
       isCurrentlyBanned = false;
+      localStorage.removeItem("meetloop_ban_until");
+      localStorage.removeItem("meetloop_ban_reason");
       if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
       submitAttempts = 0;
       
@@ -980,12 +997,17 @@ function captureReporterSnapshot() {
   return null;
 }
 
-/* ================= 6. BAN DISPLAY ENGINE ================= */
+/* ================= 6. STRICT BAN DISPLAY ENGINE ================= */
 function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap = null) {
   isCurrentlyBanned = true;
   stopSession();
 
   const finalBanUntil = (!banUntil || isNaN(banUntil)) ? (Date.now() + 7 * 24 * 60 * 60 * 1000) : banUntil;
+  
+  // 🔒 SAVE TO LOCALSTORAGE TO PREVENT UNBAN ON REFRESH!
+  localStorage.setItem("meetloop_ban_until", finalBanUntil.toString());
+  localStorage.setItem("meetloop_ban_reason", reason);
+
   document.getElementById("banReasonLabel").textContent = reason;
   
   const unbanDate = new Date(finalBanUntil);
@@ -1106,6 +1128,11 @@ function submitGCashUnbanTicket() {
 
 /* ================= 8. CAMERA ENGINE ================= */
 async function startMedia() {
+  if (isCurrentlyBanned) {
+    document.getElementById("banOverlay").style.display = "flex";
+    return false;
+  }
+
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === "live")) {
     if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
     camOffCover.style.display = "none";
