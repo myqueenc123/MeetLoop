@@ -18,7 +18,7 @@
   --bg-dark:#0a0e17;
   --panel-dark:#111827;
   --panel-border:#1f293d;
-  --blue:#0084ff;
+  --blue:#0284c7;
   --green:#22c55e;
   --red:#ef4444;
   --text-main:#f9fafb;
@@ -76,82 +76,84 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
+/* HD OMETV STYLE VIDEO RENDERING (ZERO BLUR, ZERO LAG) */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
-}
-
-.crt-screen-wrapper{
-  position:absolute;inset:0;z-index:2;overflow:hidden;background:#050811;pointer-events:none;
-}
-#crtStaticCanvas{
-  position:absolute;inset:0;width:100%;height:100%;opacity:0.25;display:block;
-}
-.crt-overlay-vignette{
-  position:absolute;inset:0;
-  background:radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,0.8) 100%),
-             repeating-linear-gradient(0deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 1.5px, transparent 1.5px, transparent 3px);
-  pointer-events:none;
+  image-rendering: -webkit-optimize-contrast;
+  transform: translateZ(0);
 }
 
 .standby-center{
-  position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;text-align:center;padding:0 12px;user-select:none;pointer-events:none;
+  position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;padding:0 12px;user-select:none;
+  background:#090d16;
 }
-.standby-title{font-size:30px;font-weight:900;letter-spacing:-0.5px;color:#fff}
+.standby-logo{
+  width:100px;height:100px;margin-bottom:12px;
+  filter:drop-shadow(0 0 25px rgba(56,189,248,.6));
+  animation:floatLogo 2.5s ease-in-out infinite alternate;
+}
+@keyframes floatLogo{from{transform:translateY(0)}to{transform:translateY(-6px)}}
+.standby-title{font-size:28px;font-weight:900;letter-spacing:-0.5px;color:#fff}
 .standby-online-tag{
-  background:rgba(15,23,42,0.88);border:1px solid rgba(255,255,255,.15);
+  background:rgba(15,23,42,0.9);border:1px solid rgba(255,255,255,.15);
   padding:6px 16px;border-radius:20px;font-size:13px;font-weight:800;color:#cbd5e1;
-  display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,0.6);margin-top:8px;
+  display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,0.6);margin-top:10px;
 }
 .online-dot{
   width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);
 }
 
+/* SEARCHING STATE */
 .search-loader{
-  position:absolute;inset:0;z-index:4;display:none;align-items:center;justify-content:center;user-select:none;
+  position:absolute;inset:0;z-index:5;display:none;flex-direction:column;
+  align-items:center;justify-content:center;user-select:none;background:#090d16;gap:12px;
 }
 .search-spinner{
-  width:44px;height:44px;border:4px solid rgba(255,255,255,.15);
+  width:50px;height:50px;border:4px solid rgba(255,255,255,.15);
   border-top-color:#38bdf8;border-radius:50%;animation:spin .75s linear infinite;
-  filter:drop-shadow(0 0 12px rgba(56,189,248,0.7));
+  filter:drop-shadow(0 0 15px rgba(56,189,248,0.8));
 }
+.search-text{font-size:13px;font-weight:800;color:#38bdf8;letter-spacing:0.5px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-#remoteVideo.remote-blur{filter:blur(25px) brightness(0.9)}
-#remoteVideo.remote-clear{filter:blur(0px) brightness(1.0);transition:filter 0.25s ease-out}
-
 .remote-audio-badge{
-  position:absolute;bottom:10px;left:10px;z-index:5;
-  background:rgba(0,0,0,0.7);padding:4px 8px;border-radius:20px;display:flex;align-items:center;gap:6px;
+  position:absolute;bottom:10px;left:10px;z-index:10;
+  background:rgba(0,0,0,0.75);padding:5px 10px;border-radius:20px;display:flex;align-items:center;gap:8px;
+  backdrop-filter:blur(4px);
 }
-.audio-speaker-btn{width:16px;height:16px;fill:#cbd5e1;cursor:pointer}
-.audio-slider{width:60px;height:4px;-webkit-appearance:none;background:#334155;border-radius:999px;outline:none;cursor:pointer}
-.audio-slider::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:#38bdf8;cursor:pointer}
+.audio-speaker-btn{width:18px;height:18px;fill:#cbd5e1;cursor:pointer;transition:transform 0.1s}
+.audio-speaker-btn:active{transform:scale(0.85)}
+.audio-slider{width:70px;height:5px;-webkit-appearance:none;background:#334155;border-radius:999px;outline:none;cursor:pointer}
+.audio-slider::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:#38bdf8;cursor:pointer}
 
 #localVideo.mirrored{transform:scaleX(-1)}
 #localVideo.unmirrored{transform:scaleX(1)}
 
 .cam-tag{
-  position:absolute;top:10px;left:10px;z-index:5;
-  background:rgba(0,0,0,.7);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;
+  position:absolute;top:10px;left:10px;z-index:10;
+  background:rgba(0,0,0,.7);padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;
 }
 .cam-status-pill{
-  position:absolute;top:10px;left:80px;z-index:5;
-  background:rgba(0,0,0,.75);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;color:#cbd5e1;
+  position:absolute;top:10px;left:80px;z-index:10;
+  background:rgba(0,0,0,.75);padding:4px 8px;border-radius:6px;font-size:10px;font-weight:700;color:#cbd5e1;
 }
 #reportBtn{
-  position:absolute;top:10px;right:10px;z-index:5;
-  background:#dc2626;color:#fff;border:0;border-radius:6px;padding:5px 10px;font-size:10px;font-weight:800;cursor:pointer;
+  position:absolute;top:10px;right:10px;z-index:10;
+  background:#dc2626;color:#fff;border:0;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:800;cursor:pointer;
 }
 
 .controls-panel{display:flex;gap:8px;height:48px;flex-shrink:0}
 .ctrl-btn{
   border:0;border-radius:10px;color:#fff;font-size:13px;font-weight:800;
   cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;user-select:none;
+  transition:all 0.15s ease;
 }
+.ctrl-btn:active{transform:scale(0.96)}
 .btn-start-next{flex:3;background:linear-gradient(135deg,#0284c7,#2563eb)}
 .btn-stop{flex:1.5;background:#dc2626}
-.btn-sec{flex:1.5;background:#1e293b;border:1px solid rgba(255,255,255,.08)}
+.btn-sec{flex:1.5;background:#1e293b;border:1px solid rgba(255,255,255,.1)}
+.btn-sec.muted{background:#ef4444;color:#fff}
 .btn-flip{background:#6b21a8}
 
 .chat-arena{
@@ -333,7 +335,7 @@ video{
       <li id="r1"><b>18+ Required:</b> Minors are strictly prohibited.</li>
       <li id="r2"><b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.</li>
       <li id="r3"><b>Human Face Only:</b> Look directly at the camera.</li>
-      <li id="r4"><b>Instant Blur Shield:</b> Safe transition on every switch.</li>
+      <li id="r4"><b>Fast & Smooth:</b> OmeTV HD Quality Real-Time Streaming.</li>
     </ul>
 
     <button class="portal-btn" id="portalStartBtn" type="button">START CHATTING</button>
@@ -466,15 +468,11 @@ video{
   <div class="stream-arena">
     <div class="video-grid">
       <div class="cam-box" id="remoteBox">
-        <video id="remoteVideo" class="remote-blur" autoplay playsinline webkit-playsinline></video>
+        <video id="remoteVideo" autoplay playsinline></video>
 
-        <div class="crt-screen-wrapper" id="crtWrapper">
-          <canvas id="crtStaticCanvas"></canvas>
-          <div class="crt-overlay-vignette"></div>
-        </div>
-
+        <!-- STANDBY VIEW -->
         <div id="standbyCenter" class="standby-center">
-          <svg style="width:105px;height:105px;margin-bottom:12px" viewBox="0 0 100 100">
+          <svg class="standby-logo" viewBox="0 0 100 100">
             <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 Z" fill="#38bdf8"/>
             <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 Z" fill="#a855f7"/>
           </svg>
@@ -485,10 +483,13 @@ video{
           </div>
         </div>
 
+        <!-- SEARCHING SPINNER -->
         <div class="search-loader" id="searchLoader">
           <div class="search-spinner"></div>
+          <div class="search-text" id="lblSearchingText">Looking for someone...</div>
         </div>
 
+        <!-- AUDIO VOLUME CONTROLS -->
         <div class="remote-audio-badge">
           <svg class="audio-speaker-btn" id="speakerIcon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
           <input type="range" class="audio-slider" id="audioSlider" min="0" max="1" step="0.05" value="1">
@@ -500,7 +501,7 @@ video{
       </div>
 
       <div class="cam-box" id="localCamBox">
-        <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
+        <video id="localVideo" class="mirrored" autoplay muted playsinline></video>
         <div class="cam-tag" id="localTag">You</div>
         <button id="hideLocalBtn" type="button">✕</button>
       </div>
@@ -528,10 +529,10 @@ video{
           👋 <b>Welcome to MeetLoop!</b><br><br>
           🔞 <b>18+ only</b> — You must be 18 or older.<br>
           🚫 <b>No nudity, sexual content, hate speech, or harassment.</b><br>
-          📹 <b>Show yourself on camera</b> — no pre-recorded or fake video.<br>
+          📹 <b>Show yourself on camera</b> — no fake or pre-recorded video.<br>
           💬 <b>Respect everyone</b> — MeetLoop is not a dating site.<br>
-          ⚠️ <b>Violations may result in a temporary or permanent ban.</b><br><br>
-          Have fun, stay respectful, and enjoy your conversation! 🌎
+          ⚠️ <b>Violations result in an instant 7-day ban.</b><br><br>
+          Have fun, stay respectful, and enjoy chatting! 🌎
         </div>
       </div>
     </div>
@@ -640,13 +641,6 @@ window.addEventListener("storage", (e) => {
   }
 });
 
-window.addEventListener("pagehide", () => {
-  if (isMasterTab) {
-    localStorage.removeItem("meetloop_active_tab");
-    localStorage.removeItem("meetloop_tab_ping");
-  }
-});
-
 const gcashPhoneInput = document.getElementById("gcashPhoneInput");
 const gcashRefInput = document.getElementById("gcashRefInput");
 
@@ -667,8 +661,6 @@ try {
   }
 } catch(e){}
 
-const crtWrapper = document.getElementById("crtWrapper");
-const crtStaticCanvas = document.getElementById("crtStaticCanvas");
 const standbyCenter = document.getElementById("standbyCenter");
 const searchLoader = document.getElementById("searchLoader");
 const remoteVideo = document.getElementById("remoteVideo");
@@ -697,22 +689,22 @@ let searching = false;
 let connected = false;
 let currentFacingMode = "user";
 let isFlipping = false;
-let blurTimer = null;
+let isMicActive = true;
 let pendingCandidates = [];
 let submitAttempts = 0;
 let cooldownTimer = null;
 let lastCapturedStrangerSnapshot = null;
 
-// ⚡ GLOBAL BULLETPROOF ICE SERVERS
+// ⚡ HIGH-SPEED TURN/STUN RELAYS
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
     { urls: "stun:stun1.l.google.com:19302" },
-    { urls: "stun:stun2.l.google.com:19302" },
     { urls: "turn:standard.relay.metered.ca:80", username: "0974f7094bbb79185dd1d4ce", credential: "jqFOtepU3tMVTfEX" },
     { urls: "turn:standard.relay.metered.ca:443", username: "0974f7094bbb79185dd1d4ce", credential: "jqFOtepU3tMVTfEX" },
     { urls: "turn:standard.relay.metered.ca:443?transport=tcp", username: "0974f7094bbb79185dd1d4ce", credential: "jqFOtepU3tMVTfEX" }
-  ]
+  ],
+  sdpSemantics: "unified-plan"
 };
 
 function handleSuccessfulUnban() {
@@ -742,8 +734,6 @@ if (socket) {
 
   socket.on("waiting", () => {
     searching = true;
-    enableBlur();
-    crtWrapper.style.display = "block";
     standbyCenter.style.display = "none";
     searchLoader.style.display = "flex";
     remoteStatus.textContent = getTranslatedText("searching");
@@ -751,7 +741,6 @@ if (socket) {
 
   socket.on("match", async (data) => {
     searching = false;
-    enableBlur();
     await createPeer(Boolean(data?.initiator));
   });
 
@@ -822,30 +811,7 @@ if (socket) {
   });
 }
 
-function runTVStatic() {
-  if (!crtStaticCanvas) return;
-  const ctx = crtStaticCanvas.getContext("2d");
-  const w = (crtStaticCanvas.width = 240);
-  const h = (crtStaticCanvas.height = 180);
-  const imgData = ctx.createImageData(w, h);
-  const buffer = new Uint32Array(imgData.data.buffer);
-  const len = buffer.length;
-
-  function noise() {
-    if (crtWrapper && crtWrapper.style.display !== "none") {
-      for (let i = 0; i < len; i++) {
-        const gray = (Math.random() * 255) | 0;
-        buffer[i] = (255 << 24) | (gray << 16) | (gray << 8) | gray;
-      }
-      ctx.putImageData(imgData, 0, 0);
-    }
-    requestAnimationFrame(noise);
-  }
-  noise();
-}
-runTVStatic();
-
-/* ================= 4. BULLETPROOF MEDIA & PEER CONNECTION ================= */
+/* ================= 4. HD LOW-LATENCY WEBRTC ENGINE ================= */
 async function startMedia() {
   if (isCurrentlyBanned) {
     document.getElementById("banOverlay").style.display = "flex";
@@ -861,31 +827,47 @@ async function startMedia() {
   }
 
   try {
+    // 🌟 HD 720p 30fps LOW-LATENCY REAL-TIME CONSTRAINTS
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: currentFacingMode, width: { ideal: 640 }, height: { ideal: 480 } },
-      audio: true
+      video: {
+        facingMode: currentFacingMode,
+        width: { ideal: 1280, min: 640 },
+        height: { ideal: 720, min: 480 },
+        frameRate: { ideal: 30, min: 24 }
+      },
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
+      }
     });
 
     localStream = stream;
     localVideo.srcObject = localStream;
     localVideo.className = (currentFacingMode === "user") ? "mirrored" : "unmirrored";
     await localVideo.play().catch(()=>{});
+    
+    // Sync Mic state
+    const aTrack = localStream.getAudioTracks()[0];
+    if (aTrack) aTrack.enabled = isMicActive;
+
     return true;
   } catch (err) {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       localStream = stream;
       localVideo.srcObject = localStream;
       localVideo.className = (currentFacingMode === "user") ? "mirrored" : "unmirrored";
       await localVideo.play().catch(()=>{});
       return true;
     } catch (finalErr) {
-      alert("⚠️ Please allow Camera permission in your browser to chat!");
+      alert("⚠️ Please allow Camera and Microphone permission in your browser to chat!");
       return false;
     }
   }
 }
 
+// 🔄 RELIABLE FAST CAMERA FLIP
 async function flipCamera() {
   if (isFlipping || !localStream) return;
   isFlipping = true;
@@ -894,21 +876,16 @@ async function flipCamera() {
   const targetFacing = (currentFacingMode === "user") ? "environment" : "user";
 
   try {
-    let newStream;
-    try {
-      newStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: targetFacing } } });
-    } catch(e) {
-      newStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: targetFacing } });
-    }
+    const newStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: targetFacing, width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
 
     const newVideoTrack = newStream.getVideoTracks()[0];
     const oldVideoTrack = localStream.getVideoTracks()[0];
 
     if (peerConnection) {
       const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
-      if (sender) {
-        await sender.replaceTrack(newVideoTrack);
-      }
+      if (sender) await sender.replaceTrack(newVideoTrack);
     }
 
     if (oldVideoTrack) {
@@ -923,10 +900,42 @@ async function flipCamera() {
     localVideo.srcObject = localStream;
     await localVideo.play().catch(()=>{});
   } catch (err) {
-    console.error("Flip camera error:", err);
+    console.error("Flip error:", err);
   } finally {
     isFlipping = false;
     flipBtn.disabled = false;
+  }
+}
+
+// 🎤 WORKING MIC TOGGLE
+function toggleMicrophone() {
+  if (!localStream) return;
+  const audioTrack = localStream.getAudioTracks()[0];
+  if (audioTrack) {
+    isMicActive = !isMicActive;
+    audioTrack.enabled = isMicActive;
+    if (isMicActive) {
+      micBtn.textContent = getTranslatedText("micOn");
+      micBtn.classList.remove("muted");
+    } else {
+      micBtn.textContent = getTranslatedText("micOff");
+      micBtn.classList.add("muted");
+    }
+  }
+}
+
+// 🔊 WORKING VOLUME CONTROLS
+function updateVolume(val) {
+  const v = Math.max(0, Math.min(1, parseFloat(val)));
+  audioSlider.value = v;
+  if (remoteVideo) {
+    remoteVideo.volume = v;
+    remoteVideo.muted = (v === 0);
+  }
+  if (v === 0) {
+    speakerIcon.style.fill = "#ef4444";
+  } else {
+    speakerIcon.style.fill = "#38bdf8";
   }
 }
 
@@ -946,7 +955,7 @@ async function createPeer(initiator) {
   };
 
   peerConnection.ontrack = (e) => {
-    crtWrapper.style.display = "none";
+    // 🌟 100% INSTANT CLEAR DISPLAY NG KAUSAP
     standbyCenter.style.display = "none";
     searchLoader.style.display = "none";
     remoteStatus.textContent = "Live";
@@ -958,22 +967,24 @@ async function createPeer(initiator) {
       remoteVideo.srcObject.addTrack(e.track);
     }
 
+    remoteVideo.muted = false;
+    remoteVideo.volume = parseFloat(audioSlider.value || 1.0);
     remoteVideo.play().catch(() => {
+      // Fallback kung na-block ang unmuted autoplay
       remoteVideo.muted = true;
-      remoteVideo.play().catch(()=>{});
+      remoteVideo.play().then(() => {
+        setTimeout(() => { remoteVideo.muted = false; }, 200);
+      });
     });
-
-    releaseBlur();
   };
 
   peerConnection.onconnectionstatechange = () => {
     if (peerConnection?.connectionState === "connected") {
       connected = true; searching = false;
-      crtWrapper.style.display = "none";
       standbyCenter.style.display = "none";
       searchLoader.style.display = "none";
       reportBtn.disabled = false;
-      releaseBlur();
+      remoteStatus.textContent = "Live";
     } else if (peerConnection?.connectionState === "disconnected" || peerConnection?.connectionState === "failed") {
       triggerStartNext();
     }
@@ -1012,20 +1023,6 @@ function closePeerConnection() {
   pendingCandidates = [];
 }
 
-function enableBlur() {
-  if (blurTimer) clearTimeout(blurTimer);
-  remoteVideo.classList.remove("remote-clear");
-  remoteVideo.classList.add("remote-blur");
-}
-
-function releaseBlur() {
-  if (blurTimer) clearTimeout(blurTimer);
-  blurTimer = setTimeout(() => {
-    remoteVideo.classList.remove("remote-blur");
-    remoteVideo.classList.add("remote-clear");
-  }, 200);
-}
-
 async function triggerStartNext() {
   if (isCurrentlyBanned) {
     document.getElementById("banOverlay").style.display = "flex";
@@ -1036,10 +1033,8 @@ async function triggerStartNext() {
   if (!ok) return;
 
   mainActionBtn.disabled = true;
-  crtWrapper.style.display = "block";
   standbyCenter.style.display = "none";
   searchLoader.style.display = "flex";
-  enableBlur();
 
   closePeerConnection();
 
@@ -1057,10 +1052,8 @@ function stopSession() {
   searching = false;
   connected = false;
 
-  crtWrapper.style.display = "block";
   standbyCenter.style.display = "flex";
   searchLoader.style.display = "none";
-  enableBlur();
 
   if (socket) socket.emit("stop-search");
   closePeerConnection();
@@ -1139,35 +1132,6 @@ function backToMethodSelection() {
   document.getElementById("selectMethodSection").style.display = "flex";
 }
 
-function start30SecondCooldown() {
-  const btn = document.getElementById("gcashVerifyBtn");
-  const phoneInput = document.getElementById("gcashPhoneInput");
-  const refInput = document.getElementById("gcashRefInput");
-  const status = document.getElementById("gcashRefStatus");
-
-  btn.disabled = true; phoneInput.disabled = true; refInput.disabled = true;
-
-  let timeLeft = 30;
-  if (cooldownTimer) clearInterval(cooldownTimer);
-
-  cooldownTimer = setInterval(() => {
-    timeLeft--;
-    if (timeLeft <= 0) {
-      clearInterval(cooldownTimer);
-      cooldownTimer = null;
-      submitAttempts = 0;
-      btn.disabled = false; phoneInput.disabled = false; refInput.disabled = false;
-      btn.textContent = `${getTranslatedText("verifyBtn")} (4 ${getTranslatedText("triesLeft")})`;
-      status.style.color = "#16a34a";
-      status.textContent = "✅ Cooldown ended. You may now submit again.";
-    } else {
-      btn.textContent = `⏳ Locked: Wait ${timeLeft}s`;
-      status.style.color = "#dc2626";
-      status.innerHTML = `⚠️ <b>Max 4 tries reached!</b><br>Please wait <b>${timeLeft}s</b> before submitting again...`;
-    }
-  }, 1000);
-}
-
 function submitGCashUnbanTicket() {
   if (cooldownTimer) return;
 
@@ -1185,12 +1149,7 @@ function submitGCashUnbanTicket() {
   }
 
   submitAttempts++;
-  if (submitAttempts >= 4) {
-    start30SecondCooldown();
-    return;
-  }
-
-  const remaining = 4 - submitAttempts;
+  const remaining = Math.max(0, 4 - submitAttempts);
   status.style.color = "#0284c7";
   status.innerHTML = `⏳ <b>Matching details... (${remaining} ${getTranslatedText("triesLeft")})</b>`;
 
@@ -1207,7 +1166,7 @@ const i18n = {
   en: {
     subTitle: "Random Video Chat", portalBtn: "START CHATTING", report: "Report", stop: "Stop", start: "Start", next: "Next", stopped: "Stopped",
     micOn: "Mic On", micOff: "Mic Off", showCam: "Show Cam", flip: "Flip",
-    onlineUsers: "online users", chatTitle: "Live Chat",
+    onlineUsers: "online users", chatTitle: "Live Chat", searchingText: "Looking for someone...",
     chatPlaceholder: "Type a message...", send: "Send", selectMethod: "Select Resolution Method:", gcashTitle: "Instant 7-Day Unban (₱10 Support)",
     gcashDesc: "Pay ₱10 GCash clearance fee & submit Mobile No.", waitTitle: "Wait 7-Day Suspension Period", waitDesc: "Auto unbans when 7 days expire",
     telegramSupport: "Message Telegram Support (@MeetLoop_bot)",
@@ -1219,13 +1178,13 @@ const i18n = {
     refPlaceholder: "13-Digit GCash Ref No. (e.g. 2004123456789)", partnerDisconnected: "Stranger disconnected.", you: "You", stranger: "Stranger",
     detailsLogged: "Details Logged", triesLeft: "tries left", unbanSuccess: "Payment Verified! Unbanning...", unbanAlert: "Your suspension has been lifted!",
     r1: "<b>18+ Required:</b> Minors are strictly prohibited.", r2: "<b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.",
-    r3: "<b>Human Face Only:</b> Look directly at the camera.", r4: "<b>Instant Blur Shield:</b> Safe transition on every switch.",
+    r3: "<b>Human Face Only:</b> Look directly at the camera.", r4: "<b>Fast & Smooth:</b> OmeTV HD Quality Real-Time Streaming.",
     banTitle: "7-Day Suspension", deviceBanId: "Device Ban ID:"
   },
   tl: {
     subTitle: "Random Video Chat", portalBtn: "MAG-START MAG-CHAT", report: "I-Report", stop: "Ihinto", start: "Magsimula", next: "Susunod", stopped: "Nakahinto",
     micOn: "Mic Bukas", micOff: "Mic Patay", showCam: "Ipakita ang Cam", flip: "I-flip",
-    onlineUsers: "aktibong users", chatTitle: "Live Usapan",
+    onlineUsers: "aktibong users", chatTitle: "Live Usapan", searchingText: "Naghahanap ng makakausap...",
     chatPlaceholder: "Mag-type ng mensahe...", send: "Ipadala", selectMethod: "Pumili ng Paraan para Ma-unban:", gcashTitle: "Instant 7-Araw na Unban (₱10 Support)",
     gcashDesc: "Magbayad ng ₱10 GCash fee at ilagay ang Mobile No.", waitTitle: "Maghintay ng 7-Araw na Suspension", waitDesc: "Kusang ma-u-unban pagkatapos ng 7 araw",
     telegramSupport: "Mag-message sa Telegram Support (@MeetLoop_bot)",
@@ -1237,7 +1196,7 @@ const i18n = {
     refPlaceholder: "13-Digit GCash Ref No. (hal. 2004123456789)", partnerDisconnected: "Nadiskonekta ang kausap.", you: "Ikaw", stranger: "Kausap",
     detailsLogged: "Nai-log ang Detalye", triesLeft: "tries natitira", unbanSuccess: "Na-verify ang bayad! Unbanning...", unbanAlert: "Matagumpay na na-unban ang account mo!",
     r1: "<b>18+ Lamang:</b> Mahigpit na ipinagbabawal ang menor de edad.", r2: "<b>Zero Tolerance:</b> Bawal ang kabastusan, hubad, at spam.",
-    r3: "<b>Totoong Mukha:</b> Tumingin nang diretso sa camera.", r4: "<b>Blur Shield:</b> Ligtas na pag-transition sa bawat switch.",
+    r3: "<b>Totoong Mukha:</b> Tumingin nang diretso sa camera.", r4: "<b>Mabilis at Malinaw:</b> OmeTV HD Quality Real-Time Streaming.",
     banTitle: "7-Araw na Suspension", deviceBanId: "ID ng Device:"
   }
 };
@@ -1289,14 +1248,15 @@ function setLanguage(lang) {
   document.getElementById("flipBtn").textContent = t.flip;
   document.getElementById("banTitle").textContent = t.banTitle;
   document.getElementById("lblDeviceBanId").textContent = t.deviceBanId;
+  document.getElementById("lblSearchingText").textContent = t.searchingText;
   document.getElementById("lblBanReason").innerHTML = `${t.banReason} <span id="banReasonLabel">${savedBanReason}</span>`;
   document.getElementById("lblTelegramSupport").querySelector("span").textContent = t.telegramSupport;
 
   document.getElementById("gcashPhoneInput").placeholder = t.phonePlaceholder;
   document.getElementById("gcashRefInput").placeholder = t.refPlaceholder;
 
-  if (!cooldownTimer && !document.getElementById("gcashVerifyBtn").disabled) {
-    document.getElementById("gcashVerifyBtn").textContent = t.verifyBtn;
+  if (micBtn) {
+    micBtn.textContent = isMicActive ? t.micOn : t.micOff;
   }
   if (!searching && !connected) {
     mainActionBtn.textContent = t.start;
@@ -1322,7 +1282,6 @@ function closeReportModal() {
 function confirmReportUser() {
   const reason = document.getElementById("reportReasonSelect").value;
   closeReportModal();
-
   if (socket) {
     socket.emit("report-user", { reason: reason, snapshot: lastCapturedStrangerSnapshot });
   }
@@ -1346,7 +1305,7 @@ function sendChat() {
   chatInput.value = "";
 }
 
-// 🟢 FIX: BUBUKSAN LANG ANG LOCAL CAMERA, MANANATILI SA STANDBY (WALANG AUTO-SEARCH)
+// 🟢 PORTAL CLICK -> INILALABAS ANG CAMERA AT NANANATILI SA STANDBY
 document.getElementById("portalStartBtn").addEventListener("click", async () => {
   document.getElementById("welcomePortal").style.display = "none";
   if (!isCurrentlyBanned) {
@@ -1360,27 +1319,14 @@ stopBtn.addEventListener("click", stopSession);
 sendBtn.addEventListener("click", sendChat);
 chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); sendChat(); } });
 
-micBtn.addEventListener("click", () => {
-  const t = localStream?.getAudioTracks()[0];
-  if (t) { 
-    t.enabled = !t.enabled; 
-    micBtn.textContent = t.enabled ? getTranslatedText("micOn") : getTranslatedText("micOff"); 
-  }
-});
-
+micBtn.addEventListener("click", toggleMicrophone);
 flipBtn.addEventListener("click", flipCamera);
 reportBtn.addEventListener("click", openReportModal);
 
-audioSlider.addEventListener("input", (e) => {
-  const v = parseFloat(e.target.value);
-  if (remoteVideo) remoteVideo.volume = v;
-});
-
+audioSlider.addEventListener("input", (e) => { updateVolume(e.target.value); });
 speakerIcon.addEventListener("click", () => {
-  const current = parseFloat(audioSlider.value);
-  const nextVal = current > 0 ? 0 : 1.0;
-  audioSlider.value = nextVal;
-  if (remoteVideo) remoteVideo.volume = nextVal;
+  const cur = parseFloat(audioSlider.value);
+  updateVolume(cur > 0 ? 0 : 1.0);
 });
 
 document.getElementById("hideLocalBtn").addEventListener("click", () => {
@@ -1393,8 +1339,4 @@ document.getElementById("showLocalBtn").addEventListener("click", () => {
 });
 
 checkMultiTabConflict();
-const initialLang = localStorage.getItem("meetloop_lang") || "en";
-setLanguage(initialLang);
-</script>
-</body>
-</html>
+const initialLa
