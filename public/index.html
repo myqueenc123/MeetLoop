@@ -76,23 +76,39 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
+/* HD VIDEO RENDERING */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
   image-rendering:-webkit-optimize-contrast;
   transform:translateZ(0);
 }
 
+/* 📺 CRT TV STATIC SCREEN WRAPPER */
+.crt-screen-wrapper{
+  position:absolute;inset:0;z-index:2;overflow:hidden;background:#050811;pointer-events:none;
+}
+#crtStaticCanvas{
+  position:absolute;inset:0;width:100%;height:100%;opacity:0.22;display:block;
+}
+.crt-overlay-vignette{
+  position:absolute;inset:0;
+  background:radial-gradient(circle, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.85) 100%),
+             repeating-linear-gradient(0deg, rgba(0,0,0,0.12), rgba(0,0,0,0.12) 1.5px, transparent 1.5px, transparent 3px);
+  pointer-events:none;
+}
+
+/* STANDBY CENTER LOGO */
 .standby-center{
   position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;padding:0 12px;user-select:none;
-  background:#090d16;
+  pointer-events:none;
 }
 .standby-logo{
-  width:100px;height:100px;margin-bottom:12px;
-  filter:drop-shadow(0 0 25px rgba(56,189,248,.6));
+  width:105px;height:105px;margin-bottom:12px;
+  filter:drop-shadow(0 0 25px rgba(56,189,248,.7));
   animation:floatLogo 2.5s ease-in-out infinite alternate;
 }
-@keyframes floatLogo{from{transform:translateY(0)}to{transform:translateY(-6px)}}
+@keyframes floatLogo{from{transform:translateY(0)}to{transform:translateY(-7px)}}
 .standby-title{font-size:28px;font-weight:900;letter-spacing:-0.5px;color:#fff}
 .standby-online-tag{
   background:rgba(15,23,42,0.9);border:1px solid rgba(255,255,255,.15);
@@ -106,12 +122,12 @@ video{
 /* SEARCHING SPINNER */
 .search-loader{
   position:absolute;inset:0;z-index:5;display:none;flex-direction:column;
-  align-items:center;justify-content:center;user-select:none;background:#090d16;gap:12px;
+  align-items:center;justify-content:center;user-select:none;gap:12px;pointer-events:none;
 }
 .search-spinner{
-  width:50px;height:50px;border:4px solid rgba(255,255,255,.15);
+  width:52px;height:52px;border:4px solid rgba(255,255,255,.15);
   border-top-color:#38bdf8;border-radius:50%;animation:spin .75s linear infinite;
-  filter:drop-shadow(0 0 15px rgba(56,189,248,0.8));
+  filter:drop-shadow(0 0 15px rgba(56,189,248,0.85));
 }
 .search-text{font-size:13px;font-weight:800;color:#38bdf8;letter-spacing:0.5px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -169,6 +185,7 @@ video{
 .chat-input{flex:1;min-width:0;height:38px;padding:0 12px;background:#070b14;border:1px solid var(--panel-border);border-radius:8px;color:#fff;outline:none;font-size:11px}
 .chat-send-btn{width:60px;height:38px;border:0;border-radius:8px;background:#2563eb;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
 
+/* 📱 MOBILE RESPONSIVE LAYOUT */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto}
   header{height:46px;padding:0 10px}
@@ -189,6 +206,8 @@ video{
   #flipBtn{grid-column:span 3;display:flex !important}
   .chat-arena{width:100%;max-width:none;height:240px;min-height:240px;border-radius:12px}
 }
+
+/* 💻 PC / DESKTOP (FLIP IS STRICTLY HIDDEN) */
 @media (min-width:851px){
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 }
@@ -470,6 +489,12 @@ video{
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" autoplay playsinline></video>
 
+        <!-- 📺 CRT TV STATIC BACKGROUND LAYER -->
+        <div class="crt-screen-wrapper" id="crtWrapper">
+          <canvas id="crtStaticCanvas"></canvas>
+          <div class="crt-overlay-vignette"></div>
+        </div>
+
         <!-- STANDBY VIEW -->
         <div id="standbyCenter" class="standby-center">
           <svg class="standby-logo" viewBox="0 0 100 100">
@@ -659,6 +684,8 @@ try {
   }
 } catch(e){}
 
+const crtWrapper = document.getElementById("crtWrapper");
+const crtStaticCanvas = document.getElementById("crtStaticCanvas");
 const standbyCenter = document.getElementById("standbyCenter");
 const searchLoader = document.getElementById("searchLoader");
 const remoteVideo = document.getElementById("remoteVideo");
@@ -702,6 +729,30 @@ const rtcConfig = {
   sdpSemantics: "unified-plan"
 };
 
+// 📺 CRT TV STATIC NOISE GENERATOR
+function runTVStatic() {
+  if (!crtStaticCanvas) return;
+  const ctx = crtStaticCanvas.getContext("2d");
+  const w = (crtStaticCanvas.width = 240);
+  const h = (crtStaticCanvas.height = 180);
+  const imgData = ctx.createImageData(w, h);
+  const buffer = new Uint32Array(imgData.data.buffer);
+  const len = buffer.length;
+
+  function noise() {
+    if (crtWrapper && crtWrapper.style.display !== "none") {
+      for (let i = 0; i < len; i++) {
+        const gray = (Math.random() * 255) | 0;
+        buffer[i] = (255 << 24) | (gray << 16) | (gray << 8) | gray;
+      }
+      ctx.putImageData(imgData, 0, 0);
+    }
+    requestAnimationFrame(noise);
+  }
+  noise();
+}
+runTVStatic();
+
 function handleSuccessfulUnban() {
   isCurrentlyBanned = false;
   localStorage.removeItem("meetloop_ban_until");
@@ -731,6 +782,7 @@ if (socket) {
 
   socket.on("waiting", () => {
     searching = true;
+    if (crtWrapper) crtWrapper.style.display = "block";
     if (standbyCenter) standbyCenter.style.display = "none";
     if (searchLoader) searchLoader.style.display = "flex";
     if (remoteStatus) remoteStatus.textContent = getTranslatedText("searching");
@@ -811,7 +863,7 @@ if (socket) {
   });
 }
 
-/* ================= 4. HD MEDIA ENGINE ================= */
+/* ================= 4. HD MEDIA ENGINE & MOBILE CAMERA FLIP ================= */
 async function startMedia() {
   if (isCurrentlyBanned) {
     const overlay = document.getElementById("banOverlay");
@@ -870,6 +922,7 @@ async function startMedia() {
   }
 }
 
+// 📱 MOBILE ONLY FRONT/BACK CAMERA FLIP
 async function flipCamera() {
   if (isFlipping || !localStream) return;
   isFlipping = true;
@@ -878,9 +931,16 @@ async function flipCamera() {
   const targetFacing = (currentFacingMode === "user") ? "environment" : "user";
 
   try {
-    const newStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: targetFacing, width: { ideal: 1280 }, height: { ideal: 720 } }
-    });
+    let newStream;
+    try {
+      newStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: targetFacing }, width: { ideal: 1280 }, height: { ideal: 720 } }
+      });
+    } catch(e) {
+      newStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: targetFacing, width: { ideal: 1280 }, height: { ideal: 720 } }
+      });
+    }
 
     const newVideoTrack = newStream.getVideoTracks()[0];
     const oldVideoTrack = localStream.getVideoTracks()[0];
@@ -962,6 +1022,7 @@ async function createPeer(initiator) {
   };
 
   peerConnection.ontrack = (e) => {
+    if (crtWrapper) crtWrapper.style.display = "none";
     if (standbyCenter) standbyCenter.style.display = "none";
     if (searchLoader) searchLoader.style.display = "none";
     if (remoteStatus) remoteStatus.textContent = "Live";
@@ -988,6 +1049,7 @@ async function createPeer(initiator) {
   peerConnection.onconnectionstatechange = () => {
     if (peerConnection?.connectionState === "connected") {
       connected = true; searching = false;
+      if (crtWrapper) crtWrapper.style.display = "none";
       if (standbyCenter) standbyCenter.style.display = "none";
       if (searchLoader) searchLoader.style.display = "none";
       if (reportBtn) reportBtn.disabled = false;
@@ -1030,7 +1092,7 @@ function closePeerConnection() {
   pendingCandidates = [];
 }
 
-// 🟢 BULLETPROOF PORTAL START HANDLER (DIRECT CALL)
+// 🟢 START CHATTING PORTAL HANDLER
 async function startPortalChatting() {
   const portal = document.getElementById("welcomePortal");
   if (portal) portal.style.display = "none";
@@ -1049,6 +1111,7 @@ async function triggerStartNext() {
   if (!ok) return;
 
   if (mainActionBtn) mainActionBtn.disabled = true;
+  if (crtWrapper) crtWrapper.style.display = "block";
   if (standbyCenter) standbyCenter.style.display = "none";
   if (searchLoader) searchLoader.style.display = "flex";
 
@@ -1070,6 +1133,7 @@ function stopSession() {
   searching = false;
   connected = false;
 
+  if (crtWrapper) crtWrapper.style.display = "block";
   if (standbyCenter) standbyCenter.style.display = "flex";
   if (searchLoader) searchLoader.style.display = "none";
 
