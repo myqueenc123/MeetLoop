@@ -516,7 +516,7 @@ video{
       </div>
     </div>
 
-    <!-- VIEW 2: GCASH TOPUP FORM -->
+    <!-- VIEW 2: GCASH TOPUP FORM (4 TRIES + 30s COOLDOWN) -->
     <div id="gcashPaySection">
       <div class="gcash-logo-banner">
         <svg class="gcash-official-svg" viewBox="0 0 160 38" fill="none">
@@ -1350,7 +1350,90 @@ document.getElementById("languageSelect").addEventListener("change", (e) => {
   setLanguage(e.target.value);
 });
 
-/* ================= 10. INITIALIZATION ================= */
+/* ================= 10. EVENT LISTENERS & CHAT ================= */
+function addChatMessage(author, msg) {
+  const div = document.createElement("div");
+  div.className = "chat-msg";
+  div.innerHTML = `<div class="chat-author">${author}</div><div class="chat-bubble">${msg.replace(/[&<>'"]/g, "")}</div>`;
+  chatStream.appendChild(div);
+  chatStream.scrollTop = chatStream.scrollHeight;
+}
+
+function sendChat() {
+  const val = chatInput.value.trim();
+  if (!val || !dataChannel || dataChannel.readyState !== "open") return;
+  dataChannel.send(val);
+  addChatMessage(document.getElementById("languageSelect").value === "tl" ? "Ikaw" : "You", val);
+  chatInput.value = "";
+}
+
+// 🟢 START CHATTING BUTTON EVENT
+document.getElementById("portalStartBtn").addEventListener("click", async () => {
+  document.getElementById("welcomePortal").style.display = "none";
+  if (!isCurrentlyBanned) {
+    await startMedia();
+  }
+});
+
+mainActionBtn.addEventListener("click", triggerStartNext);
+stopBtn.addEventListener("click", stopSession);
+sendBtn.addEventListener("click", sendChat);
+chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); sendChat(); } });
+
+micBtn.addEventListener("click", () => {
+  const t = localStream?.getAudioTracks()[0];
+  if (t) { t.enabled = !t.enabled; micBtn.textContent = t.enabled ? "Mic On" : "Mic Off"; }
+});
+camBtn.addEventListener("click", () => {
+  const t = localStream?.getVideoTracks()[0];
+  if (t) {
+    t.enabled = !t.enabled;
+    camBtn.textContent = t.enabled ? "Cam On" : "Cam Off";
+    camOffCover.style.display = t.enabled ? "none" : "flex";
+  }
+});
+
+flipBtn.addEventListener("click", async () => {
+  currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+  const oldTrack = localStream?.getVideoTracks()[0];
+  if (oldTrack) oldTrack.stop();
+  await startMedia();
+  if (peerConnection && localStream) {
+    const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
+    if (sender) sender.replaceTrack(localStream.getVideoTracks()[0]);
+  }
+});
+
+reportBtn.addEventListener("click", () => {
+  if (!connected) return;
+  const snap = captureReporterSnapshot();
+  if (socket) socket.emit("report-user", { reason: "Policy Violation", snapshot: snap });
+  reportBtn.disabled = true;
+  triggerStartNext();
+});
+
+audioSlider.addEventListener("input", (e) => {
+  const v = parseFloat(e.target.value);
+  if (remoteVideo) remoteVideo.volume = v;
+});
+
+speakerIcon.addEventListener("click", () => {
+  const current = parseFloat(audioSlider.value);
+  const nextVal = current > 0 ? 0 : 1.0;
+  audioSlider.value = nextVal;
+  if (remoteVideo) remoteVideo.volume = nextVal;
+});
+
+document.getElementById("hideLocalBtn").addEventListener("click", () => {
+  localCamBox.classList.add("hidden-cam");
+  document.getElementById("showLocalBtn").classList.add("visible");
+});
+document.getElementById("showLocalBtn").addEventListener("click", () => {
+  localCamBox.classList.remove("hidden-cam");
+  document.getElementById("showLocalBtn").classList.remove("visible");
+});
+
+// STARTUP
 checkMultiTabConflict();
 setLanguage("en");
 </script>
