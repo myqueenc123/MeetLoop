@@ -664,7 +664,7 @@ const gcashRefInput = document.getElementById("gcashRefInput");
   });
 });
 
-/* ================= 3. SOCKET CONNECTION & AUTO STATUS SYNC ================= */
+/* ================= 3. SOCKET CONNECTION & SIGNALING ================= */
 let socket = null;
 try {
   if (typeof io !== "undefined") {
@@ -711,7 +711,6 @@ let cooldownTimer = null;
 let lastCapturedStrangerSnapshot = null;
 
 if (socket) {
-  // ⚡ AUTO-SYNC ON CONNECT
   socket.on("connect", () => {
     socket.emit("check-ban-status", { hardwareId: myHardwareId });
   });
@@ -741,26 +740,33 @@ if (socket) {
       if (data.type === "offer") {
         if (!peerConnection) await createPeer(false);
         await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+        
         while (pendingCandidates.length > 0) {
-          await peerConnection.addIceCandidate(pendingCandidates.shift()).catch(()=>{});
+          const c = pendingCandidates.shift();
+          await peerConnection.addIceCandidate(c).catch(()=>{});
         }
+        
         const ans = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(ans);
         socket.emit("signal", { type: "answer", answer: ans });
       } else if (data.type === "answer" && peerConnection) {
         await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+        
         while (pendingCandidates.length > 0) {
-          await peerConnection.addIceCandidate(pendingCandidates.shift()).catch(()=>{});
+          const c = pendingCandidates.shift();
+          await peerConnection.addIceCandidate(c).catch(()=>{});
         }
       } else if (data.type === "candidate") {
         const candidate = new RTCIceCandidate(data.candidate);
-        if (peerConnection && peerConnection.remoteDescription) {
+        if (peerConnection && peerConnection.remoteDescription && peerConnection.remoteDescription.type) {
           await peerConnection.addIceCandidate(candidate).catch(()=>{});
         } else {
           pendingCandidates.push(candidate);
         }
       }
-    } catch(err){}
+    } catch(err){
+      console.error("Signaling Error:", err);
+    }
   });
 
   socket.on("partner-disconnected", () => {
@@ -838,9 +844,34 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 4. ULTRA-RESILIENT CAMERA ENGINE ================= */
+/* ================= 4. RELIABLE WEBRTC & MEDIA ================= */
+// 🌐 GLOBAL HIGH-SPEED STUN + FREE TURN RELAY (Garantisadong makakatawid sa Mobile Data / NAT)
+const rtcConfig = {
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" },
+    { urls: "stun:stun2.l.google.com:19302" },
+    { urls: "stun:stun.cloudflare.com:3478" },
+    {
+      urls: "turn:openrelay.metered.ca:80",
+      username: "openrelayproject",
+      credential: "openrelayproject"
+    },
+    {
+      urls: "turn:openrelay.metered.ca:443",
+      username: "openrelayproject",
+      credential: "openrelayproject"
+    },
+    {
+      urls: "turn:openrelay.metered.ca:443?transport=tcp",
+      username: "openrelayproject",
+      credential: "openrelayproject"
+    }
+  ],
+  iceCandidatePoolSize: 10
+};
+
 async function getMediaStreamWithFallback(facing) {
-  // Ladder 1: Preferred High Quality Video + Audio
   try {
     return await navigator.mediaDevices.getUserMedia({
       video: {
@@ -851,29 +882,18 @@ async function getMediaStreamWithFallback(facing) {
       },
       audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
     });
-  } catch (err1) {
-    console.warn("⚠️ Ladder 1 failed, trying Ladder 2 (Simple Video/Audio):", err1);
-  }
-
-  // Ladder 2: Basic Video + Audio
-  try {
-    return await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: facing },
-      audio: true
-    });
-  } catch (err2) {
-    console.warn("⚠️ Ladder 2 failed, trying Ladder 3 (Video Only):", err2);
-  }
-
-  // Ladder 3: Video Only (Kapag walang mic permission ang phone)
-  try {
-    return await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: false
-    });
-  } catch (err3) {
-    console.error("❌ Lahat ng camera attempts ay nabigo:", err3);
-    throw err3;
+  } catch (e1) {
+    try {
+      return await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: facing },
+        audio: true
+      });
+    } catch (e2) {
+      return await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: false
+      });
+    }
   }
 }
 
@@ -883,7 +903,6 @@ async function startMedia() {
     return false;
   }
 
-  // Kung buo at buhay pa ang video track, gamitin na agad
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === "live")) {
     if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
     try { await localVideo.play(); } catch(e){}
@@ -897,15 +916,13 @@ async function startMedia() {
     try { await localVideo.play(); } catch(e){}
     return true;
   } catch (err) {
-    alert("⚠️ Camera / Microphone Access Error!\n\nPakipindot ang lock icon sa browser address bar at i-allow ang Camera at Microphone para magamit ang MeetLoop.");
+    alert("⚠️ Camera / Mic Permission Error!\n\nPakipindot ang lock icon sa browser address bar at i-allow ang Camera at Microphone.");
     return false;
   }
 }
 
 async function switchCameraFacing() {
   currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
-  
-  // Itigil lamang ang lumang video track
   if (localStream) {
     localStream.getVideoTracks().forEach(track => track.stop());
   }
@@ -914,7 +931,6 @@ async function switchCameraFacing() {
     const newStream = await getMediaStreamWithFallback(currentFacingMode);
     const newVideoTrack = newStream.getVideoTracks()[0];
 
-    // Palitan ang video track sa lumang localStream object
     if (localStream && newVideoTrack) {
       const oldTracks = localStream.getVideoTracks();
       oldTracks.forEach(t => localStream.removeTrack(t));
@@ -927,7 +943,6 @@ async function switchCameraFacing() {
     localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
     try { await localVideo.play(); } catch(e){}
 
-    // I-update agad ang WebRTC connection sa kausap
     if (peerConnection && newVideoTrack) {
       const videoSender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
       if (videoSender) {
@@ -935,7 +950,7 @@ async function switchCameraFacing() {
       }
     }
   } catch (err) {
-    console.error("Camera flip error:", err);
+    console.error("Camera flip failed:", err);
   }
 }
 
@@ -950,7 +965,123 @@ function releaseBlur() {
   blurTimer = setTimeout(() => {
     remoteVideo.classList.remove("remote-blur");
     remoteVideo.classList.add("remote-clear");
-  }, 200);
+  }, 150);
+}
+
+function revealRemoteStream(stream) {
+  // ⚡ ITAGO ANG MGA NAKATAKIP NA OVERLAY
+  crtWrapper.style.display = "none";
+  standbyCenter.style.display = "none";
+  searchLoader.style.display = "none";
+  remoteStatus.textContent = "Live";
+  reportBtn.disabled = false;
+
+  if (remoteVideo.srcObject !== stream) {
+    remoteVideo.srcObject = stream;
+  }
+
+  // Auto-play unblocker
+  const playPromise = remoteVideo.play();
+  if (playPromise !== undefined) {
+    playPromise.then(() => {
+      releaseBlur();
+    }).catch(() => {
+      // Kung na-block ng audio policy, i-mute sandali para mag-play ang video
+      remoteVideo.muted = true;
+      remoteVideo.play().then(() => {
+        releaseBlur();
+        remoteVideo.muted = false;
+      }).catch(()=>{});
+    });
+  }
+}
+
+async function createPeer(initiator) {
+  closePeerConnection();
+  pendingCandidates = [];
+
+  const ok = await startMedia();
+  if (!ok) return;
+
+  peerConnection = new RTCPeerConnection(rtcConfig);
+
+  // Idagdag ang sariling tracks sa PeerConnection bago mag-create ng offer/answer
+  if (localStream) {
+    localStream.getTracks().forEach(track => {
+      peerConnection.addTrack(track, localStream);
+    });
+  }
+
+  peerConnection.onicecandidate = (e) => {
+    if (e.candidate && socket && socket.connected) {
+      socket.emit("signal", { type: "candidate", candidate: e.candidate });
+    }
+  };
+
+  peerConnection.ontrack = (e) => {
+    if (e.streams && e.streams[0]) {
+      revealRemoteStream(e.streams[0]);
+    } else {
+      let inboundStream = remoteVideo.srcObject;
+      if (!inboundStream || !(inboundStream instanceof MediaStream)) {
+        inboundStream = new MediaStream();
+      }
+      inboundStream.addTrack(e.track);
+      revealRemoteStream(inboundStream);
+    }
+  };
+
+  peerConnection.onconnectionstatechange = () => {
+    const state = peerConnection?.connectionState;
+    if (state === "connected") {
+      connected = true;
+      searching = false;
+      if (remoteVideo.srcObject) {
+        revealRemoteStream(remoteVideo.srcObject);
+      }
+    } else if (state === "disconnected" || state === "failed") {
+      triggerStartNext();
+    }
+  };
+
+  if (initiator) {
+    dataChannel = peerConnection.createDataChannel("chat");
+    setupDataChannel(dataChannel);
+    try {
+      const offer = await peerConnection.createOffer({
+        offerToReceiveVideo: true,
+        offerToReceiveAudio: true
+      });
+      await peerConnection.setLocalDescription(offer);
+      socket.emit("signal", { type: "offer", offer: offer });
+    } catch(err){
+      console.error("Create Offer Error:", err);
+    }
+  } else {
+    peerConnection.ondatachannel = (e) => setupDataChannel(e.channel);
+  }
+}
+
+function setupDataChannel(ch) {
+  dataChannel = ch;
+  ch.onmessage = (e) => addChatMessage(getTranslatedText("stranger"), e.data);
+}
+
+function closePeerConnection() {
+  if (dataChannel) { try{ dataChannel.close(); }catch(e){} dataChannel = null; }
+  if (peerConnection) {
+    try {
+      peerConnection.ontrack = null;
+      peerConnection.onicecandidate = null;
+      peerConnection.onconnectionstatechange = null;
+      peerConnection.close();
+    }catch(e){}
+    peerConnection = null;
+  }
+  if (remoteVideo.srcObject) {
+    remoteVideo.srcObject = null;
+  }
+  pendingCandidates = [];
 }
 
 async function triggerStartNext() {
@@ -996,88 +1127,6 @@ function stopSession() {
   mainActionBtn.textContent = getTranslatedText("start");
   mainActionBtn.disabled = false;
   stopBtn.disabled = true;
-}
-
-const rtcConfig = {
-  iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun1.l.google.com:19302" }
-  ]
-};
-
-async function createPeer(initiator) {
-  closePeerConnection();
-  pendingCandidates = [];
-  peerConnection = new RTCPeerConnection(rtcConfig);
-
-  if (localStream) {
-    localStream.getTracks().forEach(track => { peerConnection.addTrack(track, localStream); });
-  }
-
-  peerConnection.onicecandidate = (e) => {
-    if (e.candidate && socket && socket.connected) {
-      socket.emit("signal", { type: "candidate", candidate: e.candidate });
-    }
-  };
-
-  peerConnection.ontrack = (e) => {
-    crtWrapper.style.display = "none";
-    standbyCenter.style.display = "none";
-    searchLoader.style.display = "none";
-    remoteStatus.textContent = "Live";
-
-    if (e.streams && e.streams[0]) {
-      remoteVideo.srcObject = e.streams[0];
-    } else {
-      if (!remoteVideo.srcObject) remoteVideo.srcObject = new MediaStream();
-      remoteVideo.srcObject.addTrack(e.track);
-    }
-    remoteVideo.play().catch(()=>{});
-    releaseBlur();
-  };
-
-  peerConnection.onconnectionstatechange = () => {
-    if (peerConnection?.connectionState === "connected") {
-      connected = true; searching = false;
-      crtWrapper.style.display = "none"; standbyCenter.style.display = "none"; searchLoader.style.display = "none";
-      reportBtn.disabled = false;
-      releaseBlur();
-    } else if (peerConnection?.connectionState === "disconnected" || peerConnection?.connectionState === "failed") {
-      triggerStartNext();
-    }
-  };
-
-  if (initiator) {
-    dataChannel = peerConnection.createDataChannel("chat");
-    setupDataChannel(dataChannel);
-    try {
-      const offer = await peerConnection.createOffer({ offerToReceiveVideo: true, offerToReceiveAudio: true });
-      await peerConnection.setLocalDescription(offer);
-      socket.emit("signal", { type: "offer", offer: offer });
-    } catch(err){}
-  } else {
-    peerConnection.ondatachannel = (e) => setupDataChannel(e.channel);
-  }
-}
-
-function setupDataChannel(ch) {
-  dataChannel = ch;
-  ch.onmessage = (e) => addChatMessage(getTranslatedText("stranger"), e.data);
-}
-
-function closePeerConnection() {
-  if (dataChannel) { try{ dataChannel.close(); }catch(e){} dataChannel = null; }
-  if (peerConnection) {
-    try {
-      peerConnection.ontrack = null;
-      peerConnection.onicecandidate = null;
-      peerConnection.onconnectionstatechange = null;
-      peerConnection.close();
-    }catch(e){}
-    peerConnection = null;
-  }
-  if (remoteVideo.srcObject) remoteVideo.srcObject = null;
-  pendingCandidates = [];
 }
 
 /* ================= 5. SNAPSHOT CAPTURING & BAN UI ================= */
@@ -1214,7 +1263,7 @@ function submitGCashUnbanTicket() {
   }
 }
 
-/* ================= 6. TRANSLATIONS (DEFAULT ENGLISH) ================= */
+/* ================= 6. TRANSLATIONS ================= */
 const i18n = {
   en: {
     subTitle: "Random Video Chat", portalBtn: "START CHATTING", report: "Report", stop: "Stop", start: "Start", next: "Next", stopped: "Stopped",
