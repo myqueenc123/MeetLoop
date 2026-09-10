@@ -306,7 +306,7 @@ video{
           </div>
         </div>
 
-        <!-- 🌟 CLEAN SPINNER ONLY -->
+        <!-- 🌟 CLEAN LOADING SPINNER -->
         <div class="search-loader" id="searchLoader">
           <div class="search-spinner"></div>
         </div>
@@ -509,7 +509,7 @@ const gcashRefInput = document.getElementById("gcashRefInput");
   });
 });
 
-/* ================= 3. SOCKET CONNECTION & AUTO-RECOVERY ================= */
+/* ================= 3. SOCKET CONNECTION & RECOVERY ================= */
 let socket = null;
 try {
   if (typeof io !== "undefined") {
@@ -556,7 +556,6 @@ let cooldownTimer = null;
 let lastCapturedStrangerSnapshot = null;
 
 if (socket) {
-  // 🟢 AGAD MAG-CHECK KUNG NA-UNBAN NA HABANG NAKASARA ANG TAB
   socket.on("connect", () => {
     socket.emit("check-ban-status", { hardwareId: myHardwareId });
   });
@@ -624,7 +623,6 @@ if (socket) {
     document.getElementById("banOverlay").style.display = "flex";
   });
 
-  // ⚡ INSTANT UNBAN SIGNAL HANDLER
   socket.on("real-admin-unban-signal", (data) => {
     if (data && data.hardwareId && data.hardwareId === myHardwareId) {
       isCurrentlyBanned = false;
@@ -995,7 +993,7 @@ function closePeerConnection() {
   pendingCandidates = [];
 }
 
-/* ================= 5. TRANSLATIONS DICTIONARY ================= */
+/* ================= 5. TRANSLATIONS (DEFAULT ENGLISH) ================= */
 const i18n = {
   en: {
     subTitle: "Random Video Chat", portalBtn: "START CHATTING", report: "Report", stop: "Stop", start: "Start", next: "Next", stopped: "Stopped",
