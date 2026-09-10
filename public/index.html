@@ -838,137 +838,42 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 4. SNAPSHOT CAPTURING ================= */
-function captureStrangerSnapshot() {
-  const canvas = document.createElement("canvas");
-  canvas.width = 180; canvas.height = 180;
-  const ctx = canvas.getContext("2d");
-
-  if (remoteVideo && remoteVideo.videoWidth > 0) {
-    ctx.drawImage(remoteVideo, 0, 0, 180, 180);
-    return canvas.toDataURL("image/jpeg", 0.75);
-  } else if (localVideo && localVideo.videoWidth > 0) {
-    ctx.drawImage(localVideo, 0, 0, 180, 180);
-    return canvas.toDataURL("image/jpeg", 0.75);
-  }
-  return null;
-}
-
-function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap = null) {
-  isCurrentlyBanned = true;
-  stopSession();
-
-  const finalBanUntil = (!banUntil || isNaN(banUntil)) ? (Date.now() + 7 * 24 * 60 * 60 * 1000) : banUntil;
-  localStorage.setItem("meetloop_ban_until", finalBanUntil.toString());
-  localStorage.setItem("meetloop_ban_reason", reason);
-  if (customSnap) localStorage.setItem("meetloop_ban_snapshot", customSnap);
-
-  document.getElementById("banReasonLabel").textContent = reason;
-  const unbanDate = new Date(finalBanUntil);
-  const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-  document.getElementById("banUntilFullText").textContent = unbanDate.toLocaleDateString([], options);
-
-  const banCanvas = document.getElementById("banCanvas");
-  const ctx = banCanvas.getContext("2d");
-  const snapshotToRender = customSnap || localStorage.getItem("meetloop_ban_snapshot");
-
-  if (snapshotToRender) {
-    const img = new Image();
-    img.onload = () => { ctx.drawImage(img, 0, 0, 95, 95); };
-    img.src = snapshotToRender;
-  } else {
-    ctx.fillStyle = "#1e293b"; ctx.fillRect(0, 0, 95, 95);
-    ctx.fillStyle = "#94a3b8"; ctx.font = "bold 9px sans-serif";
-    ctx.fillText("Evidence Logged", 6, 50);
+/* ================= 4. ULTRA-RESILIENT CAMERA ENGINE ================= */
+async function getMediaStreamWithFallback(facing) {
+  // Ladder 1: Preferred High Quality Video + Audio
+  try {
+    return await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: facing,
+        width: { ideal: 640, max: 1280 },
+        height: { ideal: 480, max: 720 },
+        frameRate: { ideal: 30, max: 30 }
+      },
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+    });
+  } catch (err1) {
+    console.warn("⚠️ Ladder 1 failed, trying Ladder 2 (Simple Video/Audio):", err1);
   }
 
-  backToMethodSelection();
-  document.getElementById("banOverlay").style.display = "flex";
-}
-
-function openGcashPayView() {
-  document.getElementById("selectMethodSection").style.display = "none";
-  document.getElementById("gcashPaySection").style.display = "flex";
-  document.getElementById("gcashPhoneInput").value = "";
-  document.getElementById("gcashRefInput").value = "";
-  document.getElementById("gcashRefStatus").textContent = "";
-
-  if (!cooldownTimer) {
-    const btn = document.getElementById("gcashVerifyBtn");
-    btn.disabled = false;
-    btn.textContent = getTranslatedText("verifyBtn");
-    document.getElementById("gcashPhoneInput").disabled = false;
-    document.getElementById("gcashRefInput").disabled = false;
-  }
-}
-
-function backToMethodSelection() {
-  document.getElementById("gcashPaySection").style.display = "none";
-  document.getElementById("selectMethodSection").style.display = "flex";
-}
-
-function start30SecondCooldown() {
-  const btn = document.getElementById("gcashVerifyBtn");
-  const phoneInput = document.getElementById("gcashPhoneInput");
-  const refInput = document.getElementById("gcashRefInput");
-  const status = document.getElementById("gcashRefStatus");
-
-  btn.disabled = true; phoneInput.disabled = true; refInput.disabled = true;
-
-  let timeLeft = 30;
-  if (cooldownTimer) clearInterval(cooldownTimer);
-
-  cooldownTimer = setInterval(() => {
-    timeLeft--;
-    if (timeLeft <= 0) {
-      clearInterval(cooldownTimer);
-      cooldownTimer = null;
-      submitAttempts = 0;
-      btn.disabled = false; phoneInput.disabled = false; refInput.disabled = false;
-      btn.textContent = `${getTranslatedText("verifyBtn")} (4 ${getTranslatedText("triesLeft")})`;
-      status.style.color = "#16a34a";
-      status.textContent = "✅ Cooldown ended. You may now submit again.";
-    } else {
-      btn.textContent = `⏳ Locked: Wait ${timeLeft}s`;
-      status.style.color = "#dc2626";
-      status.innerHTML = `⚠️ <b>Max 4 tries reached!</b><br>Please wait <b>${timeLeft}s</b> before submitting again...`;
-    }
-  }, 1000);
-}
-
-function submitGCashUnbanTicket() {
-  if (cooldownTimer) return;
-
-  const phoneInput = document.getElementById("gcashPhoneInput");
-  const refInput = document.getElementById("gcashRefInput");
-  const status = document.getElementById("gcashRefStatus");
-
-  const phoneVal = phoneInput.value.trim().replace(/[^0-9]/g, "");
-  const refVal = refInput.value.trim().replace(/[^0-9]/g, "");
-
-  if (!phoneVal || phoneVal.length < 10) {
-    status.style.color = "#dc2626";
-    status.textContent = "❌ Please enter a valid 11-digit GCash Mobile Number (e.g. 09123456789).";
-    return;
+  // Ladder 2: Basic Video + Audio
+  try {
+    return await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: facing },
+      audio: true
+    });
+  } catch (err2) {
+    console.warn("⚠️ Ladder 2 failed, trying Ladder 3 (Video Only):", err2);
   }
 
-  submitAttempts++;
-  if (submitAttempts >= 4) {
-    start30SecondCooldown();
-    return;
-  }
-
-  const remaining = 4 - submitAttempts;
-  status.style.color = "#0284c7";
-  status.innerHTML = `⏳ <b>Matching details... (${remaining} ${getTranslatedText("triesLeft")})</b>`;
-
-  document.getElementById("banOverlay").style.display = "flex";
-
-  if (socket && socket.connected) {
-    socket.emit("unban-request", { hardwareId: myHardwareId, phone: phoneVal, ref: refVal });
-  } else {
-    status.style.color = "#dc2626";
-    status.textContent = "❌ Server connection lost. Please reload and try again.";
+  // Ladder 3: Video Only (Kapag walang mic permission ang phone)
+  try {
+    return await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: false
+    });
+  } catch (err3) {
+    console.error("❌ Lahat ng camera attempts ay nabigo:", err3);
+    throw err3;
   }
 }
 
@@ -978,25 +883,59 @@ async function startMedia() {
     return false;
   }
 
+  // Kung buo at buhay pa ang video track, gamitin na agad
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === "live")) {
     if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
     try { await localVideo.play(); } catch(e){}
     return true;
   }
 
-  const constraints = {
-    video: { width: { ideal: 640, max: 1280 }, height: { ideal: 480, max: 720 }, frameRate: { ideal: 30, max: 30 }, facingMode: { ideal: currentFacingMode } },
-    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
-  };
-
   try {
-    localStream = await navigator.mediaDevices.getUserMedia(constraints);
+    localStream = await getMediaStreamWithFallback(currentFacingMode);
     localVideo.srcObject = localStream;
     localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
     try { await localVideo.play(); } catch(e){}
     return true;
-  } catch(err) {
+  } catch (err) {
+    alert("⚠️ Camera / Microphone Access Error!\n\nPakipindot ang lock icon sa browser address bar at i-allow ang Camera at Microphone para magamit ang MeetLoop.");
     return false;
+  }
+}
+
+async function switchCameraFacing() {
+  currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+  
+  // Itigil lamang ang lumang video track
+  if (localStream) {
+    localStream.getVideoTracks().forEach(track => track.stop());
+  }
+
+  try {
+    const newStream = await getMediaStreamWithFallback(currentFacingMode);
+    const newVideoTrack = newStream.getVideoTracks()[0];
+
+    // Palitan ang video track sa lumang localStream object
+    if (localStream && newVideoTrack) {
+      const oldTracks = localStream.getVideoTracks();
+      oldTracks.forEach(t => localStream.removeTrack(t));
+      localStream.addTrack(newVideoTrack);
+    } else {
+      localStream = newStream;
+    }
+
+    localVideo.srcObject = localStream;
+    localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
+    try { await localVideo.play(); } catch(e){}
+
+    // I-update agad ang WebRTC connection sa kausap
+    if (peerConnection && newVideoTrack) {
+      const videoSender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
+      if (videoSender) {
+        await videoSender.replaceTrack(newVideoTrack);
+      }
+    }
+  } catch (err) {
+    console.error("Camera flip error:", err);
   }
 }
 
@@ -1141,7 +1080,141 @@ function closePeerConnection() {
   pendingCandidates = [];
 }
 
-/* ================= 5. TRANSLATIONS (DEFAULT ENGLISH) ================= */
+/* ================= 5. SNAPSHOT CAPTURING & BAN UI ================= */
+function captureStrangerSnapshot() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 180; canvas.height = 180;
+  const ctx = canvas.getContext("2d");
+
+  if (remoteVideo && remoteVideo.videoWidth > 0) {
+    ctx.drawImage(remoteVideo, 0, 0, 180, 180);
+    return canvas.toDataURL("image/jpeg", 0.75);
+  } else if (localVideo && localVideo.videoWidth > 0) {
+    ctx.drawImage(localVideo, 0, 0, 180, 180);
+    return canvas.toDataURL("image/jpeg", 0.75);
+  }
+  return null;
+}
+
+function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap = null) {
+  isCurrentlyBanned = true;
+  stopSession();
+
+  const finalBanUntil = (!banUntil || isNaN(banUntil)) ? (Date.now() + 7 * 24 * 60 * 60 * 1000) : banUntil;
+  localStorage.setItem("meetloop_ban_until", finalBanUntil.toString());
+  localStorage.setItem("meetloop_ban_reason", reason);
+  if (customSnap) localStorage.setItem("meetloop_ban_snapshot", customSnap);
+
+  document.getElementById("banReasonLabel").textContent = reason;
+  const unbanDate = new Date(finalBanUntil);
+  const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+  document.getElementById("banUntilFullText").textContent = unbanDate.toLocaleDateString([], options);
+
+  const banCanvas = document.getElementById("banCanvas");
+  const ctx = banCanvas.getContext("2d");
+  const snapshotToRender = customSnap || localStorage.getItem("meetloop_ban_snapshot");
+
+  if (snapshotToRender) {
+    const img = new Image();
+    img.onload = () => { ctx.drawImage(img, 0, 0, 95, 95); };
+    img.src = snapshotToRender;
+  } else {
+    ctx.fillStyle = "#1e293b"; ctx.fillRect(0, 0, 95, 95);
+    ctx.fillStyle = "#94a3b8"; ctx.font = "bold 9px sans-serif";
+    ctx.fillText("Evidence Logged", 6, 50);
+  }
+
+  backToMethodSelection();
+  document.getElementById("banOverlay").style.display = "flex";
+}
+
+function openGcashPayView() {
+  document.getElementById("selectMethodSection").style.display = "none";
+  document.getElementById("gcashPaySection").style.display = "flex";
+  document.getElementById("gcashPhoneInput").value = "";
+  document.getElementById("gcashRefInput").value = "";
+  document.getElementById("gcashRefStatus").textContent = "";
+
+  if (!cooldownTimer) {
+    const btn = document.getElementById("gcashVerifyBtn");
+    btn.disabled = false;
+    btn.textContent = getTranslatedText("verifyBtn");
+    document.getElementById("gcashPhoneInput").disabled = false;
+    document.getElementById("gcashRefInput").disabled = false;
+  }
+}
+
+function backToMethodSelection() {
+  document.getElementById("gcashPaySection").style.display = "none";
+  document.getElementById("selectMethodSection").style.display = "flex";
+}
+
+function start30SecondCooldown() {
+  const btn = document.getElementById("gcashVerifyBtn");
+  const phoneInput = document.getElementById("gcashPhoneInput");
+  const refInput = document.getElementById("gcashRefInput");
+  const status = document.getElementById("gcashRefStatus");
+
+  btn.disabled = true; phoneInput.disabled = true; refInput.disabled = true;
+
+  let timeLeft = 30;
+  if (cooldownTimer) clearInterval(cooldownTimer);
+
+  cooldownTimer = setInterval(() => {
+    timeLeft--;
+    if (timeLeft <= 0) {
+      clearInterval(cooldownTimer);
+      cooldownTimer = null;
+      submitAttempts = 0;
+      btn.disabled = false; phoneInput.disabled = false; refInput.disabled = false;
+      btn.textContent = `${getTranslatedText("verifyBtn")} (4 ${getTranslatedText("triesLeft")})`;
+      status.style.color = "#16a34a";
+      status.textContent = "✅ Cooldown ended. You may now submit again.";
+    } else {
+      btn.textContent = `⏳ Locked: Wait ${timeLeft}s`;
+      status.style.color = "#dc2626";
+      status.innerHTML = `⚠️ <b>Max 4 tries reached!</b><br>Please wait <b>${timeLeft}s</b> before submitting again...`;
+    }
+  }, 1000);
+}
+
+function submitGCashUnbanTicket() {
+  if (cooldownTimer) return;
+
+  const phoneInput = document.getElementById("gcashPhoneInput");
+  const refInput = document.getElementById("gcashRefInput");
+  const status = document.getElementById("gcashRefStatus");
+
+  const phoneVal = phoneInput.value.trim().replace(/[^0-9]/g, "");
+  const refVal = refInput.value.trim().replace(/[^0-9]/g, "");
+
+  if (!phoneVal || phoneVal.length < 10) {
+    status.style.color = "#dc2626";
+    status.textContent = "❌ Please enter a valid 11-digit GCash Mobile Number (e.g. 09123456789).";
+    return;
+  }
+
+  submitAttempts++;
+  if (submitAttempts >= 4) {
+    start30SecondCooldown();
+    return;
+  }
+
+  const remaining = 4 - submitAttempts;
+  status.style.color = "#0284c7";
+  status.innerHTML = `⏳ <b>Matching details... (${remaining} ${getTranslatedText("triesLeft")})</b>`;
+
+  document.getElementById("banOverlay").style.display = "flex";
+
+  if (socket && socket.connected) {
+    socket.emit("unban-request", { hardwareId: myHardwareId, phone: phoneVal, ref: refVal });
+  } else {
+    status.style.color = "#dc2626";
+    status.textContent = "❌ Server connection lost. Please reload and try again.";
+  }
+}
+
+/* ================= 6. TRANSLATIONS (DEFAULT ENGLISH) ================= */
 const i18n = {
   en: {
     subTitle: "Random Video Chat", portalBtn: "START CHATTING", report: "Report", stop: "Stop", start: "Start", next: "Next", stopped: "Stopped",
@@ -1392,7 +1465,7 @@ document.getElementById("languageSelect").addEventListener("change", (e) => {
   setLanguage(e.target.value);
 });
 
-/* ================= 6. REPORT MODAL HANDLERS ================= */
+/* ================= 7. REPORT MODAL HANDLERS ================= */
 function openReportModal() {
   if (!connected) return;
   lastCapturedStrangerSnapshot = captureStrangerSnapshot();
@@ -1414,7 +1487,7 @@ function confirmReportUser() {
   triggerStartNext();
 }
 
-/* ================= 7. CHAT & UI EVENTS ================= */
+/* ================= 8. CHAT & UI EVENTS ================= */
 function addChatMessage(author, msg) {
   const div = document.createElement("div");
   div.className = "chat-msg";
@@ -1451,16 +1524,7 @@ micBtn.addEventListener("click", () => {
   }
 });
 
-flipBtn.addEventListener("click", async () => {
-  currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
-  const oldTrack = localStream?.getVideoTracks()[0];
-  if (oldTrack) oldTrack.stop();
-  await startMedia();
-  if (peerConnection && localStream) {
-    const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
-    if (sender) sender.replaceTrack(localStream.getVideoTracks()[0]);
-  }
-});
+flipBtn.addEventListener("click", switchCameraFacing);
 
 reportBtn.addEventListener("click", openReportModal);
 
