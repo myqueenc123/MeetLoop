@@ -113,19 +113,16 @@ video{
   width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);
 }
 
+/* CLEAN SPINNER ONLY (NO BOX & NO TEXT) */
 .search-loader{
   position:absolute;inset:0;z-index:4;display:none;align-items:center;justify-content:center;user-select:none;
 }
-.search-card{
-  background:rgba(15, 23, 42, 0.94);border:1.5px solid rgba(56, 189, 248, 0.35);
-  padding:20px 26px;border-radius:20px;text-align:center;
-}
 .search-spinner{
-  width:36px;height:36px;margin:0 auto 10px;border:3.5px solid rgba(255,255,255,.15);
+  width:44px;height:44px;border:4px solid rgba(255,255,255,.15);
   border-top-color:#38bdf8;border-radius:50%;animation:spin .75s linear infinite;
+  filter:drop-shadow(0 0 12px rgba(56,189,248,0.7));
 }
 @keyframes spin{to{transform:rotate(360deg)}}
-.search-text{font-size:14px;font-weight:900;color:#f8fafc;letter-spacing:0.3px}
 
 #remoteVideo.remote-blur{filter:blur(25px) brightness(0.9)}
 #remoteVideo.remote-clear{filter:blur(0px) brightness(1.0);transition:filter 0.25s ease-out}
@@ -140,10 +137,6 @@ video{
 
 #localVideo.mirrored{transform:scaleX(-1)}
 #localVideo.unmirrored{transform:scaleX(1)}
-#camOffCover{
-  position:absolute;inset:0;background:#090d16;display:none;
-  align-items:center;justify-content:center;color:var(--text-muted);font-size:12px;font-weight:700;z-index:3;
-}
 
 .cam-tag{
   position:absolute;top:10px;left:10px;z-index:5;
@@ -163,9 +156,9 @@ video{
   border:0;border-radius:10px;color:#fff;font-size:13px;font-weight:800;
   cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;user-select:none;
 }
-.btn-start-next{flex:2;background:linear-gradient(135deg,#0284c7,#2563eb)}
-.btn-stop{flex:1;background:#dc2626}
-.btn-sec{flex:1;background:#1e293b;border:1px solid rgba(255,255,255,.08)}
+.btn-start-next{flex:3;background:linear-gradient(135deg,#0284c7,#2563eb)}
+.btn-stop{flex:1.5;background:#dc2626}
+.btn-sec{flex:1.5;background:#1e293b;border:1px solid rgba(255,255,255,.08)}
 .btn-flip{background:#6b21a8}
 
 .chat-arena{
@@ -177,7 +170,7 @@ video{
 .chat-msg{margin-bottom:10px;word-break:break-word}
 .chat-author{font-size:9px;font-weight:800;color:var(--text-muted);margin-bottom:2px}
 .chat-bubble{display:inline-block;max-width:96%;padding:8px 11px;background:#1e293b;border-radius:8px;font-size:11px;line-height:1.4;color:#f8fafc}
-.chat-rules-card{background:#1e1b4b;border:1px solid #4338ca;font-size:11px;line-height:1.5}
+.chat-rules-card{background:#1e1b4b;border:1.5px solid #4338ca;font-size:11.5px;line-height:1.6;color:#e2e8f0;padding:12px;border-radius:10px}
 .chat-foot{display:flex;gap:6px;padding:8px;border-top:1px solid var(--panel-border)}
 .chat-input{flex:1;min-width:0;height:38px;padding:0 12px;background:#070b14;border:1px solid var(--panel-border);border-radius:8px;color:#fff;outline:none;font-size:11px}
 .chat-send-btn{width:60px;height:38px;border:0;border-radius:8px;background:#2563eb;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
@@ -198,9 +191,9 @@ video{
   .ctrl-btn{min-height:42px;font-size:12px;padding:4px}
   .btn-start-next{grid-column:span 4}
   .btn-stop{grid-column:span 2}
-  .btn-sec{grid-column:span 2}
-  #flipBtn{grid-column:span 2;display:flex !important}
-  .chat-arena{width:100%;max-width:none;height:220px;min-height:220px;border-radius:12px}
+  .btn-sec{grid-column:span 3}
+  #flipBtn{grid-column:span 3;display:flex !important}
+  .chat-arena{width:100%;max-width:none;height:240px;min-height:240px;border-radius:12px}
 }
 @media (min-width:851px){
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
@@ -271,6 +264,25 @@ video{
 .portal-logo-svg{width:75px;height:75px;margin:0 auto 12px;display:block}
 .portal-btn{width:100%;height:48px;border-radius:12px;border:0;background:linear-gradient(135deg,#0284c7,#2563eb);color:#fff;font-size:14px;font-weight:800;cursor:pointer;margin-top:12px}
 .portal-rules{text-align:left;font-size:12px;color:#cbd5e1;line-height:1.6;margin:16px 0;background:#1f293d;padding:14px;border-radius:12px}
+
+/* REPORT MODAL */
+#reportModal{
+  position:fixed;inset:0;z-index:2147483640;background:rgba(0,0,0,0.85);
+  display:none;align-items:center;justify-content:center;padding:16px;
+}
+.report-modal-card{
+  background:#111827;border:1.5px solid rgba(255,255,255,0.15);border-radius:20px;
+  max-width:380px;width:100%;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,0.9);
+}
+.report-title{font-size:16px;font-weight:900;color:#ef4444;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.report-desc{font-size:11.5px;color:#94a3b8;margin-bottom:14px}
+.report-select{
+  width:100%;height:42px;background:#0f172a;border:1.5px solid #334155;border-radius:10px;
+  color:#f8fafc;font-size:12.5px;font-weight:700;padding:0 10px;outline:none;margin-bottom:16px;
+}
+.report-actions{display:flex;gap:8px}
+.btn-submit-report{flex:1;height:42px;background:#dc2626;color:#fff;border:0;border-radius:10px;font-weight:800;font-size:12.5px;cursor:pointer}
+.btn-cancel-report{flex:1;height:42px;background:#1e293b;color:#94a3b8;border:0;border-radius:10px;font-weight:800;font-size:12.5px;cursor:pointer}
 </style>
 </head>
 
@@ -283,6 +295,30 @@ video{
     <div style="font-size:18px;font-weight:900;color:#ef4444;margin-bottom:8px" id="lblTabLockTitle">Duplicate Tab Detected</div>
     <div style="font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:18px" id="lblTabLockDesc">MeetLoop is only allowed in 1 tab session.</div>
     <button type="button" class="btn-claim-tab" id="btnClaimTab">Use This Tab Instead</button>
+  </div>
+</div>
+
+<!-- REPORT MODAL -->
+<div id="reportModal">
+  <div class="report-modal-card">
+    <div class="report-title">🚨 <span id="lblReportModalTitle">Report User</span></div>
+    <div class="report-desc" id="lblReportModalDesc">Select the violation reason for reporting this user:</div>
+    <select id="reportReasonSelect" class="report-select">
+      <option value="Nudity / Sexual Content">🔞 Nudity / Sexual Content</option>
+      <option value="Harassment / Bullying">🛑 Harassment / Bullying</option>
+      <option value="Hate Speech">🗣️ Hate Speech</option>
+      <option value="Threats / Violence">⚠️ Threats / Violence</option>
+      <option value="Spam / Advertising">📢 Spam / Advertising</option>
+      <option value="Scam / Fraud">💳 Scam / Fraud</option>
+      <option value="Underage User">🚸 Underage User</option>
+      <option value="Inappropriate Behavior">🚫 Inappropriate Behavior</option>
+      <option value="Impersonation">🎭 Impersonation</option>
+      <option value="Other">❓ Other</option>
+    </select>
+    <div class="report-actions">
+      <button type="button" class="btn-cancel-report" id="btnCancelReport" onclick="closeReportModal()">Cancel</button>
+      <button type="button" class="btn-submit-report" id="btnConfirmReport" onclick="confirmReportUser()">Submit Report</button>
+    </div>
   </div>
 </div>
 
@@ -456,11 +492,9 @@ video{
           </div>
         </div>
 
+        <!-- 🌟 CLEAN SPINNER ONLY (NO BOX & NO TEXT) -->
         <div class="search-loader" id="searchLoader">
-          <div class="search-card">
-            <div class="search-spinner"></div>
-            <div class="search-text" id="lblSearchText">Looking for someone...</div>
-          </div>
+          <div class="search-spinner"></div>
         </div>
 
         <div class="remote-audio-badge">
@@ -475,7 +509,6 @@ video{
 
       <div class="cam-box" id="localCamBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
-        <div id="camOffCover">Camera Off</div>
         <div class="cam-tag" id="localTag">You</div>
         <button id="hideLocalBtn" type="button">✕</button>
       </div>
@@ -487,7 +520,6 @@ video{
       <button class="ctrl-btn btn-start-next" id="mainActionBtn" type="button">Start</button>
       <button class="ctrl-btn btn-stop" id="stopBtn" type="button" disabled>Stop</button>
       <button class="ctrl-btn btn-sec" id="micBtn" type="button">Mic On</button>
-      <button class="ctrl-btn btn-sec" id="camBtn" type="button">Cam On</button>
       <button class="ctrl-btn btn-flip" id="flipBtn" type="button">Flip</button>
     </div>
   </div>
@@ -500,8 +532,15 @@ video{
     <div class="chat-stream" id="chatStream">
       <div class="chat-msg">
         <div class="chat-author">System</div>
+        <!-- 🌟 UPDATED OFFICIAL SYSTEM RULES CARD -->
         <div class="chat-bubble chat-rules-card" id="lblChatRules">
-          • 18+ only. Strict anti-nudity policy.<br>• Real face required in front of the camera.
+          👋 <b>Welcome to MeetLoop!</b><br><br>
+          🔞 <b>18+ only</b> — You must be 18 or older.<br>
+          🚫 <b>No nudity, sexual content, hate speech, or harassment.</b><br>
+          📹 <b>Show yourself on camera</b> — no pre-recorded or fake video.<br>
+          💬 <b>Respect everyone</b> — MeetLoop is not a dating site. Please don't ask for gender or personal information.<br>
+          ⚠️ <b>Violations may result in a temporary or permanent ban.</b><br><br>
+          Have fun, stay respectful, and enjoy your conversation! 🌎
         </div>
       </div>
     </div>
@@ -633,7 +672,7 @@ const gcashRefInput = document.getElementById("gcashRefInput");
   });
 });
 
-/* ================= 3. SOCKET CONNECTION ================= */
+/* ================= 3. SOCKET CONNECTION & LISTENERS ================= */
 let socket = null;
 try {
   if (typeof io !== "undefined") {
@@ -651,13 +690,11 @@ const searchLoader = document.getElementById("searchLoader");
 const remoteVideo = document.getElementById("remoteVideo");
 const localVideo = document.getElementById("localVideo");
 const localCamBox = document.getElementById("localCamBox");
-const camOffCover = document.getElementById("camOffCover");
 
 const remoteStatus = document.getElementById("remoteStatus");
 const mainActionBtn = document.getElementById("mainActionBtn");
 const stopBtn = document.getElementById("stopBtn");
 const micBtn = document.getElementById("micBtn");
-const camBtn = document.getElementById("camBtn");
 const flipBtn = document.getElementById("flipBtn");
 const reportBtn = document.getElementById("reportBtn");
 
@@ -679,6 +716,7 @@ let blurTimer = null;
 let pendingCandidates = [];
 let submitAttempts = 0;
 let cooldownTimer = null;
+let lastCapturedStrangerSnapshot = null;
 
 if (socket) {
   socket.on("online-count", (count) => {
@@ -804,11 +842,13 @@ function runTVStatic() {
 }
 runTVStatic();
 
-function captureReporterSnapshot() {
+/* ================= 4. CAPTURE STRANGER PICTURE ACCURATELY ================= */
+function captureStrangerSnapshot() {
   const canvas = document.createElement("canvas");
   canvas.width = 180; canvas.height = 180;
   const ctx = canvas.getContext("2d");
 
+  // 100% PRIORITY: Kukunin ang mukha ng KAUSAP mula sa remote video
   if (remoteVideo && remoteVideo.videoWidth > 0) {
     ctx.drawImage(remoteVideo, 0, 0, 180, 180);
     return canvas.toDataURL("image/jpeg", 0.75);
@@ -945,7 +985,6 @@ async function startMedia() {
 
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === "live")) {
     if (localVideo.srcObject !== localStream) localVideo.srcObject = localStream;
-    camOffCover.style.display = "none";
     try { await localVideo.play(); } catch(e){}
     return true;
   }
@@ -959,11 +998,9 @@ async function startMedia() {
     localStream = await navigator.mediaDevices.getUserMedia(constraints);
     localVideo.srcObject = localStream;
     localVideo.className = currentFacingMode === "user" ? "mirrored" : "unmirrored";
-    camOffCover.style.display = "none";
     try { await localVideo.play(); } catch(e){}
     return true;
   } catch(err) {
-    camOffCover.style.display = "flex";
     return false;
   }
 }
@@ -1110,12 +1147,12 @@ function closePeerConnection() {
   pendingCandidates = [];
 }
 
-/* ================= 9. COMPLETE GLOBAL TRANSLATOR (DEFAULT ENGLISH) ================= */
+/* ================= 5. TRANSLATIONS (DEFAULT ENGLISH) ================= */
 const i18n = {
   en: {
     subTitle: "Random Video Chat", portalBtn: "START CHATTING", report: "Report", stop: "Stop", start: "Start", next: "Next", stopped: "Stopped",
-    micOn: "Mic On", micOff: "Mic Off", camOn: "Cam On", camOff: "Cam Off", camOffCover: "Camera Off", showCam: "Show Cam", flip: "Flip",
-    onlineUsers: "online users", chatTitle: "Live Chat", chatRules: "• 18+ only. Strict anti-nudity policy.<br>• Real face required in front of the camera.",
+    micOn: "Mic On", micOff: "Mic Off", showCam: "Show Cam", flip: "Flip",
+    onlineUsers: "online users", chatTitle: "Live Chat",
     chatPlaceholder: "Type a message...", send: "Send", selectMethod: "Select Resolution Method:", gcashTitle: "Instant 7-Day Unban (₱10 Support)",
     gcashDesc: "Pay ₱10 GCash clearance fee & submit Mobile No.", waitTitle: "Wait 7-Day Suspension Period", waitDesc: "Auto unbans when 7 days expire",
     telegramSupport: "Message Telegram Support (@MeetLoop_bot)",
@@ -1132,8 +1169,8 @@ const i18n = {
   },
   tl: {
     subTitle: "Random Video Chat", portalBtn: "MAG-START MAG-CHAT", report: "I-Report", stop: "Ihinto", start: "Magsimula", next: "Susunod", stopped: "Nakahinto",
-    micOn: "Mic Bukas", micOff: "Mic Patay", camOn: "Cam Bukas", camOff: "Cam Patay", camOffCover: "Naka-off ang Camera", showCam: "Ipakita ang Cam", flip: "I-flip",
-    onlineUsers: "aktibong users", chatTitle: "Live Usapan", chatRules: "• 18+ lamang. Mahigpit na ipinagbabawal ang kabastusan.<br>• Totoong mukha ang dapat nakatapat sa camera.",
+    micOn: "Mic Bukas", micOff: "Mic Patay", showCam: "Ipakita ang Cam", flip: "I-flip",
+    onlineUsers: "aktibong users", chatTitle: "Live Usapan",
     chatPlaceholder: "Mag-type ng mensahe...", send: "Ipadala", selectMethod: "Pumili ng Paraan para Ma-unban:", gcashTitle: "Instant 7-Araw na Unban (₱10 Support)",
     gcashDesc: "Magbayad ng ₱10 GCash fee at ilagay ang Mobile No.", waitTitle: "Maghintay ng 7-Araw na Suspension", waitDesc: "Kusang ma-u-unban pagkatapos ng 7 araw",
     telegramSupport: "Mag-message sa Telegram Support (@MeetLoop_bot)",
@@ -1150,8 +1187,8 @@ const i18n = {
   },
   es: {
     subTitle: "Chat de Video Aleatorio", portalBtn: "EMPEZAR CHAT", report: "Reportar", stop: "Detener", start: "Iniciar", next: "Siguiente", stopped: "Detenido",
-    micOn: "Mic On", micOff: "Mic Off", camOn: "Cam On", camOff: "Cam Off", camOffCover: "Cámara Apagada", showCam: "Mostrar Cam", flip: "Girar",
-    onlineUsers: "usuarios en línea", chatTitle: "Chat en Vivo", chatRules: "• Solo 18+. Estricta política antidesnudez.<br>• Rostro real requerido.",
+    micOn: "Mic On", micOff: "Mic Off", showCam: "Mostrar Cam", flip: "Girar",
+    onlineUsers: "usuarios en línea", chatTitle: "Chat en Vivo",
     chatPlaceholder: "Escribe un mensaje...", send: "Enviar", selectMethod: "Seleccionar Método de Resolución:", gcashTitle: "Desbloqueo Instantáneo (Apoyo ₱10)",
     gcashDesc: "Pague ₱10 y envíe su número.", waitTitle: "Esperar 7 Días de Suspensión", waitDesc: "Se desbloquea automáticamente",
     telegramSupport: "Mensaje a Soporte de Telegram (@MeetLoop_bot)",
@@ -1168,8 +1205,8 @@ const i18n = {
   },
   ja: {
     subTitle: "ランダムビデオチャット", portalBtn: "チャットを開始", report: "通報", stop: "停止", start: "開始", next: "次へ", stopped: "停止中",
-    micOn: "マイクON", micOff: "マイクOFF", camOn: "カメラON", camOff: "カメラOFF", camOffCover: "カメラOFF", showCam: "カメラ表示", flip: "反転",
-    onlineUsers: "人オンライン", chatTitle: "ライブチャット", chatRules: "• 18歳以上限定。ヌード禁止。<br>• 本人の顔をカメラに向けてください。",
+    micOn: "マイクON", micOff: "マイクOFF", showCam: "カメラ表示", flip: "反転",
+    onlineUsers: "人オンライン", chatTitle: "ライブチャット",
     chatPlaceholder: "メッセージを入力...", send: "送信", selectMethod: "解決方法を選択:", gcashTitle: "即時BAN解除 (₱10 サポート)",
     gcashDesc: "₱10の解除料金を支払い、番号を入力してください。", waitTitle: "7日間の停止期間を待つ", waitDesc: "7日後に自動解除されます",
     telegramSupport: "Telegramサポートに連絡 (@MeetLoop_bot)",
@@ -1186,8 +1223,8 @@ const i18n = {
   },
   ko: {
     subTitle: "랜덤 화상 채팅", portalBtn: "채팅 시작하기", report: "신고", stop: "중지", start: "시작", next: "다음", stopped: "중지됨",
-    micOn: "마이크 켜짐", micOff: "마이크 꺼짐", camOn: "카메라 켜짐", camOff: "카메라 꺼짐", camOffCover: "카메라 꺼짐", showCam: "카메라 보기", flip: "전환",
-    onlineUsers: "명 온라인", chatTitle: "라이브 채팅", chatRules: "• 18세 이상만 이용 가능. 음란물 엄격 금지.<br>• 실제 얼굴을 비춰주세요.",
+    micOn: "마이크 켜짐", micOff: "마이크 꺼짐", showCam: "카메라 보기", flip: "전환",
+    onlineUsers: "명 온라인", chatTitle: "라이브 채팅",
     chatPlaceholder: "메시지를 입력하세요...", send: "전송", selectMethod: "해결 방법 선택:", gcashTitle: "즉시 정지 해제 (₱10 지원)",
     gcashDesc: "₱10 결제 후 번호를 제출하세요.", waitTitle: "7일 정지 기간 대기", waitDesc: "7일 후 자동으로 해제됩니다",
     telegramSupport: "텔레그램 고객지원 문의 (@MeetLoop_bot)",
@@ -1204,8 +1241,8 @@ const i18n = {
   },
   zh: {
     subTitle: "随机视频聊天", portalBtn: "开始聊天", report: "举报", stop: "停止", start: "开始", next: "下一个", stopped: "已停止",
-    micOn: "麦克风开", micOff: "麦克风关", camOn: "摄像头开", camOff: "摄像头关", camOffCover: "摄像头已关闭", showCam: "显示画面", flip: "翻转",
-    onlineUsers: "位在线用户", chatTitle: "实时聊天", chatRules: "• 仅限18岁以上。严禁任何低俗内容。<br>• 必须真人面对摄像头。",
+    micOn: "麦克风开", micOff: "麦克风关", showCam: "显示画面", flip: "翻转",
+    onlineUsers: "位在线用户", chatTitle: "实时聊天",
     chatPlaceholder: "输入消息...", send: "发送", selectMethod: "选择解封方案:", gcashTitle: "即时解封 (₱10 支持费)",
     gcashDesc: "支付 ₱10 费用并提交手机号。", waitTitle: "等待 7 天封禁期满", waitDesc: "7天后自动解封",
     telegramSupport: "联系 Telegram 客服 (@MeetLoop_bot)",
@@ -1222,8 +1259,8 @@ const i18n = {
   },
   id: {
     subTitle: "Obrolan Video Acak", portalBtn: "MULAI MENGOBROL", report: "Lapor", stop: "Berhenti", start: "Mulai", next: "Berikutnya", stopped: "Berhenti",
-    micOn: "Mik On", micOff: "Mik Off", camOn: "Kamera On", camOff: "Kamera Off", camOffCover: "Kamera Mati", showCam: "Tampilkan Kamera", flip: "Putar",
-    onlineUsers: "pengguna online", chatTitle: "Obrolan Langsung", chatRules: "• 18+ saja. Dilarang keras pornografi.<br>• Wajib menampilkan wajah asli.",
+    micOn: "Mik On", micOff: "Mik Off", showCam: "Tampilkan Kamera", flip: "Putar",
+    onlineUsers: "pengguna online", chatTitle: "Obrolan Langsung",
     chatPlaceholder: "Ketik pesan...", send: "Kirim", selectMethod: "Pilih Metode Resolusi:", gcashTitle: "Buka Blokir Instan (Dukungan ₱10)",
     gcashDesc: "Bayar ₱10 dan kirimkan nomor Anda.", waitTitle: "Tunggu Masa Penangguhan 7 Hari", waitDesc: "Buka blokir otomatis setelah 7 hari",
     telegramSupport: "Hubungi Dukungan Telegram (@MeetLoop_bot)",
@@ -1240,8 +1277,8 @@ const i18n = {
   },
   vi: {
     subTitle: "Trò Chuyện Video Ngẫu Nhiên", portalBtn: "BẮT ĐẦU CHAT", report: "Báo cáo", stop: "Dừng", start: "Bắt đầu", next: "Tiếp theo", stopped: "Đã dừng",
-    micOn: "Bật Mic", micOff: "Tắt Mic", camOn: "Bật Cam", camOff: "Tắt Cam", camOffCover: "Camera Đang Tắt", showCam: "Hiện Camera", flip: "Lật",
-    onlineUsers: "người dùng trực tuyến", chatTitle: "Trò Chuyện Trực Tiếp", chatRules: "• Chỉ dành cho 18+. Nghiêm cấm khỏa thân.<br>• Yêu cầu khuôn mặt thật trước camera.",
+    micOn: "Bật Mic", micOff: "Tắt Mic", showCam: "Hiện Camera", flip: "Lật",
+    onlineUsers: "người dùng trực tuyến", chatTitle: "Trò Chuyện Trực Tiếp",
     chatPlaceholder: "Nhập tin nhắn...", send: "Gửi", selectMethod: "Chọn Phương Thức Mở Khóa:", gcashTitle: "Mở Khóa Ngay (Ủng Hộ ₱10)",
     gcashDesc: "Thanh toán ₱10 và gửi số điện thoại của bạn.", waitTitle: "Chờ Hết Hạn 7 Ngày", waitDesc: "Tự động mở khóa sau 7 ngày",
     telegramSupport: "Nhắn tin Hỗ trợ Telegram (@MeetLoop_bot)",
@@ -1258,8 +1295,8 @@ const i18n = {
   },
   ar: {
     subTitle: "دردشة فيديو عشوائية", portalBtn: "ابدأ الدردشة", report: "إبلاغ", stop: "إيقاف", start: "ابدأ", next: "التالي", stopped: "متوقف",
-    micOn: "الميكروفون يعمل", micOff: "الميكروفون مغلق", camOn: "الكاميرا تعمل", camOff: "الكاميرا مغلقة", camOffCover: "الكاميرا مغلقة", showCam: "عرض الكاميرا", flip: "قلب",
-    onlineUsers: "مستخدم متصل", chatTitle: "دردشة مباشرة", chatRules: "• 18+ فقط. يُمنع العري تماماً.<br>• يجب إظهار الوجه أمام الكاميرا.",
+    micOn: "الميكروفون يعمل", micOff: "الميكروفون مغلق", showCam: "عرض الكاميرا", flip: "قلب",
+    onlineUsers: "مستخدم متصل", chatTitle: "دردشة مباشرة",
     chatPlaceholder: "اكتب رسالة...", send: "إرسال", selectMethod: "اختر طريقة فك الحظر:", gcashTitle: "فك الحظر الفوري (دعم ₱10)",
     gcashDesc: "ادفع ₱10 وأدخل رقمك.", waitTitle: "انتظر فترة التعليق 7 أيام", waitDesc: "يتم فك الحظر تلقائياً بعد 7 أيام",
     telegramSupport: "مراسلة دعم التيليجرام (@MeetLoop_bot)",
@@ -1276,8 +1313,8 @@ const i18n = {
   },
   ru: {
     subTitle: "Случайный видеочат", portalBtn: "НАЧАТЬ ЧАТ", report: "Пожаловаться", stop: "Стоп", start: "Старт", next: "Далее", stopped: "Остановлено",
-    micOn: "Микр Вкл", micOff: "Микр Выкл", camOn: "Кам Вкл", camOff: "Кам Выкл", camOffCover: "Камера выключена", showCam: "Показать камеру", flip: "Поворот",
-    onlineUsers: "онлайн", chatTitle: "Чат", chatRules: "• Только 18+. Строго без обнажения.<br>• Лицо должно быть видно в камере.",
+    micOn: "Микр Вкл", micOff: "Микр Выкл", showCam: "Показать камеру", flip: "Поворот",
+    onlineUsers: "онлайн", chatTitle: "Чат",
     chatPlaceholder: "Введите сообщение...", send: "Отправить", selectMethod: "Выберите способ разблокировки:", gcashTitle: "Мгновенный разбан (₱10)",
     gcashDesc: "Оплатите ₱10 и укажите номер.", waitTitle: "Подождать 7 дней", waitDesc: "Автоматический разбан через 7 дней",
     telegramSupport: "Написать в поддержку Telegram (@MeetLoop_bot)",
@@ -1317,7 +1354,6 @@ function setLanguage(lang) {
   document.getElementById("stopBtn").textContent = t.stop;
   document.getElementById("lblOnlineText").textContent = t.onlineUsers;
   document.getElementById("lblChatTitle").textContent = t.chatTitle;
-  document.getElementById("lblChatRules").innerHTML = t.chatRules;
   document.getElementById("chatInput").placeholder = t.chatPlaceholder;
   document.getElementById("sendBtn").textContent = t.send;
   document.getElementById("lblSelectMethod").textContent = t.selectMethod;
@@ -1326,7 +1362,6 @@ function setLanguage(lang) {
   document.getElementById("lblWaitTitle").textContent = t.waitTitle;
   document.getElementById("lblWaitDesc").textContent = t.waitDesc;
   document.getElementById("lblScanText").innerHTML = t.scanText;
-  document.getElementById("lblSearchText").textContent = t.searching;
   document.getElementById("lblExpiresHeader").textContent = t.expiresHeader;
   document.getElementById("lblEvidenceTag").textContent = t.evidenceTag;
   document.getElementById("lblEncounterSnapshot").textContent = t.encounterSnapshot;
@@ -1339,7 +1374,6 @@ function setLanguage(lang) {
   document.getElementById("btnClaimTab").textContent = t.tabLockBtn;
   document.getElementById("remoteTag").textContent = t.stranger;
   document.getElementById("localTag").textContent = t.you;
-  document.getElementById("camOffCover").textContent = t.camOffCover;
   document.getElementById("showLocalBtn").textContent = t.showCam;
   document.getElementById("flipBtn").textContent = t.flip;
   document.getElementById("banTitle").textContent = t.banTitle;
@@ -1364,7 +1398,29 @@ document.getElementById("languageSelect").addEventListener("change", (e) => {
   setLanguage(e.target.value);
 });
 
-/* ================= 10. CHAT & UI EVENTS ================= */
+/* ================= 6. REPORT MODAL HANDLERS ================= */
+function openReportModal() {
+  if (!connected) return;
+  lastCapturedStrangerSnapshot = captureStrangerSnapshot(); // Capture Stranger Face!
+  document.getElementById("reportModal").style.display = "flex";
+}
+
+function closeReportModal() {
+  document.getElementById("reportModal").style.display = "none";
+}
+
+function confirmReportUser() {
+  const reason = document.getElementById("reportReasonSelect").value;
+  closeReportModal();
+
+  if (socket) {
+    socket.emit("report-user", { reason: reason, snapshot: lastCapturedStrangerSnapshot });
+  }
+  reportBtn.disabled = true;
+  triggerStartNext();
+}
+
+/* ================= 7. CHAT & UI EVENTS ================= */
 function addChatMessage(author, msg) {
   const div = document.createElement("div");
   div.className = "chat-msg";
@@ -1401,15 +1457,6 @@ micBtn.addEventListener("click", () => {
   }
 });
 
-camBtn.addEventListener("click", () => {
-  const t = localStream?.getVideoTracks()[0];
-  if (t) {
-    t.enabled = !t.enabled;
-    camBtn.textContent = t.enabled ? getTranslatedText("camOn") : getTranslatedText("camOff");
-    camOffCover.style.display = t.enabled ? "none" : "flex";
-  }
-});
-
 flipBtn.addEventListener("click", async () => {
   currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
   const oldTrack = localStream?.getVideoTracks()[0];
@@ -1421,13 +1468,7 @@ flipBtn.addEventListener("click", async () => {
   }
 });
 
-reportBtn.addEventListener("click", () => {
-  if (!connected) return;
-  const snap = captureReporterSnapshot();
-  if (socket) socket.emit("report-user", { reason: "Policy Violation", snapshot: snap });
-  reportBtn.disabled = true;
-  triggerStartNext();
-});
+reportBtn.addEventListener("click", openReportModal);
 
 audioSlider.addEventListener("input", (e) => {
   const v = parseFloat(e.target.value);
@@ -1450,7 +1491,7 @@ document.getElementById("showLocalBtn").addEventListener("click", () => {
   document.getElementById("showLocalBtn").classList.remove("visible");
 });
 
-// STARTUP
+// STARTUP (DEFAULT ENGLISH)
 checkMultiTabConflict();
 const initialLang = localStorage.getItem("meetloop_lang") || "en";
 setLanguage(initialLang);
