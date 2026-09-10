@@ -516,7 +516,7 @@ video{
       </div>
     </div>
 
-    <!-- VIEW 2: GCASH TOPUP FORM -->
+    <!-- VIEW 2: GCASH TOPUP FORM (4 TRIES + 30s COOLDOWN) -->
     <div id="gcashPaySection">
       <div class="gcash-logo-banner">
         <svg class="gcash-official-svg" viewBox="0 0 160 38" fill="none">
@@ -604,7 +604,7 @@ video{
           <div class="crt-overlay-vignette"></div>
         </div>
 
-        <!-- STANDBY VIEW WITH WORKING LIVE USER COUNTER -->
+        <!-- STANDBY VIEW WITH ACCURATE LIVE USER COUNTER -->
         <div id="standbyCenter" class="standby-center">
           <svg class="standby-logo" viewBox="0 0 100 100">
             <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z" fill="#38bdf8"/>
@@ -832,7 +832,7 @@ let pendingCandidates = [];
 let submitAttempts = 0;
 let cooldownTimer = null;
 
-// 🟢 LIVE USER COUNTER LISTENER (Real-Time Update)
+// 🟢 LIVE ACCURATE REAL-TIME USER COUNTER
 if (socket) {
   socket.on("online-count", (count) => {
     const realCount = Math.max(1, Number(count || 1));
