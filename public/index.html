@@ -76,11 +76,10 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
-/* HD OMETV STYLE VIDEO RENDERING (ZERO BLUR, ZERO LAG) */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
-  image-rendering: -webkit-optimize-contrast;
-  transform: translateZ(0);
+  image-rendering:-webkit-optimize-contrast;
+  transform:translateZ(0);
 }
 
 .standby-center{
@@ -104,7 +103,7 @@ video{
   width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);
 }
 
-/* SEARCHING STATE */
+/* SEARCHING SPINNER */
 .search-loader{
   position:absolute;inset:0;z-index:5;display:none;flex-direction:column;
   align-items:center;justify-content:center;user-select:none;background:#090d16;gap:12px;
@@ -250,6 +249,7 @@ video{
 .ban-expire-time{font-size:12px;font-weight:800;color:#0f172a}
 .ban-id-chip{font-size:10px;color:#64748b;font-family:monospace}
 
+/* WELCOME PORTAL */
 #welcomePortal{
   position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px;
   background:linear-gradient(rgba(10, 14, 23, 0.75), rgba(10, 14, 23, 0.85)), url('/meetloop-bg.png') center/cover no-repeat;
@@ -311,8 +311,8 @@ video{
       <option value="Other">❓ Other</option>
     </select>
     <div class="report-actions">
-      <button type="button" class="btn-cancel-report" id="btnCancelReport" onclick="closeReportModal()">Cancel</button>
-      <button type="button" class="btn-submit-report" id="btnConfirmReport" onclick="confirmReportUser()">Submit Report</button>
+      <button type="button" class="btn-cancel-report" onclick="closeReportModal()">Cancel</button>
+      <button type="button" class="btn-submit-report" onclick="confirmReportUser()">Submit Report</button>
     </div>
   </div>
 </div>
@@ -338,7 +338,7 @@ video{
       <li id="r4"><b>Fast & Smooth:</b> OmeTV HD Quality Real-Time Streaming.</li>
     </ul>
 
-    <button class="portal-btn" id="portalStartBtn" type="button">START CHATTING</button>
+    <button class="portal-btn" id="portalStartBtn" type="button" onclick="startPortalChatting()">START CHATTING</button>
   </div>
 </div>
 
@@ -491,12 +491,12 @@ video{
 
         <!-- AUDIO VOLUME CONTROLS -->
         <div class="remote-audio-badge">
-          <svg class="audio-speaker-btn" id="speakerIcon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-          <input type="range" class="audio-slider" id="audioSlider" min="0" max="1" step="0.05" value="1">
+          <svg class="audio-speaker-btn" id="speakerIcon" onclick="toggleMuteSpeaker()" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+          <input type="range" class="audio-slider" id="audioSlider" min="0" max="1" step="0.05" value="1" oninput="updateVolume(this.value)">
         </div>
 
         <div class="cam-tag" id="remoteTag">Stranger</div>
-        <button id="reportBtn" type="button">Report</button>
+        <button id="reportBtn" type="button" onclick="openReportModal()">Report</button>
         <div class="cam-status-pill" id="remoteStatus">Waiting...</div>
       </div>
 
@@ -510,10 +510,10 @@ video{
     </div>
 
     <div class="controls-panel">
-      <button class="ctrl-btn btn-start-next" id="mainActionBtn" type="button">Start</button>
-      <button class="ctrl-btn btn-stop" id="stopBtn" type="button" disabled>Stop</button>
-      <button class="ctrl-btn btn-sec" id="micBtn" type="button">Mic On</button>
-      <button class="ctrl-btn btn-flip" id="flipBtn" type="button">Flip</button>
+      <button class="ctrl-btn btn-start-next" id="mainActionBtn" type="button" onclick="triggerStartNext()">Start</button>
+      <button class="ctrl-btn btn-stop" id="stopBtn" type="button" onclick="stopSession()" disabled>Stop</button>
+      <button class="ctrl-btn btn-sec" id="micBtn" type="button" onclick="toggleMicrophone()">Mic On</button>
+      <button class="ctrl-btn btn-flip" id="flipBtn" type="button" onclick="flipCamera()">Flip</button>
     </div>
   </div>
 
@@ -538,7 +538,7 @@ video{
     </div>
     <div class="chat-foot">
       <input type="text" id="chatInput" class="chat-input" placeholder="Type a message..." maxlength="250">
-      <button type="button" class="chat-send-btn" id="sendBtn">Send</button>
+      <button type="button" class="chat-send-btn" id="sendBtn" onclick="sendChat()">Send</button>
     </div>
   </div>
 </div>
@@ -565,7 +565,8 @@ let myHardwareId = getPersistentDeviceId();
 function updateNumericDisplayId() {
   let numericId = 0;
   for (let i = 0; i < myHardwareId.length; i++) numericId = (numericId * 31 + myHardwareId.charCodeAt(i)) % 900000000;
-  document.getElementById("adminUnbanId").textContent = "" + (100000000 + Math.abs(numericId));
+  const adminIdEl = document.getElementById("adminUnbanId");
+  if (adminIdEl) adminIdEl.textContent = "" + (100000000 + Math.abs(numericId));
 }
 updateNumericDisplayId();
 
@@ -615,16 +616,18 @@ function claimActiveTab() {
   isMasterTab = true;
   localStorage.setItem("meetloop_active_tab", myTabId);
   localStorage.setItem("meetloop_tab_ping", Date.now().toString());
-  document.getElementById("duplicateTabOverlay").style.display = "none";
+  const overlay = document.getElementById("duplicateTabOverlay");
+  if (overlay) overlay.style.display = "none";
   if (tabChannel) tabChannel.postMessage({ type: "CLAIM_MASTER", tabId: myTabId });
 }
 
 function showDuplicateTabBlocker() {
   stopSession();
-  document.getElementById("duplicateTabOverlay").style.display = "flex";
+  const overlay = document.getElementById("duplicateTabOverlay");
+  if (overlay) overlay.style.display = "flex";
 }
 
-document.getElementById("btnClaimTab").addEventListener("click", () => {
+document.getElementById("btnClaimTab")?.addEventListener("click", () => {
   claimActiveTab();
 });
 
@@ -634,21 +637,16 @@ setInterval(() => {
   }
 }, 1200);
 
-window.addEventListener("storage", (e) => {
-  if (e.key === "meetloop_active_tab" && e.newValue && e.newValue !== myTabId) {
-    isMasterTab = false;
-    showDuplicateTabBlocker();
-  }
-});
-
 const gcashPhoneInput = document.getElementById("gcashPhoneInput");
 const gcashRefInput = document.getElementById("gcashRefInput");
 
 [gcashPhoneInput, gcashRefInput].forEach(input => {
-  input.addEventListener("input", (e) => {
-    const clean = e.target.value.replace(/[^0-9]/g, "");
-    if (e.target.value !== clean) e.target.value = clean;
-  });
+  if (input) {
+    input.addEventListener("input", (e) => {
+      const clean = e.target.value.replace(/[^0-9]/g, "");
+      if (e.target.value !== clean) e.target.value = clean;
+    });
+  }
 });
 
 let socket = null;
@@ -676,8 +674,6 @@ const reportBtn = document.getElementById("reportBtn");
 
 const chatStream = document.getElementById("chatStream");
 const chatInput = document.getElementById("chatInput");
-const sendBtn = document.getElementById("sendBtn");
-
 const audioSlider = document.getElementById("audioSlider");
 const speakerIcon = document.getElementById("speakerIcon");
 const standbyUsers = document.getElementById("standbyUsers");
@@ -695,7 +691,6 @@ let submitAttempts = 0;
 let cooldownTimer = null;
 let lastCapturedStrangerSnapshot = null;
 
-// ⚡ HIGH-SPEED TURN/STUN RELAYS
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
@@ -716,10 +711,12 @@ function handleSuccessfulUnban() {
   submitAttempts = 0;
   
   const status = document.getElementById("gcashRefStatus");
-  status.style.color = "#16a34a";
-  status.textContent = "✅ " + getTranslatedText("unbanSuccess");
-
-  document.getElementById("banOverlay").style.display = "none";
+  if (status) {
+    status.style.color = "#16a34a";
+    status.textContent = "✅ " + getTranslatedText("unbanSuccess");
+  }
+  const overlay = document.getElementById("banOverlay");
+  if (overlay) overlay.style.display = "none";
 }
 
 if (socket) {
@@ -734,9 +731,9 @@ if (socket) {
 
   socket.on("waiting", () => {
     searching = true;
-    standbyCenter.style.display = "none";
-    searchLoader.style.display = "flex";
-    remoteStatus.textContent = getTranslatedText("searching");
+    if (standbyCenter) standbyCenter.style.display = "none";
+    if (searchLoader) searchLoader.style.display = "flex";
+    if (remoteStatus) remoteStatus.textContent = getTranslatedText("searching");
   });
 
   socket.on("match", async (data) => {
@@ -769,7 +766,7 @@ if (socket) {
         }
       }
     } catch(err){
-      console.error("Signaling error:", err);
+      console.error("Signal error:", err);
     }
   });
 
@@ -784,9 +781,12 @@ if (socket) {
 
   socket.on("unban-pending", (data) => {
     const status = document.getElementById("gcashRefStatus");
-    status.style.color = "#0284c7";
-    status.innerHTML = `⏳ <b>${getTranslatedText("detailsLogged")} (${4 - submitAttempts} ${getTranslatedText("triesLeft")})</b>`;
-    document.getElementById("banOverlay").style.display = "flex";
+    if (status) {
+      status.style.color = "#0284c7";
+      status.innerHTML = `⏳ <b>${getTranslatedText("detailsLogged")} (${4 - submitAttempts} ${getTranslatedText("triesLeft")})</b>`;
+    }
+    const overlay = document.getElementById("banOverlay");
+    if (overlay) overlay.style.display = "flex";
   });
 
   socket.on("real-admin-unban-signal", (data) => {
@@ -800,7 +800,7 @@ if (socket) {
 
   socket.on("unban-response", (data) => {
     const status = document.getElementById("gcashRefStatus");
-    if (!data.success) {
+    if (status && !data.success) {
       status.style.color = "#dc2626";
       status.textContent = data.message;
     }
@@ -811,15 +811,16 @@ if (socket) {
   });
 }
 
-/* ================= 4. HD LOW-LATENCY WEBRTC ENGINE ================= */
+/* ================= 4. HD MEDIA ENGINE ================= */
 async function startMedia() {
   if (isCurrentlyBanned) {
-    document.getElementById("banOverlay").style.display = "flex";
+    const overlay = document.getElementById("banOverlay");
+    if (overlay) overlay.style.display = "flex";
     return false;
   }
 
   if (localStream && localStream.getVideoTracks().some(t => t.readyState === "live")) {
-    if (localVideo.srcObject !== localStream) {
+    if (localVideo && localVideo.srcObject !== localStream) {
       localVideo.srcObject = localStream;
       localVideo.play().catch(()=>{});
     }
@@ -827,7 +828,6 @@ async function startMedia() {
   }
 
   try {
-    // 🌟 HD 720p 30fps LOW-LATENCY REAL-TIME CONSTRAINTS
     const stream = await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: currentFacingMode,
@@ -843,11 +843,12 @@ async function startMedia() {
     });
 
     localStream = stream;
-    localVideo.srcObject = localStream;
-    localVideo.className = (currentFacingMode === "user") ? "mirrored" : "unmirrored";
-    await localVideo.play().catch(()=>{});
-    
-    // Sync Mic state
+    if (localVideo) {
+      localVideo.srcObject = localStream;
+      localVideo.className = (currentFacingMode === "user") ? "mirrored" : "unmirrored";
+      await localVideo.play().catch(()=>{});
+    }
+
     const aTrack = localStream.getAudioTracks()[0];
     if (aTrack) aTrack.enabled = isMicActive;
 
@@ -856,22 +857,23 @@ async function startMedia() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       localStream = stream;
-      localVideo.srcObject = localStream;
-      localVideo.className = (currentFacingMode === "user") ? "mirrored" : "unmirrored";
-      await localVideo.play().catch(()=>{});
+      if (localVideo) {
+        localVideo.srcObject = localStream;
+        localVideo.className = (currentFacingMode === "user") ? "mirrored" : "unmirrored";
+        await localVideo.play().catch(()=>{});
+      }
       return true;
     } catch (finalErr) {
-      alert("⚠️ Please allow Camera and Microphone permission in your browser to chat!");
+      alert("⚠️ Please allow Camera and Microphone permission in your browser!");
       return false;
     }
   }
 }
 
-// 🔄 RELIABLE FAST CAMERA FLIP
 async function flipCamera() {
   if (isFlipping || !localStream) return;
   isFlipping = true;
-  flipBtn.disabled = true;
+  if (flipBtn) flipBtn.disabled = true;
 
   const targetFacing = (currentFacingMode === "user") ? "environment" : "user";
 
@@ -896,47 +898,52 @@ async function flipCamera() {
     localStream.addTrack(newVideoTrack);
     currentFacingMode = targetFacing;
 
-    localVideo.className = (currentFacingMode === "user") ? "mirrored" : "unmirrored";
-    localVideo.srcObject = localStream;
-    await localVideo.play().catch(()=>{});
+    if (localVideo) {
+      localVideo.className = (currentFacingMode === "user") ? "mirrored" : "unmirrored";
+      localVideo.srcObject = localStream;
+      await localVideo.play().catch(()=>{});
+    }
   } catch (err) {
     console.error("Flip error:", err);
   } finally {
     isFlipping = false;
-    flipBtn.disabled = false;
+    if (flipBtn) flipBtn.disabled = false;
   }
 }
 
-// 🎤 WORKING MIC TOGGLE
 function toggleMicrophone() {
   if (!localStream) return;
   const audioTrack = localStream.getAudioTracks()[0];
   if (audioTrack) {
     isMicActive = !isMicActive;
     audioTrack.enabled = isMicActive;
-    if (isMicActive) {
-      micBtn.textContent = getTranslatedText("micOn");
-      micBtn.classList.remove("muted");
-    } else {
-      micBtn.textContent = getTranslatedText("micOff");
-      micBtn.classList.add("muted");
+    if (micBtn) {
+      if (isMicActive) {
+        micBtn.textContent = getTranslatedText("micOn");
+        micBtn.classList.remove("muted");
+      } else {
+        micBtn.textContent = getTranslatedText("micOff");
+        micBtn.classList.add("muted");
+      }
     }
   }
 }
 
-// 🔊 WORKING VOLUME CONTROLS
 function updateVolume(val) {
   const v = Math.max(0, Math.min(1, parseFloat(val)));
-  audioSlider.value = v;
+  if (audioSlider) audioSlider.value = v;
   if (remoteVideo) {
     remoteVideo.volume = v;
     remoteVideo.muted = (v === 0);
   }
-  if (v === 0) {
-    speakerIcon.style.fill = "#ef4444";
-  } else {
-    speakerIcon.style.fill = "#38bdf8";
+  if (speakerIcon) {
+    speakerIcon.style.fill = (v === 0) ? "#ef4444" : "#38bdf8";
   }
+}
+
+function toggleMuteSpeaker() {
+  const cur = parseFloat(audioSlider?.value || 1);
+  updateVolume(cur > 0 ? 0 : 1.0);
 }
 
 async function createPeer(initiator) {
@@ -955,36 +962,36 @@ async function createPeer(initiator) {
   };
 
   peerConnection.ontrack = (e) => {
-    // 🌟 100% INSTANT CLEAR DISPLAY NG KAUSAP
-    standbyCenter.style.display = "none";
-    searchLoader.style.display = "none";
-    remoteStatus.textContent = "Live";
+    if (standbyCenter) standbyCenter.style.display = "none";
+    if (searchLoader) searchLoader.style.display = "none";
+    if (remoteStatus) remoteStatus.textContent = "Live";
 
-    if (e.streams && e.streams[0]) {
-      remoteVideo.srcObject = e.streams[0];
-    } else {
-      if (!remoteVideo.srcObject) remoteVideo.srcObject = new MediaStream();
-      remoteVideo.srcObject.addTrack(e.track);
-    }
+    if (remoteVideo) {
+      if (e.streams && e.streams[0]) {
+        remoteVideo.srcObject = e.streams[0];
+      } else {
+        if (!remoteVideo.srcObject) remoteVideo.srcObject = new MediaStream();
+        remoteVideo.srcObject.addTrack(e.track);
+      }
 
-    remoteVideo.muted = false;
-    remoteVideo.volume = parseFloat(audioSlider.value || 1.0);
-    remoteVideo.play().catch(() => {
-      // Fallback kung na-block ang unmuted autoplay
-      remoteVideo.muted = true;
-      remoteVideo.play().then(() => {
-        setTimeout(() => { remoteVideo.muted = false; }, 200);
+      remoteVideo.muted = false;
+      remoteVideo.volume = parseFloat(audioSlider?.value || 1.0);
+      remoteVideo.play().catch(() => {
+        remoteVideo.muted = true;
+        remoteVideo.play().then(() => {
+          setTimeout(() => { remoteVideo.muted = false; }, 200);
+        });
       });
-    });
+    }
   };
 
   peerConnection.onconnectionstatechange = () => {
     if (peerConnection?.connectionState === "connected") {
       connected = true; searching = false;
-      standbyCenter.style.display = "none";
-      searchLoader.style.display = "none";
-      reportBtn.disabled = false;
-      remoteStatus.textContent = "Live";
+      if (standbyCenter) standbyCenter.style.display = "none";
+      if (searchLoader) searchLoader.style.display = "none";
+      if (reportBtn) reportBtn.disabled = false;
+      if (remoteStatus) remoteStatus.textContent = "Live";
     } else if (peerConnection?.connectionState === "disconnected" || peerConnection?.connectionState === "failed") {
       triggerStartNext();
     }
@@ -1019,31 +1026,42 @@ function closePeerConnection() {
     }catch(e){}
     peerConnection = null;
   }
-  if (remoteVideo.srcObject) remoteVideo.srcObject = null;
+  if (remoteVideo && remoteVideo.srcObject) remoteVideo.srcObject = null;
   pendingCandidates = [];
+}
+
+// 🟢 BULLETPROOF PORTAL START HANDLER (DIRECT CALL)
+async function startPortalChatting() {
+  const portal = document.getElementById("welcomePortal");
+  if (portal) portal.style.display = "none";
+  await startMedia();
+  stopSession();
 }
 
 async function triggerStartNext() {
   if (isCurrentlyBanned) {
-    document.getElementById("banOverlay").style.display = "flex";
+    const overlay = document.getElementById("banOverlay");
+    if (overlay) overlay.style.display = "flex";
     return;
   }
 
   const ok = await startMedia();
   if (!ok) return;
 
-  mainActionBtn.disabled = true;
-  standbyCenter.style.display = "none";
-  searchLoader.style.display = "flex";
+  if (mainActionBtn) mainActionBtn.disabled = true;
+  if (standbyCenter) standbyCenter.style.display = "none";
+  if (searchLoader) searchLoader.style.display = "flex";
 
   closePeerConnection();
 
   connected = false;
   searching = true;
-  remoteStatus.textContent = getTranslatedText("searching");
-  mainActionBtn.textContent = getTranslatedText("next");
-  mainActionBtn.disabled = false;
-  stopBtn.disabled = false;
+  if (remoteStatus) remoteStatus.textContent = getTranslatedText("searching");
+  if (mainActionBtn) {
+    mainActionBtn.textContent = getTranslatedText("next");
+    mainActionBtn.disabled = false;
+  }
+  if (stopBtn) stopBtn.disabled = false;
 
   if (socket && socket.connected) socket.emit("skip");
 }
@@ -1052,16 +1070,18 @@ function stopSession() {
   searching = false;
   connected = false;
 
-  standbyCenter.style.display = "flex";
-  searchLoader.style.display = "none";
+  if (standbyCenter) standbyCenter.style.display = "flex";
+  if (searchLoader) searchLoader.style.display = "none";
 
   if (socket) socket.emit("stop-search");
   closePeerConnection();
 
-  remoteStatus.textContent = getTranslatedText("stopped");
-  mainActionBtn.textContent = getTranslatedText("start");
-  mainActionBtn.disabled = false;
-  stopBtn.disabled = true;
+  if (remoteStatus) remoteStatus.textContent = getTranslatedText("stopped");
+  if (mainActionBtn) {
+    mainActionBtn.textContent = getTranslatedText("start");
+    mainActionBtn.disabled = false;
+  }
+  if (stopBtn) stopBtn.disabled = true;
 }
 
 function captureStrangerSnapshot() {
@@ -1088,27 +1108,31 @@ function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap 
   localStorage.setItem("meetloop_ban_reason", reason);
   if (customSnap) localStorage.setItem("meetloop_ban_snapshot", customSnap);
 
-  document.getElementById("banReasonLabel").textContent = reason;
+  const reasonLabel = document.getElementById("banReasonLabel");
+  if (reasonLabel) reasonLabel.textContent = reason;
   const unbanDate = new Date(finalBanUntil);
   const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-  document.getElementById("banUntilFullText").textContent = unbanDate.toLocaleDateString([], options);
+  const banFullText = document.getElementById("banUntilFullText");
+  if (banFullText) banFullText.textContent = unbanDate.toLocaleDateString([], options);
 
   const banCanvas = document.getElementById("banCanvas");
-  const ctx = banCanvas.getContext("2d");
-  const snapshotToRender = customSnap || localStorage.getItem("meetloop_ban_snapshot");
-
-  if (snapshotToRender) {
-    const img = new Image();
-    img.onload = () => { ctx.drawImage(img, 0, 0, 95, 95); };
-    img.src = snapshotToRender;
-  } else {
-    ctx.fillStyle = "#1e293b"; ctx.fillRect(0, 0, 95, 95);
-    ctx.fillStyle = "#94a3b8"; ctx.font = "bold 9px sans-serif";
-    ctx.fillText("Evidence Logged", 6, 50);
+  if (banCanvas) {
+    const ctx = banCanvas.getContext("2d");
+    const snapshotToRender = customSnap || localStorage.getItem("meetloop_ban_snapshot");
+    if (snapshotToRender) {
+      const img = new Image();
+      img.onload = () => { ctx.drawImage(img, 0, 0, 95, 95); };
+      img.src = snapshotToRender;
+    } else {
+      ctx.fillStyle = "#1e293b"; ctx.fillRect(0, 0, 95, 95);
+      ctx.fillStyle = "#94a3b8"; ctx.font = "bold 9px sans-serif";
+      ctx.fillText("Evidence Logged", 6, 50);
+    }
   }
 
   backToMethodSelection();
-  document.getElementById("banOverlay").style.display = "flex";
+  const overlay = document.getElementById("banOverlay");
+  if (overlay) overlay.style.display = "flex";
 }
 
 function openGcashPayView() {
@@ -1120,8 +1144,10 @@ function openGcashPayView() {
   
   if (!cooldownTimer) {
     const btn = document.getElementById("gcashVerifyBtn");
-    btn.disabled = false;
-    btn.textContent = getTranslatedText("verifyBtn");
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = getTranslatedText("verifyBtn");
+    }
     document.getElementById("gcashPhoneInput").disabled = false;
     document.getElementById("gcashRefInput").disabled = false;
   }
@@ -1143,21 +1169,27 @@ function submitGCashUnbanTicket() {
   const refVal = refInput.value.trim().replace(/[^0-9]/g, "");
 
   if (!phoneVal || phoneVal.length < 10) {
-    status.style.color = "#dc2626";
-    status.textContent = "❌ Please enter a valid 11-digit GCash Mobile Number.";
+    if (status) {
+      status.style.color = "#dc2626";
+      status.textContent = "❌ Please enter a valid 11-digit GCash Mobile Number.";
+    }
     return;
   }
 
   submitAttempts++;
   const remaining = Math.max(0, 4 - submitAttempts);
-  status.style.color = "#0284c7";
-  status.innerHTML = `⏳ <b>Matching details... (${remaining} ${getTranslatedText("triesLeft")})</b>`;
+  if (status) {
+    status.style.color = "#0284c7";
+    status.innerHTML = `⏳ <b>Matching details... (${remaining} ${getTranslatedText("triesLeft")})</b>`;
+  }
 
   if (socket && socket.connected) {
     socket.emit("unban-request", { hardwareId: myHardwareId, phone: phoneVal, ref: refVal });
   } else {
-    status.style.color = "#dc2626";
-    status.textContent = "❌ Server connection lost. Please reload and try again.";
+    if (status) {
+      status.style.color = "#dc2626";
+      status.textContent = "❌ Server connection lost. Please reload and try again.";
+    }
   }
 }
 
@@ -1176,7 +1208,7 @@ const i18n = {
     feeTag: "Fee: ₱10.00 Support Payment", verifyBtn: "Submit for Verification", backMethods: "← Back to Options", tabLockTitle: "Duplicate Tab Detected",
     tabLockDesc: "MeetLoop is only allowed in 1 tab session.", tabLockBtn: "Use This Tab Instead", phonePlaceholder: "Your GCash Mobile No. (e.g. 09123456789)",
     refPlaceholder: "13-Digit GCash Ref No. (e.g. 2004123456789)", partnerDisconnected: "Stranger disconnected.", you: "You", stranger: "Stranger",
-    detailsLogged: "Details Logged", triesLeft: "tries left", unbanSuccess: "Payment Verified! Unbanning...", unbanAlert: "Your suspension has been lifted!",
+    detailsLogged: "Details Logged", triesLeft: "tries left", unbanSuccess: "Payment Verified! Unbanning...",
     r1: "<b>18+ Required:</b> Minors are strictly prohibited.", r2: "<b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.",
     r3: "<b>Human Face Only:</b> Look directly at the camera.", r4: "<b>Fast & Smooth:</b> OmeTV HD Quality Real-Time Streaming.",
     banTitle: "7-Day Suspension", deviceBanId: "Device Ban ID:"
@@ -1194,7 +1226,7 @@ const i18n = {
     feeTag: "Halaga: ₱10.00 Support Payment", verifyBtn: "I-submit para sa Veripikasyon", backMethods: "← Bumalik sa mga Pagpipilian", tabLockTitle: "Naka-open na sa Ibang Tab",
     tabLockDesc: "Isang tab session lamang ang pwedeng gamitin.", tabLockBtn: "Gamitin ang Tab na Ito", phonePlaceholder: "Numero sa GCash (hal. 09123456789)",
     refPlaceholder: "13-Digit GCash Ref No. (hal. 2004123456789)", partnerDisconnected: "Nadiskonekta ang kausap.", you: "Ikaw", stranger: "Kausap",
-    detailsLogged: "Nai-log ang Detalye", triesLeft: "tries natitira", unbanSuccess: "Na-verify ang bayad! Unbanning...", unbanAlert: "Matagumpay na na-unban ang account mo!",
+    detailsLogged: "Nai-log ang Detalye", triesLeft: "tries natitira", unbanSuccess: "Na-verify ang bayad! Unbanning...",
     r1: "<b>18+ Lamang:</b> Mahigpit na ipinagbabawal ang menor de edad.", r2: "<b>Zero Tolerance:</b> Bawal ang kabastusan, hubad, at spam.",
     r3: "<b>Totoong Mukha:</b> Tumingin nang diretso sa camera.", r4: "<b>Mabilis at Malinaw:</b> OmeTV HD Quality Real-Time Streaming.",
     banTitle: "7-Araw na Suspension", deviceBanId: "ID ng Device:"
@@ -1209,87 +1241,81 @@ function getTranslatedText(key) {
 
 function setLanguage(lang) {
   localStorage.setItem("meetloop_lang", lang);
-  if (document.getElementById("languageSelect")) {
-    document.getElementById("languageSelect").value = lang;
-  }
+  const langSelect = document.getElementById("languageSelect");
+  if (langSelect) langSelect.value = lang;
 
   const t = i18n[lang] || i18n.en;
-  document.getElementById("lblSubTitle").textContent = t.subTitle;
-  document.getElementById("portalStartBtn").textContent = t.portalBtn;
-  document.getElementById("r1").innerHTML = t.r1;
-  document.getElementById("r2").innerHTML = t.r2;
-  document.getElementById("r3").innerHTML = t.r3;
-  document.getElementById("r4").innerHTML = t.r4;
-  document.getElementById("reportBtn").textContent = t.report;
-  document.getElementById("stopBtn").textContent = t.stop;
-  document.getElementById("lblOnlineText").textContent = t.onlineUsers;
-  document.getElementById("lblChatTitle").textContent = t.chatTitle;
-  document.getElementById("chatInput").placeholder = t.chatPlaceholder;
-  document.getElementById("sendBtn").textContent = t.send;
-  document.getElementById("lblSelectMethod").textContent = t.selectMethod;
-  document.getElementById("lblGcashTitle").textContent = t.gcashTitle;
-  document.getElementById("lblGcashDesc").textContent = t.gcashDesc;
-  document.getElementById("lblWaitTitle").textContent = t.waitTitle;
-  document.getElementById("lblWaitDesc").textContent = t.waitDesc;
-  document.getElementById("lblScanText").innerHTML = t.scanText;
-  document.getElementById("lblExpiresHeader").textContent = t.expiresHeader;
-  document.getElementById("lblEvidenceTag").textContent = t.evidenceTag;
-  document.getElementById("lblEncounterSnapshot").textContent = t.encounterSnapshot;
-  document.getElementById("lblDisclaimerTitle").textContent = t.disclaimerTitle;
-  document.getElementById("lblDisclaimerBody").innerHTML = t.disclaimerBody;
-  document.getElementById("lblFeeTag").textContent = t.feeTag;
-  document.getElementById("btnBackMethods").textContent = t.backMethods;
-  document.getElementById("lblTabLockTitle").textContent = t.tabLockTitle;
-  document.getElementById("lblTabLockDesc").textContent = t.tabLockDesc;
-  document.getElementById("btnClaimTab").textContent = t.tabLockBtn;
-  document.getElementById("remoteTag").textContent = t.stranger;
-  document.getElementById("localTag").textContent = t.you;
-  document.getElementById("showLocalBtn").textContent = t.showCam;
-  document.getElementById("flipBtn").textContent = t.flip;
-  document.getElementById("banTitle").textContent = t.banTitle;
-  document.getElementById("lblDeviceBanId").textContent = t.deviceBanId;
-  document.getElementById("lblSearchingText").textContent = t.searchingText;
-  document.getElementById("lblBanReason").innerHTML = `${t.banReason} <span id="banReasonLabel">${savedBanReason}</span>`;
-  document.getElementById("lblTelegramSupport").querySelector("span").textContent = t.telegramSupport;
+  const safeSetText = (id, text) => { const el = document.getElementById(id); if (el && text) el.textContent = text; };
+  const safeSetHTML = (id, html) => { const el = document.getElementById(id); if (el && html) el.innerHTML = html; };
 
-  document.getElementById("gcashPhoneInput").placeholder = t.phonePlaceholder;
-  document.getElementById("gcashRefInput").placeholder = t.refPlaceholder;
+  safeSetText("lblSubTitle", t.subTitle);
+  safeSetText("portalStartBtn", t.portalBtn);
+  safeSetHTML("r1", t.r1);
+  safeSetHTML("r2", t.r2);
+  safeSetHTML("r3", t.r3);
+  safeSetHTML("r4", t.r4);
+  safeSetText("reportBtn", t.report);
+  safeSetText("stopBtn", t.stop);
+  safeSetText("lblOnlineText", t.onlineUsers);
+  safeSetText("lblChatTitle", t.chatTitle);
+  safeSetText("sendBtn", t.send);
+  safeSetText("lblSelectMethod", t.selectMethod);
+  safeSetText("lblGcashTitle", t.gcashTitle);
+  safeSetText("lblGcashDesc", t.gcashDesc);
+  safeSetText("lblWaitTitle", t.waitTitle);
+  safeSetText("lblWaitDesc", t.waitDesc);
+  safeSetHTML("lblScanText", t.scanText);
+  safeSetText("lblExpiresHeader", t.expiresHeader);
+  safeSetText("lblEvidenceTag", t.evidenceTag);
+  safeSetText("lblEncounterSnapshot", t.encounterSnapshot);
+  safeSetText("lblDisclaimerTitle", t.disclaimerTitle);
+  safeSetHTML("lblDisclaimerBody", t.disclaimerBody);
+  safeSetText("lblFeeTag", t.feeTag);
+  safeSetText("btnBackMethods", t.backMethods);
+  safeSetText("lblTabLockTitle", t.tabLockTitle);
+  safeSetText("lblTabLockDesc", t.tabLockDesc);
+  safeSetText("btnClaimTab", t.tabLockBtn);
+  safeSetText("remoteTag", t.stranger);
+  safeSetText("localTag", t.you);
+  safeSetText("showLocalBtn", t.showCam);
+  safeSetText("flipBtn", t.flip);
+  safeSetText("banTitle", t.banTitle);
+  safeSetText("lblDeviceBanId", t.deviceBanId);
+  safeSetText("lblSearchingText", t.searchingText || "Looking for someone...");
 
-  if (micBtn) {
-    micBtn.textContent = isMicActive ? t.micOn : t.micOff;
-  }
-  if (!searching && !connected) {
-    mainActionBtn.textContent = t.start;
-  } else if (searching) {
-    mainActionBtn.textContent = t.next;
-  }
+  if (micBtn) micBtn.textContent = isMicActive ? t.micOn : t.micOff;
+  if (!searching && !connected && mainActionBtn) mainActionBtn.textContent = t.start;
+  else if (searching && mainActionBtn) mainActionBtn.textContent = t.next;
 }
 
-document.getElementById("languageSelect").addEventListener("change", (e) => {
+document.getElementById("languageSelect")?.addEventListener("change", (e) => {
   setLanguage(e.target.value);
 });
 
 function openReportModal() {
   if (!connected) return;
   lastCapturedStrangerSnapshot = captureStrangerSnapshot();
-  document.getElementById("reportModal").style.display = "flex";
+  const modal = document.getElementById("reportModal");
+  if (modal) modal.style.display = "flex";
 }
 
 function closeReportModal() {
-  document.getElementById("reportModal").style.display = "none";
+  const modal = document.getElementById("reportModal");
+  if (modal) modal.style.display = "none";
 }
 
 function confirmReportUser() {
-  const reason = document.getElementById("reportReasonSelect").value;
+  const reason = document.getElementById("reportReasonSelect")?.value || "Policy Violation";
   closeReportModal();
   if (socket) {
     socket.emit("report-user", { reason: reason, snapshot: lastCapturedStrangerSnapshot });
   }
-  reportBtn.disabled = true;
+  if (reportBtn) reportBtn.disabled = true;
   triggerStartNext();
 }
 
 function addChatMessage(author, msg) {
+  if (!chatStream) return;
   const div = document.createElement("div");
   div.className = "chat-msg";
   div.innerHTML = `<div class="chat-author">${author}</div><div class="chat-bubble">${msg.replace(/[&<>'"]/g, "")}</div>`;
@@ -1298,6 +1324,7 @@ function addChatMessage(author, msg) {
 }
 
 function sendChat() {
+  if (!chatInput) return;
   const val = chatInput.value.trim();
   if (!val || !dataChannel || dataChannel.readyState !== "open") return;
   dataChannel.send(val);
@@ -1305,38 +1332,20 @@ function sendChat() {
   chatInput.value = "";
 }
 
-// 🟢 PORTAL CLICK -> INILALABAS ANG CAMERA AT NANANATILI SA STANDBY
-document.getElementById("portalStartBtn").addEventListener("click", async () => {
-  document.getElementById("welcomePortal").style.display = "none";
-  if (!isCurrentlyBanned) {
-    await startMedia();
-    stopSession();
-  }
+chatInput?.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); sendChat(); } });
+
+document.getElementById("hideLocalBtn")?.addEventListener("click", () => {
+  localCamBox?.classList.add("hidden-cam");
+  document.getElementById("showLocalBtn")?.classList.add("visible");
 });
-
-mainActionBtn.addEventListener("click", triggerStartNext);
-stopBtn.addEventListener("click", stopSession);
-sendBtn.addEventListener("click", sendChat);
-chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); sendChat(); } });
-
-micBtn.addEventListener("click", toggleMicrophone);
-flipBtn.addEventListener("click", flipCamera);
-reportBtn.addEventListener("click", openReportModal);
-
-audioSlider.addEventListener("input", (e) => { updateVolume(e.target.value); });
-speakerIcon.addEventListener("click", () => {
-  const cur = parseFloat(audioSlider.value);
-  updateVolume(cur > 0 ? 0 : 1.0);
-});
-
-document.getElementById("hideLocalBtn").addEventListener("click", () => {
-  localCamBox.classList.add("hidden-cam");
-  document.getElementById("showLocalBtn").classList.add("visible");
-});
-document.getElementById("showLocalBtn").addEventListener("click", () => {
-  localCamBox.classList.remove("hidden-cam");
-  document.getElementById("showLocalBtn").classList.remove("visible");
+document.getElementById("showLocalBtn")?.addEventListener("click", () => {
+  localCamBox?.classList.remove("hidden-cam");
+  document.getElementById("showLocalBtn")?.classList.remove("visible");
 });
 
 checkMultiTabConflict();
-const initialLa
+const initialLang = localStorage.getItem("meetloop_lang") || "en";
+setLanguage(initialLang);
+</script>
+</body>
+</html>
