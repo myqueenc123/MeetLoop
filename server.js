@@ -2,7 +2,7 @@
  * MeetLoop - Official Production Server Backend
  * 100% Filipino Made Random Video Chat 🇵🇭
  * High-Speed Telegram Auto-Pairing Bot + WebRTC Matchmaking
- * (Persistent Device Tickets + Refresh Auto-Unban Recovery)
+ * (Persistent Device Tickets + Offline Recovery Auto-Unban)
  */
 
 const express = require("express");
@@ -22,7 +22,7 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 3000;
 const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000;
-const PAYMENT_VALIDITY_WINDOW = 30 * 60 * 1000; // 30 mins validity
+const PAYMENT_VALIDITY_WINDOW = 60 * 60 * 1000; // 1 oras na valid ang receipt
 
 // ================= TELEGRAM BOT CONFIG =================
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8648356765:AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
@@ -42,11 +42,12 @@ app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 app.use(express.text({ type: "*/*", limit: "15mb" }));
 
 /* ================= DATABASES & PERSISTENT TICKETS ================= */
-const bannedDevices = new Map();
+const bannedDevices = new Map();           // HardwareID -> { banUntil, reason, snapshot, ip }
 const persistentDeviceTickets = new Map(); // HardwareID -> { phone, ref, time }
-let availablePayments = [];                // Fresh, unconsumed payments only
-const burnedReceipts = new Set();          // Permanent list of consumed payments
-const attemptTracker = new Map();
+let availablePayments = [];                // Fresh, unconsumed GCash notifications
+const burnedReceipts = new Set();          // Permanent list of consumed payment IDs
+const attemptTracker = new Map();          // Anti-spam submission tracker
+const recentlyUnbanned = new Set();        // HardwareIDs na kaka-unban lang para sa offline recovery
 
 function escapeHtml(str) {
   if (!str) return "";
@@ -114,21 +115,24 @@ function sendTelegramWithButtons(chatId, text, reqId) {
   sendTelegramRaw("sendMessage", payload);
 }
 
-// ⚡ STRICT SINGLE-USE UNBAN EXECUTOR
+// ⚡ STRICT SINGLE-USE UNBAN EXECUTOR (Kahit Offline ang User)
 function executeUnbanUser(hardwareId, phone, auto = false) {
   console.log(`🔓 [UNBAN SUCCESS]: HardwareID=${hardwareId}, Phone=${phone}, Auto=${auto}`);
   
   bannedDevices.delete(hardwareId);
   persistentDeviceTickets.delete(hardwareId);
   attemptTracker.delete(hardwareId);
+  recentlyUnbanned.add(hardwareId);
 
+  // I-broadcast sa active socket kung online pa ang user
   io.emit("real-admin-unban-signal", { hardwareId: hardwareId });
 
   if (auto) {
     const successMsg = `⚡ <b>AUTO-UNBAN SUCCESSFUL!</b> 🎉\n\n` +
                        `📱 <b>Matched Mobile No:</b> <code>${escapeHtml(phone)}</code>\n` +
+                       `💳 <b>Hardware ID:</b> <code>${escapeHtml(hardwareId)}</code>\n` +
                        `💰 <b>Status:</b> GCash Payment Verified & BURNED\n\n` +
-                       `<i>Kusang binuksan ng system ang ban kahit nag-refresh ang user! Fresh ID reset na ang device.</i>`;
+                       `<i>Kahit nakasara ang tab ng user, pagbalik niya sa website ay 100% UNBANNED na siya agad!</i>`;
     sendTelegramMessage(ADMIN_CHAT_ID, successMsg);
   }
 }
@@ -197,10 +201,10 @@ app.all("/webhook/gcash-sms", (req, res) => {
   const newPaymentObj = { id: paymentId, text: fullPayloadString, time: now };
   availablePayments.push(newPaymentObj);
 
-  // 🔍 AUTO-CHECK: Hanapin sa PERSISTENT TICKETS kung may naghihintay na device (Kahit nag-refresh ang user)!
+  // 🔍 AUTO-CHECK SA LAHAT NG NAKA-PENDING NA DEVICE TICKETS
   let autoUnbanned = false;
   for (const [hwId, ticket] of persistentDeviceTickets.entries()) {
-    if (isPhoneMatch(fullPayloadString, ticket.phone) || (ticket.ref && fullPayloadString.includes(ticket.ref))) {
+    if (isPhoneMatch(fullPayloadString, ticket.phone) || (ticket.ref && ticket.ref.length >= 6 && fullPayloadString.includes(ticket.ref))) {
       console.log(`🎯 [MATCH ON PERSISTENT TICKET]: Unbanning HW=${hwId}, Phone=${ticket.phone}`);
       
       availablePayments = availablePayments.filter(p => p.id !== paymentId);
@@ -266,7 +270,7 @@ function pollTelegramUpdates() {
                   sendTelegramRaw("editMessageText", {
                     chat_id: chatId,
                     message_id: messageId,
-                    text: `✅ <b>APPROVED BY ADMIN!</b>\n\n📱 <b>Mobile No:</b> <code>${escapeHtml(ticket ? ticket.phone : "Verified")}</code>\n💰 <b>Status:</b> Clearance Fee Verified\n\n🎉 <i>Matagumpay na na-unban ang user sa MeetLoop!</i>`,
+                    text: `✅ <b>APPROVED BY ADMIN!</b>\n\n📱 <b>Mobile No:</b> <code>${escapeHtml(ticket ? ticket.phone : "Verified")}</code>\n💰 <b>Status:</b> Clearance Fee Verified\n\n🎉 <i>Matagumpay na na-unban ang user sa MeetLoop kahit nakasara ang tab niya!</i>`,
                     parse_mode: "HTML"
                   });
 
@@ -307,11 +311,11 @@ function pollTelegramUpdates() {
               const text = (update.message.text || "").trim();
 
               if (text.startsWith("/start")) {
-                const welcomeReply = `👋 <b>Kamusta Jm!</b>\n\n` +
-                                     `✅ <b>MeetLoop Auto Phone Matcher is Active!</b>\n\n` +
+                const welcomeReply = `👋 <b>Kamusta Admin!</b>\n\n` +
+                                     `✅ <b>MeetLoop Offline Auto-Matcher is ACTIVE!</b>\n\n` +
                                      `Dito papasok ang:\n` +
                                      `1. 📲 <b>GCash SMS/Notif mula sa SMS Forwarder</b>\n` +
-                                     `2. ⚡ <b>Automatic Unban kahit mag-refresh ang user</b>\n` +
+                                     `2. ⚡ <b>Automatic Unban kahit ISARA ng user ang tab</b>\n` +
                                      `3. 🛡️ <b>Strict Single-Use Burned Receipts</b>\n` +
                                      `4. 🚨 <b>1-Click Approve / Reject Buttons sa bawat ticket</b> 🎉`;
                 sendTelegramMessage(incomingChatId, welcomeReply);
@@ -348,6 +352,7 @@ function banDevice(hardwareId, reason, snapshot = null, durationMs = BAN_DURATIO
   const banUntil = Date.now() + durationMs;
   const record = { banUntil, reason, snapshot, hardwareId: finalId };
   bannedDevices.set(finalId, record);
+  recentlyUnbanned.delete(finalId);
   return record;
 }
 
@@ -406,6 +411,7 @@ io.on("connection", (socket) => {
 
   broadcastOnlineCount();
 
+  // 🔍 1. AUTOMATIC BAN CHECK SA CONNECTION (Pag-reopen o pag-refresh ng tab)
   const banInfo = checkDeviceBan(hardwareId);
   if (banInfo) {
     socket.emit("ip-banned", {
@@ -413,13 +419,19 @@ io.on("connection", (socket) => {
       reason: banInfo.reason,
       snapshot: banInfo.snapshot
     });
+  } else {
+    // Kung dati siyang na-ban pero na-unban na habang nakasara ang tab
+    socket.emit("real-admin-unban-signal", { hardwareId: hardwareId });
   }
 
-  // 🔄 AUTO-CHECK SA RECONNECT / REFRESH
+  // 🔄 2. MANUAL CHECK SA BAN STATUS
   socket.on("check-ban-status", (data) => {
     const hwId = String(data?.hardwareId || hardwareId).trim();
     if (!bannedDevices.has(hwId)) {
       socket.emit("real-admin-unban-signal", { hardwareId: hwId });
+    } else {
+      const b = bannedDevices.get(hwId);
+      socket.emit("ip-banned", { banUntil: b.banUntil, reason: b.reason, snapshot: b.snapshot });
     }
   });
 
@@ -453,7 +465,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  // REPORT USER: CAPTURES STRANGER PICTURE
+  // REPORT USER
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -503,13 +515,13 @@ io.on("connection", (socket) => {
     }
     attemptTracker.set(reqHardware, tracker);
 
-    // 🔥 INSTANT MATCH CHECK: Kung nauna ang bayad bago mag-submit
+    // 🔥 INSTANT MATCH CHECK: Kung naunang pumasok ang bayad bago mag-submit
     const now = Date.now();
     let matchedIndex = -1;
 
     for (let i = 0; i < availablePayments.length; i++) {
       const item = availablePayments[i];
-      if ((now - item.time < PAYMENT_VALIDITY_WINDOW) && (isPhoneMatch(item.text, phone) || (ref && item.text.includes(ref)))) {
+      if ((now - item.time < PAYMENT_VALIDITY_WINDOW) && (isPhoneMatch(item.text, phone) || (ref && ref.length >= 6 && item.text.includes(ref)))) {
         matchedIndex = i;
         break;
       }
@@ -524,14 +536,15 @@ io.on("connection", (socket) => {
       return;
     }
 
-    // 🔒 PERSISTENT TICKET SAVE: Kahit mag-refresh ang user, mananatili ito sa server!
+    // 🔒 PERSISTENT TICKET SAVE: Kahit isara ang tab, mananatili ito sa server memory!
     persistentDeviceTickets.set(reqHardware, { phone, ref, time: now });
 
     const msgText = `🚨 <b>MEETLOOP UNBAN REQUEST</b>\n\n` +
                     `📱 <b>Mobile No:</b> <code>${escapeHtml(phone)}</code>\n` +
                     `💳 <b>Ref No:</b> <code>${escapeHtml(ref || "N/A")}</code>\n` +
+                    `🆔 <b>Hardware ID:</b> <code>${escapeHtml(reqHardware)}</code>\n` +
                     `💰 <b>Amount:</b> ₱10.00 Clearance Fee\n\n` +
-                    `<i>Kapag pumasok ang GCash alert kahit mag-refresh ang user, automatic itong ma-u-unban. O pwede mong pindutin ang 🟢 1-CLICK APPROVE:</i>`;
+                    `<i>Kahit ISARA ng user ang tab, pag pumasok ang bayad sa GCash o pinindot mo ang 1-CLICK APPROVE, automatic siyang ma-u-unban pagbalik niya!</i>`;
 
     sendTelegramWithButtons(ADMIN_CHAT_ID, msgText, reqHardware);
 
@@ -558,7 +571,7 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
   console.log(`📡 GCash Webhook Route: READY (/webhook/gcash-sms)`);
-  console.log(`💾 Persistent Device Ticket Matching: ACTIVE`);
+  console.log(`💾 Offline Ticket Matching & Auto-Recovery: ACTIVE`);
   console.log(`🔒 Single-Use Burned Receipts: STRICTLY ACTIVE`);
   console.log(`================================================`);
   pollTelegramUpdates();
