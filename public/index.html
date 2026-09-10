@@ -46,6 +46,24 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   color:#fff;font-size:13px;font-weight:800;cursor:pointer;margin-top:14px;
 }
 
+/* WELCOME PORTAL MODAL */
+#welcomePortal{
+  position:fixed;inset:0;z-index:2147483640;background:rgba(10,14,23,0.96);
+  display:flex;align-items:center;justify-content:center;padding:16px;
+}
+.portal-card{
+  background:#111827;border:1px solid var(--panel-border);border-radius:20px;
+  max-width:440px;width:100%;padding:24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.8);
+}
+.portal-logo{width:80px;height:80px;margin-bottom:12px;filter:drop-shadow(0 0 15px rgba(56,189,248,.5))}
+.portal-title{font-size:24px;font-weight:900;color:#fff;margin-bottom:4px}
+.portal-sub{font-size:13px;color:var(--text-muted);margin-bottom:18px}
+.portal-rules{background:#1e293b;border-radius:12px;padding:12px;text-align:left;font-size:11.5px;line-height:1.6;color:#cbd5e1;margin-bottom:18px}
+.portal-start-btn{
+  width:100%;height:46px;background:linear-gradient(135deg,#0284c7,#2563eb);border:0;border-radius:10px;
+  color:#fff;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(37,99,235,0.4);
+}
+
 /* HEADER */
 header{
   height:52px;display:flex;align-items:center;justify-content:space-between;
@@ -97,12 +115,6 @@ video{
   position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;padding:0 12px;user-select:none;pointer-events:none;
 }
-.standby-logo{
-  width:105px;height:105px;margin-bottom:12px;
-  filter:drop-shadow(0 0 25px rgba(56,189,248,.6));
-  animation:floatLogo 3s ease-in-out infinite alternate;
-}
-@keyframes floatLogo{from{transform:translateY(0)}to{transform:translateY(-6px)}}
 .standby-title{font-size:30px;font-weight:900;letter-spacing:-0.5px;color:#fff}
 .standby-online-tag{
   background:rgba(15,23,42,0.88);border:1px solid rgba(255,255,255,.15);
@@ -113,7 +125,6 @@ video{
   width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);
 }
 
-/* 🌟 CLEAN FLOATING SPINNER */
 .search-loader{
   position:absolute;inset:0;z-index:4;display:none;align-items:center;justify-content:center;user-select:none;
 }
@@ -233,8 +244,7 @@ video{
 .method-desc{font-size:10.5px;color:#64748b}
 
 #gcashPaySection{display:none;flex-direction:column;gap:10px}
-.gcash-logo-banner{background:#005ce6;border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:center}
-.gcash-official-svg{height:30px;max-width:170px;display:block}
+.gcash-logo-banner{background:#005ce6;border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:18px;}
 .gcash-qr-box{background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:14px;padding:12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
 .gcash-qr-frame{background:#ffffff;padding:8px;border-radius:12px;border:1.5px solid #94a3b8;display:inline-block}
 .gcash-qr-img{width:165px;height:165px;display:block;border-radius:4px;object-fit:contain}
@@ -253,7 +263,113 @@ video{
 .ban-expire-box{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
 .ban-expire-label{font-size:11px;font-weight:800;color:#dc2626}
 .ban-expire-time{font-size:12px;font-weight:800;color:#0f172a}
-.ban-id-chip"><span id="lblDeviceBanId">Device Ban ID:</span> <span id="adminUnbanId">--</span></div>
+.ban-id-chip{background:#f1f5f9;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;color:#475569;display:flex;justify-content:space-between}
+</style>
+</head>
+<body>
+
+<!-- DUPLICATE TAB OVERLAY -->
+<div id="duplicateTabOverlay">
+  <div class="tab-lock-card">
+    <div style="font-size:36px;margin-bottom:10px">🔒</div>
+    <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px" id="lblTabLockTitle">Duplicate Tab Detected</div>
+    <div style="font-size:12px;color:var(--text-muted);line-height:1.5" id="lblTabLockDesc">MeetLoop is only allowed in 1 active tab session to save bandwidth and secure connections.</div>
+    <button class="btn-claim-tab" id="btnClaimTab">Use This Tab Instead</button>
+  </div>
+</div>
+
+<!-- WELCOME PORTAL MODAL -->
+<div id="welcomePortal">
+  <div class="portal-card">
+    <svg class="portal-logo" viewBox="0 0 100 100">
+      <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 Z" fill="#38bdf8"/>
+      <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 Z" fill="#a855f7"/>
+    </svg>
+    <div class="portal-title">MeetLoop</div>
+    <div class="portal-sub" id="lblSubTitle">Random Video Chat</div>
+    <div class="portal-rules">
+      <div id="r1"><b>18+ Required:</b> Minors are strictly prohibited.</div>
+      <div id="r2"><b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.</div>
+      <div id="r3"><b>Human Face Only:</b> Look directly at the camera.</div>
+      <div id="r4"><b>Instant Blur Shield:</b> Safe transition on every switch.</div>
+    </div>
+    <button class="portal-start-btn" id="portalStartBtn">START CHATTING</button>
+  </div>
+</div>
+
+<!-- BAN OVERLAY -->
+<div id="banOverlay">
+  <div class="ban-card">
+    <div class="ban-top">
+      <div class="ban-snap-frame">
+        <canvas id="banCanvas"></canvas>
+        <span class="ban-snap-brand">MeetLoop</span>
+        <span class="ban-snap-tag" id="lblEvidenceTag">EVIDENCE</span>
+      </div>
+      <div>
+        <div class="ban-title" id="banTitle">7-Day Suspension</div>
+        <div class="ban-reason"><span id="lblBanReason">Reason:</span> <span id="banReasonLabel" style="color:#dc2626">Policy Violation</span></div>
+      </div>
+    </div>
+
+    <div class="ban-expire-box">
+      <div class="ban-expire-label" id="lblExpiresHeader">7-Day Suspension Expiration:</div>
+      <div class="ban-expire-time" id="banUntilFullText">Calculating...</div>
+    </div>
+
+    <div class="ban-id-chip">
+      <span id="lblDeviceBanId">Device Ban ID:</span>
+      <span id="adminUnbanId" style="font-family:monospace;color:#0284c7;font-weight:900">--</span>
+    </div>
+
+    <div id="selectMethodSection" class="method-choice-container">
+      <div style="font-size:12px;font-weight:800;color:#0f172a" id="lblSelectMethod">Select Resolution Method:</div>
+      
+      <div class="method-card" onclick="openGcashPayView()">
+        <div class="method-card-left">
+          <div class="method-icon-wrap" style="background:#e0f2fe;color:#0284c7">⚡</div>
+          <div>
+            <div class="method-title" id="lblGcashTitle">Instant 7-Day Unban (₱10 Support)</div>
+            <div class="method-desc" id="lblGcashDesc">Pay ₱10 GCash clearance fee & submit Mobile No.</div>
+          </div>
+        </div>
+        <span style="font-size:14px;color:#0284c7;font-weight:900">→</span>
+      </div>
+
+      <div class="ban-disclaimer-box">
+        <div class="ban-disclaimer-title" id="lblDisclaimerTitle">🚫 Official Ban Clearance Notice</div>
+        <div id="lblDisclaimerBody">
+          Your access has been restricted for <b>7 days</b> due to Community Guidelines violation.<br><br>
+          ⚡ <b>Want to return sooner?</b><br>
+          You may request an early unban with a <b>₱10 voluntary support payment</b>.<br><br>
+          💡 <b>Payment is completely optional.</b> You can simply wait until your 7-day ban expires.<br><br>
+          <b>— MeetLoop Team</b>
+        </div>
+      </div>
+
+      <a href="https://t.me/MeetLoop_bot" target="_blank" class="telegram-support-btn" id="lblTelegramSupport">
+        <span>Message Telegram Support (@MeetLoop_bot)</span>
+      </a>
+    </div>
+
+    <div id="gcashPaySection">
+      <div class="gcash-logo-banner">GCash Express Pay</div>
+      <div class="gcash-qr-box">
+        <div class="gcash-fee-tag" id="lblFeeTag">Fee: ₱10.00 Support Payment</div>
+        <div class="gcash-qr-frame">
+          <img class="gcash-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=09123456789" alt="GCash QR">
+        </div>
+        <div style="font-size:11px;color:#475569" id="lblScanText">Scan QR via GCash, pay ₱10 clearance fee, and enter details below.</div>
+      </div>
+
+      <div class="gcash-input-group">
+        <input type="tel" id="gcashPhoneInput" class="gcash-input-field" placeholder="Your GCash Mobile No. (e.g. 09123456789)" maxlength="11">
+        <input type="tel" id="gcashRefInput" class="gcash-input-field" placeholder="13-Digit GCash Ref No. (Optional)" maxlength="13">
+      </div>
+
+      <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="submitGCashUnbanTicket()">Submit for Verification</button>
+      <div id="gcashRefStatus" style="font-size:11px;text-align:center;font-weight:700"></div>
+      <button type="button" class="btn-back-methods" id="btnBackMethods" onclick="backToMethodSelection()">← Back to Options</button>
     </div>
   </div>
 </div>
@@ -350,9 +466,8 @@ video{
           🔞 <b>18+ only</b> — You must be 18 or older.<br>
           🚫 <b>No nudity, sexual content, hate speech, or harassment.</b><br>
           📹 <b>Show yourself on camera</b> — no pre-recorded or fake video.<br>
-          💬 <b>Respect everyone</b> — MeetLoop is not a dating site. Please don't ask for gender or personal information.<br>
-          ⚠️ <b>Violations may result in a temporary or permanent ban.</b><br><br>
-          Have fun, stay respectful, and enjoy your conversation! 🌎
+          💬 <b>Respect everyone</b> — MeetLoop is not a dating site.<br>
+          ⚠️ <b>Violations may result in a temporary or permanent ban.</b>
         </div>
       </div>
     </div>
@@ -374,10 +489,6 @@ video{
       <option value="Hate Speech">🗣️ Hate Speech</option>
       <option value="Threats / Violence">⚠️ Threats / Violence</option>
       <option value="Spam / Advertising">📢 Spam / Advertising</option>
-      <option value="Scam / Fraud">💳 Scam / Fraud</option>
-      <option value="Underage User">🚸 Underage User</option>
-      <option value="Inappropriate Behavior">🚫 Inappropriate Behavior</option>
-      <option value="Impersonation">🎭 Impersonation</option>
       <option value="Other">❓ Other</option>
     </select>
     <div style="display:flex;gap:8px;">
@@ -477,9 +588,12 @@ function showDuplicateTabBlocker() {
   if (overlay) overlay.style.display = "flex";
 }
 
-document.getElementById("btnClaimTab").addEventListener("click", () => {
-  claimActiveTab();
-});
+const btnClaim = document.getElementById("btnClaimTab");
+if (btnClaim) {
+  btnClaim.addEventListener("click", () => {
+    claimActiveTab();
+  });
+}
 
 setInterval(() => {
   if (isMasterTab && localStorage.getItem("meetloop_active_tab") === myTabId) {
@@ -1084,150 +1198,6 @@ const i18n = {
     r1: "<b>18+ Lamang:</b> Mahigpit na ipinagbabawal ang menor de edad.", r2: "<b>Zero Tolerance:</b> Bawal ang kabastusan, hubad, at spam.",
     r3: "<b>Totoong Mukha:</b> Tumingin nang diretso sa camera.", r4: "<b>Blur Shield:</b> Ligtas na pag-transition sa bawat switch.",
     banTitle: "7-Araw na Suspension", deviceBanId: "ID ng Device:"
-  },
-  es: {
-    subTitle: "Chat de Video Aleatorio", portalBtn: "EMPEZAR CHAT", report: "Reportar", stop: "Detener", start: "Iniciar", next: "Siguiente", stopped: "Detenido",
-    micOn: "Mic On", micOff: "Mic Off", showCam: "Mostrar Cam", flip: "Girar",
-    onlineUsers: "usuarios en línea", chatTitle: "Chat en Vivo",
-    chatPlaceholder: "Escribe un mensaje...", send: "Enviar", selectMethod: "Seleccionar Método de Resolución:", gcashTitle: "Desbloqueo Instantáneo (Apoyo ₱10)",
-    gcashDesc: "Pague ₱10 y envíe su número.", waitTitle: "Esperar 7 Días de Suspensión", waitDesc: "Se desbloquea automáticamente",
-    telegramSupport: "Mensaje a Soporte de Telegram (@MeetLoop_bot)",
-    scanText: "Escanee el QR y pague ₱10 para continuar.", searching: "Buscando a alguien...", expiresHeader: "Expiración de la suspensión:",
-    evidenceTag: "EVIDENCIA DEL ENCUENTRO", banReason: "Razón:", encounterSnapshot: "Foto del encuentro guardada", disclaimerTitle: "🚫 Aviso Oficial de Suspensión",
-    disclaimerBody: "Su acceso ha sido restringido por 7 días por violar las normas de la comunidad.",
-    feeTag: "Tarifa: ₱10.00 Pago de Apoyo", verifyBtn: "Enviar para Verificación", backMethods: "← Volver a Opciones", tabLockTitle: "Pestaña Duplicada",
-    tabLockDesc: "Solo se permite una pestaña.", tabLockBtn: "Usar Esta Pestaña", phonePlaceholder: "Número Móvil",
-    refPlaceholder: "Número de Referencia", partnerDisconnected: "El extraño se desconectó.", you: "Tú", stranger: "Extraño",
-    detailsLogged: "Detalles guardados", triesLeft: "intentos restantes", unbanSuccess: "¡Pago Verificado!", unbanAlert: "¡Tu suspensión ha sido levantada!",
-    r1: "<b>18+ Requerido:</b> Menores prohibidos.", r2: "<b>Cero Tolerancia:</b> Desnudez y spam prohibidos.",
-    r3: "<b>Rostro Humano:</b> Mire a la cámara.", r4: "<b>Escudo Seguro:</b> Transición protegida.",
-    banTitle: "Suspensión de 7 Días", deviceBanId: "ID del Dispositivo:"
-  },
-  ja: {
-    subTitle: "ランダムビデオチャット", portalBtn: "チャットを開始", report: "通報", stop: "停止", start: "開始", next: "次へ", stopped: "停止中",
-    micOn: "マイクON", micOff: "マイクOFF", showCam: "カメラ表示", flip: "反転",
-    onlineUsers: "人オンライン", chatTitle: "ライブチャット",
-    chatPlaceholder: "メッセージを入力...", send: "送信", selectMethod: "解決方法を選択:", gcashTitle: "即時BAN解除 (₱10 サポート)",
-    gcashDesc: "₱10の解除料金を支払い、番号を入力してください。", waitTitle: "7日間の停止期間を待つ", waitDesc: "7日後に自動解除されます",
-    telegramSupport: "Telegramサポートに連絡 (@MeetLoop_bot)",
-    scanText: "QRコードをスキャンして₱10をお支払いください。", searching: "相手を探しています...", expiresHeader: "停止期間の終了:",
-    evidenceTag: "違反証拠写真", banReason: "理由:", encounterSnapshot: "遭遇記録が保存されました", disclaimerTitle: "🚫 公式BAN通知",
-    disclaimerBody: "コミュニティガイドライン違反により7日間のアクセス制限が行われました。",
-    feeTag: "料金: ₱10.00 サポート支払い", verifyBtn: "確認のため送信", backMethods: "← オプションに戻る", tabLockTitle: "重複タブを検出",
-    tabLockDesc: "1つのタブでのみ利用可能です。", tabLockBtn: "このタブを使用", phonePlaceholder: "携帯電話番号",
-    refPlaceholder: "参照番号", partnerDisconnected: "相手が切断しました。", you: "あなた", stranger: "相手",
-    detailsLogged: "詳細が記録されました", triesLeft: "残り試行回数", unbanSuccess: "支払い確認完了！", unbanAlert: "BANが解除されました！",
-    r1: "<b>18歳以上必須:</b> 未成年者の利用は禁止です。", r2: "<b>違反厳禁:</b> ヌードや不適切な行為は禁止です。",
-    r3: "<b>顔出し必須:</b> カメラを直接見てください。", r4: "<b>セーフシールド:</b> 安全な遷移保護。",
-    banTitle: "7日間の利用停止", deviceBanId: "端末ID:"
-  },
-  ko: {
-    subTitle: "랜덤 화상 채팅", portalBtn: "채팅 시작하기", report: "신고", stop: "중지", start: "시작", next: "다음", stopped: "중지됨",
-    micOn: "마이크 켜짐", micOff: "마이크 꺼짐", showCam: "카메라 보기", flip: "전환",
-    onlineUsers: "명 온라인", chatTitle: "라이브 채팅",
-    chatPlaceholder: "메시지를 입력하세요...", send: "전송", selectMethod: "해결 방법 선택:", gcashTitle: "즉시 정지 해제 (₱10 지원)",
-    gcashDesc: "₱10 결제 후 번호를 제출하세요.", waitTitle: "7일 정지 기간 대기", waitDesc: "7일 후 자동으로 해제됩니다",
-    telegramSupport: "텔레그램 고객지원 문의 (@MeetLoop_bot)",
-    scanText: "QR을 스캔하여 ₱10를 결제하세요.", searching: "상대방을 찾는 중...", expiresHeader: "정지 만료일:",
-    evidenceTag: "위반 증거 스냅샷", banReason: "이유:", encounterSnapshot: "스냅샷이 기록되었습니다", disclaimerTitle: "🚫 공식 이용 정지 안내",
-    disclaimerBody: "커뮤니티 가이드라인 위반으로 인해 7일간 이용이 제한되었습니다.",
-    feeTag: "수수료: ₱10.00 지원 결제", verifyBtn: "확인을 위해 제출", backMethods: "← 옵션으로 돌아가기", tabLockTitle: "중복 탭 감지됨",
-    tabLockDesc: "하나의 탭에서만 사용할 수 있습니다.", tabLockBtn: "이 탭 사용하기", phonePlaceholder: "휴대폰 번호",
-    refPlaceholder: "참조 번호", partnerDisconnected: "상대방이 연결을 끊었습니다.", you: "나", stranger: "상대방",
-    detailsLogged: "세부정보 기록됨", triesLeft: "남은 횟수", unbanSuccess: "결제 확인 완료!", unbanAlert: "정지가 해제되었습니다!",
-    r1: "<b>18세 이상:</b> 미성년자는 엄격히 금지됩니다.", r2: "<b>무관용 원칙:</b> 음란물 및 스팸 금지.",
-    r3: "<b>실제 얼굴:</b> 카메라를 정면으로 응시하세요.", r4: "<b>안전 쉴드:</b> 전환 시 안전 블러 보호.",
-    banTitle: "7일 이용 정지", deviceBanId: "기기 ID:"
-  },
-  zh: {
-    subTitle: "随机视频聊天", portalBtn: "开始聊天", report: "举报", stop: "停止", start: "开始", next: "下一个", stopped: "已停止",
-    micOn: "麦克风开", micOff: "麦克风关", showCam: "显示画面", flip: "翻转",
-    onlineUsers: "位在线用户", chatTitle: "实时聊天",
-    chatPlaceholder: "输入消息...", send: "发送", selectMethod: "选择解封方案:", gcashTitle: "即时解封 (₱10 支持费)",
-    gcashDesc: "支付 ₱10 费用并提交手机号。", waitTitle: "等待 7 天封禁期满", waitDesc: "7天后自动解封",
-    telegramSupport: "联系 Telegram 客服 (@MeetLoop_bot)",
-    scanText: "扫描二维码支付 ₱10 解封费。", searching: "正在寻找匹配对象...", expiresHeader: "封禁到期时间:",
-    evidenceTag: "违规证据快照", banReason: "原因:", encounterSnapshot: "已记录违规快照", disclaimerTitle: "🚫 官方封禁通知",
-    disclaimerBody: "由于违反社区准则，您的访问权限已被限制 7 天。",
-    feeTag: "费用: ₱10.00 支持金", verifyBtn: "提交验证", backMethods: "← 返回选项", tabLockTitle: "检测到重复标签页",
-    tabLockDesc: "仅允许在一个标签页中使用。", tabLockBtn: "在此标签页使用", phonePlaceholder: "手机号码",
-    refPlaceholder: "交易参考号", partnerDisconnected: "对方已断开连接。", you: "你", stranger: "陌生人",
-    detailsLogged: "详情已提交", triesLeft: "次剩余机会", unbanSuccess: "支付已确认！正在解封...", unbanAlert: "您的封禁已被解除！",
-    r1: "<b>年满18岁:</b> 严禁未成年人使用。", r2: "<b>零容忍:</b> 严禁色情低俗和垃圾信息。",
-    r3: "<b>真人露脸:</b> 请正视摄像头。", r4: "<b>安全护盾:</b> 切换时自动模糊保护。",
-    banTitle: "7天封禁限制", deviceBanId: "设备 ID:"
-  },
-  id: {
-    subTitle: "Obrolan Video Acak", portalBtn: "MULAI MENGOBROL", report: "Lapor", stop: "Berhenti", start: "Mulai", next: "Berikutnya", stopped: "Berhenti",
-    micOn: "Mik On", micOff: "Mik Off", showCam: "Tampilkan Kamera", flip: "Putar",
-    onlineUsers: "pengguna online", chatTitle: "Obrolan Langsung",
-    chatPlaceholder: "Ketik pesan...", send: "Kirim", selectMethod: "Pilih Metode Resolusi:", gcashTitle: "Buka Blokir Instan (Dukungan ₱10)",
-    gcashDesc: "Bayar ₱10 dan kirimkan nomor Anda.", waitTitle: "Tunggu Masa Penangguhan 7 Hari", waitDesc: "Buka blokir otomatis setelah 7 hari",
-    telegramSupport: "Hubungi Dukungan Telegram (@MeetLoop_bot)",
-    scanText: "Pindai QR dan bayar ₱10 untuk membuka blokir.", searching: "Mencari seseorang...", expiresHeader: "Kedaluwarsa Penangguhan:",
-    evidenceTag: "BUKTI PERTEMUAN", banReason: "Alasan:", encounterSnapshot: "Foto bukti telah disimpan", disclaimerTitle: "🚫 Pemberitahuan Blokir Resmi",
-    disclaimerBody: "Akses Anda telah dibatasi selama 7 hari karena pelanggaran pedoman komunitas.",
-    feeTag: "Biaya: ₱10.00 Pembayaran Dukungan", verifyBtn: "Kirim untuk Verifikasi", backMethods: "← Kembali ke Opsi", tabLockTitle: "Tab Duplikat Terdeteksi",
-    tabLockDesc: "Hanya diperbolehkan 1 sesi tab.", tabLockBtn: "Gunakan Tab Ini", phonePlaceholder: "Nomor Ponsel",
-    refPlaceholder: "Nomor Referensi", partnerDisconnected: "Orang asing terputus.", you: "Anda", stranger: "Orang Asing",
-    detailsLogged: "Detail tersimpan", triesLeft: "kesempatan tersisa", unbanSuccess: "Pembayaran Diverifikasi!", unbanAlert: "Penangguhan Anda telah dicabut!",
-    r1: "<b>Wajib 18+:</b> Anak di bawah umur dilarang.", r2: "<b>Tanpa Toleransi:</b> Pornografi & spam dilarang.",
-    r3: "<b>Wajah Asli:</b> Tatap langsung kamera.", r4: "<b>Pelindung Aman:</b> Transisi terlindungi.",
-    banTitle: "Penangguhan 7 Hari", deviceBanId: "ID Perangkat:"
-  },
-  vi: {
-    subTitle: "Trò Chuyện Video Ngẫu Nhiên", portalBtn: "BẮT ĐẦU CHAT", report: "Báo cáo", stop: "Dừng", start: "Bắt đầu", next: "Tiếp theo", stopped: "Đã dừng",
-    micOn: "Bật Mic", micOff: "Tắt Mic", showCam: "Hiện Camera", flip: "Lật",
-    onlineUsers: "người dùng trực tuyến", chatTitle: "Trò Chuyện Trực Tiếp",
-    chatPlaceholder: "Nhập tin nhắn...", send: "Gửi", selectMethod: "Chọn Phương Thức Mở Khóa:", gcashTitle: "Mở Khóa Ngay (Ủng Hộ ₱10)",
-    gcashDesc: "Thanh toán ₱10 và gửi số điện thoại của bạn.", waitTitle: "Chờ Hết Hạn 7 Ngày", waitDesc: "Tự động mở khóa sau 7 ngày",
-    telegramSupport: "Nhắn tin Hỗ trợ Telegram (@MeetLoop_bot)",
-    scanText: "Quét mã QR và thanh toán ₱10 để mở khóa.", searching: "Đang tìm người trò chuyện...", expiresHeader: "Hạn Đình Chỉ 7 Ngày:",
-    evidenceTag: "BẰNG CHỨNG VI PHẠM", banReason: "Lý do:", encounterSnapshot: "Ảnh chụp vi phạm đã được lưu", disclaimerTitle: "🚫 Thông Báo Khóa Truy Cập",
-    disclaimerBody: "Quyền truy cập của bạn đã bị hạn chế 7 ngày do vi phạm Nguyên tắc cộng đồng.",
-    feeTag: "Phí: ₱10.00 Ủng Hộ", verifyBtn: "Gửi Để Xác Minh", backMethods: "← Quay Lại Tùy Chọn", tabLockTitle: "Phát Hiện Tab Trùng Lặp",
-    tabLockDesc: "Chỉ được phép sử dụng trong 1 tab.", tabLockBtn: "Dùng Tab Này", phonePlaceholder: "Số Điện Thoại",
-    refPlaceholder: "Mã Giao Dịch", partnerDisconnected: "Người lạ đã ngắt kết nối.", you: "Bạn", stranger: "Người Lạ",
-    detailsLogged: "Đã ghi nhận chi tiết", triesLeft: "lần thử còn lại", unbanSuccess: "Xác minh thành công!", unbanAlert: "Bạn đã được mở khóa!",
-    r1: "<b>Yêu cầu 18+:</b> Nghiêm cấm trẻ vị thành niên.", r2: "<b>Không Khoan Nhượng:</b> Cấm ảnh nóng và spam.",
-    r3: "<b>Khuôn Mặt Thật:</b> Nhìn thẳng vào camera.", r4: "<b>Lá Chắn An Toàn:</b> Chuyển tiếp mờ an toàn.",
-    banTitle: "Đình Chỉ 7 Ngày", deviceBanId: "Mã Thiết Bị:"
-  },
-  ar: {
-    subTitle: "دردشة فيديو عشوائية", portalBtn: "ابدأ الدردشة", report: "إبلاغ", stop: "إيقاف", start: "ابدأ", next: "التالي", stopped: "متوقف",
-    micOn: "الميكروفون يعمل", micOff: "الميكروفون مغلق", showCam: "عرض الكاميرا", flip: "قلب",
-    onlineUsers: "مستخدم متصل", chatTitle: "دردشة مباشرة",
-    chatPlaceholder: "اكتب رسالة...", send: "إرسال", selectMethod: "اختر طريقة فك الحظر:", gcashTitle: "فك الحظر الفوري (دعم ₱10)",
-    gcashDesc: "ادفع ₱10 وأدخل رقمك.", waitTitle: "انتظر فترة التعليق 7 أيام", waitDesc: "يتم فك الحظر تلقائياً بعد 7 أيام",
-    telegramSupport: "مراسلة دعم التيليجرام (@MeetLoop_bot)",
-    scanText: "امسح رمز QR وادفع ₱10 للمتابعة.", searching: "جارٍ البحث عن شخص ما...", expiresHeader: "انتهاء فترة الحظر:",
-    evidenceTag: "دليل المخالفة", banReason: "السبب:", encounterSnapshot: "تم تسجيل لقطة المخالفة", disclaimerTitle: "🚫 إشعار الحظر الرسمي",
-    disclaimerBody: "تم تقييد وصولك لمدة 7 أيام بسبب انتهاك إرشادات المنتدى.",
-    feeTag: "الرسوم: ₱10.00 دفعة دعم", verifyBtn: "إرسال للتحقق", backMethods: "← العودة للخيارات", tabLockTitle: "تم اكتشاف علامة تبويب مكررة",
-    tabLockDesc: "مسموح بعلامة تبويب واحدة فقط.", tabLockBtn: "استخدم علامة التبويب هذه", phonePlaceholder: "رقم الهاتف",
-    refPlaceholder: "رقم المرجع", partnerDisconnected: "انقطع اتصال الغريب.", you: "أنت", stranger: "الغريب",
-    detailsLogged: "تم تسجيل التفاصيل", triesLeft: "محاولات متبقية", unbanSuccess: "تم التحقق من الدفع!", unbanAlert: "تم رفع الحظر بنجاح!",
-    r1: "<b>18+ مطلوب:</b> يُمنع القاصرين تماماً.", r2: "<b>عدم التسامح:</b> يُمنع العري والسلوك المسيء.",
-    r3: "<b>وجه حقيقي:</b> انظر مباشرة إلى الكاميرا.", r4: "<b>درع الأمان:</b> حماية ضبابية آمنة عند التبديل.",
-    banTitle: "تعليق لمدة 7 أيام", deviceBanId: "معرف الجهاز:"
-  },
-  ru: {
-    subTitle: "Случайный видеочат", portalBtn: "НАЧАТЬ ЧАТ", report: "Пожаловаться", stop: "Стоп", start: "Старт", next: "Далее", stopped: "Остановлено",
-    micOn: "Микр Вкл", micOff: "Микр Выкл", showCam: "Показать камеру", flip: "Поворот",
-    onlineUsers: "онлайн", chatTitle: "Чат",
-    chatPlaceholder: "Введите сообщение...", send: "Отправить", selectMethod: "Выберите способ разблокировки:", gcashTitle: "Мгновенный разбан (₱10)",
-    gcashDesc: "Оплатите ₱10 и укажите номер.", waitTitle: "Подождать 7 дней", waitDesc: "Автоматический разбан через 7 дней",
-    telegramSupport: "Написать в поддержку Telegram (@MeetLoop_bot)",
-    scanText: "Отсканируйте QR и оплатите ₱10 для разбана.", searching: "Поиск собеседника...", expiresHeader: "Окончание блокировки:",
-    evidenceTag: "СНИМОК НАРУШЕНИЯ", banReason: "Причина:", encounterSnapshot: "Снимок зафиксирован", disclaimerTitle: "🚫 Уведомление о блокировке",
-    disclaimerBody: "Доступ ограничен на 7 дней за нарушение правил сообщества.",
-    feeTag: "Сбор: ₱10.00 Поддержка", verifyBtn: "Отправить на проверку", backMethods: "← Назад", tabLockTitle: "Дубликат вкладки",
-    tabLockDesc: "Разрешена только 1 вкладка.", tabLockBtn: "Использовать эту вкладку", phonePlaceholder: "Номер телефона",
-    refPlaceholder: "Номер транзакции", partnerDisconnected: "Собеседник отключился.", you: "Вы", stranger: "Собеседник",
-    detailsLogged: "Данные отправлены", triesLeft: "попыток осталось", unbanSuccess: "Оплата подтверждена!", unbanAlert: "Блокировка снята!",
-    r1: "<b>Только 18+:</b> Несовершеннолетним вход запрещен.", r2: "<b>Без цензуры:</b> Обнажение и спам запрещены.",
-    r3: "<b>Только лицо:</b> Смотрите прямо в камеру.", r4: "<b>Размытие экрана:</b> Безопасный переход при переключении.",
-    banTitle: "Блокировка на 7 дней", deviceBanId: "ID устройства:"
   }
 };
 
@@ -1266,12 +1236,9 @@ function setLanguage(lang) {
   safeSet("lblSelectMethod", t.selectMethod);
   safeSet("lblGcashTitle", t.gcashTitle);
   safeSet("lblGcashDesc", t.gcashDesc);
-  safeSet("lblWaitTitle", t.waitTitle);
-  safeSet("lblWaitDesc", t.waitDesc);
   safeSet("lblScanText", t.scanText);
   safeSet("lblExpiresHeader", t.expiresHeader);
   safeSet("lblEvidenceTag", t.evidenceTag);
-  safeSet("lblEncounterSnapshot", t.encounterSnapshot);
   safeSet("lblDisclaimerTitle", t.disclaimerTitle);
   safeSet("lblDisclaimerBody", t.disclaimerBody, true);
   safeSet("lblFeeTag", t.feeTag);
@@ -1359,13 +1326,16 @@ function sendChat() {
   chatInput.value = "";
 }
 
-document.getElementById("portalStartBtn").addEventListener("click", async () => {
-  const p = document.getElementById("welcomePortal");
-  if (p) p.style.display = "none";
-  if (!isCurrentlyBanned) {
-    await startMedia();
-  }
-});
+const portalBtn = document.getElementById("portalStartBtn");
+if (portalBtn) {
+  portalBtn.addEventListener("click", async () => {
+    const p = document.getElementById("welcomePortal");
+    if (p) p.style.display = "none";
+    if (!isCurrentlyBanned) {
+      await startMedia();
+    }
+  });
+}
 
 if (mainActionBtn) mainActionBtn.addEventListener("click", triggerStartNext);
 if (stopBtn) stopBtn.addEventListener("click", stopSession);
@@ -1436,7 +1406,7 @@ if (showBtn) {
   });
 }
 
-// STARTUP (DEFAULT ENGLISH)
+// STARTUP
 checkMultiTabConflict();
 const initialLang = localStorage.getItem("meetloop_lang") || "en";
 setLanguage(initialLang);
