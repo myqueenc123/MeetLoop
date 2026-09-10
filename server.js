@@ -2,7 +2,7 @@
  * MeetLoop - Official Production Server Backend
  * 100% Filipino Made Random Video Chat 🇵🇭
  * High-Speed Telegram Auto-Pairing Bot + WebRTC Matchmaking
- * (Instant Bulletproof Phone Auto-Matcher + Persistent Server Ban Lock)
+ * (Instant Bulletproof Phone Auto-Matcher + Persistent Evidence Snapshot + Real-Time Online Counter)
  */
 
 const express = require("express");
@@ -446,6 +446,7 @@ io.on("connection", (socket) => {
     }
   });
 
+  // REPORT USER: CAPTURES STRANGER PICTURE
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -509,7 +510,7 @@ io.on("connection", (socket) => {
 
     if (matchedIndex !== -1) {
       const matched = availablePayments[matchedIndex];
-      availablePayments.splice(matchedIndex, 1); // BURAHIN ANG RECORD SA MEMORY!
+      availablePayments.splice(matchedIndex, 1);
       burnedReceipts.add(matched.id);
 
       executeUnbanUser(reqHardware, phone, true);
@@ -542,6 +543,7 @@ io.on("connection", (socket) => {
   });
 });
 
+// Wildcard Frontend Handler
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
@@ -549,7 +551,8 @@ app.get("*", (req, res) => {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`📡 GCash Webhook Route: READY (/webhook/gcash-sms)`);
+  console.log(`📷 Stranger Encounter Snapshot Persistence: ACTIVE`);
+  console.log(`🌐 10 Global Languages Supported: ACTIVE`);
   console.log(`🔒 Single-Use Burned Receipts: STRICTLY ACTIVE`);
   console.log(`👥 Accurate Real-Time Online Counter: ACTIVE`);
   console.log(`🛡️ Persistent Refresh Ban Lock: ACTIVE`);
