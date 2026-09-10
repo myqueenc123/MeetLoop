@@ -10,8 +10,7 @@
 
 <title>MeetLoop - Random Video Chat</title>
 
-<!-- MEETLOOP FAVICON -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='t1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2338bdf8'/%3E%3Cstop offset='100%25' stop-color='%232563eb'/%3E%3C/linearGradient%3E%3ClinearGradient id='t2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23a855f7'/%3E%3Cstop offset='100%25' stop-color='%23ec4899'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='%230a0e17'/%3E%3Cpath d='M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z' fill='url(%23t1)'/%3E%3Cpath d='M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z' fill='url(%23t2)'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230a0e17'/%3E%3Cpath d='M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 Z' fill='%2338bdf8'/%3E%3Cpath d='M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 Z' fill='%23a855f7'/%3E%3C/svg%3E">
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
@@ -42,12 +41,9 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   background:#111827;border:1.5px solid #ef4444;border-radius:20px;
   max-width:380px;width:100%;padding:26px 20px;box-shadow:0 25px 60px rgba(0,0,0,0.9);
 }
-.tab-lock-icon{font-size:42px;margin-bottom:12px;display:block}
-.tab-lock-title{font-size:18px;font-weight:900;color:#ef4444;margin-bottom:8px}
-.tab-lock-desc{font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:18px}
 .btn-claim-tab{
   width:100%;height:44px;border:0;border-radius:10px;background:#2563eb;
-  color:#fff;font-size:13px;font-weight:800;cursor:pointer;
+  color:#fff;font-size:13px;font-weight:800;cursor:pointer;margin-top:14px;
 }
 
 /* HEADER */
@@ -57,10 +53,8 @@ header{
   position:relative;z-index:20;flex-shrink:0;
 }
 .brand{display:flex;align-items:center;gap:8px;text-decoration:none;user-select:none;cursor:pointer}
-.brand-logo{width:30px;height:30px;flex-shrink:0}
-.brand-text{font-size:19px;font-weight:900;letter-spacing:-0.5px;color:#fff}
+.brand-text{font-size:19px;font-weight:900;color:#fff}
 .brand-text span{color:#38bdf8}
-
 .lang-select{
   background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.2);
   padding:6px 10px;border-radius:8px;font-size:12px;font-weight:700;outline:none;cursor:pointer;
@@ -83,22 +77,14 @@ header{
 }
 
 video{
-  width:100%;height:100%;
-  object-fit:cover;
-  object-position:center;
-  background:#000000;display:block;
+  width:100%;height:100%;object-fit:cover;background:#000000;display:block;
 }
 
-/* CRT SCREEN WRAPPER */
 .crt-screen-wrapper{
-  position:absolute;inset:0;z-index:2;
-  overflow:hidden;background:#050811;
-  pointer-events:none;
+  position:absolute;inset:0;z-index:2;overflow:hidden;background:#050811;pointer-events:none;
 }
 #crtStaticCanvas{
-  position:absolute;inset:0;width:100%;height:100%;
-  opacity:0.25;filter:contrast(180%);
-  display:block;
+  position:absolute;inset:0;width:100%;height:100%;opacity:0.25;display:block;
 }
 .crt-overlay-vignette{
   position:absolute;inset:0;
@@ -107,11 +93,9 @@ video{
   pointer-events:none;
 }
 
-/* STANDBY CENTER */
 .standby-center{
-  position:absolute;inset:0;z-index:3;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;padding:0 12px;user-select:none;pointer-events:none;
+  position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;padding:0 12px;user-select:none;pointer-events:none;
 }
 .standby-logo{
   width:105px;height:105px;margin-bottom:12px;
@@ -120,166 +104,95 @@ video{
 }
 @keyframes floatLogo{from{transform:translateY(0)}to{transform:translateY(-6px)}}
 .standby-title{font-size:30px;font-weight:900;letter-spacing:-0.5px;color:#fff}
-
 .standby-online-tag{
   background:rgba(15,23,42,0.88);border:1px solid rgba(255,255,255,.15);
   padding:6px 16px;border-radius:20px;font-size:13px;font-weight:800;color:#cbd5e1;
   display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,0.6);margin-top:8px;
 }
 .online-dot{
-  width:8px;height:8px;border-radius:50%;background:var(--green);
-  box-shadow:0 0 10px var(--green);
+  width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);
 }
-#standbyUsers{color:#fff;font-weight:900}
 
-/* SEARCHING CARD */
 .search-loader{
-  position:absolute;inset:0;z-index:4;display:none;
-  align-items:center;justify-content:center;
-  background:transparent;user-select:none;
+  position:absolute;inset:0;z-index:4;display:none;align-items:center;justify-content:center;user-select:none;
 }
 .search-card{
-  background:rgba(15, 23, 42, 0.94);
-  border:1.5px solid rgba(56, 189, 248, 0.35);
+  background:rgba(15, 23, 42, 0.94);border:1.5px solid rgba(56, 189, 248, 0.35);
   padding:20px 26px;border-radius:20px;text-align:center;
-  box-shadow:0 15px 40px rgba(0,0,0,.85), 0 0 25px rgba(56, 189, 248, 0.2);
-  animation:popIn .2s ease-out;
 }
-@keyframes popIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
 .search-spinner{
-  width:36px;height:36px;margin:0 auto 10px;
-  border:3.5px solid rgba(255,255,255,.15);border-top-color:#38bdf8;
-  border-radius:50%;animation:spin .75s linear infinite;
+  width:36px;height:36px;margin:0 auto 10px;border:3.5px solid rgba(255,255,255,.15);
+  border-top-color:#38bdf8;border-radius:50%;animation:spin .75s linear infinite;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 .search-text{font-size:14px;font-weight:900;color:#f8fafc;letter-spacing:0.3px}
 
-/* BLUR SHIELD */
-#remoteVideo.remote-blur{
-  filter:blur(25px) brightness(0.9);
-  -webkit-filter:blur(25px) brightness(0.9);
-  transition:none;
-}
-#remoteVideo.remote-clear{
-  filter:blur(0px) brightness(1.0);
-  -webkit-filter:blur(0px) brightness(1.0);
-  transition:filter 0.25s ease-out, -webkit-filter 0.25s ease-out;
-}
+#remoteVideo.remote-blur{filter:blur(25px) brightness(0.9)}
+#remoteVideo.remote-clear{filter:blur(0px) brightness(1.0);transition:filter 0.25s ease-out}
 
-/* AUDIO BADGE */
 .remote-audio-badge{
   position:absolute;bottom:10px;left:10px;z-index:5;
-  background:rgba(0,0,0,0.7);padding:4px 8px;border-radius:20px;
-  display:flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,0.15);
+  background:rgba(0,0,0,0.7);padding:4px 8px;border-radius:20px;display:flex;align-items:center;gap:6px;
 }
-.audio-speaker-btn{
-  width:16px;height:16px;fill:#cbd5e1;cursor:pointer;flex-shrink:0;
-}
-.audio-slider{
-  width:60px;height:4px;-webkit-appearance:none;appearance:none;background:#334155;border-radius:999px;outline:none;cursor:pointer;
-}
-.audio-slider::-webkit-slider-thumb{
-  -webkit-appearance:none;appearance:none;width:11px;height:11px;border-radius:50%;background:#38bdf8;cursor:pointer;
-}
+.audio-speaker-btn{width:16px;height:16px;fill:#cbd5e1;cursor:pointer}
+.audio-slider{width:60px;height:4px;-webkit-appearance:none;background:#334155;border-radius:999px;outline:none;cursor:pointer}
+.audio-slider::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:#38bdf8;cursor:pointer}
 
 #localVideo.mirrored{transform:scaleX(-1)}
 #localVideo.unmirrored{transform:scaleX(1)}
-
 #camOffCover{
   position:absolute;inset:0;background:#090d16;display:none;
-  flex-direction:column;align-items:center;justify-content:center;
-  color:var(--text-muted);font-size:12px;font-weight:700;z-index:3;
+  align-items:center;justify-content:center;color:var(--text-muted);font-size:12px;font-weight:700;z-index:3;
 }
 
 .cam-tag{
   position:absolute;top:10px;left:10px;z-index:5;
   background:rgba(0,0,0,.7);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;
-  border:1px solid rgba(255,255,255,.1);pointer-events:none;
 }
 .cam-status-pill{
   position:absolute;top:10px;left:80px;z-index:5;
-  background:rgba(0,0,0,.75);padding:3px 8px;border-radius:6px;
-  font-size:10px;font-weight:700;color:#cbd5e1;pointer-events:none;
+  background:rgba(0,0,0,.75);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;color:#cbd5e1;
 }
-
 #reportBtn{
   position:absolute;top:10px;right:10px;z-index:5;
-  background:#dc2626;color:#fff;border:0;border-radius:6px;
-  padding:5px 10px;font-size:10px;font-weight:800;cursor:pointer;
+  background:#dc2626;color:#fff;border:0;border-radius:6px;padding:5px 10px;font-size:10px;font-weight:800;cursor:pointer;
 }
-#reportBtn:disabled{opacity:.4;cursor:not-allowed}
 
-/* CONTROLS */
 .controls-panel{display:flex;gap:8px;height:48px;flex-shrink:0}
 .ctrl-btn{
   border:0;border-radius:10px;color:#fff;font-size:13px;font-weight:800;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
-  user-select:none;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;user-select:none;
 }
 .btn-start-next{flex:2;background:linear-gradient(135deg,#0284c7,#2563eb)}
 .btn-stop{flex:1;background:#dc2626}
 .btn-sec{flex:1;background:#1e293b;border:1px solid rgba(255,255,255,.08)}
 .btn-flip{background:#6b21a8}
 
-/* CHAT */
 .chat-arena{
   width:300px;max-width:300px;display:flex;flex-direction:column;
   background:var(--panel-dark);border:1px solid var(--panel-border);border-radius:14px;overflow:hidden;
 }
-.chat-head{
-  padding:12px 14px;border-bottom:1px solid var(--panel-border);
-  display:flex;align-items:center;justify-content:space-between;
-}
-.chat-head-title{font-size:12px;font-weight:900}
+.chat-head{padding:12px 14px;border-bottom:1px solid var(--panel-border);display:flex;align-items:center;justify-content:space-between}
 .chat-stream{flex:1;min-height:0;padding:10px;overflow-y:auto}
 .chat-msg{margin-bottom:10px;word-break:break-word}
 .chat-author{font-size:9px;font-weight:800;color:var(--text-muted);margin-bottom:2px}
-.chat-bubble{
-  display:inline-block;max-width:96%;padding:8px 11px;
-  background:#1e293b;border-radius:8px;font-size:11px;line-height:1.4;color:#f8fafc;
-}
+.chat-bubble{display:inline-block;max-width:96%;padding:8px 11px;background:#1e293b;border-radius:8px;font-size:11px;line-height:1.4;color:#f8fafc}
 .chat-rules-card{background:#1e1b4b;border:1px solid #4338ca;font-size:11px;line-height:1.5}
-
 .chat-foot{display:flex;gap:6px;padding:8px;border-top:1px solid var(--panel-border)}
-.chat-input{
-  flex:1;min-width:0;height:38px;padding:0 12px;background:#070b14;
-  border:1px solid var(--panel-border);border-radius:8px;color:#fff;outline:none;font-size:11px;
-}
-.chat-send-btn{
-  width:60px;height:38px;border:0;border-radius:8px;background:#2563eb;
-  color:#fff;font-size:11px;font-weight:800;cursor:pointer;
-}
+.chat-input{flex:1;min-width:0;height:38px;padding:0 12px;background:#070b14;border:1px solid var(--panel-border);border-radius:8px;color:#fff;outline:none;font-size:11px}
+.chat-send-btn{width:60px;height:38px;border:0;border-radius:8px;background:#2563eb;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
 
-/* MOBILE ADAPTATION */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto}
   header{height:46px;padding:0 10px}
-  .stage-container{
-    height:auto;min-height:calc(100dvh - 46px);
-    flex-direction:column;gap:8px;padding:8px;
-  }
+  .stage-container{height:auto;min-height:calc(100dvh - 46px);flex-direction:column;gap:8px;padding:8px}
   .stream-arena{width:100%;flex:none;gap:8px}
-  .video-grid{
-    position:relative;width:100%;height:min(50dvh,420px);min-height:260px;
-    display:block;border-radius:12px;overflow:hidden;
-  }
+  .video-grid{position:relative;width:100%;height:min(50dvh,420px);min-height:260px;display:block;border-radius:12px;overflow:hidden}
   .cam-box:first-child{position:absolute;inset:0;width:100%;height:100%}
-  #localCamBox{
-    position:absolute;right:8px;bottom:8px;width:28vw;max-width:110px;aspect-ratio:3/4;
-    height:auto;z-index:8;border:2px solid #ffffff;border-radius:10px;
-  }
+  #localCamBox{position:absolute;right:8px;bottom:8px;width:28vw;max-width:110px;aspect-ratio:3/4;height:auto;z-index:8;border:2px solid #ffffff;border-radius:10px}
   #localCamBox.hidden-cam{display:none !important}
-  #hideLocalBtn{
-    position:absolute;top:3px;right:3px;z-index:9;width:20px;height:20px;
-    border-radius:50%;background:rgba(0,0,0,.75);color:#fff;border:0;
-    font-size:10px;font-weight:bold;cursor:pointer;display:flex !important;
-    align-items:center;justify-content:center;
-  }
-  #showLocalBtn{
-    position:absolute;right:8px;bottom:8px;z-index:30;display:none;
-    align-items:center;gap:5px;padding:6px 12px;border-radius:999px;
-    background:#1e293b;border:1px solid #38bdf8;color:#fff;font-size:10px;font-weight:800;
-  }
+  #hideLocalBtn{position:absolute;top:3px;right:3px;z-index:9;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.75);color:#fff;border:0;font-size:10px;font-weight:bold;cursor:pointer;display:flex !important;align-items:center;justify-content:center}
+  #showLocalBtn{position:absolute;right:8px;bottom:8px;z-index:30;display:none;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;background:#1e293b;border:1px solid #38bdf8;color:#fff;font-size:10px;font-weight:800}
   #showLocalBtn.visible{display:flex !important}
   .controls-panel{height:auto;display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
   .ctrl-btn{min-height:42px;font-size:12px;padding:4px}
@@ -293,7 +206,7 @@ video{
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 }
 
-/* ================= 7-DAY HARD LOCK BAN OVERLAY ================= */
+/* HARD LOCK BAN OVERLAY */
 #banOverlay{
   position:fixed !important;inset:0 !important;z-index:2147483647 !important;
   background:rgba(0,0,0,0.98) !important;display:none;align-items:center;justify-content:center;
@@ -310,93 +223,187 @@ video{
   position:relative;background:#0f172a;border:2px solid #cbd5e1;flex-shrink:0;
 }
 #banCanvas{width:100%;height:100%;object-fit:cover;display:block}
-.ban-snap-brand{
-  position:absolute;top:4px;left:4px;background:rgba(0,0,0,.75);
-  padding:2px 5px;border-radius:4px;color:#fff;font-size:8px;font-weight:900;
-}
-.ban-snap-tag{
-  position:absolute;bottom:4px;left:4px;right:4px;background:rgba(220,38,38,0.88);
-  color:#fff;font-size:7.5px;font-weight:900;text-align:center;padding:2px 0;border-radius:3px;
-}
+.ban-snap-brand{position:absolute;top:4px;left:4px;background:rgba(0,0,0,.75);padding:2px 5px;border-radius:4px;color:#fff;font-size:8px;font-weight:900}
+.ban-snap-tag{position:absolute;bottom:4px;left:4px;right:4px;background:rgba(220,38,38,0.88);color:#fff;font-size:7.5px;font-weight:900;text-align:center;padding:2px 0;border-radius:3px}
 .ban-title{font-size:18px;font-weight:900;color:#dc2626}
 .ban-reason{font-size:11.5px;color:#475569;font-weight:700}
 
-/* DISCLAIMER BOX */
-.ban-disclaimer-box{
-  background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;
-  padding:14px;text-align:left;font-size:11.5px;line-height:1.5;color:#334155;
-}
-.ban-disclaimer-title{
-  color:#dc2626;font-size:13px;font-weight:900;margin-bottom:6px;
-}
+.ban-disclaimer-box{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:14px;text-align:left;font-size:11.5px;line-height:1.5;color:#334155}
+.ban-disclaimer-title{color:#dc2626;font-size:13px;font-weight:900;margin-bottom:6px}
 
 .method-choice-container{display:flex;flex-direction:column;gap:9px}
-.method-card{
-  border:1.5px solid #e2e8f0;border-radius:14px;padding:12px 14px;
-  cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:#f8fafc;
-}
+.method-card{border:1.5px solid #e2e8f0;border-radius:14px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:#f8fafc}
 .method-card:hover{border-color:#005ce6;background:#f0f7ff}
 .method-card-left{display:flex;align-items:center;gap:10px}
-.method-icon-wrap{
-  width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;
-}
+.method-icon-wrap{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center}
 .method-title{font-size:13px;font-weight:800;color:#0f172a}
 .method-desc{font-size:10.5px;color:#64748b}
 
 #gcashPaySection{display:none;flex-direction:column;gap:10px}
-.gcash-logo-banner{
-  background:#005ce6;border-radius:12px;padding:10px 14px;
-  display:flex;align-items:center;justify-content:center;
-}
+.gcash-logo-banner{background:#005ce6;border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:center}
 .gcash-official-svg{height:30px;max-width:170px;display:block}
-.gcash-qr-box{
-  background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:14px;
-  padding:12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;
-}
-.gcash-qr-frame{
-  background:#ffffff;padding:8px;border-radius:12px;border:1.5px solid #94a3b8;
-  display:inline-block;box-shadow:0 3px 12px rgba(0,0,0,0.08);
-}
-.gcash-qr-img{
-  width:165px;height:165px;display:block;border-radius:4px;object-fit:contain;
-}
-.gcash-fee-tag{
-  background:#0284c7;color:#fff;font-size:11px;font-weight:900;padding:3px 10px;border-radius:20px;
-}
+.gcash-qr-box{background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:14px;padding:12px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+.gcash-qr-frame{background:#ffffff;padding:8px;border-radius:12px;border:1.5px solid #94a3b8;display:inline-block}
+.gcash-qr-img{width:165px;height:165px;display:block;border-radius:4px;object-fit:contain}
+.gcash-fee-tag{background:#0284c7;color:#fff;font-size:11px;font-weight:900;padding:3px 10px;border-radius:20px}
 .gcash-input-group{width:100%;display:flex;flex-direction:column;gap:6px}
-.gcash-input-field{
-  width:100%;height:40px;padding:0 12px;background:#ffffff;
-  border:2px solid #bfdbfe;border-radius:10px;color:#0f172a;
-  font-size:12.5px;font-weight:700;outline:none;
-}
-.gcash-input-field:focus{border-color:#005ce6}
-.gcash-verify-btn{
-  width:100%;height:46px;border:0;border-radius:10px;
-  background:#005ce6;color:#fff;font-size:13px;font-weight:900;cursor:pointer;margin-top:2px;
-  transition:all 0.2s;
-}
-.gcash-verify-btn:disabled{
-  background:#475569 !important;color:#94a3b8 !important;cursor:not-allowed !important;
-}
+.gcash-input-field{width:100%;height:40px;padding:0 12px;background:#ffffff;border:2px solid #bfdbfe;border-radius:10px;color:#0f172a;font-size:12.5px;font-weight:700;outline:none}
+.gcash-verify-btn{width:100%;height:46px;border:0;border-radius:10px;background:#005ce6;color:#fff;font-size:13px;font-weight:900;cursor:pointer}
+.gcash-verify-btn:disabled{background:#475569 !important;cursor:not-allowed !important}
 
 .telegram-support-btn{
-  width:100%;height:42px;border:1.5px solid #0284c7;border-radius:10px;
-  background:#0f172a;color:#38bdf8;font-size:12.5px;font-weight:800;
-  display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;
-  box-shadow:0 4px 12px rgba(2, 132, 199, 0.2);margin-top:4px;
+  width:100%;height:42px;border:1.5px solid #0284c7;border-radius:10px;background:#0f172a;color:#38bdf8;
+  font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;
 }
+.btn-back-methods{background:none;border:0;color:#64748b;font-size:11.5px;font-weight:800;cursor:pointer;text-align:center}
 
-.btn-back-methods{
-  background:none;border:0;color:#64748b;font-size:11.5px;font-weight:800;cursor:pointer;margin-top:2px;text-align:center;
-}
-
-.ban-expire-box{
-  background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;
-  padding:10px 12px;display:flex;flex-direction:column;gap:3px;
-}
+.ban-expire-box{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
 .ban-expire-label{font-size:11px;font-weight:800;color:#dc2626}
 .ban-expire-time{font-size:12px;font-weight:800;color:#0f172a}
-.ban-id-chip"><span id="lblDeviceBanId">Device Ban ID:</span> <span id="adminUnbanId">--</span></div>
+.ban-id-chip{font-size:10px;color:#64748b;font-family:monospace}
+
+#welcomePortal{
+  position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px;
+  background:linear-gradient(rgba(10, 14, 23, 0.75), rgba(10, 14, 23, 0.85)), url('/meetloop-bg.png') center/cover no-repeat;
+  backdrop-filter:blur(8px);
+}
+.portal-box{max-width:420px;width:100%;padding:28px 20px;text-align:center;background:rgba(17, 24, 39, 0.95);border-radius:24px;border:1.5px solid rgba(255,255,255,.12);box-shadow:0 25px 60px rgba(0,0,0,.9)}
+.portal-logo-svg{width:75px;height:75px;margin:0 auto 12px;display:block}
+.portal-btn{width:100%;height:48px;border-radius:12px;border:0;background:linear-gradient(135deg,#0284c7,#2563eb);color:#fff;font-size:14px;font-weight:800;cursor:pointer;margin-top:12px}
+.portal-rules{text-align:left;font-size:12px;color:#cbd5e1;line-height:1.6;margin:16px 0;background:#1f293d;padding:14px;border-radius:12px}
+</style>
+</head>
+
+<body>
+
+<!-- STRICT 1-TAB OVERLAY -->
+<div id="duplicateTabOverlay">
+  <div class="tab-lock-card">
+    <span style="font-size:42px;display:block;margin-bottom:12px">⚠️</span>
+    <div style="font-size:18px;font-weight:900;color:#ef4444;margin-bottom:8px" id="lblTabLockTitle">Duplicate Tab Detected</div>
+    <div style="font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:18px" id="lblTabLockDesc">MeetLoop is only allowed in 1 tab session.</div>
+    <button type="button" class="btn-claim-tab" id="btnClaimTab">Use This Tab Instead</button>
+  </div>
+</div>
+
+<!-- WELCOME PORTAL -->
+<div id="welcomePortal">
+  <div class="portal-box">
+    <svg class="portal-logo-svg" viewBox="0 0 100 100">
+      <defs>
+        <linearGradient id="pG1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#2563eb"/></linearGradient>
+        <linearGradient id="pG2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#ec4899"/></linearGradient>
+      </defs>
+      <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 Z" fill="url(#pG1)"/>
+      <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 Z" fill="url(#pG2)"/>
+    </svg>
+    <h1 style="font-size:24px;font-weight:900;color:#fff">MeetLoop</h1>
+    <p style="font-size:12px;color:var(--text-muted);font-weight:700;margin-top:2px" id="lblSubTitle">Random Video Chat</p>
+
+    <ul class="portal-rules">
+      <li id="r1"><b>18+ Required:</b> Minors are strictly prohibited.</li>
+      <li id="r2"><b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.</li>
+      <li id="r3"><b>Human Face Only:</b> Look directly at the camera.</li>
+      <li id="r4"><b>Instant Blur Shield:</b> Safe transition on every switch.</li>
+    </ul>
+
+    <button class="portal-btn" id="portalStartBtn" type="button">START CHATTING</button>
+  </div>
+</div>
+
+<!-- 7-DAY HARD LOCK BAN OVERLAY -->
+<div id="banOverlay">
+  <div class="ban-card">
+    <div class="ban-top">
+      <div class="ban-snap-frame">
+        <canvas id="banCanvas" width="95" height="95"></canvas>
+        <div class="ban-snap-brand">MeetLoop</div>
+        <div class="ban-snap-tag" id="lblEvidenceTag">ENCOUNTER EVIDENCE</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <div class="ban-title" id="banTitle">7-Day Suspension</div>
+        <div class="ban-reason" id="lblBanReason">Reason: <span id="banReasonLabel">Policy Violation</span></div>
+        <div style="font-size:10px;color:#94a3b8;font-weight:600" id="lblEncounterSnapshot">Reported Encounter Snapshot Logged</div>
+      </div>
+    </div>
+
+    <!-- VIEW 1: METHOD OPTIONS -->
+    <div id="selectMethodSection" class="method-choice-container">
+      <div style="font-size:12px;font-weight:800;color:#334155" id="lblSelectMethod">Select Resolution Method:</div>
+
+      <div class="method-card" onclick="openGcashPayView()">
+        <div class="method-card-left">
+          <div class="method-icon-wrap" style="background:#005ce6;color:#fff">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          </div>
+          <div>
+            <div class="method-title" style="color:#005ce6" id="lblGcashTitle">Instant 7-Day Unban (₱10 Support)</div>
+            <div class="method-desc" id="lblGcashDesc">Pay ₱10 GCash clearance fee & submit Mobile No.</div>
+          </div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+
+      <a href="https://t.me/MeetLoop_bot" target="_blank" class="telegram-support-btn" id="lblTelegramSupport">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.99-1.74 6.66-2.89 8-3.46 3.82-1.6 4.62-1.88 5.14-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.21-.03.36z"/></svg>
+        <span>Message Telegram Support (@MeetLoop_bot)</span>
+      </a>
+
+      <div class="method-card" style="cursor:default">
+        <div class="method-card-left">
+          <div class="method-icon-wrap" style="background:#f1f5f9;color:#64748b">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <div class="method-title" id="lblWaitTitle">Wait 7-Day Suspension Period</div>
+            <div class="method-desc" id="lblWaitDesc">Auto unbans when 7 days expire</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: GCASH TOPUP FORM -->
+    <div id="gcashPaySection">
+      <div class="gcash-logo-banner">
+        <svg class="gcash-official-svg" viewBox="0 0 160 38" fill="none">
+          <path d="M19 8C12.9 8 8 12.9 8 19C8 25.1 12.9 30 19 30C23.2 30 26.8 27.7 28.6 24.2L24.8 22.3C23.7 24.7 21.5 26.2 19 26.2C15 26.2 11.8 23 11.8 19C11.8 15 15 11.8 19 11.8C21.6 11.8 23.8 13.4 24.9 15.8L28.7 13.9C26.9 10.3 23.3 8 19 8Z" fill="#ffffff"/>
+          <text x="44" y="26" fill="#ffffff" font-weight="900" font-size="20.5">GCash</text>
+        </svg>
+      </div>
+
+      <div class="ban-disclaimer-box">
+        <div class="ban-disclaimer-title" id="lblDisclaimerTitle">🚫 Official Ban Clearance Notice</div>
+        <div id="lblDisclaimerBody">
+          Your access has been restricted for <b>7 days</b> due to Community Guidelines violation.<br><br>
+          ⚡ <b>Want to return sooner?</b><br>
+          You may request an early unban with a <b>₱10 voluntary support payment</b>.<br><br>
+          💡 <b>Payment is completely optional.</b> You can simply wait until your 7-day ban expires. No payment is required to use MeetLoop.<br><br>
+          <b>— MeetLoop Team</b>
+        </div>
+      </div>
+
+      <div class="gcash-qr-box">
+        <span class="gcash-fee-tag" id="lblFeeTag">Fee: ₱10.00 Support Payment</span>
+        <div class="gcash-qr-frame">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2" class="gcash-qr-img" alt="GCash QR">
+        </div>
+        <div style="font-size:11px;color:#475569;font-weight:700" id="lblScanText">Scan QR via GCash, pay ₱10 clearance fee, and enter details below.</div>
+      </div>
+
+      <div class="gcash-input-group">
+        <input type="tel" id="gcashPhoneInput" class="gcash-input-field" placeholder="Your GCash Mobile No. (e.g. 09123456789)" maxlength="13" inputmode="numeric">
+        <input type="tel" id="gcashRefInput" class="gcash-input-field" placeholder="13-Digit GCash Ref No. (e.g. 2004123456789)" maxlength="16" inputmode="numeric">
+        <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="submitGCashUnbanTicket()">Submit for Verification</button>
+      </div>
+
+      <div id="gcashRefStatus" style="font-size:11.5px;font-weight:800;text-align:center;min-height:16px;line-height:1.4"></div>
+      <button type="button" class="btn-back-methods" id="btnBackMethods" onclick="backToMethodSelection()">← Back to Options</button>
+    </div>
+
+    <div class="ban-expire-box">
+      <span class="ban-expire-label" id="lblExpiresHeader">7-Day Suspension Expiration:</span>
+      <span class="ban-expire-time" id="banUntilFullText">--:-- --</span>
+      <div class="ban-id-chip"><span id="lblDeviceBanId">Device Ban ID:</span> <span id="adminUnbanId">--</span></div>
     </div>
   </div>
 </div>
@@ -404,9 +411,9 @@ video{
 <!-- HEADER -->
 <header>
   <div class="brand">
-    <svg class="brand-logo" viewBox="0 0 100 100">
-      <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z" fill="#38bdf8"/>
-      <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z" fill="#a855f7"/>
+    <svg width="30" height="30" viewBox="0 0 100 100">
+      <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 Z" fill="#38bdf8"/>
+      <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 Z" fill="#a855f7"/>
     </svg>
     <div class="brand-text">Meet<span>Loop</span></div>
   </div>
@@ -429,31 +436,26 @@ video{
 <div class="stage-container">
   <div class="stream-arena">
     <div class="video-grid">
-      <!-- STRANGER BOX -->
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" class="remote-blur" autoplay playsinline webkit-playsinline></video>
 
-        <!-- CRT SCREEN -->
         <div class="crt-screen-wrapper" id="crtWrapper">
           <canvas id="crtStaticCanvas"></canvas>
           <div class="crt-overlay-vignette"></div>
         </div>
 
-        <!-- STANDBY VIEW -->
         <div id="standbyCenter" class="standby-center">
-          <svg class="standby-logo" viewBox="0 0 100 100">
-            <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 C47.5 75 54 71.5 58 66 C55 67 51 68 47 68 C35 68 26 58 26 46 C26 36.5 31.5 28.5 39.5 25 C39 23 38.5 22 38 22 Z" fill="#38bdf8"/>
-            <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 C69 52 77 60 77 70 C77 70.8 77 71.5 76.8 72.3 C82.5 68 86 61.5 86 54.5 C86 40.5 75 25 62 25 Z" fill="#a855f7"/>
+          <svg style="width:105px;height:105px;margin-bottom:12px" viewBox="0 0 100 100">
+            <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 Z" fill="#38bdf8"/>
+            <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 Z" fill="#a855f7"/>
           </svg>
           <div class="standby-title">MeetLoop</div>
-          
           <div class="standby-online-tag">
             <span class="online-dot"></span>
             <span id="standbyUsers">1</span> <span id="lblOnlineText">online users</span>
           </div>
         </div>
 
-        <!-- SEARCHING CARD -->
         <div class="search-loader" id="searchLoader">
           <div class="search-card">
             <div class="search-spinner"></div>
@@ -462,9 +464,7 @@ video{
         </div>
 
         <div class="remote-audio-badge">
-          <svg class="audio-speaker-btn" id="speakerIcon" viewBox="0 0 24 24">
-            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
-          </svg>
+          <svg class="audio-speaker-btn" id="speakerIcon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
           <input type="range" class="audio-slider" id="audioSlider" min="0" max="1" step="0.05" value="1">
         </div>
 
@@ -473,7 +473,6 @@ video{
         <div class="cam-status-pill" id="remoteStatus">Waiting...</div>
       </div>
 
-      <!-- LOCAL BOX -->
       <div class="cam-box" id="localCamBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline webkit-playsinline></video>
         <div id="camOffCover">Camera Off</div>
@@ -484,7 +483,6 @@ video{
       <button id="showLocalBtn" type="button">Show Cam</button>
     </div>
 
-    <!-- CONTROLS -->
     <div class="controls-panel">
       <button class="ctrl-btn btn-start-next" id="mainActionBtn" type="button">Start</button>
       <button class="ctrl-btn btn-stop" id="stopBtn" type="button" disabled>Stop</button>
@@ -494,7 +492,6 @@ video{
     </div>
   </div>
 
-  <!-- CHAT ARENA -->
   <div class="chat-arena">
     <div class="chat-head">
       <span class="chat-head-title" id="lblChatTitle">Live Chat</span>
@@ -504,8 +501,7 @@ video{
       <div class="chat-msg">
         <div class="chat-author">System</div>
         <div class="chat-bubble chat-rules-card" id="lblChatRules">
-          • 18+ only. Strict anti-nudity policy.<br>
-          • Real face required in front of the camera.
+          • 18+ only. Strict anti-nudity policy.<br>• Real face required in front of the camera.
         </div>
       </div>
     </div>
@@ -637,7 +633,7 @@ const gcashRefInput = document.getElementById("gcashRefInput");
   });
 });
 
-/* ================= 3. SOCKET CONNECTION & SIGNALING ================= */
+/* ================= 3. SOCKET CONNECTION ================= */
 let socket = null;
 try {
   if (typeof io !== "undefined") {
@@ -681,7 +677,6 @@ let connected = false;
 let currentFacingMode = "user";
 let blurTimer = null;
 let pendingCandidates = [];
-
 let submitAttempts = 0;
 let cooldownTimer = null;
 
@@ -785,14 +780,6 @@ if (socket) {
     addChatMessage("MeetLoop", "User reported successfully.");
   });
 }
-
-/* ================= 4. PERIODIC AUTO-POLL UNBAN ON REFRESH ================= */
-// 🔄 Kahit mag-refresh ang user habang banned, kusa itong magtatanong sa server kung nag-match na ang bayad!
-setInterval(() => {
-  if (isCurrentlyBanned && socket && socket.connected) {
-    socket.emit("check-ban-status", { hardwareId: myHardwareId });
-  }
-}, 3000);
 
 function runTVStatic() {
   if (!crtStaticCanvas) return;
@@ -1434,7 +1421,6 @@ flipBtn.addEventListener("click", async () => {
   }
 });
 
-// REPORT BUTTON -> CAPTURES STRANGER PICTURE
 reportBtn.addEventListener("click", () => {
   if (!connected) return;
   const snap = captureReporterSnapshot();
@@ -1464,7 +1450,7 @@ document.getElementById("showLocalBtn").addEventListener("click", () => {
   document.getElementById("showLocalBtn").classList.remove("visible");
 });
 
-// STARTUP (DEFAULT ENGLISH)
+// STARTUP
 checkMultiTabConflict();
 const initialLang = localStorage.getItem("meetloop_lang") || "en";
 setLanguage(initialLang);
