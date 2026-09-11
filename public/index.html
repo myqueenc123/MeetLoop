@@ -79,12 +79,12 @@ video{
   transform:translateZ(0);
 }
 
-/* 🛡️ 1-SECOND OMETV FROZEN BLURRED STILL PHOTO OVERLAY */
-#freezeCanvasOverlay{
+/* 🛡️ 1-SECOND OMETV FROZEN STILL PHOTO OVERLAY (100% STILL IMAGE, HINDI GAGALAW) */
+#freezeImageOverlay{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
   z-index:6;display:none;
-  filter:blur(30px) brightness(0.88);
-  transition:opacity 0.45s ease-out;
+  filter:blur(14px) brightness(0.96);
+  transition:opacity 0.35s ease-out;
   pointer-events:none;
   background:#000000;
 }
@@ -154,7 +154,7 @@ video{
   background:rgba(0,0,0,.7);padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;
 }
 
-/* 🚩 RED FLAG REPORT BUTTON (LILITAW LANG PAG MAY KAUSAP NA) */
+/* 🚩 RED FLAG REPORT BUTTON */
 #reportBtn{
   position:absolute;top:10px;right:10px;z-index:10;
   width:34px;height:34px;border-radius:50%;
@@ -498,8 +498,8 @@ video{
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" autoplay playsinline></video>
 
-        <!-- 🛡️ 1-SECOND OMETV FROZEN BLURRED SNAPSHOT CANVAS OVERLAY -->
-        <canvas id="freezeCanvasOverlay"></canvas>
+        <!-- 🛡️ 1-SECOND OMETV FROZEN STILL PHOTO OVERLAY (100% STILL IMAGE) -->
+        <img id="freezeImageOverlay" alt="Frozen Still Frame">
 
         <!-- 📺 CRT TV STATIC LAYER -->
         <div class="crt-screen-wrapper" id="crtWrapper">
@@ -683,7 +683,7 @@ try {
 
 const crtWrapper = document.getElementById("crtWrapper");
 const crtStaticCanvas = document.getElementById("crtStaticCanvas");
-const freezeCanvasOverlay = document.getElementById("freezeCanvasOverlay");
+const freezeImageOverlay = document.getElementById("freezeImageOverlay");
 const standbyCenter = document.getElementById("standbyCenter");
 const searchLoader = document.getElementById("searchLoader");
 const remoteVideo = document.getElementById("remoteVideo");
@@ -711,7 +711,7 @@ let currentFacingMode = "user";
 let isFlipping = false;
 let isMicActive = true;
 let freezeTimer = null;
-let isShieldTriggered = false;
+let isFreezeActive = false;
 let pendingCandidates = [];
 let submitAttempts = 0;
 let cooldownTimer = null;
@@ -752,65 +752,67 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 🌟 1-SECOND OMETV FROZEN + BLURRED STILL SHIELD ================= */
-function captureFrozenFrameAndShield() {
-  if (isShieldTriggered) return;
+/* ================= 🌟 100% GUARANTEED STILL PHOTO FREEZE & 1s OMETV BLUR ================= */
+function displayOmeTVFrozenSnapshot() {
+  if (isFreezeActive) return;
 
-  const renderStillPhoto = () => {
-    if (isShieldTriggered || !remoteVideo || remoteVideo.videoWidth === 0) return;
-    isShieldTriggered = true;
+  const capturePhoto = () => {
+    if (isFreezeActive || !remoteVideo || remoteVideo.videoWidth === 0) return;
+    isFreezeActive = true;
 
-    // 1. Kunan ng STILL PHOTO ang unang tunay na frame ng kausap
-    if (freezeCanvasOverlay) {
-      freezeCanvasOverlay.width = remoteVideo.videoWidth || 640;
-      freezeCanvasOverlay.height = remoteVideo.videoHeight || 480;
-      const ctx = freezeCanvasOverlay.getContext("2d");
-      ctx.drawImage(remoteVideo, 0, 0, freezeCanvasOverlay.width, freezeCanvasOverlay.height);
+    // 1. Kunan ng LITERAL NA PICTURE (Still Frame) ang kausap
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = remoteVideo.videoWidth || 640;
+    tempCanvas.height = remoteVideo.videoHeight || 480;
+    const ctx = tempCanvas.getContext("2d");
+    ctx.drawImage(remoteVideo, 0, 0, tempCanvas.width, tempCanvas.height);
 
-      freezeCanvasOverlay.style.opacity = "1";
-      freezeCanvasOverlay.style.display = "block";
+    // 2. I-display sa Still Image Overlay (100% Frozen, HINDI GAGALAW)
+    if (freezeImageOverlay) {
+      freezeImageOverlay.src = tempCanvas.toDataURL("image/jpeg", 0.85);
+      freezeImageOverlay.style.opacity = "1";
+      freezeImageOverlay.style.display = "block";
     }
 
-    // 2. Itago ang Static at Spinner (Naka-lock na ang blurred still frame)
+    // 3. Itago ang TV Static at Search Spinner
     if (crtWrapper) crtWrapper.style.display = "none";
     if (standbyCenter) standbyCenter.style.display = "none";
     if (searchLoader) searchLoader.style.display = "none";
     if (reportBtn) reportBtn.style.display = "flex";
 
-    // 3. Eksaktong 1.1s: I-unfreeze at i-reveal ang live moving video
+    // 4. Eksaktong 1.0s: I-fade out ang still photo at i-reveal ang live moving video
     if (freezeTimer) clearTimeout(freezeTimer);
     freezeTimer = setTimeout(() => {
-      if (freezeCanvasOverlay) {
-        freezeCanvasOverlay.style.opacity = "0";
+      if (freezeImageOverlay) {
+        freezeImageOverlay.style.opacity = "0";
         setTimeout(() => {
-          freezeCanvasOverlay.style.display = "none";
-          isShieldTriggered = false;
-        }, 400);
+          freezeImageOverlay.style.display = "none";
+          freezeImageOverlay.src = "";
+          isFreezeActive = false;
+        }, 350);
       }
-    }, 1100);
+    }, 1000);
   };
 
-  // Siguraduhin na may rendered frame na bago kumuha ng snapshot
   if ("requestVideoFrameCallback" in HTMLVideoElement.prototype) {
-    remoteVideo.requestVideoFrameCallback(() => {
-      renderStillPhoto();
-    });
+    remoteVideo.requestVideoFrameCallback(capturePhoto);
   } else {
-    setTimeout(renderStillPhoto, 120);
+    setTimeout(capturePhoto, 120);
   }
 }
 
 if (remoteVideo) {
-  remoteVideo.addEventListener("loadeddata", captureFrozenFrameAndShield);
-  remoteVideo.addEventListener("playing", captureFrozenFrameAndShield);
+  remoteVideo.addEventListener("loadeddata", displayOmeTVFrozenSnapshot);
+  remoteVideo.addEventListener("playing", displayOmeTVFrozenSnapshot);
 }
 
 function resetVideoLayers() {
   if (freezeTimer) clearTimeout(freezeTimer);
-  isShieldTriggered = false;
-  if (freezeCanvasOverlay) {
-    freezeCanvasOverlay.style.opacity = "0";
-    freezeCanvasOverlay.style.display = "none";
+  isFreezeActive = false;
+  if (freezeImageOverlay) {
+    freezeImageOverlay.style.opacity = "0";
+    freezeImageOverlay.style.display = "none";
+    freezeImageOverlay.src = "";
   }
   if (reportBtn) reportBtn.style.display = "none";
 }
