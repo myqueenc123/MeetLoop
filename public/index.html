@@ -76,7 +76,6 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
-/* HD VIDEO RENDERING */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
   image-rendering:-webkit-optimize-contrast;
@@ -119,7 +118,7 @@ video{
   width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);
 }
 
-/* CLEAN SPINNER ONLY (NO TEXT) */
+/* SEARCHING SPINNER */
 .search-loader{
   position:absolute;inset:0;z-index:5;display:none;align-items:center;justify-content:center;
   user-select:none;pointer-events:none;
@@ -147,16 +146,42 @@ video{
   position:absolute;top:10px;left:10px;z-index:10;
   background:rgba(0,0,0,.7);padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;
 }
+
+/* 🚩 EXACT CUSTOM REPORT BUTTON (MATTE BLACK PILL + RED FLAG) */
 #reportBtn{
   position:absolute;top:10px;right:10px;z-index:10;
-  background:#dc2626;color:#fff;border:0;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:800;cursor:pointer;
+  background:#141414;color:#ffffff;
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:999px;padding:6px 14px;
+  cursor:pointer;display:flex;align-items:center;gap:7px;
+  box-shadow:0 4px 14px rgba(0,0,0,0.6);
+  backdrop-filter:blur(6px);transition:all 0.15s ease;
+  user-select:none;
+}
+#reportBtn svg{
+  width:15px;height:15px;fill:#ef4444;flex-shrink:0;
+  filter:drop-shadow(0 0 4px rgba(239,68,68,0.4));
+}
+#reportBtn span{
+  font-family:Georgia, "Times New Roman", serif;
+  font-size:12.5px;font-weight:900;letter-spacing:0.8px;
+  color:#ffffff;text-transform:uppercase;
+}
+#reportBtn:hover{
+  background:#1f1f1f;border-color:rgba(255,255,255,0.25);
+  transform:scale(1.03);
+}
+#reportBtn:active{
+  transform:scale(0.96);
 }
 
 .controls-panel{display:flex;gap:8px;height:48px;flex-shrink:0}
 .ctrl-btn{
   border:0;border-radius:10px;color:#fff;font-size:13px;font-weight:800;
   cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;user-select:none;
+  transition:all 0.15s ease;
 }
+.ctrl-btn:active{transform:scale(0.96)}
 .btn-start-next{flex:3;background:linear-gradient(135deg,#0284c7,#2563eb)}
 .btn-stop{flex:1.5;background:#dc2626}
 .btn-sec{flex:1.5;background:#1e293b;border:1px solid rgba(255,255,255,.1)}
@@ -177,7 +202,7 @@ video{
 .chat-input{flex:1;min-width:0;height:38px;padding:0 12px;background:#070b14;border:1px solid var(--panel-border);border-radius:8px;color:#fff;outline:none;font-size:11px}
 .chat-send-btn{width:60px;height:38px;border:0;border-radius:8px;background:#2563eb;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
 
-/* 📱 MOBILE RESPONSIVE LAYOUT */
+/* 📱 MOBILE RESPONSIVE */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto}
   header{height:46px;padding:0 10px}
@@ -308,7 +333,7 @@ video{
 <div id="reportModal">
   <div class="report-modal-card">
     <div class="report-title">🚨 <span id="lblReportModalTitle">Report User</span></div>
-    <div class="report-desc" id="lblReportModalDesc">Select the violation reason for reporting this user:</div>
+    <div class="report-desc" id="lblReportModalDesc">Select violation reason:</div>
     <select id="reportReasonSelect" class="report-select">
       <option value="Nudity / Sexual Content">🔞 Nudity / Sexual Content</option>
       <option value="Harassment / Bullying">🛑 Harassment / Bullying</option>
@@ -512,7 +537,12 @@ video{
         </div>
 
         <div class="cam-tag" id="remoteTag">Stranger</div>
-        <button id="reportBtn" type="button" onclick="openReportModal()">Report</button>
+        
+        <!-- 🚩 EXACT MATTE BLACK PILL REPORT BUTTON -->
+        <button id="reportBtn" type="button" onclick="openReportModal()">
+          <svg viewBox="0 0 24 24"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z"/></svg>
+          <span>REPORT</span>
+        </button>
       </div>
 
       <div class="cam-box" id="localCamBox">
@@ -546,7 +576,7 @@ video{
           🚫 <b>No nudity, sexual content, hate speech, or harassment.</b><br>
           📹 <b>Show yourself on camera</b> — no fake or pre-recorded video.<br>
           💬 <b>Respect everyone</b> — MeetLoop is not a dating site.<br>
-          ⚠️ <b>Violations result in an instant 7-day ban.</b><br><br>
+          ⚠️ <b>3 Policy Violations will result in an automatic 7-day ban.</b><br><br>
           Have fun, stay respectful, and enjoy chatting! 🌎
         </div>
       </div>
@@ -562,7 +592,7 @@ video{
 <script>
 "use strict";
 
-/* ================= 1. TAB CONTROLLER ================= */
+/* ================= 1. STRICT 1-TAB CONTROLLER ================= */
 const myTabId = "tab_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
 let isMasterTab = true;
 let tabChannel = null;
@@ -598,7 +628,6 @@ try {
   };
 } catch(e){}
 
-// Auto claim master on startup
 claimActiveTab();
 
 setInterval(() => {
@@ -611,7 +640,7 @@ document.getElementById("btnClaimTab")?.addEventListener("click", () => {
   claimActiveTab();
 });
 
-/* ================= 2. PERSISTENT DEVICE & BAN ENGINE ================= */
+/* ================= 2. PERSISTENT DEVICE & HARDENED BAN ENGINE ================= */
 function getPersistentDeviceId(forceNew = false) {
   let devId = localStorage.getItem("meetloop_device_id");
   if (!devId || forceNew) {
@@ -726,6 +755,15 @@ function runTVStatic() {
 }
 runTVStatic();
 
+// 🌟 ZERO BLACK SCREEN: Magtatago lang ang overlay kapag 100% active na ang video frame
+if (remoteVideo) {
+  remoteVideo.addEventListener("playing", () => {
+    if (crtWrapper) crtWrapper.style.display = "none";
+    if (standbyCenter) standbyCenter.style.display = "none";
+    if (searchLoader) searchLoader.style.display = "none";
+  });
+}
+
 function handleSuccessfulUnban() {
   isCurrentlyBanned = false;
   localStorage.removeItem("meetloop_ban_until");
@@ -831,11 +869,11 @@ if (socket) {
   });
 
   socket.on("report-success", () => {
-    addChatMessage("MeetLoop", "User reported successfully.");
+    addChatMessage("MeetLoop", "Report received. Thank you for keeping MeetLoop safe!");
   });
 }
 
-/* ================= 4. HD MEDIA ENGINE & MOBILE FLIP ================= */
+/* ================= 4. BULLETPROOF MEDIA & ZERO-BLACK-SCREEN FLIP ================= */
 async function startMedia() {
   if (isCurrentlyBanned) {
     const overlay = document.getElementById("banOverlay");
@@ -890,7 +928,6 @@ async function startMedia() {
   }
 }
 
-// 📱 MOBILE ONLY FRONT/BACK CAMERA FLIP
 async function flipCamera() {
   if (isFlipping || !localStream) return;
   isFlipping = true;
@@ -1002,10 +1039,6 @@ async function createPeer(initiator) {
   };
 
   peerConnection.ontrack = (e) => {
-    if (crtWrapper) crtWrapper.style.display = "none";
-    if (standbyCenter) standbyCenter.style.display = "none";
-    if (searchLoader) searchLoader.style.display = "none";
-
     if (remoteVideo) {
       if (e.streams && e.streams[0]) {
         remoteVideo.srcObject = e.streams[0];
@@ -1028,9 +1061,6 @@ async function createPeer(initiator) {
   peerConnection.onconnectionstatechange = () => {
     if (peerConnection?.connectionState === "connected") {
       connected = true; searching = false;
-      if (crtWrapper) crtWrapper.style.display = "none";
-      if (standbyCenter) standbyCenter.style.display = "none";
-      if (searchLoader) searchLoader.style.display = "none";
       if (reportBtn) reportBtn.disabled = false;
     } else if (peerConnection?.connectionState === "disconnected" || peerConnection?.connectionState === "failed") {
       triggerStartNext();
@@ -1236,7 +1266,7 @@ function submitGCashUnbanTicket() {
 /* ================= 5. TRANSLATIONS ================= */
 const i18n = {
   en: {
-    subTitle: "Random Video Chat", portalBtn: "START CHATTING", report: "Report", stop: "Stop", start: "Start", next: "Next", stopped: "Stopped",
+    subTitle: "Random Video Chat", portalBtn: "START CHATTING", report: "REPORT", stop: "Stop", start: "Start", next: "Next", stopped: "Stopped",
     micOn: "Mic On", micOff: "Mic Off", showCam: "Show Cam", flip: "Flip",
     onlineUsers: "online users", chatTitle: "Live Chat",
     chatPlaceholder: "Type a message...", send: "Send", selectMethod: "Select Resolution Method:", gcashTitle: "Instant 7-Day Unban (₱10 Support)",
@@ -1254,7 +1284,7 @@ const i18n = {
     banTitle: "7-Day Suspension", deviceBanId: "Device Ban ID:"
   },
   tl: {
-    subTitle: "Random Video Chat", portalBtn: "MAG-START MAG-CHAT", report: "I-Report", stop: "Ihinto", start: "Magsimula", next: "Susunod", stopped: "Nakahinto",
+    subTitle: "Random Video Chat", portalBtn: "MAG-START MAG-CHAT", report: "I-REPORT", stop: "Ihinto", start: "Magsimula", next: "Susunod", stopped: "Nakahinto",
     micOn: "Mic Bukas", micOff: "Mic Patay", showCam: "Ipakita ang Cam", flip: "I-flip",
     onlineUsers: "aktibong users", chatTitle: "Live Usapan",
     chatPlaceholder: "Mag-type ng mensahe...", send: "Ipadala", selectMethod: "Pumili ng Paraan para Ma-unban:", gcashTitle: "Instant 7-Araw na Unban (₱10 Support)",
@@ -1294,7 +1324,6 @@ function setLanguage(lang) {
   safeSetHTML("r2", t.r2);
   safeSetHTML("r3", t.r3);
   safeSetHTML("r4", t.r4);
-  safeSetText("reportBtn", t.report);
   safeSetText("stopBtn", t.stop);
   safeSetText("lblOnlineText", t.onlineUsers);
   safeSetText("lblChatTitle", t.chatTitle);
@@ -1321,6 +1350,9 @@ function setLanguage(lang) {
   safeSetText("flipBtn", t.flip);
   safeSetText("banTitle", t.banTitle);
   safeSetText("lblDeviceBanId", t.deviceBanId);
+
+  const rBtnSpan = document.getElementById("reportBtn")?.querySelector("span");
+  if (rBtnSpan) rBtnSpan.textContent = t.report;
 
   if (micBtn) micBtn.textContent = isMicActive ? t.micOn : t.micOff;
   if (!searching && !connected && mainActionBtn) mainActionBtn.textContent = t.start;
