@@ -72,18 +72,22 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
-/* HD FULL COVERAGE VIDEO */
+/* HD LIVE VIDEO */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
   image-rendering:-webkit-optimize-contrast;
   transform:translateZ(0);
 }
 
-/* 🛡️ STRANGER FULL-SCREEN 1-SECOND FROZEN STILL PHOTO OVERLAY */
+/* 🛡️ 100% FULL-BLEED FROZEN STILL PHOTO OVERLAY (SAGAD SA GILID AT SULOK) */
 #freezeImageOverlay{
-  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  position:absolute;
+  top:-25px;left:-25px;right:-25px;bottom:-25px;
+  width:calc(100% + 50px);
+  height:calc(100% + 50px);
+  object-fit:cover;
   z-index:6;display:none;
-  filter:blur(14px) brightness(0.96);
+  filter:blur(10px) brightness(0.98);
   transition:opacity 0.35s ease-out;
   pointer-events:none;
   background:#000000;
@@ -498,7 +502,7 @@ video{
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" autoplay playsinline></video>
 
-        <!-- 🛡️ STRANGER-ONLY FULL-COVERAGE FROZEN STILL PHOTO OVERLAY -->
+        <!-- 🛡️ 100% FULL-BLEED FROZEN STILL PHOTO OVERLAY -->
         <img id="freezeImageOverlay" alt="Frozen Still Frame">
 
         <!-- 📺 CRT TV STATIC LAYER -->
@@ -752,7 +756,7 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 🌟 100% STRANGER FULL-COVERAGE FROZEN STILL PHOTO (1s SHIELD) ================= */
+/* ================= 🌟 FULL-BLEED 100% FROZEN STILL PHOTO + 10px OMETV BLUR ================= */
 function displayOmeTVFrozenSnapshot() {
   if (isFreezeActive) return;
 
@@ -760,21 +764,21 @@ function displayOmeTVFrozenSnapshot() {
     if (isFreezeActive || !remoteVideo || remoteVideo.videoWidth === 0) return;
     isFreezeActive = true;
 
-    // 1. Kunan ng STILL PHOTO ang unang tunay na frame ng kausap
+    // 1. Kumuha ng Still Photo mula sa video frame ng kausap
     const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = remoteVideo.videoWidth || 640;
-    tempCanvas.height = remoteVideo.videoHeight || 480;
+    tempCanvas.width = remoteVideo.videoWidth || 1280;
+    tempCanvas.height = remoteVideo.videoHeight || 720;
     const ctx = tempCanvas.getContext("2d");
     ctx.drawImage(remoteVideo, 0, 0, tempCanvas.width, tempCanvas.height);
 
-    // 2. I-display sa Still Image Overlay (100% Frozen, HINDI GAGALAW)
+    // 2. I-display sa Full-Bleed Overlay (100% Solid Still Image, Walang butas sa gilid)
     if (freezeImageOverlay) {
-      freezeImageOverlay.src = tempCanvas.toDataURL("image/jpeg", 0.85);
+      freezeImageOverlay.src = tempCanvas.toDataURL("image/jpeg", 0.9);
       freezeImageOverlay.style.opacity = "1";
       freezeImageOverlay.style.display = "block";
     }
 
-    // 3. Itago ang TV Static at Search Spinner
+    // 3. Itago ang Static at Spinner
     if (crtWrapper) crtWrapper.style.display = "none";
     if (standbyCenter) standbyCenter.style.display = "none";
     if (searchLoader) searchLoader.style.display = "none";
@@ -1105,6 +1109,7 @@ async function createPeer(initiator) {
       remoteVideo.muted = false;
       remoteVideo.volume = parseFloat(audioSlider?.value || 1.0);
 
+      // Tuloy-tuloy na live playback
       remoteVideo.play().catch(() => {
         remoteVideo.muted = true;
         remoteVideo.play().then(() => {
