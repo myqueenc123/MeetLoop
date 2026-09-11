@@ -72,7 +72,7 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
-/* HD VIDEO RENDERING & SMOOTH OMETV BLUR */
+/* HD VIDEO RENDERING & OMETV SMOOTH SAFETY BLUR */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
   image-rendering:-webkit-optimize-contrast;
@@ -88,9 +88,9 @@ video{
   filter:blur(0px) brightness(1);
 }
 
-/* 📺 CRT TV STATIC SCREEN */
+/* 📺 CRT TV STATIC SCREEN (Z-INDEX 3 PARA MATAKPAN ANG BLACK SCREEN) */
 .crt-screen-wrapper{
-  position:absolute;inset:0;z-index:2;overflow:hidden;background:#050811;pointer-events:none;
+  position:absolute;inset:0;z-index:3;overflow:hidden;background:#050811;pointer-events:none;
 }
 #crtStaticCanvas{
   position:absolute;inset:0;width:100%;height:100%;opacity:0.22;display:block;
@@ -153,7 +153,7 @@ video{
   background:rgba(0,0,0,.7);padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;
 }
 
-/* 🚩 RED FLAG REPORT BUTTON */
+/* 🚩 RED FLAG REPORT BUTTON (LILITAW LANG PAG MAY KAUSAP NA) */
 #reportBtn{
   position:absolute;top:10px;right:10px;z-index:10;
   width:34px;height:34px;border-radius:50%;
@@ -479,7 +479,7 @@ video{
   </div>
 </div>
 
-<!-- HEADER (100% PURE ENGLISH) -->
+<!-- HEADER -->
 <header>
   <div class="brand">
     <svg width="30" height="30" viewBox="0 0 100 100">
@@ -516,7 +516,7 @@ video{
           </div>
         </div>
 
-        <!-- CLEAN SPINNER ONLY (NO TEXT) -->
+        <!-- CLEAN SPINNER ONLY -->
         <div class="search-loader" id="searchLoader">
           <div class="search-spinner"></div>
         </div>
@@ -746,16 +746,18 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 🌟 CONTINUOUS LIVE HD + 1s OMETV SAFETY BLUR ================= */
-function startOmeTVSafetyBlur() {
-  if (blurTimer) clearTimeout(blurTimer);
+/* ================= 🌟 ZERO BLACK SCREEN: REVEAL ONLY WHEN FRAMES ARE READY ================= */
+function onStrangerFrameDecoded() {
+  if (crtWrapper) crtWrapper.style.display = "none";
+  if (standbyCenter) standbyCenter.style.display = "none";
+  if (searchLoader) searchLoader.style.display = "none";
+  if (reportBtn) reportBtn.style.display = "flex";
 
+  if (blurTimer) clearTimeout(blurTimer);
   if (remoteVideo) {
-    // 1. I-apply ang heavy blur agad pagdating ng video
     remoteVideo.classList.remove("remote-clear");
     remoteVideo.classList.add("remote-blur");
 
-    // 2. Matapos ang 1 segundo, maayos at tuloy-tuloy na mag-fe-fade out ang blur
     blurTimer = setTimeout(() => {
       if (remoteVideo && remoteVideo.srcObject) {
         remoteVideo.classList.remove("remote-blur");
@@ -763,6 +765,11 @@ function startOmeTVSafetyBlur() {
       }
     }, 1000);
   }
+}
+
+if (remoteVideo) {
+  remoteVideo.addEventListener("loadeddata", onStrangerFrameDecoded);
+  remoteVideo.addEventListener("playing", onStrangerFrameDecoded);
 }
 
 function resetVideoLayers() {
@@ -1062,24 +1069,11 @@ async function createPeer(initiator) {
       remoteVideo.muted = false;
       remoteVideo.volume = parseFloat(audioSlider?.value || 1.0);
 
-      // 🌟 TANGGALIN ANG STATIC / LOADER AT SIMULAN ANG OMETV SAFETY BLUR
-      if (crtWrapper) crtWrapper.style.display = "none";
-      if (standbyCenter) standbyCenter.style.display = "none";
-      if (searchLoader) searchLoader.style.display = "none";
-
-      if (reportBtn) {
-        reportBtn.style.display = "flex";
-        reportBtn.disabled = false;
-      }
-
-      // Tuloy-tuloy ang pag-play ng video kasabay ng 1s blur fade out
-      remoteVideo.play().then(() => {
-        startOmeTVSafetyBlur();
-      }).catch(() => {
+      // Tuloy-tuloy ang pag-play ng video
+      remoteVideo.play().catch(() => {
         remoteVideo.muted = true;
         remoteVideo.play().then(() => {
           setTimeout(() => { remoteVideo.muted = false; }, 150);
-          startOmeTVSafetyBlur();
         });
       });
     }
@@ -1088,10 +1082,6 @@ async function createPeer(initiator) {
   peerConnection.onconnectionstatechange = () => {
     if (peerConnection?.connectionState === "connected") {
       connected = true; searching = false;
-      if (reportBtn) {
-        reportBtn.style.display = "flex";
-        reportBtn.disabled = false;
-      }
     } else if (peerConnection?.connectionState === "disconnected" || peerConnection?.connectionState === "failed") {
       triggerStartNext();
     }
