@@ -79,13 +79,14 @@ video{
   transform:translateZ(0);
 }
 
-/* 🛡️ 1-SECOND OMETV BLURRED & FROZEN CANVAS OVERLAY (Z-INDEX 6) */
+/* 🛡️ 1-SECOND OMETV FROZEN BLURRED STILL PHOTO OVERLAY */
 #freezeCanvasOverlay{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
   z-index:6;display:none;
   filter:blur(30px) brightness(0.88);
-  transition:opacity 0.4s ease-out;
+  transition:opacity 0.45s ease-out;
   pointer-events:none;
+  background:#000000;
 }
 
 /* 📺 CRT TV STATIC SCREEN */
@@ -497,7 +498,7 @@ video{
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" autoplay playsinline></video>
 
-        <!-- 🛡️ 1-SECOND OMETV FROZEN SNAPSHOT CANVAS (Z-INDEX 6) -->
+        <!-- 🛡️ 1-SECOND OMETV FROZEN BLURRED SNAPSHOT CANVAS OVERLAY -->
         <canvas id="freezeCanvasOverlay"></canvas>
 
         <!-- 📺 CRT TV STATIC LAYER -->
@@ -532,7 +533,7 @@ video{
 
         <div class="cam-tag">Stranger</div>
         
-        <!-- 🚩 RED FLAG REPORT BUTTON (LILITAW LANG PAG MAY KAUSAP NA) -->
+        <!-- 🚩 RED FLAG REPORT BUTTON -->
         <button id="reportBtn" type="button" onclick="openReportModal()" title="Report User">
           <svg viewBox="0 0 24 24"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z"/></svg>
         </button>
@@ -751,43 +752,57 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 🌟 1-SECOND EXACT OMETV FROZEN + BLURRED FRAME REVEAL ================= */
-function triggerOmeTVFreezeBlurShield() {
-  if (isShieldTriggered || !remoteVideo || remoteVideo.videoWidth === 0) return;
-  isShieldTriggered = true;
+/* ================= 🌟 1-SECOND OMETV FROZEN + BLURRED STILL SHIELD ================= */
+function captureFrozenFrameAndShield() {
+  if (isShieldTriggered) return;
 
-  // 1. Iguhit ang exact still photo ng kausap sa overlay canvas
-  if (freezeCanvasOverlay) {
-    freezeCanvasOverlay.width = remoteVideo.videoWidth || 640;
-    freezeCanvasOverlay.height = remoteVideo.videoHeight || 480;
-    const ctx = freezeCanvasOverlay.getContext("2d");
-    ctx.drawImage(remoteVideo, 0, 0, freezeCanvasOverlay.width, freezeCanvasOverlay.height);
+  const renderStillPhoto = () => {
+    if (isShieldTriggered || !remoteVideo || remoteVideo.videoWidth === 0) return;
+    isShieldTriggered = true;
 
-    freezeCanvasOverlay.style.opacity = "1";
-    freezeCanvasOverlay.style.display = "block";
-  }
-
-  // 2. Itago ang Static at Spinner agad dahil may blurred still photo na
-  if (crtWrapper) crtWrapper.style.display = "none";
-  if (standbyCenter) standbyCenter.style.display = "none";
-  if (searchLoader) searchLoader.style.display = "none";
-  if (reportBtn) reportBtn.style.display = "flex";
-
-  // 3. Eksaktong 1.1s: I-unfreeze ang video at i-fade out ang blur
-  if (freezeTimer) clearTimeout(freezeTimer);
-  freezeTimer = setTimeout(() => {
+    // 1. Kunan ng STILL PHOTO ang unang tunay na frame ng kausap
     if (freezeCanvasOverlay) {
-      freezeCanvasOverlay.style.opacity = "0";
-      setTimeout(() => {
-        freezeCanvasOverlay.style.display = "none";
-      }, 400);
+      freezeCanvasOverlay.width = remoteVideo.videoWidth || 640;
+      freezeCanvasOverlay.height = remoteVideo.videoHeight || 480;
+      const ctx = freezeCanvasOverlay.getContext("2d");
+      ctx.drawImage(remoteVideo, 0, 0, freezeCanvasOverlay.width, freezeCanvasOverlay.height);
+
+      freezeCanvasOverlay.style.opacity = "1";
+      freezeCanvasOverlay.style.display = "block";
     }
-  }, 1100);
+
+    // 2. Itago ang Static at Spinner (Naka-lock na ang blurred still frame)
+    if (crtWrapper) crtWrapper.style.display = "none";
+    if (standbyCenter) standbyCenter.style.display = "none";
+    if (searchLoader) searchLoader.style.display = "none";
+    if (reportBtn) reportBtn.style.display = "flex";
+
+    // 3. Eksaktong 1.1s: I-unfreeze at i-reveal ang live moving video
+    if (freezeTimer) clearTimeout(freezeTimer);
+    freezeTimer = setTimeout(() => {
+      if (freezeCanvasOverlay) {
+        freezeCanvasOverlay.style.opacity = "0";
+        setTimeout(() => {
+          freezeCanvasOverlay.style.display = "none";
+          isShieldTriggered = false;
+        }, 400);
+      }
+    }, 1100);
+  };
+
+  // Siguraduhin na may rendered frame na bago kumuha ng snapshot
+  if ("requestVideoFrameCallback" in HTMLVideoElement.prototype) {
+    remoteVideo.requestVideoFrameCallback(() => {
+      renderStillPhoto();
+    });
+  } else {
+    setTimeout(renderStillPhoto, 120);
+  }
 }
 
 if (remoteVideo) {
-  remoteVideo.addEventListener("loadeddata", triggerOmeTVFreezeBlurShield);
-  remoteVideo.addEventListener("playing", triggerOmeTVFreezeBlurShield);
+  remoteVideo.addEventListener("loadeddata", captureFrozenFrameAndShield);
+  remoteVideo.addEventListener("playing", captureFrozenFrameAndShield);
 }
 
 function resetVideoLayers() {
@@ -911,7 +926,7 @@ if (socket) {
   });
 }
 
-/* ================= 4. BULLETPROOF MEDIA & MOBILE CAMERA FLIP ================= */
+/* ================= 4. BULLETPROOF MEDIA & ZERO-BLACK-SCREEN FLIP ================= */
 async function startMedia() {
   if (isCurrentlyBanned) {
     const overlay = document.getElementById("banOverlay");
@@ -1088,7 +1103,6 @@ async function createPeer(initiator) {
       remoteVideo.muted = false;
       remoteVideo.volume = parseFloat(audioSlider?.value || 1.0);
 
-      // I-play ang remote video stream
       remoteVideo.play().catch(() => {
         remoteVideo.muted = true;
         remoteVideo.play().then(() => {
