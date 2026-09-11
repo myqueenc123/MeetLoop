@@ -1,6 +1,6 @@
 /**
  * MeetLoop - High-Performance WebRTC Backend Server
- * 100% Low Latency + Telegram Admin + GCash Persistent Unban
+ * 100% Low Latency + Hardened Security + Anti-Bypass + Smart Report Engine
  */
 
 const express = require("express");
@@ -21,6 +21,7 @@ const io = new Server(server, {
 const PORT = process.env.PORT || 3000;
 const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000;
 const PAYMENT_VALIDITY_WINDOW = 60 * 60 * 1000;
+const REPORT_RESET_WINDOW = 24 * 60 * 60 * 1000; // 24 oras bago ma-reset ang report count
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8648356765:AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || "5779976596";
@@ -36,11 +37,20 @@ app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 app.use(express.text({ type: "*/*", limit: "15mb" }));
 
-const bannedDevices = new Map();
-const persistentDeviceTickets = new Map();
+/* ================= DATABASES & SECURITY ================= */
+const bannedDevices = new Map();           // HardwareID -> { banUntil, reason, snapshot, ip }
+const bannedIPs = new Map();               // IP -> { banUntil, reason, hardwareId }
+const userReports = new Map();             // HardwareID -> [{ by: reporterHw, reason: string, time: number }]
+const persistentDeviceTickets = new Map(); // HardwareID -> { phone, ref, time }
 let availablePayments = [];
 const burnedReceipts = new Set();
 const attemptTracker = new Map();
+
+function getClientIp(socket) {
+  const forwarded = socket.handshake.headers["x-forwarded-for"];
+  if (forwarded) return forwarded.split(",")[0].trim();
+  return socket.handshake.address || "0.0.0.0";
+}
 
 function escapeHtml(str) {
   if (!str) return "";
@@ -94,9 +104,16 @@ function sendTelegramWithButtons(chatId, text, reqId) {
 }
 
 function executeUnbanUser(hardwareId, phone, auto = false) {
+  // Kunin ang nakatali na IP para sabay ding ma-unban
+  const banRecord = bannedDevices.get(hardwareId);
+  if (banRecord && banRecord.ip) {
+    bannedIPs.delete(banRecord.ip);
+  }
+
   bannedDevices.delete(hardwareId);
   persistentDeviceTickets.delete(hardwareId);
   attemptTracker.delete(hardwareId);
+  userReports.delete(hardwareId);
 
   io.emit("real-admin-unban-signal", { hardwareId: hardwareId });
 
@@ -194,24 +211,36 @@ function pollTelegramUpdates() {
   }).on("error", () => { setTimeout(pollTelegramUpdates, 3000); });
 }
 
-function checkDeviceBan(hardwareId) {
-  if (!hardwareId) return null;
+// HARDENED SECURITY CHECK: DEVICE + IP BAN CHECK
+function checkDeviceOrIpBan(hardwareId, clientIp) {
   const now = Date.now();
-  if (bannedDevices.has(hardwareId)) {
+
+  // 1. Check Hardware ID
+  if (hardwareId && bannedDevices.has(hardwareId)) {
     const record = bannedDevices.get(hardwareId);
     if (now < record.banUntil) return record;
     bannedDevices.delete(hardwareId);
     persistentDeviceTickets.delete(hardwareId);
   }
+
+  // 2. Check Client IP
+  if (clientIp && bannedIPs.has(clientIp)) {
+    const record = bannedIPs.get(clientIp);
+    if (now < record.banUntil) return record;
+    bannedIPs.delete(clientIp);
+  }
+
   return null;
 }
 
-function banDevice(hardwareId, reason, snapshot = null) {
+function banDeviceAndIp(hardwareId, clientIp, reason, snapshot = null) {
   const finalId = String(hardwareId || "").trim();
-  if (!finalId) return null;
   const banUntil = Date.now() + BAN_DURATION_7DAYS;
-  const record = { banUntil, reason, snapshot, hardwareId: finalId };
-  bannedDevices.set(finalId, record);
+  const record = { banUntil, reason, snapshot, hardwareId: finalId, ip: clientIp };
+  
+  if (finalId) bannedDevices.set(finalId, record);
+  if (clientIp && clientIp !== "0.0.0.0") bannedIPs.set(clientIp, record);
+
   return record;
 }
 
@@ -253,10 +282,11 @@ function matchUsers() {
 
 io.on("connection", (socket) => {
   const hardwareId = String(socket.handshake.query.hardwareId || socket.handshake.query.deviceId || "").trim();
+  const clientIp = getClientIp(socket);
 
   io.emit("online-count", Math.max(1, io.engine.clientsCount));
 
-  const banInfo = checkDeviceBan(hardwareId);
+  const banInfo = checkDeviceOrIpBan(hardwareId, clientIp);
   if (banInfo) {
     socket.emit("ip-banned", { banUntil: banInfo.banUntil, reason: banInfo.reason, snapshot: banInfo.snapshot });
   } else {
@@ -265,16 +295,16 @@ io.on("connection", (socket) => {
 
   socket.on("check-ban-status", (data) => {
     const hwId = String(data?.hardwareId || hardwareId).trim();
-    if (!bannedDevices.has(hwId)) {
+    const b = checkDeviceOrIpBan(hwId, clientIp);
+    if (!b) {
       socket.emit("real-admin-unban-signal", { hardwareId: hwId });
     } else {
-      const b = bannedDevices.get(hwId);
       socket.emit("ip-banned", { banUntil: b.banUntil, reason: b.reason, snapshot: b.snapshot });
     }
   });
 
   socket.on("skip", () => {
-    const currentBan = checkDeviceBan(hardwareId);
+    const currentBan = checkDeviceOrIpBan(hardwareId, clientIp);
     if (currentBan) {
       return socket.emit("ip-banned", { banUntil: currentBan.banUntil, reason: currentBan.reason, snapshot: currentBan.snapshot });
     }
@@ -288,7 +318,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("signal", (data) => {
-    const currentBan = checkDeviceBan(hardwareId);
+    const currentBan = checkDeviceOrIpBan(hardwareId, clientIp);
     if (currentBan) return;
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -296,14 +326,50 @@ io.on("connection", (socket) => {
     }
   });
 
+  // 🚨 SMART REPORT ENGINE WITH 3-REPORT THRESHOLD
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
       const partner = io.sockets.sockets.get(partnerId);
       if (partner) {
         const partnerHw = String(partner.handshake.query.hardwareId || partner.handshake.query.deviceId || partner.id).trim();
-        const record = banDevice(partnerHw, data.reason || "Policy Violation", data.snapshot || null);
-        partner.emit("ip-banned", { banUntil: record.banUntil, reason: record.reason, snapshot: record.snapshot });
+        const partnerIp = getClientIp(partner);
+        const reason = data.reason || "Policy Violation";
+        const snapshot = data.snapshot || null;
+        const now = Date.now();
+
+        // Linisin ang mga lumang report na lampas 24 hours na
+        let reports = userReports.get(partnerHw) || [];
+        reports = reports.filter(r => (now - r.time < REPORT_RESET_WINDOW));
+
+        // Iwasan ang duplicate spam report mula sa iisang user
+        const alreadyReported = reports.some(r => r.by === hardwareId);
+        if (!alreadyReported) {
+          reports.push({ by: hardwareId, reason: reason, time: now });
+          userReports.set(partnerHw, reports);
+        }
+
+        const reportCount = reports.length;
+        const isSevere = reason.includes("Nudity") || reason.includes("Underage") || reason.includes("Violence");
+        const threshold = isSevere ? 2 : 3;
+
+        console.log(`🚨 [REPORT LOGGED]: Target=${partnerHw}, Count=${reportCount}/${threshold}, Reason=${reason}`);
+
+        // I-notify si Admin sa Telegram sa bawat report
+        const reportAlert = `⚠️ <b>USER REPORT FILED (${reportCount}/${threshold})</b>\n\n` +
+                            `🚨 <b>Reason:</b> ${escapeHtml(reason)}\n` +
+                            `🆔 <b>Device:</b> <code>${escapeHtml(partnerHw)}</code>\n` +
+                            `🌐 <b>IP:</b> <code>${escapeHtml(partnerIp)}</code>\n` +
+                            `<i>${reportCount >= threshold ? "🛑 THRESHOLD REACHED: AUTO-BANNING FOR 7 DAYS!" : "Naka-log sa system. Hindi pa banned."}</i>`;
+        sendTelegramMessage(ADMIN_CHAT_ID, reportAlert);
+
+        // Kapag naabot ang 3 reports (o 2 reports sa nudity), i-BAN na siya!
+        if (reportCount >= threshold) {
+          const record = banDeviceAndIp(partnerHw, partnerIp, reason, snapshot);
+          partner.emit("ip-banned", { banUntil: record.banUntil, reason: record.reason, snapshot: record.snapshot });
+          userReports.delete(partnerHw);
+        }
+
         activePairs.delete(partnerId);
       }
       activePairs.delete(socket.id);
@@ -355,6 +421,10 @@ io.on("connection", (socket) => {
 app.get("*", (req, res) => { res.sendFile(path.join(__dirname, "public", "index.html")); });
 
 server.listen(PORT, "0.0.0.0", () => {
+  console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
+  console.log(`🛡️ 3-Tier Smart Report Engine: ACTIVE`);
+  console.log(`🔒 Anti-Bypass Device+IP Tracking: ACTIVE`);
+  console.log(`================================================`);
   pollTelegramUpdates();
 });
