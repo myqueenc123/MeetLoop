@@ -72,23 +72,23 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
-/* HD VIDEO RENDERING & OMETV SMOOTH SAFETY BLUR */
+/* HD VIDEO RENDERING */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
   image-rendering:-webkit-optimize-contrast;
   transform:translateZ(0);
 }
-#remoteVideo{
-  transition:filter 0.5s ease-out;
-}
-#remoteVideo.remote-blur{
-  filter:blur(28px) brightness(0.9);
-}
-#remoteVideo.remote-clear{
-  filter:blur(0px) brightness(1);
+
+/* 🛡️ 1-SECOND OMETV FROZEN + BLURRED SNAPSHOT CANVAS */
+#freezeCanvas{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  z-index:2;display:none;
+  filter:blur(30px) brightness(0.9);
+  transition:opacity 0.4s ease-out;
+  pointer-events:none;
 }
 
-/* 📺 CRT TV STATIC SCREEN (Z-INDEX 3 PARA MATAKPAN ANG BLACK SCREEN) */
+/* 📺 CRT TV STATIC SCREEN */
 .crt-screen-wrapper{
   position:absolute;inset:0;z-index:3;overflow:hidden;background:#050811;pointer-events:none;
 }
@@ -495,7 +495,10 @@ video{
   <div class="stream-arena">
     <div class="video-grid">
       <div class="cam-box" id="remoteBox">
-        <video id="remoteVideo" class="remote-blur" autoplay playsinline></video>
+        <video id="remoteVideo" autoplay playsinline></video>
+
+        <!-- 🛡️ 1-SECOND OMETV FROZEN BLURRED SNAPSHOT CANVAS -->
+        <canvas id="freezeCanvas"></canvas>
 
         <!-- 📺 CRT TV STATIC LAYER -->
         <div class="crt-screen-wrapper" id="crtWrapper">
@@ -679,6 +682,7 @@ try {
 
 const crtWrapper = document.getElementById("crtWrapper");
 const crtStaticCanvas = document.getElementById("crtStaticCanvas");
+const freezeCanvas = document.getElementById("freezeCanvas");
 const standbyCenter = document.getElementById("standbyCenter");
 const searchLoader = document.getElementById("searchLoader");
 const remoteVideo = document.getElementById("remoteVideo");
@@ -705,7 +709,8 @@ let connected = false;
 let currentFacingMode = "user";
 let isFlipping = false;
 let isMicActive = true;
-let blurTimer = null;
+let freezeShieldTimer = null;
+let isFreezeShieldActive = false;
 let pendingCandidates = [];
 let submitAttempts = 0;
 let cooldownTimer = null;
@@ -746,37 +751,52 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 🌟 ZERO BLACK SCREEN: REVEAL ONLY WHEN FRAMES ARE READY ================= */
-function onStrangerFrameDecoded() {
+/* ================= 🌟 1-SECOND FROZEN + BLURRED OMETV SAFETY SHIELD ================= */
+function captureFrozenFrameAndShield() {
+  if (isFreezeShieldActive || !remoteVideo || remoteVideo.videoWidth === 0) return;
+  isFreezeShieldActive = true;
+
+  // 1. Iguhit ang exact first frame ng kausap sa freeze canvas (Still image)
+  if (freezeCanvas) {
+    freezeCanvas.width = remoteVideo.videoWidth || 640;
+    freezeCanvas.height = remoteVideo.videoHeight || 480;
+    const ctx = freezeCanvas.getContext("2d");
+    ctx.drawImage(remoteVideo, 0, 0, freezeCanvas.width, freezeCanvas.height);
+
+    freezeCanvas.style.opacity = "1";
+    freezeCanvas.style.display = "block";
+  }
+
+  // 2. Itago ang Static at Spinner (Naka-display na ang blurred still frame)
   if (crtWrapper) crtWrapper.style.display = "none";
   if (standbyCenter) standbyCenter.style.display = "none";
   if (searchLoader) searchLoader.style.display = "none";
   if (reportBtn) reportBtn.style.display = "flex";
 
-  if (blurTimer) clearTimeout(blurTimer);
-  if (remoteVideo) {
-    remoteVideo.classList.remove("remote-clear");
-    remoteVideo.classList.add("remote-blur");
-
-    blurTimer = setTimeout(() => {
-      if (remoteVideo && remoteVideo.srcObject) {
-        remoteVideo.classList.remove("remote-blur");
-        remoteVideo.classList.add("remote-clear");
-      }
-    }, 1000);
-  }
+  // 3. Eksaktong 1.1s: Smooth unfreeze & release blur
+  if (freezeShieldTimer) clearTimeout(freezeShieldTimer);
+  freezeShieldTimer = setTimeout(() => {
+    if (freezeCanvas) {
+      freezeCanvas.style.opacity = "0";
+      setTimeout(() => {
+        freezeCanvas.style.display = "none";
+        isFreezeShieldActive = false;
+      }, 400);
+    }
+  }, 1100);
 }
 
 if (remoteVideo) {
-  remoteVideo.addEventListener("loadeddata", onStrangerFrameDecoded);
-  remoteVideo.addEventListener("playing", onStrangerFrameDecoded);
+  remoteVideo.addEventListener("loadeddata", captureFrozenFrameAndShield);
+  remoteVideo.addEventListener("playing", captureFrozenFrameAndShield);
 }
 
 function resetVideoLayers() {
-  if (blurTimer) clearTimeout(blurTimer);
-  if (remoteVideo) {
-    remoteVideo.classList.remove("remote-clear");
-    remoteVideo.classList.add("remote-blur");
+  if (freezeShieldTimer) clearTimeout(freezeShieldTimer);
+  isFreezeShieldActive = false;
+  if (freezeCanvas) {
+    freezeCanvas.style.opacity = "0";
+    freezeCanvas.style.display = "none";
   }
   if (reportBtn) reportBtn.style.display = "none";
 }
@@ -1069,7 +1089,6 @@ async function createPeer(initiator) {
       remoteVideo.muted = false;
       remoteVideo.volume = parseFloat(audioSlider?.value || 1.0);
 
-      // Tuloy-tuloy ang pag-play ng video
       remoteVideo.play().catch(() => {
         remoteVideo.muted = true;
         remoteVideo.play().then(() => {
