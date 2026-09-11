@@ -55,10 +55,6 @@ header{
 .brand{display:flex;align-items:center;gap:8px;text-decoration:none;user-select:none;cursor:pointer}
 .brand-text{font-size:19px;font-weight:900;color:#fff}
 .brand-text span{color:#38bdf8}
-.lang-select{
-  background:#1e293b;color:#fff;border:1px solid rgba(255,255,255,.2);
-  padding:6px 10px;border-radius:8px;font-size:12px;font-weight:700;outline:none;cursor:pointer;
-}
 
 /* STAGE */
 .stage-container{
@@ -76,17 +72,17 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
-/* HD VIDEO RENDERING & OMETV SMOOTH BLUR TRANSITION */
+/* HD VIDEO RENDERING & OMETV SAFETY BLUR TRANSITION */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
   image-rendering:-webkit-optimize-contrast;
   transform:translateZ(0);
 }
 #remoteVideo{
-  transition:filter 0.85s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s ease;
+  transition:filter 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 #remoteVideo.remote-blur{
-  filter:blur(30px) brightness(0.9);
+  filter:blur(32px) brightness(0.85);
 }
 #remoteVideo.remote-clear{
   filter:blur(0px) brightness(1);
@@ -157,13 +153,13 @@ video{
   background:rgba(0,0,0,.7);padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;
 }
 
-/* 🚩 SLEEK ICON-ONLY RED FLAG REPORT BUTTON */
+/* 🚩 RED FLAG REPORT BUTTON (LILITAW LANG PAG MAY KAUSAP NA) */
 #reportBtn{
   position:absolute;top:10px;right:10px;z-index:10;
   width:34px;height:34px;border-radius:50%;
   background:rgba(18, 20, 26, 0.85);
   border:1px solid rgba(255,255,255,0.15);
-  display:flex;align-items:center;justify-content:center;
+  display:none;align-items:center;justify-content:center;
   cursor:pointer;padding:0;
   box-shadow:0 4px 12px rgba(0,0,0,0.6);
   backdrop-filter:blur(6px);
@@ -331,8 +327,8 @@ video{
 <div id="duplicateTabOverlay">
   <div class="tab-lock-card">
     <span style="font-size:42px;display:block;margin-bottom:12px">⚠️</span>
-    <div style="font-size:18px;font-weight:900;color:#ef4444;margin-bottom:8px" id="lblTabLockTitle">Duplicate Tab Detected</div>
-    <div style="font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:18px" id="lblTabLockDesc">MeetLoop is only allowed in 1 tab session.</div>
+    <div style="font-size:18px;font-weight:900;color:#ef4444;margin-bottom:8px">Duplicate Tab Detected</div>
+    <div style="font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:18px">MeetLoop is only allowed in 1 tab session.</div>
     <button type="button" class="btn-claim-tab" id="btnClaimTab">Use This Tab Instead</button>
   </div>
 </div>
@@ -340,8 +336,8 @@ video{
 <!-- REPORT MODAL -->
 <div id="reportModal">
   <div class="report-modal-card">
-    <div class="report-title">🚨 <span id="lblReportModalTitle">Report User</span></div>
-    <div class="report-desc" id="lblReportModalDesc">Select violation reason:</div>
+    <div class="report-title">🚨 Report User</div>
+    <div class="report-desc">Select violation reason:</div>
     <select id="reportReasonSelect" class="report-select">
       <option value="Nudity / Sexual Content">🔞 Nudity / Sexual Content</option>
       <option value="Harassment / Bullying">🛑 Harassment / Bullying</option>
@@ -373,13 +369,13 @@ video{
       <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 Z" fill="url(#pG2)"/>
     </svg>
     <h1 style="font-size:24px;font-weight:900;color:#fff">MeetLoop</h1>
-    <p style="font-size:12px;color:var(--text-muted);font-weight:700;margin-top:2px" id="lblSubTitle">Random Video Chat</p>
+    <p style="font-size:12px;color:var(--text-muted);font-weight:700;margin-top:2px">Random Video Chat</p>
 
     <ul class="portal-rules">
-      <li id="r1"><b>18+ Required:</b> Minors are strictly prohibited.</li>
-      <li id="r2"><b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.</li>
-      <li id="r3"><b>Human Face Only:</b> Look directly at the camera.</li>
-      <li id="r4"><b>Instant 1s Blur Shield:</b> Safe OmeTV-style transition on every switch.</li>
+      <li><b>18+ Required:</b> Minors are strictly prohibited.</li>
+      <li><b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.</li>
+      <li><b>Human Face Only:</b> Look directly at the camera.</li>
+      <li><b>Instant 1s Safety Shield:</b> Safe OmeTV-style transition on every switch.</li>
     </ul>
 
     <button class="portal-btn" id="portalStartBtn" type="button" onclick="startPortalChatting()">START CHATTING</button>
@@ -393,18 +389,18 @@ video{
       <div class="ban-snap-frame">
         <canvas id="banCanvas" width="95" height="95"></canvas>
         <div class="ban-snap-brand">MeetLoop</div>
-        <div class="ban-snap-tag" id="lblEvidenceTag">ENCOUNTER EVIDENCE</div>
+        <div class="ban-snap-tag">ENCOUNTER EVIDENCE</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:3px">
-        <div class="ban-title" id="banTitle">7-Day Suspension</div>
-        <div class="ban-reason" id="lblBanReason">Reason: <span id="banReasonLabel">Policy Violation</span></div>
-        <div style="font-size:10px;color:#94a3b8;font-weight:600" id="lblEncounterSnapshot">Reported Encounter Snapshot Logged</div>
+        <div class="ban-title">7-Day Suspension</div>
+        <div class="ban-reason">Reason: <span id="banReasonLabel">Policy Violation</span></div>
+        <div style="font-size:10px;color:#94a3b8;font-weight:600">Reported Encounter Snapshot Logged</div>
       </div>
     </div>
 
     <!-- VIEW 1: METHOD OPTIONS -->
     <div id="selectMethodSection" class="method-choice-container">
-      <div style="font-size:12px;font-weight:800;color:#334155" id="lblSelectMethod">Select Resolution Method:</div>
+      <div style="font-size:12px;font-weight:800;color:#334155">Select Resolution Method:</div>
 
       <div class="method-card" onclick="openGcashPayView()">
         <div class="method-card-left">
@@ -412,14 +408,14 @@ video{
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
           </div>
           <div>
-            <div class="method-title" style="color:#005ce6" id="lblGcashTitle">Instant 7-Day Unban (₱10 Support)</div>
-            <div class="method-desc" id="lblGcashDesc">Pay ₱10 GCash clearance fee & submit Mobile No.</div>
+            <div class="method-title" style="color:#005ce6">Instant 7-Day Unban (₱10 Support)</div>
+            <div class="method-desc">Pay ₱10 GCash clearance fee & submit Mobile No.</div>
           </div>
         </div>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
 
-      <a href="https://t.me/MeetLoop_bot" target="_blank" class="telegram-support-btn" id="lblTelegramSupport">
+      <a href="https://t.me/MeetLoop_bot" target="_blank" class="telegram-support-btn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.99-1.74 6.66-2.89 8-3.46 3.82-1.6 4.62-1.88 5.14-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.21-.03.36z"/></svg>
         <span>Message Telegram Support (@MeetLoop_bot)</span>
       </a>
@@ -430,8 +426,8 @@ video{
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
           <div>
-            <div class="method-title" id="lblWaitTitle">Wait 7-Day Suspension Period</div>
-            <div class="method-desc" id="lblWaitDesc">Auto unbans when 7 days expire</div>
+            <div class="method-title">Wait 7-Day Suspension Period</div>
+            <div class="method-desc">Auto unbans when 7 days expire</div>
           </div>
         </div>
       </div>
@@ -447,8 +443,8 @@ video{
       </div>
 
       <div class="ban-disclaimer-box">
-        <div class="ban-disclaimer-title" id="lblDisclaimerTitle">🚫 Official Ban Clearance Notice</div>
-        <div id="lblDisclaimerBody">
+        <div class="ban-disclaimer-title">🚫 Official Ban Clearance Notice</div>
+        <div>
           Your access has been restricted for <b>7 days</b> due to Community Guidelines violation.<br><br>
           ⚡ <b>Want to return sooner?</b><br>
           You may request an early unban with a <b>₱10 voluntary support payment</b>.<br><br>
@@ -458,11 +454,11 @@ video{
       </div>
 
       <div class="gcash-qr-box">
-        <span class="gcash-fee-tag" id="lblFeeTag">Fee: ₱10.00 Support Payment</span>
+        <span class="gcash-fee-tag">Fee: ₱10.00 Support Payment</span>
         <div class="gcash-qr-frame">
           <img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2" class="gcash-qr-img" alt="GCash QR">
         </div>
-        <div style="font-size:11px;color:#475569;font-weight:700" id="lblScanText">Scan QR via GCash, pay ₱10 clearance fee, and enter details below.</div>
+        <div style="font-size:11px;color:#475569;font-weight:700">Scan QR via GCash, pay ₱10 clearance fee, and enter details below.</div>
       </div>
 
       <div class="gcash-input-group">
@@ -472,18 +468,18 @@ video{
       </div>
 
       <div id="gcashRefStatus" style="font-size:11.5px;font-weight:800;text-align:center;min-height:16px;line-height:1.4"></div>
-      <button type="button" class="btn-back-methods" id="btnBackMethods" onclick="backToMethodSelection()">← Back to Options</button>
+      <button type="button" class="btn-back-methods" onclick="backToMethodSelection()">← Back to Options</button>
     </div>
 
     <div class="ban-expire-box">
-      <span class="ban-expire-label" id="lblExpiresHeader">7-Day Suspension Expiration:</span>
+      <span class="ban-expire-label">7-Day Suspension Expiration:</span>
       <span class="ban-expire-time" id="banUntilFullText">--:-- --</span>
-      <div class="ban-id-chip"><span id="lblDeviceBanId">Device Ban ID:</span> <span id="adminUnbanId">--</span></div>
+      <div class="ban-id-chip">Device Ban ID: <span id="adminUnbanId">--</span></div>
     </div>
   </div>
 </div>
 
-<!-- HEADER -->
+<!-- HEADER (100% PURE ENGLISH) -->
 <header>
   <div class="brand">
     <svg width="30" height="30" viewBox="0 0 100 100">
@@ -492,19 +488,6 @@ video{
     </svg>
     <div class="brand-text">Meet<span>Loop</span></div>
   </div>
-
-  <select id="languageSelect" class="lang-select">
-    <option value="en" selected>🇺🇸 English</option>
-    <option value="tl">🇵🇭 Tagalog</option>
-    <option value="es">🇪🇸 Español</option>
-    <option value="ja">🇯🇵 日本語</option>
-    <option value="ko">🇰🇷 한국어</option>
-    <option value="zh">🇨🇳 中文</option>
-    <option value="id">🇮🇩 Bahasa Indonesia</option>
-    <option value="vi">🇻🇳 Tiếng Việt</option>
-    <option value="ar">🇸🇦 العربية</option>
-    <option value="ru">🇷🇺 Русский</option>
-  </select>
 </header>
 
 <!-- STAGE -->
@@ -529,7 +512,7 @@ video{
           <div class="standby-title">MeetLoop</div>
           <div class="standby-online-tag">
             <span class="online-dot"></span>
-            <span id="standbyUsers">1</span> <span id="lblOnlineText">online users</span>
+            <span id="standbyUsers">1</span> <span>online users</span>
           </div>
         </div>
 
@@ -544,9 +527,9 @@ video{
           <input type="range" class="audio-slider" id="audioSlider" min="0" max="1" step="0.05" value="1" oninput="updateVolume(this.value)">
         </div>
 
-        <div class="cam-tag" id="remoteTag">Stranger</div>
+        <div class="cam-tag">Stranger</div>
         
-        <!-- 🚩 SLEEK RED FLAG REPORT BUTTON ONLY -->
+        <!-- 🚩 RED FLAG REPORT BUTTON (VISIBLE ONLY WHEN CONNECTED TO A STRANGER) -->
         <button id="reportBtn" type="button" onclick="openReportModal()" title="Report User">
           <svg viewBox="0 0 24 24"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z"/></svg>
         </button>
@@ -554,7 +537,7 @@ video{
 
       <div class="cam-box" id="localCamBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline></video>
-        <div class="cam-tag" id="localTag">You</div>
+        <div class="cam-tag">You</div>
         <button id="hideLocalBtn" type="button">✕</button>
       </div>
 
@@ -571,13 +554,13 @@ video{
 
   <div class="chat-arena">
     <div class="chat-head">
-      <span class="chat-head-title" id="lblChatTitle">Live Chat</span>
+      <span class="chat-head-title">Live Chat</span>
       <span style="font-size:10px;color:var(--text-muted);font-weight:700">MeetLoop</span>
     </div>
     <div class="chat-stream" id="chatStream">
       <div class="chat-msg">
         <div class="chat-author">System</div>
-        <div class="chat-bubble chat-rules-card" id="lblChatRules">
+        <div class="chat-bubble chat-rules-card">
           👋 <b>Welcome to MeetLoop!</b><br><br>
           🔞 <b>18+ only</b> — You must be 18 or older.<br>
           🚫 <b>No nudity, sexual content, hate speech, or harassment.</b><br>
@@ -722,7 +705,7 @@ let connected = false;
 let currentFacingMode = "user";
 let isFlipping = false;
 let isMicActive = true;
-let blurTimer = null;
+let safetyShieldTimer = null;
 let pendingCandidates = [];
 let submitAttempts = 0;
 let cooldownTimer = null;
@@ -739,7 +722,7 @@ const rtcConfig = {
   sdpSemantics: "unified-plan"
 };
 
-// 📺 CRT TV STATIC ANIMATOR
+// 📺 CRT TV STATIC NOISE GENERATOR
 function runTVStatic() {
   if (!crtStaticCanvas) return;
   const ctx = crtStaticCanvas.getContext("2d");
@@ -763,32 +746,34 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 🌟 OMETV 1-SECOND SAFETY BLUR SHIELD ENGINE ================= */
-function applyInstantBlur() {
-  if (blurTimer) clearTimeout(blurTimer);
+/* ================= 🌟 1-SECOND OMETV SAFETY SHIELD & REPORT VISIBILITY ================= */
+function activateSafetyShield() {
+  if (safetyShieldTimer) clearTimeout(safetyShieldTimer);
+
+  if (remoteVideo) {
+    remoteVideo.classList.remove("remote-clear");
+    remoteVideo.classList.add("remote-blur");
+
+    try { remoteVideo.pause(); } catch(e){}
+
+    safetyShieldTimer = setTimeout(() => {
+      if (remoteVideo && remoteVideo.srcObject) {
+        remoteVideo.play().catch(()=>{});
+        remoteVideo.classList.remove("remote-blur");
+        remoteVideo.classList.add("remote-clear");
+      }
+    }, 1100);
+  }
+}
+
+function resetShieldState() {
+  if (safetyShieldTimer) clearTimeout(safetyShieldTimer);
   if (remoteVideo) {
     remoteVideo.classList.remove("remote-clear");
     remoteVideo.classList.add("remote-blur");
   }
-}
-
-function releaseBlurSmoothly() {
-  if (blurTimer) clearTimeout(blurTimer);
-  blurTimer = setTimeout(() => {
-    if (remoteVideo) {
-      remoteVideo.classList.remove("remote-blur");
-      remoteVideo.classList.add("remote-clear");
-    }
-  }, 950); // ~1 segundo na smooth safety transition
-}
-
-if (remoteVideo) {
-  remoteVideo.addEventListener("playing", () => {
-    if (crtWrapper) crtWrapper.style.display = "none";
-    if (standbyCenter) standbyCenter.style.display = "none";
-    if (searchLoader) searchLoader.style.display = "none";
-    releaseBlurSmoothly();
-  });
+  // Itago ang report button kapag walang kausap
+  if (reportBtn) reportBtn.style.display = "none";
 }
 
 function handleSuccessfulUnban() {
@@ -802,7 +787,7 @@ function handleSuccessfulUnban() {
   const status = document.getElementById("gcashRefStatus");
   if (status) {
     status.style.color = "#16a34a";
-    status.textContent = "✅ " + getTranslatedText("unbanSuccess");
+    status.textContent = "✅ Payment Verified! Unbanning...";
   }
   const overlay = document.getElementById("banOverlay");
   if (overlay) overlay.style.display = "none";
@@ -820,7 +805,7 @@ if (socket) {
 
   socket.on("waiting", () => {
     searching = true;
-    applyInstantBlur();
+    resetShieldState();
     if (crtWrapper) crtWrapper.style.display = "block";
     if (standbyCenter) standbyCenter.style.display = "none";
     if (searchLoader) searchLoader.style.display = "flex";
@@ -828,7 +813,7 @@ if (socket) {
 
   socket.on("match", async (data) => {
     searching = false;
-    applyInstantBlur();
+    resetShieldState();
     await createPeer(Boolean(data?.initiator));
   });
 
@@ -862,7 +847,7 @@ if (socket) {
   });
 
   socket.on("partner-disconnected", () => {
-    addChatMessage("MeetLoop", getTranslatedText("partnerDisconnected"));
+    addChatMessage("MeetLoop", "Stranger disconnected.");
     triggerStartNext();
   });
 
@@ -874,7 +859,7 @@ if (socket) {
     const status = document.getElementById("gcashRefStatus");
     if (status) {
       status.style.color = "#0284c7";
-      status.innerHTML = `⏳ <b>${getTranslatedText("detailsLogged")} (${4 - submitAttempts} ${getTranslatedText("triesLeft")})</b>`;
+      status.innerHTML = `⏳ <b>Details Logged (${4 - submitAttempts} tries left)</b>`;
     }
     const overlay = document.getElementById("banOverlay");
     if (overlay) overlay.style.display = "flex";
@@ -902,7 +887,7 @@ if (socket) {
   });
 }
 
-/* ================= 4. BULLETPROOF MEDIA & ZERO-BLACK-SCREEN FLIP ================= */
+/* ================= 4. BULLETPROOF MEDIA & MOBILE CAMERA FLIP ================= */
 async function startMedia() {
   if (isCurrentlyBanned) {
     const overlay = document.getElementById("banOverlay");
@@ -1025,10 +1010,10 @@ function toggleMicrophone() {
     audioTrack.enabled = isMicActive;
     if (micBtn) {
       if (isMicActive) {
-        micBtn.textContent = getTranslatedText("micOn");
+        micBtn.textContent = "Mic On";
         micBtn.classList.remove("muted");
       } else {
-        micBtn.textContent = getTranslatedText("micOff");
+        micBtn.textContent = "Mic Off";
         micBtn.classList.add("muted");
       }
     }
@@ -1078,19 +1063,29 @@ async function createPeer(initiator) {
 
       remoteVideo.muted = false;
       remoteVideo.volume = parseFloat(audioSlider?.value || 1.0);
-      remoteVideo.play().catch(() => {
-        remoteVideo.muted = true;
-        remoteVideo.play().then(() => {
-          setTimeout(() => { remoteVideo.muted = false; }, 200);
-        });
-      });
+
+      // 🛡️ OMETV BLUR + FREEZE ACTIVATION
+      if (crtWrapper) crtWrapper.style.display = "none";
+      if (standbyCenter) standbyCenter.style.display = "none";
+      if (searchLoader) searchLoader.style.display = "none";
+
+      // 🚨 ILABAS ANG REPORT BUTTON DAHIL MAY KAUSAP NA
+      if (reportBtn) {
+        reportBtn.style.display = "flex";
+        reportBtn.disabled = false;
+      }
+
+      activateSafetyShield();
     }
   };
 
   peerConnection.onconnectionstatechange = () => {
     if (peerConnection?.connectionState === "connected") {
       connected = true; searching = false;
-      if (reportBtn) reportBtn.disabled = false;
+      if (reportBtn) {
+        reportBtn.style.display = "flex";
+        reportBtn.disabled = false;
+      }
     } else if (peerConnection?.connectionState === "disconnected" || peerConnection?.connectionState === "failed") {
       triggerStartNext();
     }
@@ -1111,7 +1106,7 @@ async function createPeer(initiator) {
 
 function setupDataChannel(ch) {
   dataChannel = ch;
-  ch.onmessage = (e) => addChatMessage(getTranslatedText("stranger"), e.data);
+  ch.onmessage = (e) => addChatMessage("Stranger", e.data);
 }
 
 function closePeerConnection() {
@@ -1148,7 +1143,7 @@ async function triggerStartNext() {
   if (!ok) return;
 
   if (mainActionBtn) mainActionBtn.disabled = true;
-  applyInstantBlur();
+  resetShieldState();
   if (crtWrapper) crtWrapper.style.display = "block";
   if (standbyCenter) standbyCenter.style.display = "none";
   if (searchLoader) searchLoader.style.display = "flex";
@@ -1158,7 +1153,7 @@ async function triggerStartNext() {
   connected = false;
   searching = true;
   if (mainActionBtn) {
-    mainActionBtn.textContent = getTranslatedText("next");
+    mainActionBtn.textContent = "Next";
     mainActionBtn.disabled = false;
   }
   if (stopBtn) stopBtn.disabled = false;
@@ -1170,7 +1165,7 @@ function stopSession() {
   searching = false;
   connected = false;
 
-  applyInstantBlur();
+  resetShieldState();
   if (crtWrapper) crtWrapper.style.display = "block";
   if (standbyCenter) standbyCenter.style.display = "flex";
   if (searchLoader) searchLoader.style.display = "none";
@@ -1179,7 +1174,7 @@ function stopSession() {
   closePeerConnection();
 
   if (mainActionBtn) {
-    mainActionBtn.textContent = getTranslatedText("start");
+    mainActionBtn.textContent = "Start";
     mainActionBtn.disabled = false;
   }
   if (stopBtn) stopBtn.disabled = true;
@@ -1247,7 +1242,7 @@ function openGcashPayView() {
     const btn = document.getElementById("gcashVerifyBtn");
     if (btn) {
       btn.disabled = false;
-      btn.textContent = getTranslatedText("verifyBtn");
+      btn.textContent = "Submit for Verification";
     }
     document.getElementById("gcashPhoneInput").disabled = false;
     document.getElementById("gcashRefInput").disabled = false;
@@ -1281,7 +1276,7 @@ function submitGCashUnbanTicket() {
   const remaining = Math.max(0, 4 - submitAttempts);
   if (status) {
     status.style.color = "#0284c7";
-    status.innerHTML = `⏳ <b>Matching details... (${remaining} ${getTranslatedText("triesLeft")})</b>`;
+    status.innerHTML = `⏳ <b>Matching details... (${remaining} tries left)</b>`;
   }
 
   if (socket && socket.connected) {
@@ -1293,103 +1288,6 @@ function submitGCashUnbanTicket() {
     }
   }
 }
-
-/* ================= 5. TRANSLATIONS ================= */
-const i18n = {
-  en: {
-    subTitle: "Random Video Chat", portalBtn: "START CHATTING", stop: "Stop", start: "Start", next: "Next", stopped: "Stopped",
-    micOn: "Mic On", micOff: "Mic Off", showCam: "Show Cam", flip: "Flip",
-    onlineUsers: "online users", chatTitle: "Live Chat",
-    chatPlaceholder: "Type a message...", send: "Send", selectMethod: "Select Resolution Method:", gcashTitle: "Instant 7-Day Unban (₱10 Support)",
-    gcashDesc: "Pay ₱10 GCash clearance fee & submit Mobile No.", waitTitle: "Wait 7-Day Suspension Period", waitDesc: "Auto unbans when 7 days expire",
-    telegramSupport: "Message Telegram Support (@MeetLoop_bot)",
-    scanText: "Scan QR via GCash, pay ₱10 clearance fee, and enter your details below.", expiresHeader: "7-Day Suspension Expiration:",
-    evidenceTag: "ENCOUNTER EVIDENCE", banReason: "Reason:", encounterSnapshot: "Reported Encounter Snapshot Logged", disclaimerTitle: "🚫 Official Ban Clearance Notice",
-    disclaimerBody: "Your access has been restricted for <b>7 days</b> due to Community Guidelines violation.<br><br>⚡ <b>Want to return sooner?</b><br>You may request an early unban with a <b>₱10 voluntary support payment</b>.<br><br>💡 <b>Payment is completely optional.</b> You can simply wait until your 7-day ban expires.<br><br><b>— MeetLoop Team</b>",
-    feeTag: "Fee: ₱10.00 Support Payment", verifyBtn: "Submit for Verification", backMethods: "← Back to Options", tabLockTitle: "Duplicate Tab Detected",
-    tabLockDesc: "MeetLoop is only allowed in 1 tab session.", tabLockBtn: "Use This Tab Instead", phonePlaceholder: "Your GCash Mobile No. (e.g. 09123456789)",
-    refPlaceholder: "13-Digit GCash Ref No. (e.g. 2004123456789)", partnerDisconnected: "Stranger disconnected.", you: "You", stranger: "Stranger",
-    detailsLogged: "Details Logged", triesLeft: "tries left", unbanSuccess: "Payment Verified! Unbanning...",
-    r1: "<b>18+ Required:</b> Minors are strictly prohibited.", r2: "<b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.",
-    r3: "<b>Human Face Only:</b> Look directly at the camera.", r4: "<b>Instant 1s Blur Shield:</b> Safe OmeTV-style transition on every switch.",
-    banTitle: "7-Day Suspension", deviceBanId: "Device Ban ID:"
-  },
-  tl: {
-    subTitle: "Random Video Chat", portalBtn: "MAG-START MAG-CHAT", stop: "Ihinto", start: "Magsimula", next: "Susunod", stopped: "Nakahinto",
-    micOn: "Mic Bukas", micOff: "Mic Patay", showCam: "Ipakita ang Cam", flip: "I-flip",
-    onlineUsers: "aktibong users", chatTitle: "Live Usapan",
-    chatPlaceholder: "Mag-type ng mensahe...", send: "Ipadala", selectMethod: "Pumili ng Paraan para Ma-unban:", gcashTitle: "Instant 7-Araw na Unban (₱10 Support)",
-    gcashDesc: "Magbayad ng ₱10 GCash fee at ilagay ang Mobile No.", waitTitle: "Maghintay ng 7-Araw na Suspension", waitDesc: "Kusang ma-u-unban pagkatapos ng 7 araw",
-    telegramSupport: "Mag-message sa Telegram Support (@MeetLoop_bot)",
-    scanText: "I-scan sa GCash, magbayad ng ₱10 clearance fee, at ilagay ang detalye sa ibaba.", expiresHeader: "Matatapos ang 7-Araw na Suspension sa:",
-    evidenceTag: "EBIDENSYA NG ENCOUNTER", banReason: "Dahilan:", encounterSnapshot: "Nai-save ang Litrato ng Encounter", disclaimerTitle: "🚫 Opisyal na Paalala sa Pagka-ban",
-    disclaimerBody: "Ang iyong access ay pansamantalang na-restrict ng <b>7 araw</b> dahil sa paglabag sa Community Guidelines.<br><br>⚡ <b>Gusto mo bang makabalik agad?</b><br>Maaari kang humiling ng maagang unban gamit ang <b>₱10 voluntary support payment</b>.<br><br>💡 <b>Kusang-loob lamang ang bayad.</b> Maaari kang maghintay hanggang matapos ang 7 araw.<br><br><b>— MeetLoop Team</b>",
-    feeTag: "Halaga: ₱10.00 Support Payment", verifyBtn: "I-submit para sa Veripikasyon", backMethods: "← Bumalik sa mga Pagpipilian", tabLockTitle: "Naka-open na sa Ibang Tab",
-    tabLockDesc: "Isang tab session lamang ang pwedeng gamitin.", tabLockBtn: "Gamitin ang Tab na Ito", phonePlaceholder: "Numero sa GCash (hal. 09123456789)",
-    refPlaceholder: "13-Digit GCash Ref No. (hal. 2004123456789)", partnerDisconnected: "Nadiskonekta ang kausap.", you: "Ikaw", stranger: "Kausap",
-    detailsLogged: "Nai-log ang Detalye", triesLeft: "tries natitira", unbanSuccess: "Na-verify ang bayad! Unbanning...",
-    r1: "<b>18+ Lamang:</b> Mahigpit na ipinagbabawal ang menor de edad.", r2: "<b>Zero Tolerance:</b> Bawal ang kabastusan, hubad, at spam.",
-    r3: "<b>Totoong Mukha:</b> Tumingin nang diretso sa camera.", r4: "<b>Blur Shield:</b> Ligtas na pag-transition sa bawat switch.",
-    banTitle: "7-Araw na Suspension", deviceBanId: "ID ng Device:"
-  }
-};
-
-function getTranslatedText(key) {
-  const lang = localStorage.getItem("meetloop_lang") || "en";
-  const dict = i18n[lang] || i18n.en;
-  return dict[key] || i18n.en[key] || "";
-}
-
-function setLanguage(lang) {
-  localStorage.setItem("meetloop_lang", lang);
-  const langSelect = document.getElementById("languageSelect");
-  if (langSelect) langSelect.value = lang;
-
-  const t = i18n[lang] || i18n.en;
-  const safeSetText = (id, text) => { const el = document.getElementById(id); if (el && text) el.textContent = text; };
-  const safeSetHTML = (id, html) => { const el = document.getElementById(id); if (el && html) el.innerHTML = html; };
-
-  safeSetText("lblSubTitle", t.subTitle);
-  safeSetText("portalStartBtn", t.portalBtn);
-  safeSetHTML("r1", t.r1);
-  safeSetHTML("r2", t.r2);
-  safeSetHTML("r3", t.r3);
-  safeSetHTML("r4", t.r4);
-  safeSetText("stopBtn", t.stop);
-  safeSetText("lblOnlineText", t.onlineUsers);
-  safeSetText("lblChatTitle", t.chatTitle);
-  safeSetText("sendBtn", t.send);
-  safeSetText("lblSelectMethod", t.selectMethod);
-  safeSetText("lblGcashTitle", t.gcashTitle);
-  safeSetText("lblGcashDesc", t.gcashDesc);
-  safeSetText("lblWaitTitle", t.waitTitle);
-  safeSetText("lblWaitDesc", t.waitDesc);
-  safeSetHTML("lblScanText", t.scanText);
-  safeSetText("lblExpiresHeader", t.expiresHeader);
-  safeSetText("lblEvidenceTag", t.evidenceTag);
-  safeSetText("lblEncounterSnapshot", t.encounterSnapshot);
-  safeSetText("lblDisclaimerTitle", t.disclaimerTitle);
-  safeSetHTML("lblDisclaimerBody", t.disclaimerBody);
-  safeSetText("lblFeeTag", t.feeTag);
-  safeSetText("btnBackMethods", t.backMethods);
-  safeSetText("lblTabLockTitle", t.tabLockTitle);
-  safeSetText("lblTabLockDesc", t.tabLockDesc);
-  safeSetText("btnClaimTab", t.tabLockBtn);
-  safeSetText("remoteTag", t.stranger);
-  safeSetText("localTag", t.you);
-  safeSetText("showLocalBtn", t.showCam);
-  safeSetText("flipBtn", t.flip);
-  safeSetText("banTitle", t.banTitle);
-  safeSetText("lblDeviceBanId", t.deviceBanId);
-
-  if (micBtn) micBtn.textContent = isMicActive ? t.micOn : t.micOff;
-  if (!searching && !connected && mainActionBtn) mainActionBtn.textContent = t.start;
-  else if (searching && mainActionBtn) mainActionBtn.textContent = t.next;
-}
-
-document.getElementById("languageSelect")?.addEventListener("change", (e) => {
-  setLanguage(e.target.value);
-});
 
 function openReportModal() {
   if (!connected) return;
@@ -1427,7 +1325,7 @@ function sendChat() {
   const val = chatInput.value.trim();
   if (!val || !dataChannel || dataChannel.readyState !== "open") return;
   dataChannel.send(val);
-  addChatMessage(getTranslatedText("you"), val);
+  addChatMessage("You", val);
   chatInput.value = "";
 }
 
@@ -1441,9 +1339,6 @@ document.getElementById("showLocalBtn")?.addEventListener("click", () => {
   localCamBox?.classList.remove("hidden-cam");
   document.getElementById("showLocalBtn")?.classList.remove("visible");
 });
-
-const initialLang = localStorage.getItem("meetloop_lang") || "en";
-setLanguage(initialLang);
 </script>
 </body>
 </html>
