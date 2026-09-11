@@ -76,6 +76,7 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
+/* HD VIDEO RENDERING */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
   image-rendering:-webkit-optimize-contrast;
@@ -118,17 +119,16 @@ video{
   width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);
 }
 
-/* SEARCHING SPINNER */
+/* CLEAN SPINNER ONLY (NO TEXT) */
 .search-loader{
-  position:absolute;inset:0;z-index:5;display:none;flex-direction:column;
-  align-items:center;justify-content:center;user-select:none;gap:12px;pointer-events:none;
+  position:absolute;inset:0;z-index:5;display:none;align-items:center;justify-content:center;
+  user-select:none;pointer-events:none;
 }
 .search-spinner{
   width:52px;height:52px;border:4px solid rgba(255,255,255,.15);
   border-top-color:#38bdf8;border-radius:50%;animation:spin .75s linear infinite;
   filter:drop-shadow(0 0 15px rgba(56,189,248,0.85));
 }
-.search-text{font-size:13px;font-weight:800;color:#38bdf8;letter-spacing:0.5px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 .remote-audio-badge{
@@ -146,10 +146,6 @@ video{
 .cam-tag{
   position:absolute;top:10px;left:10px;z-index:10;
   background:rgba(0,0,0,.7);padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;
-}
-.cam-status-pill{
-  position:absolute;top:10px;left:80px;z-index:10;
-  background:rgba(0,0,0,.75);padding:4px 8px;border-radius:6px;font-size:10px;font-weight:700;color:#cbd5e1;
 }
 #reportBtn{
   position:absolute;top:10px;right:10px;z-index:10;
@@ -203,7 +199,7 @@ video{
   .chat-arena{width:100%;max-width:none;height:240px;min-height:240px;border-radius:12px}
 }
 
-/* 💻 PC / DESKTOP (FLIP IS NATIVELY HIDDEN) */
+/* 💻 PC / DESKTOP */
 @media (min-width:851px){
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 }
@@ -504,10 +500,9 @@ video{
           </div>
         </div>
 
-        <!-- SEARCHING SPINNER -->
+        <!-- CLEAN SPINNER ONLY (NO TEXT) -->
         <div class="search-loader" id="searchLoader">
           <div class="search-spinner"></div>
-          <div class="search-text" id="lblSearchingText">Looking for someone...</div>
         </div>
 
         <!-- AUDIO VOLUME CONTROLS -->
@@ -518,7 +513,6 @@ video{
 
         <div class="cam-tag" id="remoteTag">Stranger</div>
         <button id="reportBtn" type="button" onclick="openReportModal()">Report</button>
-        <div class="cam-status-pill" id="remoteStatus">Waiting...</div>
       </div>
 
       <div class="cam-box" id="localCamBox">
@@ -604,7 +598,7 @@ try {
   };
 } catch(e){}
 
-// Auto claim master on page load
+// Auto claim master on startup
 claimActiveTab();
 
 setInterval(() => {
@@ -672,7 +666,6 @@ const remoteVideo = document.getElementById("remoteVideo");
 const localVideo = document.getElementById("localVideo");
 const localCamBox = document.getElementById("localCamBox");
 
-const remoteStatus = document.getElementById("remoteStatus");
 const mainActionBtn = document.getElementById("mainActionBtn");
 const stopBtn = document.getElementById("stopBtn");
 const micBtn = document.getElementById("micBtn");
@@ -765,7 +758,6 @@ if (socket) {
     if (crtWrapper) crtWrapper.style.display = "block";
     if (standbyCenter) standbyCenter.style.display = "none";
     if (searchLoader) searchLoader.style.display = "flex";
-    if (remoteStatus) remoteStatus.textContent = getTranslatedText("searching");
   });
 
   socket.on("match", async (data) => {
@@ -843,7 +835,7 @@ if (socket) {
   });
 }
 
-/* ================= 4. BULLETPROOF MEDIA & WORKING FLIP ENGINE ================= */
+/* ================= 4. HD MEDIA ENGINE & MOBILE FLIP ================= */
 async function startMedia() {
   if (isCurrentlyBanned) {
     const overlay = document.getElementById("banOverlay");
@@ -898,7 +890,7 @@ async function startMedia() {
   }
 }
 
-// 📱 100% WORKING MOBILE FRONT/BACK CAMERA FLIP
+// 📱 MOBILE ONLY FRONT/BACK CAMERA FLIP
 async function flipCamera() {
   if (isFlipping || !localStream) return;
   isFlipping = true;
@@ -907,18 +899,16 @@ async function flipCamera() {
   const targetFacing = (currentFacingMode === "user") ? "environment" : "user";
 
   try {
-    // 1. Bitawan muna ang lumang video track para hindi ma-lock ang hardware sa phone
     const oldVideoTrack = localStream.getVideoTracks()[0];
     if (oldVideoTrack) {
       localStream.removeTrack(oldVideoTrack);
       oldVideoTrack.stop();
     }
 
-    // 2. Kumuha ng bagong stream
     let newStream;
     try {
       newStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: targetFacing, width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: { facingMode: { exact: targetFacing }, width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false
       });
     } catch(e) {
@@ -932,13 +922,11 @@ async function flipCamera() {
     localStream.addTrack(newVideoTrack);
     currentFacingMode = targetFacing;
 
-    // 3. I-update ang WebRTC connection kung may kausap
     if (peerConnection) {
       const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
       if (sender) await sender.replaceTrack(newVideoTrack);
     }
 
-    // 4. I-update ang screen
     if (localVideo) {
       localVideo.className = (currentFacingMode === "user") ? "mirrored" : "unmirrored";
       localVideo.srcObject = localStream;
@@ -946,7 +934,6 @@ async function flipCamera() {
     }
   } catch (err) {
     console.error("Mobile Flip error:", err);
-    // Fallback kung nagka-issue: ibalik sa front camera
     try {
       const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
       const fallbackTrack = fallbackStream.getVideoTracks()[0];
@@ -1018,7 +1005,6 @@ async function createPeer(initiator) {
     if (crtWrapper) crtWrapper.style.display = "none";
     if (standbyCenter) standbyCenter.style.display = "none";
     if (searchLoader) searchLoader.style.display = "none";
-    if (remoteStatus) remoteStatus.textContent = "Live";
 
     if (remoteVideo) {
       if (e.streams && e.streams[0]) {
@@ -1046,7 +1032,6 @@ async function createPeer(initiator) {
       if (standbyCenter) standbyCenter.style.display = "none";
       if (searchLoader) searchLoader.style.display = "none";
       if (reportBtn) reportBtn.disabled = false;
-      if (remoteStatus) remoteStatus.textContent = "Live";
     } else if (peerConnection?.connectionState === "disconnected" || peerConnection?.connectionState === "failed") {
       triggerStartNext();
     }
@@ -1112,7 +1097,6 @@ async function triggerStartNext() {
 
   connected = false;
   searching = true;
-  if (remoteStatus) remoteStatus.textContent = getTranslatedText("searching");
   if (mainActionBtn) {
     mainActionBtn.textContent = getTranslatedText("next");
     mainActionBtn.disabled = false;
@@ -1133,7 +1117,6 @@ function stopSession() {
   if (socket) socket.emit("stop-search");
   closePeerConnection();
 
-  if (remoteStatus) remoteStatus.textContent = getTranslatedText("stopped");
   if (mainActionBtn) {
     mainActionBtn.textContent = getTranslatedText("start");
     mainActionBtn.disabled = false;
@@ -1255,11 +1238,11 @@ const i18n = {
   en: {
     subTitle: "Random Video Chat", portalBtn: "START CHATTING", report: "Report", stop: "Stop", start: "Start", next: "Next", stopped: "Stopped",
     micOn: "Mic On", micOff: "Mic Off", showCam: "Show Cam", flip: "Flip",
-    onlineUsers: "online users", chatTitle: "Live Chat", searchingText: "Looking for someone...",
+    onlineUsers: "online users", chatTitle: "Live Chat",
     chatPlaceholder: "Type a message...", send: "Send", selectMethod: "Select Resolution Method:", gcashTitle: "Instant 7-Day Unban (₱10 Support)",
     gcashDesc: "Pay ₱10 GCash clearance fee & submit Mobile No.", waitTitle: "Wait 7-Day Suspension Period", waitDesc: "Auto unbans when 7 days expire",
     telegramSupport: "Message Telegram Support (@MeetLoop_bot)",
-    scanText: "Scan QR via GCash, pay ₱10 clearance fee, and enter your details below.", searching: "Looking for someone...", expiresHeader: "7-Day Suspension Expiration:",
+    scanText: "Scan QR via GCash, pay ₱10 clearance fee, and enter your details below.", expiresHeader: "7-Day Suspension Expiration:",
     evidenceTag: "ENCOUNTER EVIDENCE", banReason: "Reason:", encounterSnapshot: "Reported Encounter Snapshot Logged", disclaimerTitle: "🚫 Official Ban Clearance Notice",
     disclaimerBody: "Your access has been restricted for <b>7 days</b> due to Community Guidelines violation.<br><br>⚡ <b>Want to return sooner?</b><br>You may request an early unban with a <b>₱10 voluntary support payment</b>.<br><br>💡 <b>Payment is completely optional.</b> You can simply wait until your 7-day ban expires.<br><br><b>— MeetLoop Team</b>",
     feeTag: "Fee: ₱10.00 Support Payment", verifyBtn: "Submit for Verification", backMethods: "← Back to Options", tabLockTitle: "Duplicate Tab Detected",
@@ -1273,11 +1256,11 @@ const i18n = {
   tl: {
     subTitle: "Random Video Chat", portalBtn: "MAG-START MAG-CHAT", report: "I-Report", stop: "Ihinto", start: "Magsimula", next: "Susunod", stopped: "Nakahinto",
     micOn: "Mic Bukas", micOff: "Mic Patay", showCam: "Ipakita ang Cam", flip: "I-flip",
-    onlineUsers: "aktibong users", chatTitle: "Live Usapan", searchingText: "Naghahanap ng makakausap...",
+    onlineUsers: "aktibong users", chatTitle: "Live Usapan",
     chatPlaceholder: "Mag-type ng mensahe...", send: "Ipadala", selectMethod: "Pumili ng Paraan para Ma-unban:", gcashTitle: "Instant 7-Araw na Unban (₱10 Support)",
     gcashDesc: "Magbayad ng ₱10 GCash fee at ilagay ang Mobile No.", waitTitle: "Maghintay ng 7-Araw na Suspension", waitDesc: "Kusang ma-u-unban pagkatapos ng 7 araw",
     telegramSupport: "Mag-message sa Telegram Support (@MeetLoop_bot)",
-    scanText: "I-scan sa GCash, magbayad ng ₱10 clearance fee, at ilagay ang detalye sa ibaba.", searching: "Naghahanap ng makakausap...", expiresHeader: "Matatapos ang 7-Araw na Suspension sa:",
+    scanText: "I-scan sa GCash, magbayad ng ₱10 clearance fee, at ilagay ang detalye sa ibaba.", expiresHeader: "Matatapos ang 7-Araw na Suspension sa:",
     evidenceTag: "EBIDENSYA NG ENCOUNTER", banReason: "Dahilan:", encounterSnapshot: "Nai-save ang Litrato ng Encounter", disclaimerTitle: "🚫 Opisyal na Paalala sa Pagka-ban",
     disclaimerBody: "Ang iyong access ay pansamantalang na-restrict ng <b>7 araw</b> dahil sa paglabag sa Community Guidelines.<br><br>⚡ <b>Gusto mo bang makabalik agad?</b><br>Maaari kang humiling ng maagang unban gamit ang <b>₱10 voluntary support payment</b>.<br><br>💡 <b>Kusang-loob lamang ang bayad.</b> Maaari kang maghintay hanggang matapos ang 7 araw.<br><br><b>— MeetLoop Team</b>",
     feeTag: "Halaga: ₱10.00 Support Payment", verifyBtn: "I-submit para sa Veripikasyon", backMethods: "← Bumalik sa mga Pagpipilian", tabLockTitle: "Naka-open na sa Ibang Tab",
@@ -1338,7 +1321,6 @@ function setLanguage(lang) {
   safeSetText("flipBtn", t.flip);
   safeSetText("banTitle", t.banTitle);
   safeSetText("lblDeviceBanId", t.deviceBanId);
-  safeSetText("lblSearchingText", t.searchingText || "Looking for someone...");
 
   if (micBtn) micBtn.textContent = isMicActive ? t.micOn : t.micOff;
   if (!searching && !connected && mainActionBtn) mainActionBtn.textContent = t.start;
