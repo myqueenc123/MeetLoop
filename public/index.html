@@ -72,18 +72,18 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
-/* HD VIDEO RENDERING */
+/* HD LIVE VIDEO */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
   image-rendering:-webkit-optimize-contrast;
   transform:translateZ(0);
 }
 
-/* 🛡️ 1-SECOND OMETV FROZEN + BLURRED SNAPSHOT CANVAS */
-#freezeCanvas{
+/* 🛡️ 1-SECOND OMETV BLURRED & FROZEN CANVAS OVERLAY (Z-INDEX 6) */
+#freezeCanvasOverlay{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  z-index:2;display:none;
-  filter:blur(30px) brightness(0.9);
+  z-index:6;display:none;
+  filter:blur(30px) brightness(0.88);
   transition:opacity 0.4s ease-out;
   pointer-events:none;
 }
@@ -497,8 +497,8 @@ video{
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" autoplay playsinline></video>
 
-        <!-- 🛡️ 1-SECOND OMETV FROZEN BLURRED SNAPSHOT CANVAS -->
-        <canvas id="freezeCanvas"></canvas>
+        <!-- 🛡️ 1-SECOND OMETV FROZEN SNAPSHOT CANVAS (Z-INDEX 6) -->
+        <canvas id="freezeCanvasOverlay"></canvas>
 
         <!-- 📺 CRT TV STATIC LAYER -->
         <div class="crt-screen-wrapper" id="crtWrapper">
@@ -532,7 +532,7 @@ video{
 
         <div class="cam-tag">Stranger</div>
         
-        <!-- 🚩 RED FLAG REPORT BUTTON -->
+        <!-- 🚩 RED FLAG REPORT BUTTON (LILITAW LANG PAG MAY KAUSAP NA) -->
         <button id="reportBtn" type="button" onclick="openReportModal()" title="Report User">
           <svg viewBox="0 0 24 24"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z"/></svg>
         </button>
@@ -682,7 +682,7 @@ try {
 
 const crtWrapper = document.getElementById("crtWrapper");
 const crtStaticCanvas = document.getElementById("crtStaticCanvas");
-const freezeCanvas = document.getElementById("freezeCanvas");
+const freezeCanvasOverlay = document.getElementById("freezeCanvasOverlay");
 const standbyCenter = document.getElementById("standbyCenter");
 const searchLoader = document.getElementById("searchLoader");
 const remoteVideo = document.getElementById("remoteVideo");
@@ -709,8 +709,8 @@ let connected = false;
 let currentFacingMode = "user";
 let isFlipping = false;
 let isMicActive = true;
-let freezeShieldTimer = null;
-let isFreezeShieldActive = false;
+let freezeTimer = null;
+let isShieldTriggered = false;
 let pendingCandidates = [];
 let submitAttempts = 0;
 let cooldownTimer = null;
@@ -751,52 +751,51 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 🌟 1-SECOND FROZEN + BLURRED OMETV SAFETY SHIELD ================= */
-function captureFrozenFrameAndShield() {
-  if (isFreezeShieldActive || !remoteVideo || remoteVideo.videoWidth === 0) return;
-  isFreezeShieldActive = true;
+/* ================= 🌟 1-SECOND EXACT OMETV FROZEN + BLURRED FRAME REVEAL ================= */
+function triggerOmeTVFreezeBlurShield() {
+  if (isShieldTriggered || !remoteVideo || remoteVideo.videoWidth === 0) return;
+  isShieldTriggered = true;
 
-  // 1. Iguhit ang exact first frame ng kausap sa freeze canvas (Still image)
-  if (freezeCanvas) {
-    freezeCanvas.width = remoteVideo.videoWidth || 640;
-    freezeCanvas.height = remoteVideo.videoHeight || 480;
-    const ctx = freezeCanvas.getContext("2d");
-    ctx.drawImage(remoteVideo, 0, 0, freezeCanvas.width, freezeCanvas.height);
+  // 1. Iguhit ang exact still photo ng kausap sa overlay canvas
+  if (freezeCanvasOverlay) {
+    freezeCanvasOverlay.width = remoteVideo.videoWidth || 640;
+    freezeCanvasOverlay.height = remoteVideo.videoHeight || 480;
+    const ctx = freezeCanvasOverlay.getContext("2d");
+    ctx.drawImage(remoteVideo, 0, 0, freezeCanvasOverlay.width, freezeCanvasOverlay.height);
 
-    freezeCanvas.style.opacity = "1";
-    freezeCanvas.style.display = "block";
+    freezeCanvasOverlay.style.opacity = "1";
+    freezeCanvasOverlay.style.display = "block";
   }
 
-  // 2. Itago ang Static at Spinner (Naka-display na ang blurred still frame)
+  // 2. Itago ang Static at Spinner agad dahil may blurred still photo na
   if (crtWrapper) crtWrapper.style.display = "none";
   if (standbyCenter) standbyCenter.style.display = "none";
   if (searchLoader) searchLoader.style.display = "none";
   if (reportBtn) reportBtn.style.display = "flex";
 
-  // 3. Eksaktong 1.1s: Smooth unfreeze & release blur
-  if (freezeShieldTimer) clearTimeout(freezeShieldTimer);
-  freezeShieldTimer = setTimeout(() => {
-    if (freezeCanvas) {
-      freezeCanvas.style.opacity = "0";
+  // 3. Eksaktong 1.1s: I-unfreeze ang video at i-fade out ang blur
+  if (freezeTimer) clearTimeout(freezeTimer);
+  freezeTimer = setTimeout(() => {
+    if (freezeCanvasOverlay) {
+      freezeCanvasOverlay.style.opacity = "0";
       setTimeout(() => {
-        freezeCanvas.style.display = "none";
-        isFreezeShieldActive = false;
+        freezeCanvasOverlay.style.display = "none";
       }, 400);
     }
   }, 1100);
 }
 
 if (remoteVideo) {
-  remoteVideo.addEventListener("loadeddata", captureFrozenFrameAndShield);
-  remoteVideo.addEventListener("playing", captureFrozenFrameAndShield);
+  remoteVideo.addEventListener("loadeddata", triggerOmeTVFreezeBlurShield);
+  remoteVideo.addEventListener("playing", triggerOmeTVFreezeBlurShield);
 }
 
 function resetVideoLayers() {
-  if (freezeShieldTimer) clearTimeout(freezeShieldTimer);
-  isFreezeShieldActive = false;
-  if (freezeCanvas) {
-    freezeCanvas.style.opacity = "0";
-    freezeCanvas.style.display = "none";
+  if (freezeTimer) clearTimeout(freezeTimer);
+  isShieldTriggered = false;
+  if (freezeCanvasOverlay) {
+    freezeCanvasOverlay.style.opacity = "0";
+    freezeCanvasOverlay.style.display = "none";
   }
   if (reportBtn) reportBtn.style.display = "none";
 }
@@ -912,7 +911,7 @@ if (socket) {
   });
 }
 
-/* ================= 4. BULLETPROOF MEDIA & ZERO-BLACK-SCREEN FLIP ================= */
+/* ================= 4. BULLETPROOF MEDIA & MOBILE CAMERA FLIP ================= */
 async function startMedia() {
   if (isCurrentlyBanned) {
     const overlay = document.getElementById("banOverlay");
@@ -1089,6 +1088,7 @@ async function createPeer(initiator) {
       remoteVideo.muted = false;
       remoteVideo.volume = parseFloat(audioSlider?.value || 1.0);
 
+      // I-play ang remote video stream
       remoteVideo.play().catch(() => {
         remoteVideo.muted = true;
         remoteVideo.play().then(() => {
