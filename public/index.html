@@ -72,14 +72,14 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
-/* HD LIVE VIDEO */
+/* HD FULL COVERAGE VIDEO */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
   image-rendering:-webkit-optimize-contrast;
   transform:translateZ(0);
 }
 
-/* 🛡️ 1-SECOND OMETV FROZEN STILL PHOTO OVERLAY (100% STILL IMAGE, HINDI GAGALAW) */
+/* 🛡️ STRANGER FULL-SCREEN 1-SECOND FROZEN STILL PHOTO OVERLAY */
 #freezeImageOverlay{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
   z-index:6;display:none;
@@ -154,7 +154,7 @@ video{
   background:rgba(0,0,0,.7);padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;
 }
 
-/* 🚩 RED FLAG REPORT BUTTON */
+/* 🚩 RED FLAG REPORT BUTTON (LILITAW LANG PAG MAY KAUSAP NA) */
 #reportBtn{
   position:absolute;top:10px;right:10px;z-index:10;
   width:34px;height:34px;border-radius:50%;
@@ -498,7 +498,7 @@ video{
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" autoplay playsinline></video>
 
-        <!-- 🛡️ 1-SECOND OMETV FROZEN STILL PHOTO OVERLAY (100% STILL IMAGE) -->
+        <!-- 🛡️ STRANGER-ONLY FULL-COVERAGE FROZEN STILL PHOTO OVERLAY -->
         <img id="freezeImageOverlay" alt="Frozen Still Frame">
 
         <!-- 📺 CRT TV STATIC LAYER -->
@@ -752,7 +752,7 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 🌟 100% GUARANTEED STILL PHOTO FREEZE & 1s OMETV BLUR ================= */
+/* ================= 🌟 100% STRANGER FULL-COVERAGE FROZEN STILL PHOTO (1s SHIELD) ================= */
 function displayOmeTVFrozenSnapshot() {
   if (isFreezeActive) return;
 
@@ -760,7 +760,7 @@ function displayOmeTVFrozenSnapshot() {
     if (isFreezeActive || !remoteVideo || remoteVideo.videoWidth === 0) return;
     isFreezeActive = true;
 
-    // 1. Kunan ng LITERAL NA PICTURE (Still Frame) ang kausap
+    // 1. Kunan ng STILL PHOTO ang unang tunay na frame ng kausap
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = remoteVideo.videoWidth || 640;
     tempCanvas.height = remoteVideo.videoHeight || 480;
@@ -780,7 +780,7 @@ function displayOmeTVFrozenSnapshot() {
     if (searchLoader) searchLoader.style.display = "none";
     if (reportBtn) reportBtn.style.display = "flex";
 
-    // 4. Eksaktong 1.0s: I-fade out ang still photo at i-reveal ang live moving video
+    // 4. Eksaktong 1.0s: I-fade out ang still photo at i-reveal ang live moving video ng kausap
     if (freezeTimer) clearTimeout(freezeTimer);
     freezeTimer = setTimeout(() => {
       if (freezeImageOverlay) {
