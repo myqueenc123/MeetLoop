@@ -76,10 +76,20 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
+/* HD VIDEO RENDERING & OMETV SMOOTH BLUR TRANSITION */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
   image-rendering:-webkit-optimize-contrast;
   transform:translateZ(0);
+}
+#remoteVideo{
+  transition:filter 0.85s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s ease;
+}
+#remoteVideo.remote-blur{
+  filter:blur(30px) brightness(0.9);
+}
+#remoteVideo.remote-clear{
+  filter:blur(0px) brightness(1);
 }
 
 /* 📺 CRT TV STATIC SCREEN */
@@ -147,32 +157,30 @@ video{
   background:rgba(0,0,0,.7);padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;
 }
 
-/* 🚩 EXACT CUSTOM REPORT BUTTON (MATTE BLACK PILL + RED FLAG) */
+/* 🚩 SLEEK ICON-ONLY RED FLAG REPORT BUTTON */
 #reportBtn{
   position:absolute;top:10px;right:10px;z-index:10;
-  background:#141414;color:#ffffff;
-  border:1px solid rgba(255,255,255,0.12);
-  border-radius:999px;padding:6px 14px;
-  cursor:pointer;display:flex;align-items:center;gap:7px;
-  box-shadow:0 4px 14px rgba(0,0,0,0.6);
-  backdrop-filter:blur(6px);transition:all 0.15s ease;
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(18, 20, 26, 0.85);
+  border:1px solid rgba(255,255,255,0.15);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;padding:0;
+  box-shadow:0 4px 12px rgba(0,0,0,0.6);
+  backdrop-filter:blur(6px);
+  transition:all 0.15s ease;
   user-select:none;
 }
 #reportBtn svg{
-  width:15px;height:15px;fill:#ef4444;flex-shrink:0;
-  filter:drop-shadow(0 0 4px rgba(239,68,68,0.4));
-}
-#reportBtn span{
-  font-family:Georgia, "Times New Roman", serif;
-  font-size:12.5px;font-weight:900;letter-spacing:0.8px;
-  color:#ffffff;text-transform:uppercase;
+  width:18px;height:18px;fill:#ef4444;flex-shrink:0;
+  filter:drop-shadow(0 0 5px rgba(239,68,68,0.6));
 }
 #reportBtn:hover{
-  background:#1f1f1f;border-color:rgba(255,255,255,0.25);
-  transform:scale(1.03);
+  background:rgba(239,68,68,0.2);
+  border-color:rgba(239,68,68,0.5);
+  transform:scale(1.08);
 }
 #reportBtn:active{
-  transform:scale(0.96);
+  transform:scale(0.92);
 }
 
 .controls-panel{display:flex;gap:8px;height:48px;flex-shrink:0}
@@ -371,7 +379,7 @@ video{
       <li id="r1"><b>18+ Required:</b> Minors are strictly prohibited.</li>
       <li id="r2"><b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.</li>
       <li id="r3"><b>Human Face Only:</b> Look directly at the camera.</li>
-      <li id="r4"><b>Fast & Smooth:</b> OmeTV HD Quality Real-Time Streaming.</li>
+      <li id="r4"><b>Instant 1s Blur Shield:</b> Safe OmeTV-style transition on every switch.</li>
     </ul>
 
     <button class="portal-btn" id="portalStartBtn" type="button" onclick="startPortalChatting()">START CHATTING</button>
@@ -504,7 +512,7 @@ video{
   <div class="stream-arena">
     <div class="video-grid">
       <div class="cam-box" id="remoteBox">
-        <video id="remoteVideo" autoplay playsinline></video>
+        <video id="remoteVideo" class="remote-blur" autoplay playsinline></video>
 
         <!-- 📺 CRT TV STATIC LAYER -->
         <div class="crt-screen-wrapper" id="crtWrapper">
@@ -538,10 +546,9 @@ video{
 
         <div class="cam-tag" id="remoteTag">Stranger</div>
         
-        <!-- 🚩 EXACT MATTE BLACK PILL REPORT BUTTON -->
-        <button id="reportBtn" type="button" onclick="openReportModal()">
+        <!-- 🚩 SLEEK RED FLAG REPORT BUTTON ONLY -->
+        <button id="reportBtn" type="button" onclick="openReportModal()" title="Report User">
           <svg viewBox="0 0 24 24"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z"/></svg>
-          <span>REPORT</span>
         </button>
       </div>
 
@@ -715,6 +722,7 @@ let connected = false;
 let currentFacingMode = "user";
 let isFlipping = false;
 let isMicActive = true;
+let blurTimer = null;
 let pendingCandidates = [];
 let submitAttempts = 0;
 let cooldownTimer = null;
@@ -755,12 +763,31 @@ function runTVStatic() {
 }
 runTVStatic();
 
-// 🌟 ZERO BLACK SCREEN: Magtatago lang ang overlay kapag 100% active na ang video frame
+/* ================= 🌟 OMETV 1-SECOND SAFETY BLUR SHIELD ENGINE ================= */
+function applyInstantBlur() {
+  if (blurTimer) clearTimeout(blurTimer);
+  if (remoteVideo) {
+    remoteVideo.classList.remove("remote-clear");
+    remoteVideo.classList.add("remote-blur");
+  }
+}
+
+function releaseBlurSmoothly() {
+  if (blurTimer) clearTimeout(blurTimer);
+  blurTimer = setTimeout(() => {
+    if (remoteVideo) {
+      remoteVideo.classList.remove("remote-blur");
+      remoteVideo.classList.add("remote-clear");
+    }
+  }, 950); // ~1 segundo na smooth safety transition
+}
+
 if (remoteVideo) {
   remoteVideo.addEventListener("playing", () => {
     if (crtWrapper) crtWrapper.style.display = "none";
     if (standbyCenter) standbyCenter.style.display = "none";
     if (searchLoader) searchLoader.style.display = "none";
+    releaseBlurSmoothly();
   });
 }
 
@@ -793,6 +820,7 @@ if (socket) {
 
   socket.on("waiting", () => {
     searching = true;
+    applyInstantBlur();
     if (crtWrapper) crtWrapper.style.display = "block";
     if (standbyCenter) standbyCenter.style.display = "none";
     if (searchLoader) searchLoader.style.display = "flex";
@@ -800,6 +828,7 @@ if (socket) {
 
   socket.on("match", async (data) => {
     searching = false;
+    applyInstantBlur();
     await createPeer(Boolean(data?.initiator));
   });
 
@@ -1119,6 +1148,7 @@ async function triggerStartNext() {
   if (!ok) return;
 
   if (mainActionBtn) mainActionBtn.disabled = true;
+  applyInstantBlur();
   if (crtWrapper) crtWrapper.style.display = "block";
   if (standbyCenter) standbyCenter.style.display = "none";
   if (searchLoader) searchLoader.style.display = "flex";
@@ -1140,6 +1170,7 @@ function stopSession() {
   searching = false;
   connected = false;
 
+  applyInstantBlur();
   if (crtWrapper) crtWrapper.style.display = "block";
   if (standbyCenter) standbyCenter.style.display = "flex";
   if (searchLoader) searchLoader.style.display = "none";
@@ -1266,7 +1297,7 @@ function submitGCashUnbanTicket() {
 /* ================= 5. TRANSLATIONS ================= */
 const i18n = {
   en: {
-    subTitle: "Random Video Chat", portalBtn: "START CHATTING", report: "REPORT", stop: "Stop", start: "Start", next: "Next", stopped: "Stopped",
+    subTitle: "Random Video Chat", portalBtn: "START CHATTING", stop: "Stop", start: "Start", next: "Next", stopped: "Stopped",
     micOn: "Mic On", micOff: "Mic Off", showCam: "Show Cam", flip: "Flip",
     onlineUsers: "online users", chatTitle: "Live Chat",
     chatPlaceholder: "Type a message...", send: "Send", selectMethod: "Select Resolution Method:", gcashTitle: "Instant 7-Day Unban (₱10 Support)",
@@ -1280,11 +1311,11 @@ const i18n = {
     refPlaceholder: "13-Digit GCash Ref No. (e.g. 2004123456789)", partnerDisconnected: "Stranger disconnected.", you: "You", stranger: "Stranger",
     detailsLogged: "Details Logged", triesLeft: "tries left", unbanSuccess: "Payment Verified! Unbanning...",
     r1: "<b>18+ Required:</b> Minors are strictly prohibited.", r2: "<b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.",
-    r3: "<b>Human Face Only:</b> Look directly at the camera.", r4: "<b>Fast & Smooth:</b> OmeTV HD Quality Real-Time Streaming.",
+    r3: "<b>Human Face Only:</b> Look directly at the camera.", r4: "<b>Instant 1s Blur Shield:</b> Safe OmeTV-style transition on every switch.",
     banTitle: "7-Day Suspension", deviceBanId: "Device Ban ID:"
   },
   tl: {
-    subTitle: "Random Video Chat", portalBtn: "MAG-START MAG-CHAT", report: "I-REPORT", stop: "Ihinto", start: "Magsimula", next: "Susunod", stopped: "Nakahinto",
+    subTitle: "Random Video Chat", portalBtn: "MAG-START MAG-CHAT", stop: "Ihinto", start: "Magsimula", next: "Susunod", stopped: "Nakahinto",
     micOn: "Mic Bukas", micOff: "Mic Patay", showCam: "Ipakita ang Cam", flip: "I-flip",
     onlineUsers: "aktibong users", chatTitle: "Live Usapan",
     chatPlaceholder: "Mag-type ng mensahe...", send: "Ipadala", selectMethod: "Pumili ng Paraan para Ma-unban:", gcashTitle: "Instant 7-Araw na Unban (₱10 Support)",
@@ -1298,7 +1329,7 @@ const i18n = {
     refPlaceholder: "13-Digit GCash Ref No. (hal. 2004123456789)", partnerDisconnected: "Nadiskonekta ang kausap.", you: "Ikaw", stranger: "Kausap",
     detailsLogged: "Nai-log ang Detalye", triesLeft: "tries natitira", unbanSuccess: "Na-verify ang bayad! Unbanning...",
     r1: "<b>18+ Lamang:</b> Mahigpit na ipinagbabawal ang menor de edad.", r2: "<b>Zero Tolerance:</b> Bawal ang kabastusan, hubad, at spam.",
-    r3: "<b>Totoong Mukha:</b> Tumingin nang diretso sa camera.", r4: "<b>Mabilis at Malinaw:</b> OmeTV HD Quality Real-Time Streaming.",
+    r3: "<b>Totoong Mukha:</b> Tumingin nang diretso sa camera.", r4: "<b>Blur Shield:</b> Ligtas na pag-transition sa bawat switch.",
     banTitle: "7-Araw na Suspension", deviceBanId: "ID ng Device:"
   }
 };
@@ -1350,9 +1381,6 @@ function setLanguage(lang) {
   safeSetText("flipBtn", t.flip);
   safeSetText("banTitle", t.banTitle);
   safeSetText("lblDeviceBanId", t.deviceBanId);
-
-  const rBtnSpan = document.getElementById("reportBtn")?.querySelector("span");
-  if (rBtnSpan) rBtnSpan.textContent = t.report;
 
   if (micBtn) micBtn.textContent = isMicActive ? t.micOn : t.micOff;
   if (!searching && !connected && mainActionBtn) mainActionBtn.textContent = t.start;
