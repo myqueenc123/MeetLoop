@@ -72,7 +72,7 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
-/* 🌟 ULTRA HD OMETV QUALITY VIDEO RENDERING */
+/* 🌟 OMETV ULTRA-CRISP HARDWARE-ACCELERATED VIDEO */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
   image-rendering:-webkit-optimize-contrast;
@@ -82,7 +82,7 @@ video{
   will-change:transform;
 }
 
-/* 🛡️ 100% FULL-BLEED FROZEN STILL PHOTO OVERLAY */
+/* 🛡️ FULL-BLEED 100% STILL PHOTO OVERLAY (10px OMETV BLUR) */
 #freezeImageOverlay{
   position:absolute;
   top:-25px;left:-25px;right:-25px;bottom:-25px;
@@ -214,7 +214,7 @@ video{
 .chat-input{flex:1;min-width:0;height:38px;padding:0 12px;background:#070b14;border:1px solid var(--panel-border);border-radius:8px;color:#fff;outline:none;font-size:11px}
 .chat-send-btn{width:60px;height:38px;border:0;border-radius:8px;background:#2563eb;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
 
-/* 📱 COMPACT OMETV MOBILE PiP PREVIEW */
+/* 📱 COMPACT OMETV MOBILE PiP */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto}
   header{height:46px;padding:0 10px}
@@ -979,7 +979,6 @@ async function startMedia() {
   }
 
   try {
-    // 🌟 HD 720p 30fps LOW-LATENCY SENSOR ACQUISITION
     const stream = await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: currentFacingMode,
@@ -1053,7 +1052,6 @@ async function flipCamera() {
       const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
       if (sender) {
         await sender.replaceTrack(newVideoTrack);
-        // I-apply ang 2.5 Mbps HD bitrate sa bagong camera
         const params = sender.getParameters();
         if (params.encodings && params.encodings[0]) {
           params.encodings[0].maxBitrate = 2500000;
@@ -1163,6 +1161,11 @@ async function createPeer(initiator) {
 
       remoteVideo.muted = false;
       remoteVideo.volume = parseFloat(audioSlider?.value || 1.0);
+
+      // Low latency playout
+      if ("playoutDelayHint" in remoteVideo) {
+        remoteVideo.playoutDelayHint = 0;
+      }
 
       remoteVideo.play().catch(() => {
         remoteVideo.muted = true;
