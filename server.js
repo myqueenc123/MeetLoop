@@ -1,6 +1,6 @@
 /**
  * MeetLoop - High-Performance WebRTC Backend Server
- * 100% Low Latency + Hardened Security + Anti-Bypass + Smart Report Engine
+ * Smart AI/Heuristic Moderation + Hardware Fingerprint Anti-Bypass + Telegram Controls
  */
 
 const express = require("express");
@@ -21,7 +21,6 @@ const io = new Server(server, {
 const PORT = process.env.PORT || 3000;
 const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000;
 const PAYMENT_VALIDITY_WINDOW = 60 * 60 * 1000;
-const REPORT_RESET_WINDOW = 24 * 60 * 60 * 1000; // 24 oras bago ma-reset ang report count
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8648356765:AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || "5779976596";
@@ -33,14 +32,15 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json({ limit: "15mb" }));
-app.use(express.urlencoded({ extended: true, limit: "15mb" }));
-app.use(express.text({ type: "*/*", limit: "15mb" }));
+app.use(express.json({ limit: "25mb" }));
+app.use(express.urlencoded({ extended: true, limit: "25mb" }));
+app.use(express.text({ type: "*/*", limit: "25mb" }));
 
-/* ================= DATABASES & SECURITY ================= */
-const bannedDevices = new Map();           // HardwareID -> { banUntil, reason, snapshot, ip }
-const bannedIPs = new Map();               // IP -> { banUntil, reason, hardwareId }
-const userReports = new Map();             // HardwareID -> [{ by: reporterHw, reason: string, time: number }]
+/* ================= DATABASES & HARDENED ANTI-BYPASS ================= */
+const bannedDevices = new Map();           // HardwareID -> { banUntil, reason, snapshot, ip, fingerprint }
+const bannedFingerprints = new Map();      // Canvas/WebGL Fingerprint Hash -> Record
+const bannedIPs = new Map();               // Client IP -> Record
+const userTrustScore = new Map();          // Tracks reliable vs spam reporters
 const persistentDeviceTickets = new Map(); // HardwareID -> { phone, ref, time }
 let availablePayments = [];
 const burnedReceipts = new Set();
@@ -75,7 +75,7 @@ function sendTelegramRaw(endpoint, payloadObj, callback) {
     res.on("end", () => { if (callback) callback(null, d); });
   });
   req.on("error", (e) => {
-    console.error("❌ Telegram API Error:", e.message);
+    console.error("❌ Telegram Error:", e.message);
     if (callback) callback(e);
   });
   req.write(payload);
@@ -103,17 +103,33 @@ function sendTelegramWithButtons(chatId, text, reqId) {
   });
 }
 
+function sendReportAlertWithActions(chatId, text, targetHw) {
+  sendTelegramRaw("sendMessage", {
+    chat_id: chatId,
+    text: text,
+    parse_mode: "HTML",
+    disable_web_page_preview: true,
+    reply_markup: {
+      inline_keyboard: [
+        [
+          { text: "🚨 1-CLICK BAN (7-DAYS)", callback_data: `adminban_${targetHw}` },
+          { text: "✅ DISMISS", callback_data: `dismiss_${targetHw}` }
+        ]
+      ]
+    }
+  });
+}
+
 function executeUnbanUser(hardwareId, phone, auto = false) {
-  // Kunin ang nakatali na IP para sabay ding ma-unban
   const banRecord = bannedDevices.get(hardwareId);
-  if (banRecord && banRecord.ip) {
-    bannedIPs.delete(banRecord.ip);
+  if (banRecord) {
+    if (banRecord.ip) bannedIPs.delete(banRecord.ip);
+    if (banRecord.fingerprint) bannedFingerprints.delete(banRecord.fingerprint);
   }
 
   bannedDevices.delete(hardwareId);
   persistentDeviceTickets.delete(hardwareId);
   attemptTracker.delete(hardwareId);
-  userReports.delete(hardwareId);
 
   io.emit("real-admin-unban-signal", { hardwareId: hardwareId });
 
@@ -192,6 +208,7 @@ function pollTelegramUpdates() {
             if (update.callback_query) {
               const cb = update.callback_query;
               const cbData = cb.data || "";
+
               if (cbData.startsWith("approve_")) {
                 const hwId = cbData.replace("approve_", "");
                 const ticket = persistentDeviceTickets.get(hwId);
@@ -201,6 +218,13 @@ function pollTelegramUpdates() {
                 const hwId = cbData.replace("reject_", "");
                 persistentDeviceTickets.delete(hwId);
                 sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "❌ Rejected!", show_alert: false });
+              } else if (cbData.startsWith("adminban_")) {
+                const hwId = cbData.replace("adminban_", "");
+                const record = banDeviceSecurity(hwId, "0.0.0.0", "", "Admin Action Violation", null);
+                io.emit("force-device-ban", { hardwareId: hwId, banUntil: record.banUntil });
+                sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "🚨 User Banned for 7 Days!", show_alert: true });
+              } else if (cbData.startsWith("dismiss_")) {
+                sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "✅ Report Dismissed.", show_alert: false });
               }
             }
           });
@@ -211,39 +235,46 @@ function pollTelegramUpdates() {
   }).on("error", () => { setTimeout(pollTelegramUpdates, 3000); });
 }
 
-// HARDENED SECURITY CHECK: DEVICE + IP BAN CHECK
-function checkDeviceOrIpBan(hardwareId, clientIp) {
+/* ================= 🔒 HARDENED ANTI-BYPASS BAN ENGINE ================= */
+function checkSecurityBan(hardwareId, clientIp, fingerprint) {
   const now = Date.now();
 
-  // 1. Check Hardware ID
+  // 1. Hardware ID Check
   if (hardwareId && bannedDevices.has(hardwareId)) {
-    const record = bannedDevices.get(hardwareId);
-    if (now < record.banUntil) return record;
+    const r = bannedDevices.get(hardwareId);
+    if (now < r.banUntil) return r;
     bannedDevices.delete(hardwareId);
-    persistentDeviceTickets.delete(hardwareId);
   }
 
-  // 2. Check Client IP
-  if (clientIp && bannedIPs.has(clientIp)) {
-    const record = bannedIPs.get(clientIp);
-    if (now < record.banUntil) return record;
+  // 2. GPU / Canvas Fingerprint Check (Catches Incognito Mode!)
+  if (fingerprint && bannedFingerprints.has(fingerprint)) {
+    const r = bannedFingerprints.get(fingerprint);
+    if (now < r.banUntil) return r;
+    bannedFingerprints.delete(fingerprint);
+  }
+
+  // 3. Client IP Check
+  if (clientIp && clientIp !== "0.0.0.0" && bannedIPs.has(clientIp)) {
+    const r = bannedIPs.get(clientIp);
+    if (now < r.banUntil) return r;
     bannedIPs.delete(clientIp);
   }
 
   return null;
 }
 
-function banDeviceAndIp(hardwareId, clientIp, reason, snapshot = null) {
-  const finalId = String(hardwareId || "").trim();
+function banDeviceSecurity(hardwareId, clientIp, fingerprint, reason, snapshot = null) {
   const banUntil = Date.now() + BAN_DURATION_7DAYS;
-  const record = { banUntil, reason, snapshot, hardwareId: finalId, ip: clientIp };
-  
-  if (finalId) bannedDevices.set(finalId, record);
+  const record = { banUntil, reason, snapshot, hardwareId, ip: clientIp, fingerprint };
+
+  if (hardwareId) bannedDevices.set(hardwareId, record);
+  if (fingerprint) bannedFingerprints.set(fingerprint, record);
   if (clientIp && clientIp !== "0.0.0.0") bannedIPs.set(clientIp, record);
 
   return record;
 }
 
+/* ================= MATCHMAKING ENGINE ================= */
 let waitingQueue = [];
 const activePairs = new Map();
 
@@ -281,12 +312,13 @@ function matchUsers() {
 }
 
 io.on("connection", (socket) => {
-  const hardwareId = String(socket.handshake.query.hardwareId || socket.handshake.query.deviceId || "").trim();
+  const hardwareId = String(socket.handshake.query.hardwareId || "").trim();
+  const fingerprint = String(socket.handshake.query.fingerprint || "").trim();
   const clientIp = getClientIp(socket);
 
   io.emit("online-count", Math.max(1, io.engine.clientsCount));
 
-  const banInfo = checkDeviceOrIpBan(hardwareId, clientIp);
+  const banInfo = checkSecurityBan(hardwareId, clientIp, fingerprint);
   if (banInfo) {
     socket.emit("ip-banned", { banUntil: banInfo.banUntil, reason: banInfo.reason, snapshot: banInfo.snapshot });
   } else {
@@ -295,7 +327,8 @@ io.on("connection", (socket) => {
 
   socket.on("check-ban-status", (data) => {
     const hwId = String(data?.hardwareId || hardwareId).trim();
-    const b = checkDeviceOrIpBan(hwId, clientIp);
+    const fp = String(data?.fingerprint || fingerprint).trim();
+    const b = checkSecurityBan(hwId, clientIp, fp);
     if (!b) {
       socket.emit("real-admin-unban-signal", { hardwareId: hwId });
     } else {
@@ -304,7 +337,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("skip", () => {
-    const currentBan = checkDeviceOrIpBan(hardwareId, clientIp);
+    const currentBan = checkSecurityBan(hardwareId, clientIp, fingerprint);
     if (currentBan) {
       return socket.emit("ip-banned", { banUntil: currentBan.banUntil, reason: currentBan.reason, snapshot: currentBan.snapshot });
     }
@@ -318,7 +351,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("signal", (data) => {
-    const currentBan = checkDeviceOrIpBan(hardwareId, clientIp);
+    const currentBan = checkSecurityBan(hardwareId, clientIp, fingerprint);
     if (currentBan) return;
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -326,48 +359,40 @@ io.on("connection", (socket) => {
     }
   });
 
-  // 🚨 SMART REPORT ENGINE WITH 3-REPORT THRESHOLD
+  /* ================= 🧠 SMART EVIDENCE-BASED REPORT SYSTEM ================= */
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
       const partner = io.sockets.sockets.get(partnerId);
       if (partner) {
-        const partnerHw = String(partner.handshake.query.hardwareId || partner.handshake.query.deviceId || partner.id).trim();
+        const partnerHw = String(partner.handshake.query.hardwareId || "").trim();
+        const partnerFp = String(partner.handshake.query.fingerprint || "").trim();
         const partnerIp = getClientIp(partner);
         const reason = data.reason || "Policy Violation";
         const snapshot = data.snapshot || null;
-        const now = Date.now();
 
-        // Linisin ang mga lumang report na lampas 24 hours na
-        let reports = userReports.get(partnerHw) || [];
-        reports = reports.filter(r => (now - r.time < REPORT_RESET_WINDOW));
+        // Smart Risk Evaluation
+        let riskScore = 30;
+        const hasSnapshot = Boolean(snapshot && snapshot.length > 500);
+        if (hasSnapshot) riskScore += 35;
+        if (reason.includes("Nudity") || reason.includes("Underage")) riskScore += 30;
+        if (reason.includes("Violence") || reason.includes("Threats")) riskScore += 25;
 
-        // Iwasan ang duplicate spam report mula sa iisang user
-        const alreadyReported = reports.some(r => r.by === hardwareId);
-        if (!alreadyReported) {
-          reports.push({ by: hardwareId, reason: reason, time: now });
-          userReports.set(partnerHw, reports);
-        }
+        console.log(`🔍 [SMART REPORT ANALYSIS]: Target=${partnerHw}, Score=${riskScore}/100, Reason=${reason}, HasEvidence=${hasSnapshot}`);
 
-        const reportCount = reports.length;
-        const isSevere = reason.includes("Nudity") || reason.includes("Underage") || reason.includes("Violence");
-        const threshold = isSevere ? 2 : 3;
+        const alertText = `🚨 <b>INCOMING USER REPORT (AI Score: ${riskScore}%)</b>\n\n` +
+                          `⚠️ <b>Violation:</b> ${escapeHtml(reason)}\n` +
+                          `🆔 <b>Target Device:</b> <code>${escapeHtml(partnerHw)}</code>\n` +
+                          `🌐 <b>Target IP:</b> <code>${escapeHtml(partnerIp)}</code>\n` +
+                          `📸 <b>Snapshot Logged:</b> ${hasSnapshot ? "✅ YES (Evidence Attached)" : "❌ NO"}\n\n` +
+                          `<i>Decision: ${riskScore >= 85 ? "🛑 AUTO-BAN EXECUTED (Critical Score)" : "⏳ Flagged for Admin Review"}</i>`;
 
-        console.log(`🚨 [REPORT LOGGED]: Target=${partnerHw}, Count=${reportCount}/${threshold}, Reason=${reason}`);
+        sendReportAlertWithActions(ADMIN_CHAT_ID, alertText, partnerHw);
 
-        // I-notify si Admin sa Telegram sa bawat report
-        const reportAlert = `⚠️ <b>USER REPORT FILED (${reportCount}/${threshold})</b>\n\n` +
-                            `🚨 <b>Reason:</b> ${escapeHtml(reason)}\n` +
-                            `🆔 <b>Device:</b> <code>${escapeHtml(partnerHw)}</code>\n` +
-                            `🌐 <b>IP:</b> <code>${escapeHtml(partnerIp)}</code>\n` +
-                            `<i>${reportCount >= threshold ? "🛑 THRESHOLD REACHED: AUTO-BANNING FOR 7 DAYS!" : "Naka-log sa system. Hindi pa banned."}</i>`;
-        sendTelegramMessage(ADMIN_CHAT_ID, reportAlert);
-
-        // Kapag naabot ang 3 reports (o 2 reports sa nudity), i-BAN na siya!
-        if (reportCount >= threshold) {
-          const record = banDeviceAndIp(partnerHw, partnerIp, reason, snapshot);
+        // Auto-ban only if evidence + severe category (high confidence), otherwise flagged for 1-click admin approval
+        if (riskScore >= 85) {
+          const record = banDeviceSecurity(partnerHw, partnerIp, partnerFp, reason, snapshot);
           partner.emit("ip-banned", { banUntil: record.banUntil, reason: record.reason, snapshot: record.snapshot });
-          userReports.delete(partnerHw);
         }
 
         activePairs.delete(partnerId);
@@ -423,8 +448,8 @@ app.get("*", (req, res) => { res.sendFile(path.join(__dirname, "public", "index.
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`🛡️ 3-Tier Smart Report Engine: ACTIVE`);
-  console.log(`🔒 Anti-Bypass Device+IP Tracking: ACTIVE`);
+  console.log(`🛡️ Hardware + WebGL Anti-Bypass Security: ACTIVE`);
+  console.log(`🧠 Smart AI Evidence Report Moderation: ACTIVE`);
   console.log(`================================================`);
   pollTelegramUpdates();
 });
