@@ -79,7 +79,7 @@ video{
   transform:translateZ(0);
 }
 
-/* 🛡️ 100% FULL-BLEED FROZEN STILL PHOTO OVERLAY (SAGAD SA GILID AT SULOK) */
+/* 🛡️ FULL-BLEED 100% STILL PHOTO OVERLAY (10px OMETV BLUR) */
 #freezeImageOverlay{
   position:absolute;
   top:-25px;left:-25px;right:-25px;bottom:-25px;
@@ -158,7 +158,7 @@ video{
   background:rgba(0,0,0,.7);padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;
 }
 
-/* 🚩 RED FLAG REPORT BUTTON (LILITAW LANG PAG MAY KAUSAP NA) */
+/* 🚩 RED FLAG REPORT BUTTON */
 #reportBtn{
   position:absolute;top:10px;right:10px;z-index:10;
   width:34px;height:34px;border-radius:50%;
@@ -211,7 +211,7 @@ video{
 .chat-input{flex:1;min-width:0;height:38px;padding:0 12px;background:#070b14;border:1px solid var(--panel-border);border-radius:8px;color:#fff;outline:none;font-size:11px}
 .chat-send-btn{width:60px;height:38px;border:0;border-radius:8px;background:#2563eb;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
 
-/* 📱 MOBILE RESPONSIVE */
+/* 📱 COMPACT OMETV MOBILE PICTURE-IN-PICTURE (PiP) PREVIEW */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto}
   header{height:46px;padding:0 10px}
@@ -219,11 +219,33 @@ video{
   .stream-arena{width:100%;flex:none;gap:8px}
   .video-grid{position:relative;width:100%;height:min(50dvh,420px);min-height:260px;display:block;border-radius:12px;overflow:hidden}
   .cam-box:first-child{position:absolute;inset:0;width:100%;height:100%}
-  #localCamBox{position:absolute;right:8px;bottom:8px;width:28vw;max-width:110px;aspect-ratio:3/4;height:auto;z-index:8;border:2px solid #ffffff;border-radius:10px}
+  
+  /* 🌟 COMPACT SELFIE PREVIEW ON MOBILE (HINDI NA NAKAHARANG) */
+  #localCamBox{
+    position:absolute;right:8px;bottom:8px;
+    width:72px;height:96px;aspect-ratio:3/4;
+    z-index:8;border:1.5px solid rgba(255,255,255,0.75);
+    border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,0.8);
+  }
+  #localCamBox #localTag{font-size:8px;padding:2px 4px;top:4px;left:4px}
   #localCamBox.hidden-cam{display:none !important}
-  #hideLocalBtn{position:absolute;top:3px;right:3px;z-index:9;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.75);color:#fff;border:0;font-size:10px;font-weight:bold;cursor:pointer;display:flex !important;align-items:center;justify-content:center}
-  #showLocalBtn{position:absolute;right:8px;bottom:8px;z-index:30;display:none;align-items:center;gap:5px;padding:6px 12px;border-radius:999px;background:#1e293b;border:1px solid #38bdf8;color:#fff;font-size:10px;font-weight:800}
+  
+  #hideLocalBtn{
+    position:absolute;top:2px;right:2px;z-index:9;
+    width:16px;height:16px;border-radius:50%;
+    background:rgba(0,0,0,.75);color:#fff;border:0;
+    font-size:8px;font-weight:bold;cursor:pointer;
+    display:flex !important;align-items:center;justify-content:center;
+  }
+  
+  #showLocalBtn{
+    position:absolute;right:8px;bottom:8px;z-index:30;
+    display:none;align-items:center;gap:5px;padding:5px 10px;
+    border-radius:999px;background:#1e293b;border:1px solid #38bdf8;
+    color:#fff;font-size:9.5px;font-weight:800;
+  }
   #showLocalBtn.visible{display:flex !important}
+  
   .controls-panel{height:auto;display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
   .ctrl-btn{min-height:42px;font-size:12px;padding:4px}
   .btn-start-next{grid-column:span 4}
@@ -502,7 +524,7 @@ video{
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" autoplay playsinline></video>
 
-        <!-- 🛡️ 100% FULL-BLEED FROZEN STILL PHOTO OVERLAY -->
+        <!-- 🛡️ STRANGER-ONLY FULL-COVERAGE FROZEN STILL PHOTO OVERLAY -->
         <img id="freezeImageOverlay" alt="Frozen Still Frame">
 
         <!-- 📺 CRT TV STATIC LAYER -->
@@ -545,7 +567,7 @@ video{
 
       <div class="cam-box" id="localCamBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline></video>
-        <div class="cam-tag">You</div>
+        <div class="cam-tag" id="localTag">You</div>
         <button id="hideLocalBtn" type="button">✕</button>
       </div>
 
