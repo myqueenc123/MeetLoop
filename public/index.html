@@ -72,7 +72,7 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
-/* 🌟 OMETV ULTRA-CRISP HARDWARE-ACCELERATED VIDEO */
+/* 🌟 ULTRA-CRISP HD VIDEO */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
   image-rendering:-webkit-optimize-contrast;
@@ -82,7 +82,7 @@ video{
   will-change:transform;
 }
 
-/* 🛡️ FULL-BLEED 100% STILL PHOTO OVERLAY (10px OMETV BLUR) */
+/* 🛡️ 100% FULL-BLEED FROZEN STILL PHOTO OVERLAY (10px OMETV BLUR) */
 #freezeImageOverlay{
   position:absolute;
   top:-25px;left:-25px;right:-25px;bottom:-25px;
@@ -526,7 +526,7 @@ video{
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" autoplay playsinline></video>
 
-        <!-- 🛡️ STRANGER FULL-BLEED 100% FROZEN STILL PHOTO OVERLAY -->
+        <!-- 🛡️ 100% FULL-BLEED FROZEN STILL PHOTO OVERLAY -->
         <img id="freezeImageOverlay" alt="Frozen Still Frame">
 
         <!-- 📺 CRT TV STATIC LAYER -->
@@ -598,7 +598,7 @@ video{
           🚫 <b>No nudity, sexual content, hate speech, or harassment.</b><br>
           📹 <b>Show yourself on camera</b> — no fake or pre-recorded video.<br>
           💬 <b>Respect everyone</b> — MeetLoop is not a dating site.<br>
-          ⚠️ <b>3 Policy Violations will result in an automatic 7-day ban.</b><br><br>
+          ⚠️ <b>Violations result in an immediate 7-day hardware suspension.</b><br><br>
           Have fun, stay respectful, and enjoy chatting! 🌎
         </div>
       </div>
@@ -613,6 +613,43 @@ video{
 <script src="/socket.io/socket.io.js"></script>
 <script>
 "use strict";
+
+/* ================= 🔒 HARDWARE & CANVAS FINGERPRINT GENERATOR (ANTI-INCOGNITO) ================= */
+function generateDeviceFingerprint() {
+  try {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.textBaseline = "top";
+    ctx.font = "14px 'Arial'";
+    ctx.fillStyle = "#f60";
+    ctx.fillRect(125, 1, 62, 20);
+    ctx.fillStyle = "#069";
+    ctx.fillText("MeetLoop_Sec_FP_v2", 2, 15);
+    ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
+    ctx.fillText("MeetLoop_Sec_FP_v2", 4, 17);
+    
+    let glRenderer = "";
+    try {
+      const gl = document.createElement("canvas").getContext("webgl");
+      if (gl) {
+        const dbg = gl.getExtension("WEBGL_debug_renderer_info");
+        if (dbg) glRenderer = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL);
+      }
+    } catch(e){}
+
+    const str = canvas.toDataURL() + "___" + glRenderer + "___" + (navigator.hardwareConcurrency || 4) + "___" + (screen.colorDepth || 24);
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return "fp_" + Math.abs(hash).toString(36);
+  } catch(e) {
+    return "fp_fallback_" + Math.random().toString(36).substring(2, 8);
+  }
+}
+
+const myFingerprint = generateDeviceFingerprint();
 
 /* ================= 1. STRICT 1-TAB CONTROLLER ================= */
 const myTabId = "tab_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
@@ -704,7 +741,7 @@ try {
   if (typeof io !== "undefined") {
     socket = io({
       transports: ["websocket", "polling"],
-      query: { hardwareId: myHardwareId, deviceId: myHardwareId }
+      query: { hardwareId: myHardwareId, deviceId: myHardwareId, fingerprint: myFingerprint }
     });
   }
 } catch(e){}
@@ -793,27 +830,23 @@ function displayOmeTVFrozenSnapshot() {
     if (isFreezeActive || !remoteVideo || remoteVideo.videoWidth === 0) return;
     isFreezeActive = true;
 
-    // 1. Kumuha ng 100% still picture mula sa tunay na frame ng kausap
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = remoteVideo.videoWidth || 1280;
     tempCanvas.height = remoteVideo.videoHeight || 720;
     const ctx = tempCanvas.getContext("2d");
     ctx.drawImage(remoteVideo, 0, 0, tempCanvas.width, tempCanvas.height);
 
-    // 2. I-display sa Full-Bleed Overlay (100% Frozen, HINDI GAGALAW)
     if (freezeImageOverlay) {
       freezeImageOverlay.src = tempCanvas.toDataURL("image/jpeg", 0.9);
       freezeImageOverlay.style.opacity = "1";
       freezeImageOverlay.style.display = "block";
     }
 
-    // 3. Itago ang TV Static at Search Spinner
     if (crtWrapper) crtWrapper.style.display = "none";
     if (standbyCenter) standbyCenter.style.display = "none";
     if (searchLoader) searchLoader.style.display = "none";
     if (reportBtn) reportBtn.style.display = "flex";
 
-    // 4. Eksaktong 1.0s: I-fade out ang still photo at i-reveal ang live HD moving video
     if (freezeTimer) clearTimeout(freezeTimer);
     freezeTimer = setTimeout(() => {
       if (freezeImageOverlay) {
@@ -869,7 +902,7 @@ function handleSuccessfulUnban() {
 
 if (socket) {
   socket.on("connect", () => {
-    socket.emit("check-ban-status", { hardwareId: myHardwareId });
+    socket.emit("check-ban-status", { hardwareId: myHardwareId, fingerprint: myFingerprint });
   });
 
   socket.on("online-count", (count) => {
@@ -928,6 +961,12 @@ if (socket) {
 
   socket.on("ip-banned", (data) => {
     display7DayBanScreen(data.banUntil, data.reason, data.snapshot);
+  });
+
+  socket.on("force-device-ban", (data) => {
+    if (data && data.hardwareId === myHardwareId) {
+      display7DayBanScreen(data.banUntil, "Administrative Action", null);
+    }
   });
 
   socket.on("unban-pending", (data) => {
@@ -1128,7 +1167,6 @@ async function createPeer(initiator) {
   if (localStream) {
     localStream.getTracks().forEach(track => {
       const sender = peerConnection.addTrack(track, localStream);
-      // 🌟 OMETV HD QUALITY SENDER PARAMETERS (2.5 Mbps)
       if (track.kind === "video") {
         setTimeout(() => {
           try {
@@ -1162,7 +1200,6 @@ async function createPeer(initiator) {
       remoteVideo.muted = false;
       remoteVideo.volume = parseFloat(audioSlider?.value || 1.0);
 
-      // Low latency playout
       if ("playoutDelayHint" in remoteVideo) {
         remoteVideo.playoutDelayHint = 0;
       }
