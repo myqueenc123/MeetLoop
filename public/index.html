@@ -261,27 +261,27 @@ video{
     max-width:440px;width:100%;max-height:92vh;overflow-y:auto;
     padding:16px;display:flex;flex-direction:column;gap:12px;
   }
+  #gcashPaySection.active{display:flex !important}
 }
 
-/* 💻 PC / DESKTOP (FLIP IS HIDDEN & 0-SCROLL BAN CARD) */
+/* 💻 PC / DESKTOP (CLEAN 0-SCROLL BAN CARD) */
 @media (min-width:851px){
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 
-  /* 🌟 NO SCROLLBAR PC BAN MODAL (SEAMLESS 2-COLUMN VIEW) */
   .ban-card{
-    max-width:760px !important;width:100% !important;
-    max-height:90vh !important;overflow:hidden !important;
-    padding:24px !important;
+    max-width:760px;width:100%;
+    max-height:90vh;overflow:hidden;
+    padding:24px;
   }
-  .ban-content-grid{
+  #gcashPaySection.active{
     display:grid !important;
-    grid-template-columns:1fr 1.15fr !important;
-    gap:20px !important;
-    align-items:start !important;
+    grid-template-columns:1fr 1.15fr;
+    gap:20px;
+    align-items:start;
   }
 }
 
-/* 🔒 FULL WHITE HARD LOCK BAN OVERLAY */
+/* 🔒 FULL WHITE BAN OVERLAY */
 #banOverlay{
   position:fixed !important;inset:0 !important;z-index:2147483647 !important;
   background:rgba(0,0,0,0.98) !important;display:none;align-items:center;justify-content:center;
@@ -299,7 +299,7 @@ video{
   width:95px;height:95px;border-radius:14px;overflow:hidden;
   position:relative;background:#0f172a;border:2px solid #cbd5e1;flex-shrink:0;
 }
-#banSnapshotImg{width:100%;height:100%;object-fit:cover;display:block;background:#0f172a}
+#banSnapshotImg, #banSnapshotImg2{width:100%;height:100%;object-fit:cover;display:block;background:#0f172a}
 .ban-snap-brand{position:absolute;top:4px;left:4px;background:rgba(0,0,0,.75);padding:2px 5px;border-radius:4px;color:#fff;font-size:8px;font-weight:900}
 .ban-snap-tag{position:absolute;bottom:4px;left:4px;right:4px;background:rgba(220,38,38,0.88);color:#fff;font-size:7.5px;font-weight:900;text-align:center;padding:2px 0;border-radius:3px}
 .ban-title{font-size:18px;font-weight:900;color:#dc2626}
@@ -316,7 +316,8 @@ video{
 .method-title{font-size:13px;font-weight:800;color:#0f172a}
 .method-desc{font-size:10.5px;color:#64748b}
 
-#gcashPaySection{display:none;flex-direction:column;gap:8px}
+#gcashPaySection{display:none}
+
 .gcash-logo-banner{background:#005ce6;border-radius:10px;padding:6px 12px;display:flex;align-items:center;justify-content:center}
 .gcash-official-svg{height:24px;max-width:140px;display:block}
 .gcash-qr-box{background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:12px;padding:8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
@@ -432,7 +433,7 @@ video{
   </div>
 </div>
 
-<!-- 7-DAY HARD LOCK BAN OVERLAY (SEAMLESS FULL-WHITE DESKTOP VIEW) -->
+<!-- 7-DAY HARD LOCK BAN OVERLAY -->
 <div id="banOverlay">
   <div class="ban-card">
     
@@ -490,8 +491,8 @@ video{
       </div>
     </div>
 
-    <!-- VIEW 2: GCASH TOPUP FORM (2-COLUMN PC GRID, 0 SCROLLING) -->
-    <div id="gcashPaySection" class="ban-content-grid">
+    <!-- VIEW 2: GCASH TOPUP FORM -->
+    <div id="gcashPaySection">
       <!-- LEFT COLUMN -->
       <div style="display:flex;flex-direction:column;gap:10px">
         <div class="ban-top">
@@ -616,7 +617,7 @@ video{
 
       <div class="cam-box" id="localCamBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline></video>
-        <div class="cam-tag" id="localTag">You</div>
+        <div class="cam-tag">You</div>
         <button id="hideLocalBtn" type="button">✕</button>
       </div>
 
@@ -1359,7 +1360,7 @@ function stopSession() {
   if (stopBtn) stopBtn.disabled = true;
 }
 
-// 📸 PRIORITY: CAPTURES THE STRANGER'S CAMERA FEED AS VIOLATION EVIDENCE
+// 📸 PRIORITY: CAPTURES THE STRANGER'S CAMERA FEED
 function captureStrangerSnapshot() {
   try {
     const canvas = document.createElement("canvas");
@@ -1367,7 +1368,6 @@ function captureStrangerSnapshot() {
     canvas.height = 160;
     const ctx = canvas.getContext("2d");
 
-    // Kinukunan ang mukha ng kausap (Stranger) mula sa remote video
     if (remoteVideo && (remoteVideo.videoWidth > 0 || remoteVideo.srcObject)) {
       ctx.drawImage(remoteVideo, 0, 0, 160, 160);
       return canvas.toDataURL("image/jpeg", 0.7);
@@ -1421,8 +1421,13 @@ function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap 
 }
 
 function openGcashPayView() {
-  document.getElementById("selectMethodSection").style.display = "none";
-  document.getElementById("gcashPaySection").style.display = "flex";
+  const selectSec = document.getElementById("selectMethodSection");
+  const gcashSec = document.getElementById("gcashPaySection");
+  if (selectSec) selectSec.style.display = "none";
+  if (gcashSec) {
+    gcashSec.style.display = "";
+    gcashSec.classList.add("active");
+  }
   document.getElementById("gcashPhoneInput").value = "";
   document.getElementById("gcashRefInput").value = "";
   document.getElementById("gcashRefStatus").textContent = "";
@@ -1439,8 +1444,13 @@ function openGcashPayView() {
 }
 
 function backToMethodSelection() {
-  document.getElementById("gcashPaySection").style.display = "none";
-  document.getElementById("selectMethodSection").style.display = "flex";
+  const selectSec = document.getElementById("selectMethodSection");
+  const gcashSec = document.getElementById("gcashPaySection");
+  if (gcashSec) {
+    gcashSec.classList.remove("active");
+    gcashSec.style.display = "none";
+  }
+  if (selectSec) selectSec.style.display = "flex";
 }
 
 function submitGCashUnbanTicket() {
