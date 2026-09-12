@@ -82,7 +82,7 @@ video{
   will-change:transform;
 }
 
-/* 🛡️ FULL-BLEED 100% STILL PHOTO OVERLAY */
+/* 🛡️ 100% FULL-BLEED FROZEN STILL PHOTO OVERLAY */
 #freezeImageOverlay{
   position:absolute;
   top:-25px;left:-25px;right:-25px;bottom:-25px;
@@ -255,33 +255,14 @@ video{
   .btn-sec{grid-column:span 3}
   #flipBtn{grid-column:span 3;display:flex !important}
   .chat-arena{width:100%;max-width:none;height:240px;min-height:240px;border-radius:12px}
-
-  /* Mobile Ban Card Styling */
-  .ban-card{
-    max-width:440px;width:100%;max-height:92vh;overflow-y:auto;
-    padding:16px;display:flex;flex-direction:column;gap:12px;
-  }
-  #gcashPaySection.active{display:flex !important}
 }
 
-/* 💻 PC / DESKTOP (CLEAN 0-SCROLL BAN CARD) */
+/* 💻 PC / DESKTOP */
 @media (min-width:851px){
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
-
-  .ban-card{
-    max-width:760px;width:100%;
-    max-height:90vh;overflow:hidden;
-    padding:24px;
-  }
-  #gcashPaySection.active{
-    display:grid !important;
-    grid-template-columns:1fr 1.15fr;
-    gap:20px;
-    align-items:start;
-  }
 }
 
-/* 🔒 FULL WHITE BAN OVERLAY */
+/* 🔒 100% CLEAN NO-SCROLL BAN CARD */
 #banOverlay{
   position:fixed !important;inset:0 !important;z-index:2147483647 !important;
   background:rgba(0,0,0,0.98) !important;display:none;align-items:center;justify-content:center;
@@ -289,55 +270,56 @@ video{
 }
 .ban-card{
   background:#ffffff !important;border-radius:24px !important;
-  color:#1e293b !important;box-shadow:0 35px 80px rgba(0,0,0,1) !important;
-  border:0 !important;scrollbar-width:none !important;
+  max-width:420px !important;width:100% !important;
+  color:#1e293b !important;box-shadow:0 30px 80px rgba(0,0,0,1) !important;
+  border:0 !important;padding:18px 20px !important;
+  display:flex !important;flex-direction:column !important;gap:10px !important;
+  overflow:hidden !important;
 }
-.ban-card::-webkit-scrollbar{display:none !important}
 
 .ban-top{display:flex;gap:12px;align-items:center}
 .ban-snap-frame{
-  width:95px;height:95px;border-radius:14px;overflow:hidden;
+  width:88px;height:88px;border-radius:12px;overflow:hidden;
   position:relative;background:#0f172a;border:2px solid #cbd5e1;flex-shrink:0;
 }
-#banSnapshotImg, #banSnapshotImg2{width:100%;height:100%;object-fit:cover;display:block;background:#0f172a}
+#banSnapshotImg{width:100%;height:100%;object-fit:cover;display:block;background:#0f172a}
 .ban-snap-brand{position:absolute;top:4px;left:4px;background:rgba(0,0,0,.75);padding:2px 5px;border-radius:4px;color:#fff;font-size:8px;font-weight:900}
 .ban-snap-tag{position:absolute;bottom:4px;left:4px;right:4px;background:rgba(220,38,38,0.88);color:#fff;font-size:7.5px;font-weight:900;text-align:center;padding:2px 0;border-radius:3px}
-.ban-title{font-size:18px;font-weight:900;color:#dc2626}
-.ban-reason{font-size:11.5px;color:#475569;font-weight:700}
+.ban-title{font-size:17px;font-weight:900;color:#dc2626}
+.ban-reason{font-size:11px;color:#475569;font-weight:700}
 
-.ban-disclaimer-box{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:12px 14px;text-align:left;font-size:11px;line-height:1.5;color:#334155}
-.ban-disclaimer-title{color:#dc2626;font-size:12px;font-weight:900;margin-bottom:4px}
+.ban-disclaimer-box{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:10px 12px;text-align:left;font-size:10.5px;line-height:1.45;color:#334155}
+.ban-disclaimer-title{color:#dc2626;font-size:11.5px;font-weight:900;margin-bottom:3px}
 
-.method-choice-container{display:flex;flex-direction:column;gap:9px}
-.method-card{border:1.5px solid #e2e8f0;border-radius:14px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:#f8fafc}
+.method-choice-container{display:flex;flex-direction:column;gap:8px}
+.method-card{border:1.5px solid #e2e8f0;border-radius:12px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:#f8fafc}
 .method-card:hover{border-color:#005ce6;background:#f0f7ff}
 .method-card-left{display:flex;align-items:center;gap:10px}
-.method-icon-wrap{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center}
-.method-title{font-size:13px;font-weight:800;color:#0f172a}
-.method-desc{font-size:10.5px;color:#64748b}
+.method-icon-wrap{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.method-title{font-size:12px;font-weight:800;color:#0f172a}
+.method-desc{font-size:10px;color:#64748b}
 
-#gcashPaySection{display:none}
-
+#gcashPaySection{display:none;flex-direction:column;gap:8px}
 .gcash-logo-banner{background:#005ce6;border-radius:10px;padding:6px 12px;display:flex;align-items:center;justify-content:center}
-.gcash-official-svg{height:24px;max-width:140px;display:block}
-.gcash-qr-box{background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:12px;padding:8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
-.gcash-qr-frame{background:#ffffff;padding:6px;border-radius:10px;border:1.5px solid #94a3b8;display:inline-block}
-.gcash-qr-img{width:130px;height:130px;display:block;border-radius:4px;object-fit:contain}
+.gcash-official-svg{height:22px;max-width:130px;display:block}
+.gcash-qr-box{background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:12px;padding:8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px}
+.gcash-qr-frame{background:#ffffff;padding:5px;border-radius:10px;border:1.5px solid #94a3b8;display:inline-block}
+.gcash-qr-img{width:115px;height:115px;display:block;border-radius:4px;object-fit:contain}
 .gcash-fee-tag{background:#0284c7;color:#fff;font-size:10px;font-weight:900;padding:2px 8px;border-radius:20px}
 .gcash-input-group{width:100%;display:flex;flex-direction:column;gap:5px}
-.gcash-input-field{width:100%;height:38px;padding:0 10px;background:#ffffff;border:2px solid #bfdbfe;border-radius:8px;color:#0f172a;font-size:11.5px;font-weight:700;outline:none}
-.gcash-verify-btn{width:100%;height:42px;border:0;border-radius:8px;background:#005ce6;color:#fff;font-size:12px;font-weight:900;cursor:pointer}
+.gcash-input-field{width:100%;height:36px;padding:0 10px;background:#ffffff;border:2px solid #bfdbfe;border-radius:8px;color:#0f172a;font-size:11px;font-weight:700;outline:none}
+.gcash-verify-btn{width:100%;height:40px;border:0;border-radius:8px;background:#005ce6;color:#fff;font-size:12px;font-weight:900;cursor:pointer}
 .gcash-verify-btn:disabled{background:#475569 !important;cursor:not-allowed !important}
 
 .telegram-support-btn{
-  width:100%;height:40px;border:1.5px solid #0284c7;border-radius:10px;background:#0f172a;color:#38bdf8;
-  font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;
+  width:100%;height:38px;border:1.5px solid #0284c7;border-radius:10px;background:#0f172a;color:#38bdf8;
+  font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;
 }
-.btn-back-methods{background:none;border:0;color:#64748b;font-size:11px;font-weight:800;cursor:pointer;text-align:center;padding:4px}
+.btn-back-methods{background:none;border:0;color:#64748b;font-size:11px;font-weight:800;cursor:pointer;text-align:center;padding:2px}
 
-.ban-expire-box{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:8px 12px;display:flex;flex-direction:column;gap:2px}
-.ban-expire-label{font-size:10.5px;font-weight:800;color:#dc2626}
-.ban-expire-time{font-size:11.5px;font-weight:800;color:#0f172a}
+.ban-expire-box{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:6px 10px;display:flex;flex-direction:column;gap:2px}
+.ban-expire-label{font-size:10px;font-weight:800;color:#dc2626}
+.ban-expire-time{font-size:11px;font-weight:800;color:#0f172a}
 .ban-id-chip{font-size:9.5px;color:#64748b;font-family:monospace}
 
 /* WELCOME PORTAL */
@@ -433,49 +415,50 @@ video{
   </div>
 </div>
 
-<!-- 7-DAY HARD LOCK BAN OVERLAY -->
+<!-- 7-DAY HARD LOCK BAN OVERLAY (COMPACT NO-SCROLL CARD) -->
 <div id="banOverlay">
   <div class="ban-card">
     
-    <!-- VIEW 1: METHOD OPTIONS -->
-    <div id="selectMethodSection" style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:440px;margin:0 auto">
-      <div class="ban-top">
-        <div class="ban-snap-frame">
-          <img id="banSnapshotImg" alt="Evidence Snapshot">
-          <div class="ban-snap-brand">MeetLoop</div>
-          <div class="ban-snap-tag">ENCOUNTER EVIDENCE</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:3px">
-          <div class="ban-title">7-Day Suspension</div>
-          <div class="ban-reason">Reason: <span id="banReasonLabel">Policy Violation</span></div>
-          <div style="font-size:10px;color:#94a3b8;font-weight:600">Reported Encounter Snapshot Logged</div>
-        </div>
+    <!-- BAN CARD HEADER (ALWAYS VISIBLE AT TOP) -->
+    <div class="ban-top">
+      <div class="ban-snap-frame">
+        <img id="banSnapshotImg" alt="Evidence Snapshot">
+        <div class="ban-snap-brand">MeetLoop</div>
+        <div class="ban-snap-tag">ENCOUNTER EVIDENCE</div>
       </div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <div class="ban-title">7-Day Suspension</div>
+        <div class="ban-reason">Reason: <span id="banReasonLabel">Policy Violation</span></div>
+        <div style="font-size:10px;color:#94a3b8;font-weight:600">Reported Encounter Snapshot Logged</div>
+      </div>
+    </div>
 
-      <div style="font-size:12px;font-weight:800;color:#334155">Select Resolution Method:</div>
+    <!-- VIEW 1: METHOD OPTIONS -->
+    <div id="selectMethodSection" class="method-choice-container">
+      <div style="font-size:11.5px;font-weight:800;color:#334155">Select Resolution Method:</div>
 
       <div class="method-card" onclick="openGcashPayView()">
         <div class="method-card-left">
           <div class="method-icon-wrap" style="background:#005ce6;color:#fff">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
           </div>
           <div>
             <div class="method-title" style="color:#005ce6">Instant 7-Day Unban (₱10 Support)</div>
             <div class="method-desc">Pay ₱10 GCash clearance fee & submit Mobile No.</div>
           </div>
         </div>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
 
       <a href="https://t.me/MeetLoop_bot" target="_blank" class="telegram-support-btn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.99-1.74 6.66-2.89 8-3.46 3.82-1.6 4.62-1.88 5.14-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.21-.03.36z"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.99-1.74 6.66-2.89 8-3.46 3.82-1.6 4.62-1.88 5.14-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.21-.03.36z"/></svg>
         <span>Message Telegram Support (@MeetLoop_bot)</span>
       </a>
 
       <div class="method-card" style="cursor:default">
         <div class="method-card-left">
           <div class="method-icon-wrap" style="background:#f1f5f9;color:#64748b">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
           <div>
             <div class="method-title">Wait 7-Day Suspension Period</div>
@@ -483,74 +466,41 @@ video{
           </div>
         </div>
       </div>
-
-      <div class="ban-expire-box">
-        <span class="ban-expire-label">7-Day Suspension Expiration:</span>
-        <span class="ban-expire-time" id="banUntilFullText">--:-- --</span>
-        <div class="ban-id-chip">Device Ban ID: <span id="adminUnbanId">--</span></div>
-      </div>
     </div>
 
     <!-- VIEW 2: GCASH TOPUP FORM -->
     <div id="gcashPaySection">
-      <!-- LEFT COLUMN -->
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div class="ban-top">
-          <div class="ban-snap-frame">
-            <img id="banSnapshotImg2" alt="Evidence Snapshot">
-            <div class="ban-snap-brand">MeetLoop</div>
-            <div class="ban-snap-tag">ENCOUNTER EVIDENCE</div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:2px">
-            <div class="ban-title">7-Day Suspension</div>
-            <div class="ban-reason">Reason: <span id="banReasonLabel2">Policy Violation</span></div>
-            <div style="font-size:10px;color:#94a3b8;font-weight:600">Reported Encounter Snapshot Logged</div>
-          </div>
-        </div>
-
-        <div class="ban-disclaimer-box">
-          <div class="ban-disclaimer-title">🚫 Official Ban Clearance Notice</div>
-          <div>
-            Your access has been restricted for <b>7 days</b> due to Community Guidelines violation.<br><br>
-            ⚡ <b>Want to return sooner?</b><br>
-            You may request an early unban with a <b>₱10 voluntary support payment</b>.<br><br>
-            💡 <b>Payment is completely optional.</b> You can simply wait until your 7-day ban expires.
-          </div>
-        </div>
-
-        <div class="ban-expire-box">
-          <span class="ban-expire-label">7-Day Suspension Expiration:</span>
-          <span class="ban-expire-time" id="banUntilFullText2">--:-- --</span>
-          <div class="ban-id-chip">Device Ban ID: <span id="adminUnbanId2">--</span></div>
+      <div class="ban-disclaimer-box">
+        <div class="ban-disclaimer-title">🚫 Official Ban Clearance Notice</div>
+        <div>
+          Your access is restricted for <b>7 days</b> due to Community Guidelines violation.<br>
+          ⚡ <b>Want to return sooner?</b> Pay <b>₱10 voluntary support</b>. (Payment is optional).
         </div>
       </div>
 
-      <!-- RIGHT COLUMN (GCASH QR & INPUTS) -->
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div class="gcash-logo-banner">
-          <svg class="gcash-official-svg" viewBox="0 0 160 38" fill="none">
-            <path d="M19 8C12.9 8 8 12.9 8 19C8 25.1 12.9 30 19 30C23.2 30 26.8 27.7 28.6 24.2L24.8 22.3C23.7 24.7 21.5 26.2 19 26.2C15 26.2 11.8 23 11.8 19C11.8 15 15 11.8 19 11.8C21.6 11.8 23.8 13.4 24.9 15.8L28.7 13.9C26.9 10.3 23.3 8 19 8Z" fill="#ffffff"/>
-            <text x="44" y="26" fill="#ffffff" font-weight="900" font-size="20.5">GCash</text>
-          </svg>
+      <div class="gcash-qr-box">
+        <span class="gcash-fee-tag">Fee: ₱10.00 Support Payment</span>
+        <div class="gcash-qr-frame">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2" class="gcash-qr-img" alt="GCash QR">
         </div>
-
-        <div class="gcash-qr-box">
-          <span class="gcash-fee-tag">Fee: ₱10.00 Support Payment</span>
-          <div class="gcash-qr-frame">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=00020101021226540014PH.GCASH.WWW0111091712345675204000053036085802PH5911MEETLOOP6006MANILA630489C2" class="gcash-qr-img" alt="GCash QR">
-          </div>
-          <div style="font-size:10px;color:#475569;font-weight:700">Scan QR via GCash, pay ₱10, & enter details below.</div>
-        </div>
-
-        <div class="gcash-input-group">
-          <input type="tel" id="gcashPhoneInput" class="gcash-input-field" placeholder="GCash Mobile No. (e.g. 09123456789)" maxlength="13" inputmode="numeric">
-          <input type="tel" id="gcashRefInput" class="gcash-input-field" placeholder="13-Digit Ref No. (e.g. 2004123456789)" maxlength="16" inputmode="numeric">
-          <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="submitGCashUnbanTicket()">Submit for Verification</button>
-        </div>
-
-        <div id="gcashRefStatus" style="font-size:11px;font-weight:800;text-align:center;min-height:14px;line-height:1.3"></div>
-        <button type="button" class="btn-back-methods" onclick="backToMethodSelection()">← Back to Options</button>
+        <div style="font-size:9.5px;color:#475569;font-weight:700">Scan QR via GCash, pay ₱10, & enter details below.</div>
       </div>
+
+      <div class="gcash-input-group">
+        <input type="tel" id="gcashPhoneInput" class="gcash-input-field" placeholder="GCash Mobile No. (e.g. 09123456789)" maxlength="13" inputmode="numeric">
+        <input type="tel" id="gcashRefInput" class="gcash-input-field" placeholder="13-Digit Ref No. (e.g. 2004123456789)" maxlength="16" inputmode="numeric">
+        <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="submitGCashUnbanTicket()">Submit for Verification</button>
+      </div>
+
+      <div id="gcashRefStatus" style="font-size:10.5px;font-weight:800;text-align:center;min-height:12px;line-height:1.2"></div>
+      <button type="button" class="btn-back-methods" onclick="backToMethodSelection()">← Back to Options</button>
+    </div>
+
+    <!-- BAN EXPIRATION INFO (BOTTOM) -->
+    <div class="ban-expire-box">
+      <span class="ban-expire-label">7-Day Suspension Expiration:</span>
+      <span class="ban-expire-time" id="banUntilFullText">--:-- --</span>
+      <div class="ban-id-chip">Device Ban ID: <span id="adminUnbanId">--</span></div>
     </div>
 
   </div>
@@ -761,10 +711,8 @@ function updateNumericDisplayId() {
   let numericId = 0;
   for (let i = 0; i < myHardwareId.length; i++) numericId = (numericId * 31 + myHardwareId.charCodeAt(i)) % 900000000;
   const num = "" + (100000000 + Math.abs(numericId));
-  const el1 = document.getElementById("adminUnbanId");
-  const el2 = document.getElementById("adminUnbanId2");
-  if (el1) el1.textContent = num;
-  if (el2) el2.textContent = num;
+  const el = document.getElementById("adminUnbanId");
+  if (el) el.textContent = num;
 }
 updateNumericDisplayId();
 
@@ -879,23 +827,27 @@ function displayOmeTVFrozenSnapshot() {
     if (isFreezeActive || !remoteVideo || remoteVideo.videoWidth === 0) return;
     isFreezeActive = true;
 
+    // 1. Kumuha ng 100% still picture mula sa tunay na frame ng kausap
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = remoteVideo.videoWidth || 1280;
     tempCanvas.height = remoteVideo.videoHeight || 720;
     const ctx = tempCanvas.getContext("2d");
     ctx.drawImage(remoteVideo, 0, 0, tempCanvas.width, tempCanvas.height);
 
+    // 2. I-display sa Full-Bleed Overlay (100% Frozen, HINDI GAGALAW)
     if (freezeImageOverlay) {
       freezeImageOverlay.src = tempCanvas.toDataURL("image/jpeg", 0.9);
       freezeImageOverlay.style.opacity = "1";
       freezeImageOverlay.style.display = "block";
     }
 
+    // 3. Itago ang TV Static at Search Spinner
     if (crtWrapper) crtWrapper.style.display = "none";
     if (standbyCenter) standbyCenter.style.display = "none";
     if (searchLoader) searchLoader.style.display = "none";
     if (reportBtn) reportBtn.style.display = "flex";
 
+    // 4. Eksaktong 1.0s: I-fade out ang still photo at i-reveal ang live HD moving video
     if (freezeTimer) clearTimeout(freezeTimer);
     freezeTimer = setTimeout(() => {
       if (freezeImageOverlay) {
@@ -1360,7 +1312,7 @@ function stopSession() {
   if (stopBtn) stopBtn.disabled = true;
 }
 
-// 📸 PRIORITY: CAPTURES THE STRANGER'S CAMERA FEED
+// 📸 PRIORITY: CAPTURES THE STRANGER'S CAMERA FEED AS VIOLATION EVIDENCE
 function captureStrangerSnapshot() {
   try {
     const canvas = document.createElement("canvas");
@@ -1376,7 +1328,7 @@ function captureStrangerSnapshot() {
   return null;
 }
 
-// 📸 PERMANENT EVIDENCE DISPLAY (0 SCROLL ON PC)
+// 📸 PERMANENT EVIDENCE DISPLAY (COMPACT ZERO-SCROLL MODAL)
 function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap = null) {
   isCurrentlyBanned = true;
   stopSession();
@@ -1390,30 +1342,23 @@ function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap 
     try { localStorage.setItem("meetloop_ban_snapshot", customSnap); } catch(e){}
   }
 
-  const elReason1 = document.getElementById("banReasonLabel");
-  const elReason2 = document.getElementById("banReasonLabel2");
-  if (elReason1) elReason1.textContent = reason;
-  if (elReason2) elReason2.textContent = reason;
+  const elReason = document.getElementById("banReasonLabel");
+  if (elReason) elReason.textContent = reason;
 
   const unbanDate = new Date(finalBanUntil);
   const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
   const dateStr = unbanDate.toLocaleDateString([], options);
   
-  const elDate1 = document.getElementById("banUntilFullText");
-  const elDate2 = document.getElementById("banUntilFullText2");
-  if (elDate1) elDate1.textContent = dateStr;
-  if (elDate2) elDate2.textContent = dateStr;
+  const elDate = document.getElementById("banUntilFullText");
+  if (elDate) elDate.textContent = dateStr;
 
-  const banImg1 = document.getElementById("banSnapshotImg");
-  const banImg2 = document.getElementById("banSnapshotImg2");
+  const banImg = document.getElementById("banSnapshotImg");
   const fallbackSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='95' height='95'%3E%3Crect width='95' height='95' fill='%231e293b'/%3E%3Ctext x='50%25' y='50%25' fill='%2394a3b8' font-size='10' font-family='sans-serif' text-anchor='middle' dy='.3em'%3EEvidence Logged%3C/text%3E%3C/svg%3E";
 
-  [banImg1, banImg2].forEach(img => {
-    if (img) {
-      img.src = snapshotToRender || fallbackSvg;
-      img.style.display = "block";
-    }
-  });
+  if (banImg) {
+    banImg.src = snapshotToRender || fallbackSvg;
+    banImg.style.display = "block";
+  }
 
   backToMethodSelection();
   const overlay = document.getElementById("banOverlay");
@@ -1424,10 +1369,8 @@ function openGcashPayView() {
   const selectSec = document.getElementById("selectMethodSection");
   const gcashSec = document.getElementById("gcashPaySection");
   if (selectSec) selectSec.style.display = "none";
-  if (gcashSec) {
-    gcashSec.style.display = "";
-    gcashSec.classList.add("active");
-  }
+  if (gcashSec) gcashSec.style.display = "flex";
+
   document.getElementById("gcashPhoneInput").value = "";
   document.getElementById("gcashRefInput").value = "";
   document.getElementById("gcashRefStatus").textContent = "";
@@ -1446,10 +1389,7 @@ function openGcashPayView() {
 function backToMethodSelection() {
   const selectSec = document.getElementById("selectMethodSection");
   const gcashSec = document.getElementById("gcashPaySection");
-  if (gcashSec) {
-    gcashSec.classList.remove("active");
-    gcashSec.style.display = "none";
-  }
+  if (gcashSec) gcashSec.style.display = "none";
   if (selectSec) selectSec.style.display = "flex";
 }
 
