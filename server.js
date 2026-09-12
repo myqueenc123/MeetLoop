@@ -1,6 +1,7 @@
 /**
  * MeetLoop - High-Performance WebRTC Backend Server
- * Smart AI/Heuristic Moderation + Hardware Fingerprint Anti-Bypass + Telegram Controls
+ * 100% Filipino Made 🇵🇭
+ * Smart Evidence-Based Ban + Hardened Anti-Bypass + Telegram Bot + GCash Auto-Unban
  */
 
 const express = require("express");
@@ -36,11 +37,10 @@ app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 app.use(express.text({ type: "*/*", limit: "25mb" }));
 
-/* ================= DATABASES & HARDENED ANTI-BYPASS ================= */
+/* ================= DATABASES & SECURITY ================= */
 const bannedDevices = new Map();           // HardwareID -> { banUntil, reason, snapshot, ip, fingerprint }
-const bannedFingerprints = new Map();      // Canvas/WebGL Fingerprint Hash -> Record
+const bannedFingerprints = new Map();      // Fingerprint Hash -> Record
 const bannedIPs = new Map();               // Client IP -> Record
-const userTrustScore = new Map();          // Tracks reliable vs spam reporters
 const persistentDeviceTickets = new Map(); // HardwareID -> { phone, ref, time }
 let availablePayments = [];
 const burnedReceipts = new Set();
@@ -221,7 +221,7 @@ function pollTelegramUpdates() {
               } else if (cbData.startsWith("adminban_")) {
                 const hwId = cbData.replace("adminban_", "");
                 const record = banDeviceSecurity(hwId, "0.0.0.0", "", "Admin Action Violation", null);
-                io.emit("force-device-ban", { hardwareId: hwId, banUntil: record.banUntil });
+                io.emit("force-device-ban", { hardwareId: hwId, banUntil: record.banUntil, snapshot: record.snapshot });
                 sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "🚨 User Banned for 7 Days!", show_alert: true });
               } else if (cbData.startsWith("dismiss_")) {
                 sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "✅ Report Dismissed.", show_alert: false });
@@ -235,7 +235,7 @@ function pollTelegramUpdates() {
   }).on("error", () => { setTimeout(pollTelegramUpdates, 3000); });
 }
 
-/* ================= 🔒 HARDENED ANTI-BYPASS BAN ENGINE ================= */
+/* ================= 🔒 HARDENED PERSISTENT BAN ENGINE ================= */
 function checkSecurityBan(hardwareId, clientIp, fingerprint) {
   const now = Date.now();
 
@@ -246,7 +246,7 @@ function checkSecurityBan(hardwareId, clientIp, fingerprint) {
     bannedDevices.delete(hardwareId);
   }
 
-  // 2. GPU / Canvas Fingerprint Check (Catches Incognito Mode!)
+  // 2. GPU / Canvas Fingerprint Check (Anti-Incognito)
   if (fingerprint && bannedFingerprints.has(fingerprint)) {
     const r = bannedFingerprints.get(fingerprint);
     if (now < r.banUntil) return r;
@@ -320,7 +320,11 @@ io.on("connection", (socket) => {
 
   const banInfo = checkSecurityBan(hardwareId, clientIp, fingerprint);
   if (banInfo) {
-    socket.emit("ip-banned", { banUntil: banInfo.banUntil, reason: banInfo.reason, snapshot: banInfo.snapshot });
+    socket.emit("ip-banned", { 
+      banUntil: banInfo.banUntil, 
+      reason: banInfo.reason, 
+      snapshot: banInfo.snapshot 
+    });
   } else {
     socket.emit("real-admin-unban-signal", { hardwareId: hardwareId });
   }
@@ -359,7 +363,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  /* ================= 🧠 SMART EVIDENCE-BASED REPORT SYSTEM ================= */
+  /* ================= 🧠 SNAPSHOT EVIDENCE REPORT PROCESSING ================= */
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -371,25 +375,22 @@ io.on("connection", (socket) => {
         const reason = data.reason || "Policy Violation";
         const snapshot = data.snapshot || null;
 
-        // Smart Risk Evaluation
         let riskScore = 30;
         const hasSnapshot = Boolean(snapshot && snapshot.length > 500);
         if (hasSnapshot) riskScore += 35;
         if (reason.includes("Nudity") || reason.includes("Underage")) riskScore += 30;
         if (reason.includes("Violence") || reason.includes("Threats")) riskScore += 25;
 
-        console.log(`🔍 [SMART REPORT ANALYSIS]: Target=${partnerHw}, Score=${riskScore}/100, Reason=${reason}, HasEvidence=${hasSnapshot}`);
-
-        const alertText = `🚨 <b>INCOMING USER REPORT (AI Score: ${riskScore}%)</b>\n\n` +
+        const alertText = `🚨 <b>USER REPORT (AI Risk: ${riskScore}%)</b>\n\n` +
                           `⚠️ <b>Violation:</b> ${escapeHtml(reason)}\n` +
                           `🆔 <b>Target Device:</b> <code>${escapeHtml(partnerHw)}</code>\n` +
                           `🌐 <b>Target IP:</b> <code>${escapeHtml(partnerIp)}</code>\n` +
-                          `📸 <b>Snapshot Logged:</b> ${hasSnapshot ? "✅ YES (Evidence Attached)" : "❌ NO"}\n\n` +
-                          `<i>Decision: ${riskScore >= 85 ? "🛑 AUTO-BAN EXECUTED (Critical Score)" : "⏳ Flagged for Admin Review"}</i>`;
+                          `📸 <b>Snapshot Saved:</b> ${hasSnapshot ? "✅ YES (Encounter Photo Logged)" : "❌ NO"}\n\n` +
+                          `<i>Decision: ${riskScore >= 85 ? "🛑 AUTO-BAN EXECUTED" : "⏳ Review with Telegram Buttons below"}</i>`;
 
         sendReportAlertWithActions(ADMIN_CHAT_ID, alertText, partnerHw);
 
-        // Auto-ban only if evidence + severe category (high confidence), otherwise flagged for 1-click admin approval
+        // Auto-ban when high risk + snapshot verified
         if (riskScore >= 85) {
           const record = banDeviceSecurity(partnerHw, partnerIp, partnerFp, reason, snapshot);
           partner.emit("ip-banned", { banUntil: record.banUntil, reason: record.reason, snapshot: record.snapshot });
@@ -448,8 +449,8 @@ app.get("*", (req, res) => { res.sendFile(path.join(__dirname, "public", "index.
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`🛡️ Hardware + WebGL Anti-Bypass Security: ACTIVE`);
-  console.log(`🧠 Smart AI Evidence Report Moderation: ACTIVE`);
+  console.log(`📸 Permanent Evidence Snapshot System: ACTIVE`);
+  console.log(`🛡️ Hardened Anti-Bypass Fingerprinting: ACTIVE`);
   console.log(`================================================`);
   pollTelegramUpdates();
 });
