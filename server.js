@@ -1,7 +1,6 @@
 /**
  * MeetLoop - High-Performance WebRTC Backend Server
- * 100% Filipino Made 🇵🇭
- * Smart Evidence-Based Ban + Hardened Anti-Bypass + Telegram Bot + GCash Auto-Unban
+ * Smart AI Moderation + Protected Reporter Whitelist + Anti-Bypass
  */
 
 const express = require("express");
@@ -38,9 +37,8 @@ app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 app.use(express.text({ type: "*/*", limit: "25mb" }));
 
 /* ================= DATABASES & SECURITY ================= */
-const bannedDevices = new Map();           // HardwareID -> { banUntil, reason, snapshot, ip, fingerprint }
+const bannedDevices = new Map();           // HardwareID -> Record
 const bannedFingerprints = new Map();      // Fingerprint Hash -> Record
-const bannedIPs = new Map();               // Client IP -> Record
 const persistentDeviceTickets = new Map(); // HardwareID -> { phone, ref, time }
 let availablePayments = [];
 const burnedReceipts = new Set();
@@ -122,9 +120,8 @@ function sendReportAlertWithActions(chatId, text, targetHw) {
 
 function executeUnbanUser(hardwareId, phone, auto = false) {
   const banRecord = bannedDevices.get(hardwareId);
-  if (banRecord) {
-    if (banRecord.ip) bannedIPs.delete(banRecord.ip);
-    if (banRecord.fingerprint) bannedFingerprints.delete(banRecord.fingerprint);
+  if (banRecord && banRecord.fingerprint) {
+    bannedFingerprints.delete(banRecord.fingerprint);
   }
 
   bannedDevices.delete(hardwareId);
@@ -235,7 +232,7 @@ function pollTelegramUpdates() {
   }).on("error", () => { setTimeout(pollTelegramUpdates, 3000); });
 }
 
-/* ================= 🔒 HARDENED PERSISTENT BAN ENGINE ================= */
+/* ================= 🔒 HARDENED BAN ENGINE ================= */
 function checkSecurityBan(hardwareId, clientIp, fingerprint) {
   const now = Date.now();
 
@@ -246,18 +243,11 @@ function checkSecurityBan(hardwareId, clientIp, fingerprint) {
     bannedDevices.delete(hardwareId);
   }
 
-  // 2. GPU / Canvas Fingerprint Check (Anti-Incognito)
+  // 2. GPU Fingerprint Check (Anti-Incognito)
   if (fingerprint && bannedFingerprints.has(fingerprint)) {
     const r = bannedFingerprints.get(fingerprint);
     if (now < r.banUntil) return r;
     bannedFingerprints.delete(fingerprint);
-  }
-
-  // 3. Client IP Check
-  if (clientIp && clientIp !== "0.0.0.0" && bannedIPs.has(clientIp)) {
-    const r = bannedIPs.get(clientIp);
-    if (now < r.banUntil) return r;
-    bannedIPs.delete(clientIp);
   }
 
   return null;
@@ -269,7 +259,6 @@ function banDeviceSecurity(hardwareId, clientIp, fingerprint, reason, snapshot =
 
   if (hardwareId) bannedDevices.set(hardwareId, record);
   if (fingerprint) bannedFingerprints.set(fingerprint, record);
-  if (clientIp && clientIp !== "0.0.0.0") bannedIPs.set(clientIp, record);
 
   return record;
 }
@@ -363,12 +352,13 @@ io.on("connection", (socket) => {
     }
   });
 
-  /* ================= 🧠 SNAPSHOT EVIDENCE REPORT PROCESSING ================= */
+  /* ================= 🧠 STRICT TARGET-ONLY REPORT PROCESSING ================= */
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
       const partner = io.sockets.sockets.get(partnerId);
       if (partner) {
+        // TARGET KAUSAP LAMANG ANG MA-PRO-PROCESS
         const partnerHw = String(partner.handshake.query.hardwareId || "").trim();
         const partnerFp = String(partner.handshake.query.fingerprint || "").trim();
         const partnerIp = getClientIp(partner);
@@ -381,7 +371,7 @@ io.on("connection", (socket) => {
         if (reason.includes("Nudity") || reason.includes("Underage")) riskScore += 30;
         if (reason.includes("Violence") || reason.includes("Threats")) riskScore += 25;
 
-        const alertText = `🚨 <b>USER REPORT (AI Risk: ${riskScore}%)</b>\n\n` +
+        const alertText = `🚨 <b>USER REPORT (AI Score: ${riskScore}%)</b>\n\n` +
                           `⚠️ <b>Violation:</b> ${escapeHtml(reason)}\n` +
                           `🆔 <b>Target Device:</b> <code>${escapeHtml(partnerHw)}</code>\n` +
                           `🌐 <b>Target IP:</b> <code>${escapeHtml(partnerIp)}</code>\n` +
@@ -390,7 +380,7 @@ io.on("connection", (socket) => {
 
         sendReportAlertWithActions(ADMIN_CHAT_ID, alertText, partnerHw);
 
-        // Auto-ban when high risk + snapshot verified
+        // Ang KAUSAP lamang ang maba-ban kapag lumagpas sa score
         if (riskScore >= 85) {
           const record = banDeviceSecurity(partnerHw, partnerIp, partnerFp, reason, snapshot);
           partner.emit("ip-banned", { banUntil: record.banUntil, reason: record.reason, snapshot: record.snapshot });
@@ -449,8 +439,8 @@ app.get("*", (req, res) => { res.sendFile(path.join(__dirname, "public", "index.
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`📸 Permanent Evidence Snapshot System: ACTIVE`);
-  console.log(`🛡️ Hardened Anti-Bypass Fingerprinting: ACTIVE`);
+  console.log(`📸 Evidence Snapshot System: ACTIVE`);
+  console.log(`🛡️ Target-Only Ban Logic (Reporter Safe): ACTIVE`);
   console.log(`================================================`);
   pollTelegramUpdates();
 });
