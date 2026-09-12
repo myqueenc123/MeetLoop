@@ -72,14 +72,17 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
-/* HD LIVE VIDEO */
+/* 🌟 ULTRA HD OMETV QUALITY VIDEO RENDERING */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
   image-rendering:-webkit-optimize-contrast;
-  transform:translateZ(0);
+  image-rendering:crisp-edges;
+  transform:translate3d(0,0,0);
+  backface-visibility:hidden;
+  will-change:transform;
 }
 
-/* 🛡️ FULL-BLEED 100% STILL PHOTO OVERLAY (10px OMETV BLUR) */
+/* 🛡️ 100% FULL-BLEED FROZEN STILL PHOTO OVERLAY */
 #freezeImageOverlay{
   position:absolute;
   top:-25px;left:-25px;right:-25px;bottom:-25px;
@@ -211,7 +214,7 @@ video{
 .chat-input{flex:1;min-width:0;height:38px;padding:0 12px;background:#070b14;border:1px solid var(--panel-border);border-radius:8px;color:#fff;outline:none;font-size:11px}
 .chat-send-btn{width:60px;height:38px;border:0;border-radius:8px;background:#2563eb;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
 
-/* 📱 COMPACT OMETV MOBILE PICTURE-IN-PICTURE (PiP) PREVIEW */
+/* 📱 COMPACT OMETV MOBILE PiP PREVIEW */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto}
   header{height:46px;padding:0 10px}
@@ -220,7 +223,6 @@ video{
   .video-grid{position:relative;width:100%;height:min(50dvh,420px);min-height:260px;display:block;border-radius:12px;overflow:hidden}
   .cam-box:first-child{position:absolute;inset:0;width:100%;height:100%}
   
-  /* 🌟 COMPACT SELFIE PREVIEW ON MOBILE (HINDI NA NAKAHARANG) */
   #localCamBox{
     position:absolute;right:8px;bottom:8px;
     width:72px;height:96px;aspect-ratio:3/4;
@@ -524,7 +526,7 @@ video{
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" autoplay playsinline></video>
 
-        <!-- 🛡️ STRANGER-ONLY FULL-COVERAGE FROZEN STILL PHOTO OVERLAY -->
+        <!-- 🛡️ STRANGER FULL-BLEED 100% FROZEN STILL PHOTO OVERLAY -->
         <img id="freezeImageOverlay" alt="Frozen Still Frame">
 
         <!-- 📺 CRT TV STATIC LAYER -->
@@ -567,7 +569,7 @@ video{
 
       <div class="cam-box" id="localCamBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline></video>
-        <div class="cam-tag" id="localTag">You</div>
+        <div class="cam-tag">You</div>
         <button id="hideLocalBtn" type="button">✕</button>
       </div>
 
@@ -778,7 +780,12 @@ function runTVStatic() {
 }
 runTVStatic();
 
-/* ================= 🌟 FULL-BLEED 100% FROZEN STILL PHOTO + 10px OMETV BLUR ================= */
+/* ================= 🌟 2.5 Mbps HD SDP OPTIMIZER (OMETV CLARITY) ================= */
+function setHighQualityBitrate(sdp) {
+  return sdp.replace(/a=mid:video\r\n/g, "a=mid:video\r\nb=AS:2500\r\n");
+}
+
+/* ================= 🌟 100% STILL PHOTO FREEZE & 1s OMETV BLUR ================= */
 function displayOmeTVFrozenSnapshot() {
   if (isFreezeActive) return;
 
@@ -786,27 +793,27 @@ function displayOmeTVFrozenSnapshot() {
     if (isFreezeActive || !remoteVideo || remoteVideo.videoWidth === 0) return;
     isFreezeActive = true;
 
-    // 1. Kumuha ng Still Photo mula sa video frame ng kausap
+    // 1. Kumuha ng 100% still picture mula sa tunay na frame ng kausap
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = remoteVideo.videoWidth || 1280;
     tempCanvas.height = remoteVideo.videoHeight || 720;
     const ctx = tempCanvas.getContext("2d");
     ctx.drawImage(remoteVideo, 0, 0, tempCanvas.width, tempCanvas.height);
 
-    // 2. I-display sa Full-Bleed Overlay (100% Solid Still Image, Walang butas sa gilid)
+    // 2. I-display sa Full-Bleed Overlay (100% Frozen, HINDI GAGALAW)
     if (freezeImageOverlay) {
       freezeImageOverlay.src = tempCanvas.toDataURL("image/jpeg", 0.9);
       freezeImageOverlay.style.opacity = "1";
       freezeImageOverlay.style.display = "block";
     }
 
-    // 3. Itago ang Static at Spinner
+    // 3. Itago ang TV Static at Search Spinner
     if (crtWrapper) crtWrapper.style.display = "none";
     if (standbyCenter) standbyCenter.style.display = "none";
     if (searchLoader) searchLoader.style.display = "none";
     if (reportBtn) reportBtn.style.display = "flex";
 
-    // 4. Eksaktong 1.0s: I-fade out ang still photo at i-reveal ang live moving video ng kausap
+    // 4. Eksaktong 1.0s: I-fade out ang still photo at i-reveal ang live HD moving video
     if (freezeTimer) clearTimeout(freezeTimer);
     freezeTimer = setTimeout(() => {
       if (freezeImageOverlay) {
@@ -893,6 +900,7 @@ if (socket) {
           await peerConnection.addIceCandidate(pendingCandidates.shift()).catch(()=>{});
         }
         const ans = await peerConnection.createAnswer();
+        ans.sdp = setHighQualityBitrate(ans.sdp);
         await peerConnection.setLocalDescription(ans);
         socket.emit("signal", { type: "answer", answer: ans });
       } else if (data.type === "answer" && peerConnection) {
@@ -954,7 +962,7 @@ if (socket) {
   });
 }
 
-/* ================= 4. BULLETPROOF MEDIA & ZERO-BLACK-SCREEN FLIP ================= */
+/* ================= 4. HD LOW-LATENCY MEDIA & MOBILE FLIP ================= */
 async function startMedia() {
   if (isCurrentlyBanned) {
     const overlay = document.getElementById("banOverlay");
@@ -971,6 +979,7 @@ async function startMedia() {
   }
 
   try {
+    // 🌟 HD 720p 30fps LOW-LATENCY SENSOR ACQUISITION
     const stream = await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: currentFacingMode,
@@ -1042,7 +1051,16 @@ async function flipCamera() {
 
     if (peerConnection) {
       const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
-      if (sender) await sender.replaceTrack(newVideoTrack);
+      if (sender) {
+        await sender.replaceTrack(newVideoTrack);
+        // I-apply ang 2.5 Mbps HD bitrate sa bagong camera
+        const params = sender.getParameters();
+        if (params.encodings && params.encodings[0]) {
+          params.encodings[0].maxBitrate = 2500000;
+          params.degradationPreference = "maintain-resolution";
+          sender.setParameters(params).catch(()=>{});
+        }
+      }
     }
 
     if (localVideo) {
@@ -1110,7 +1128,22 @@ async function createPeer(initiator) {
   peerConnection = new RTCPeerConnection(rtcConfig);
 
   if (localStream) {
-    localStream.getTracks().forEach(track => { peerConnection.addTrack(track, localStream); });
+    localStream.getTracks().forEach(track => {
+      const sender = peerConnection.addTrack(track, localStream);
+      // 🌟 OMETV HD QUALITY SENDER PARAMETERS (2.5 Mbps)
+      if (track.kind === "video") {
+        setTimeout(() => {
+          try {
+            const params = sender.getParameters();
+            if (!params.encodings) params.encodings = [{}];
+            params.encodings[0].maxBitrate = 2500000;
+            params.encodings[0].maxFramerate = 30;
+            params.degradationPreference = "maintain-resolution";
+            sender.setParameters(params).catch(()=>{});
+          } catch(e){}
+        }, 100);
+      }
+    });
   }
 
   peerConnection.onicecandidate = (e) => {
@@ -1131,7 +1164,6 @@ async function createPeer(initiator) {
       remoteVideo.muted = false;
       remoteVideo.volume = parseFloat(audioSlider?.value || 1.0);
 
-      // Tuloy-tuloy na live playback
       remoteVideo.play().catch(() => {
         remoteVideo.muted = true;
         remoteVideo.play().then(() => {
@@ -1154,6 +1186,7 @@ async function createPeer(initiator) {
     setupDataChannel(dataChannel);
     try {
       const offer = await peerConnection.createOffer({ offerToReceiveVideo: true, offerToReceiveAudio: true });
+      offer.sdp = setHighQualityBitrate(offer.sdp);
       await peerConnection.setLocalDescription(offer);
       socket.emit("signal", { type: "offer", offer: offer });
     } catch(err){}
