@@ -72,7 +72,7 @@ header{
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
 }
 
-/* 🌟 ULTRA-CRISP HD VIDEO */
+/* HD LIVE VIDEO */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
   image-rendering:-webkit-optimize-contrast;
@@ -161,7 +161,7 @@ video{
   background:rgba(0,0,0,.7);padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;color:#fff;
 }
 
-/* 🚩 RED FLAG REPORT BUTTON */
+/* 🚩 RED FLAG REPORT BUTTON (LILITAW LANG PAG MAY KAUSAP NA) */
 #reportBtn{
   position:absolute;top:10px;right:10px;z-index:10;
   width:34px;height:34px;border-radius:50%;
@@ -278,7 +278,11 @@ video{
   width:95px;height:95px;border-radius:12px;overflow:hidden;
   position:relative;background:#0f172a;border:2px solid #cbd5e1;flex-shrink:0;
 }
-#banCanvas{width:100%;height:100%;object-fit:cover;display:block}
+
+/* 📸 PERMANENT EVIDENCE SNAPSHOT IMAGE */
+#banSnapshotImg{
+  width:100%;height:100%;object-fit:cover;display:block;background:#0f172a;
+}
 .ban-snap-brand{position:absolute;top:4px;left:4px;background:rgba(0,0,0,.75);padding:2px 5px;border-radius:4px;color:#fff;font-size:8px;font-weight:900}
 .ban-snap-tag{position:absolute;bottom:4px;left:4px;right:4px;background:rgba(220,38,38,0.88);color:#fff;font-size:7.5px;font-weight:900;text-align:center;padding:2px 0;border-radius:3px}
 .ban-title{font-size:18px;font-weight:900;color:#dc2626}
@@ -416,7 +420,8 @@ video{
   <div class="ban-card">
     <div class="ban-top">
       <div class="ban-snap-frame">
-        <canvas id="banCanvas" width="95" height="95"></canvas>
+        <!-- 📸 PERMANENT EVIDENCE SNAPSHOT IMAGE -->
+        <img id="banSnapshotImg" alt="Evidence Snapshot">
         <div class="ban-snap-brand">MeetLoop</div>
         <div class="ban-snap-tag">ENCOUNTER EVIDENCE</div>
       </div>
@@ -526,7 +531,7 @@ video{
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" autoplay playsinline></video>
 
-        <!-- 🛡️ 100% FULL-BLEED FROZEN STILL PHOTO OVERLAY -->
+        <!-- 🛡️ STRANGER FULL-BLEED 100% FROZEN STILL PHOTO OVERLAY -->
         <img id="freezeImageOverlay" alt="Frozen Still Frame">
 
         <!-- 📺 CRT TV STATIC LAYER -->
@@ -614,7 +619,7 @@ video{
 <script>
 "use strict";
 
-/* ================= 🔒 HARDWARE & CANVAS FINGERPRINT GENERATOR (ANTI-INCOGNITO) ================= */
+/* ================= 🔒 HARDWARE & CANVAS FINGERPRINT (ANTI-INCOGNITO) ================= */
 function generateDeviceFingerprint() {
   try {
     const canvas = document.createElement("canvas");
@@ -625,8 +630,6 @@ function generateDeviceFingerprint() {
     ctx.fillRect(125, 1, 62, 20);
     ctx.fillStyle = "#069";
     ctx.fillText("MeetLoop_Sec_FP_v2", 2, 15);
-    ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
-    ctx.fillText("MeetLoop_Sec_FP_v2", 4, 17);
     
     let glRenderer = "";
     try {
@@ -830,23 +833,27 @@ function displayOmeTVFrozenSnapshot() {
     if (isFreezeActive || !remoteVideo || remoteVideo.videoWidth === 0) return;
     isFreezeActive = true;
 
+    // 1. Kumuha ng 100% still picture mula sa tunay na frame ng kausap
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = remoteVideo.videoWidth || 1280;
     tempCanvas.height = remoteVideo.videoHeight || 720;
     const ctx = tempCanvas.getContext("2d");
     ctx.drawImage(remoteVideo, 0, 0, tempCanvas.width, tempCanvas.height);
 
+    // 2. I-display sa Full-Bleed Overlay (100% Frozen, HINDI GAGALAW)
     if (freezeImageOverlay) {
       freezeImageOverlay.src = tempCanvas.toDataURL("image/jpeg", 0.9);
       freezeImageOverlay.style.opacity = "1";
       freezeImageOverlay.style.display = "block";
     }
 
+    // 3. Itago ang TV Static at Search Spinner
     if (crtWrapper) crtWrapper.style.display = "none";
     if (standbyCenter) standbyCenter.style.display = "none";
     if (searchLoader) searchLoader.style.display = "none";
     if (reportBtn) reportBtn.style.display = "flex";
 
+    // 4. Eksaktong 1.0s: I-fade out ang still photo at i-reveal ang live HD moving video
     if (freezeTimer) clearTimeout(freezeTimer);
     freezeTimer = setTimeout(() => {
       if (freezeImageOverlay) {
@@ -965,7 +972,7 @@ if (socket) {
 
   socket.on("force-device-ban", (data) => {
     if (data && data.hardwareId === myHardwareId) {
-      display7DayBanScreen(data.banUntil, "Administrative Action", null);
+      display7DayBanScreen(data.banUntil, "Administrative Action", data.snapshot || null);
     }
   });
 
@@ -1018,6 +1025,7 @@ async function startMedia() {
   }
 
   try {
+    // 🌟 HD 720p 30fps SENSOR ACQUISITION
     const stream = await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: currentFacingMode,
@@ -1311,21 +1319,24 @@ function stopSession() {
   if (stopBtn) stopBtn.disabled = true;
 }
 
+// 📸 PRIORITY: CAPTURES THE STRANGER'S CAMERA FEED AS VIOLATION EVIDENCE
 function captureStrangerSnapshot() {
-  const canvas = document.createElement("canvas");
-  canvas.width = 180; canvas.height = 180;
-  const ctx = canvas.getContext("2d");
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = 160;
+    canvas.height = 160;
+    const ctx = canvas.getContext("2d");
 
-  if (remoteVideo && remoteVideo.videoWidth > 0) {
-    ctx.drawImage(remoteVideo, 0, 0, 180, 180);
-    return canvas.toDataURL("image/jpeg", 0.75);
-  } else if (localVideo && localVideo.videoWidth > 0) {
-    ctx.drawImage(localVideo, 0, 0, 180, 180);
-    return canvas.toDataURL("image/jpeg", 0.75);
-  }
+    // Kinukunan ang mukha ng kausap (Stranger) mula sa remote video
+    if (remoteVideo && (remoteVideo.videoWidth > 0 || remoteVideo.srcObject)) {
+      ctx.drawImage(remoteVideo, 0, 0, 160, 160);
+      return canvas.toDataURL("image/jpeg", 0.7);
+    }
+  } catch(e){}
   return null;
 }
 
+// 📸 PERMANENT EVIDENCE DISPLAY (NEVER DISAPPEARS ON REFRESH)
 function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap = null) {
   isCurrentlyBanned = true;
   stopSession();
@@ -1333,7 +1344,11 @@ function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap 
   const finalBanUntil = (!banUntil || isNaN(banUntil)) ? (Date.now() + 7 * 24 * 60 * 60 * 1000) : banUntil;
   localStorage.setItem("meetloop_ban_until", finalBanUntil.toString());
   localStorage.setItem("meetloop_ban_reason", reason);
-  if (customSnap) localStorage.setItem("meetloop_ban_snapshot", customSnap);
+
+  const snapshotToRender = customSnap || localStorage.getItem("meetloop_ban_snapshot");
+  if (customSnap) {
+    try { localStorage.setItem("meetloop_ban_snapshot", customSnap); } catch(e){}
+  }
 
   const reasonLabel = document.getElementById("banReasonLabel");
   if (reasonLabel) reasonLabel.textContent = reason;
@@ -1342,18 +1357,13 @@ function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap 
   const banFullText = document.getElementById("banUntilFullText");
   if (banFullText) banFullText.textContent = unbanDate.toLocaleDateString([], options);
 
-  const banCanvas = document.getElementById("banCanvas");
-  if (banCanvas) {
-    const ctx = banCanvas.getContext("2d");
-    const snapshotToRender = customSnap || localStorage.getItem("meetloop_ban_snapshot");
+  const banImg = document.getElementById("banSnapshotImg");
+  if (banImg) {
     if (snapshotToRender) {
-      const img = new Image();
-      img.onload = () => { ctx.drawImage(img, 0, 0, 95, 95); };
-      img.src = snapshotToRender;
+      banImg.src = snapshotToRender;
+      banImg.style.display = "block";
     } else {
-      ctx.fillStyle = "#1e293b"; ctx.fillRect(0, 0, 95, 95);
-      ctx.fillStyle = "#94a3b8"; ctx.font = "bold 9px sans-serif";
-      ctx.fillText("Evidence Logged", 6, 50);
+      banImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='95' height='95'%3E%3Crect width='95' height='95' fill='%231e293b'/%3E%3Ctext x='50%25' y='50%25' fill='%2394a3b8' font-size='10' font-family='sans-serif' text-anchor='middle' dy='.3em'%3EEvidence Logged%3C/text%3E%3C/svg%3E";
     }
   }
 
