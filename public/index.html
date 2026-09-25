@@ -82,7 +82,7 @@ video{
   will-change:transform;
 }
 
-/* 🛡️ 100% FULL-BLEED FROZEN STILL PHOTO OVERLAY */
+/* 🛡️ FULL-BLEED 100% STILL PHOTO OVERLAY */
 #freezeImageOverlay{
   position:absolute;
   top:-25px;left:-25px;right:-25px;bottom:-25px;
@@ -263,7 +263,7 @@ video{
   }
 }
 
-/* 💻 PC / DESKTOP (LARGE, CRISP, PROMINENT BAN CARD) */
+/* 💻 PC / DESKTOP */
 @media (min-width:851px){
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 
@@ -644,7 +644,7 @@ video{
 <script>
 "use strict";
 
-/* ================= 🔒 HARDWARE & CANVAS FINGERPRINT ================= */
+/* ================= 🔒 HARDWARE FINGERPRINT ================= */
 function generateDeviceFingerprint() {
   try {
     const canvas = document.createElement("canvas");
@@ -910,14 +910,14 @@ function resetVideoLayers() {
   if (reportBtn) reportBtn.style.display = "none";
 }
 
-// 🌟 CLEAN UNBAN WITH FRESH ID RESET (ZERO RE-BAN ON REFRESH)
+// 🌟 PERMANENT CLEAN UNBAN WITH FRESH ID RESET
 function handleSuccessfulUnban() {
   isCurrentlyBanned = false;
   localStorage.removeItem("meetloop_ban_until");
   localStorage.removeItem("meetloop_ban_reason");
   localStorage.removeItem("meetloop_ban_snapshot");
 
-  // Reset to fresh Hardware ID on unban
+  // Fresh ID Reset
   myHardwareId = getPersistentDeviceId(true);
   updateNumericDisplayId();
 
@@ -1360,7 +1360,7 @@ function captureStrangerSnapshot() {
   return null;
 }
 
-// 📸 PERMANENT EVIDENCE DISPLAY
+// 📸 PERMANENT EVIDENCE DISPLAY (NEVER DISAPPEARS ON REFRESH)
 function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap = null) {
   isCurrentlyBanned = true;
   stopSession();
