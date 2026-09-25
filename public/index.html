@@ -353,7 +353,7 @@ video{
 .ban-expire-time{font-size:11.5px;font-weight:800;color:#0f172a}
 .ban-id-chip{font-size:9.5px;color:#64748b;font-family:monospace}
 
-/* WELCOME PORTAL (WITH /meetloop-bg.png IMAGE BACKGROUND) */
+/* WELCOME PORTAL */
 #welcomePortal{
   position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px;
   background:linear-gradient(rgba(10, 14, 23, 0.72), rgba(10, 14, 23, 0.85)), url('/meetloop-bg.png') center/cover no-repeat fixed;
@@ -498,7 +498,7 @@ video{
       </div>
     </div>
 
-    <!-- VIEW 2: GCASH FORM (ANTI-SPAM PROTECTED) -->
+    <!-- VIEW 2: GCASH FORM -->
     <div id="gcashPaySection">
       <div class="ban-disclaimer-box">
         <div class="ban-disclaimer-title">🚫 Official Ban Clearance Notice</div>
@@ -712,7 +712,7 @@ try {
 claimActiveTab();
 document.getElementById("btnClaimTab")?.addEventListener("click", claimActiveTab);
 
-/* ================= 2. HARDENED DEVICE BAN IDENTITY ================= */
+/* ================= 2. DEVICE IDENTITY ================= */
 function getPersistentDeviceId() {
   let devId = localStorage.getItem("meetloop_device_id");
   if (!devId) {
@@ -722,7 +722,7 @@ function getPersistentDeviceId() {
   return devId;
 }
 
-let myHardwareId = getPersistentDeviceId();
+const myHardwareId = getPersistentDeviceId();
 
 function updateNumericDisplayId() {
   let numericId = 0;
@@ -743,13 +743,6 @@ if (savedBanUntil && Date.now() < savedBanUntil) {
   setTimeout(() => {
     display7DayBanScreen(savedBanUntil, savedBanReason, savedBanSnapshot);
   }, 30);
-} else {
-  localStorage.removeItem("meetloop_ban_until");
-  localStorage.removeItem("meetloop_ban_reason");
-  localStorage.removeItem("meetloop_ban_snapshot");
-  sessionStorage.removeItem("meetloop_ban_until");
-  sessionStorage.removeItem("meetloop_ban_reason");
-  sessionStorage.removeItem("meetloop_ban_snapshot");
 }
 
 /* ================= 3. SOCKET CONNECTION ================= */
@@ -861,7 +854,12 @@ function displayOmeTVFrozenSnapshot() {
     if (crtWrapper) crtWrapper.style.display = "none";
     if (standbyCenter) standbyCenter.style.display = "none";
     if (searchLoader) searchLoader.style.display = "none";
-    if (reportBtn) reportBtn.style.display = "flex";
+    
+    // Palaging i-enable at ipakita ang report button
+    if (reportBtn) {
+      reportBtn.style.display = "flex";
+      reportBtn.disabled = false;
+    }
 
     if (freezeTimer) clearTimeout(freezeTimer);
     freezeTimer = setTimeout(() => {
@@ -896,7 +894,10 @@ function resetVideoLayers() {
     freezeImageOverlay.style.display = "none";
     freezeImageOverlay.src = "";
   }
-  if (reportBtn) reportBtn.style.display = "none";
+  if (reportBtn) {
+    reportBtn.style.display = "none";
+    reportBtn.disabled = false;
+  }
 }
 
 function handleSuccessfulUnban() {
@@ -908,8 +909,6 @@ function handleSuccessfulUnban() {
   sessionStorage.removeItem("meetloop_ban_reason");
   sessionStorage.removeItem("meetloop_ban_snapshot");
 
-  localStorage.removeItem("meetloop_device_id");
-  myHardwareId = getPersistentDeviceId();
   updateNumericDisplayId();
 
   if (cooldownInterval) clearInterval(cooldownInterval);
@@ -917,7 +916,7 @@ function handleSuccessfulUnban() {
   const status = document.getElementById("gcashRefStatus");
   if (status) {
     status.style.color = "#16a34a";
-    status.textContent = "✅ ₱20 Verified! Unban Successful! Welcome back!";
+    status.textContent = "✅ Unban Successful! Welcome back!";
   }
   const overlay = document.getElementById("banOverlay");
   if (overlay) overlay.style.display = "none";
@@ -985,7 +984,7 @@ if (socket) {
   });
 
   socket.on("force-device-ban", (data) => {
-    if (data && data.hardwareId === myHardwareId) {
+    if (data && (!data.hardwareId || data.hardwareId === myHardwareId)) {
       display7DayBanScreen(data.banUntil, "Administrative Action", data.snapshot || null);
     }
   });
@@ -1366,7 +1365,7 @@ function backToMethodSelection() {
 }
 
 /* ================= 🛑 ANTI-SPAM SUBMISSION CONTROLLER ================= */
-function startAntiSpamCooldown(seconds = 30) {
+function startAntiSpamCooldown(seconds = 5) {
   cooldownSeconds = seconds;
   const btn = document.getElementById("gcashVerifyBtn");
   const phoneInput = document.getElementById("gcashPhoneInput");
@@ -1415,7 +1414,7 @@ function submitGCashUnbanTicket() {
     return;
   }
 
-  startAntiSpamCooldown(30);
+  startAntiSpamCooldown(5);
 
   if (status) {
     status.style.color = "#0284c7";
@@ -1424,11 +1423,6 @@ function submitGCashUnbanTicket() {
 
   if (socket && socket.connected) {
     socket.emit("unban-request", { hardwareId: myHardwareId, phone: phoneVal, ref: refVal });
-  } else {
-    if (status) {
-      status.style.color = "#dc2626";
-      status.textContent = "❌ Server disconnected. Please check internet connection.";
-    }
   }
 }
 
@@ -1447,10 +1441,9 @@ function closeReportModal() {
 function confirmReportUser() {
   const reason = document.getElementById("reportReasonSelect")?.value || "Policy Violation";
   closeReportModal();
-  if (socket) {
+  if (socket && socket.connected) {
     socket.emit("report-user", { reason: reason, snapshot: lastCapturedStrangerSnapshot });
   }
-  if (reportBtn) reportBtn.disabled = true;
   triggerStartNext();
 }
 
