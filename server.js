@@ -1,6 +1,6 @@
 /**
  * MeetLoop - High-Performance WebRTC Backend Server
- * Umingle-Grade AI Vision Moderation + Anti-Troll Shield + Telegram Bot
+ * Umingle-Grade AI Vision Moderation + Strict Anti-Spam Submission Rate-Limiter
  * Fee Enforced: PHP 20.00 ONLY
  */
 
@@ -25,6 +25,7 @@ const PORT = process.env.PORT || 3000;
 const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000;
 const PAYMENT_VALIDITY_WINDOW = 60 * 60 * 1000;
 const REPORT_EXPIRY_WINDOW = 24 * 60 * 60 * 1000;
+const UNBAN_SUBMIT_COOLDOWN = 30 * 1000; // 30 seconds server-side spam block
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8648356765:AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || "5779976596";
@@ -91,6 +92,7 @@ const bannedIPs = new Map();
 const userInfractions = new Map();
 let availablePayments = [];
 const offlineClearedSet = new Set();
+const unbanRequestCooldowns = new Map(); // Anti-Spam tracker
 
 function syncToDisk() {
   dbData.bannedDevices = Object.fromEntries(bannedDevices);
@@ -256,9 +258,7 @@ function analyzeCameraFrameSnapshot(base64Data) {
       sampleCount++;
       totalLuminance += byte;
 
-      // Skin Tone Band Detection
       if (byte >= 140 && byte <= 230) skinToneBytes++;
-      // Black / Covered Camera Detection
       if (byte < 30) darkBlackBytes++;
     }
 
@@ -266,13 +266,8 @@ function analyzeCameraFrameSnapshot(base64Data) {
     const skinRatio = sampleCount > 0 ? (skinToneBytes / sampleCount) : 0;
     const blackRatio = sampleCount > 0 ? (darkBlackBytes / sampleCount) : 0;
 
-    // 1. Check: Normal Human Face (Typical Skin Ratio is 15% - 45% with balanced background)
     const isNormalFace = (skinRatio >= 0.12 && skinRatio <= 0.48) && (avgLuminance > 50);
-
-    // 2. Check: Black Screen / Covered Camera
     const isCoveredCamera = (blackRatio > 0.85) || (avgLuminance < 20);
-
-    // 3. Check: Severe Excessive Naked Skin (Nudity Pattern > 68%)
     const isSevereNudity = (skinRatio > 0.68);
 
     let verdict = "SAFE_NORMAL_USER";
@@ -281,15 +276,15 @@ function analyzeCameraFrameSnapshot(base64Data) {
 
     if (isSevereNudity) {
       verdict = "CONFIRMED_EXCESSIVE_NSFW";
-      shouldAutoBan = true; // Auto-ban ONLY if confirmed high bare skin
+      shouldAutoBan = true;
       isSafeUser = false;
     } else if (isCoveredCamera) {
       verdict = "COVERED_CAMERA_OR_BLACK_SCREEN";
-      shouldAutoBan = false; // Send to admin for review, do not false-ban
+      shouldAutoBan = false;
       isSafeUser = false;
     } else if (isNormalFace) {
       verdict = "NORMAL_HUMAN_FACE_VERIFIED";
-      shouldAutoBan = false; // 100% Immune to false ban
+      shouldAutoBan = false;
       isSafeUser = true;
     } else {
       verdict = "NORMAL_BACKGROUND_ACTIVITY";
@@ -341,6 +336,7 @@ function executeUnbanUser(hardwareId, phone, auto = false) {
 
   persistentDeviceTickets.delete(hardwareId);
   userInfractions.delete(hardwareId);
+  unbanRequestCooldowns.delete(hardwareId);
   offlineClearedSet.add(hardwareId);
 
   syncToDisk();
@@ -369,7 +365,7 @@ function isExact20Pesos(text) {
   return clean.includes("20.00") || clean.includes("php 20") || clean.includes("php20") || clean.includes("₱20") || clean.includes("p20.00");
 }
 
-/* ================= 💳 GCASH SMS WEBHOOK (₱20 ONLY) ================= */
+/* ================= 💳 GCASH SMS WEBHOOK ================= */
 app.all("/webhook/gcash-sms", (req, res) => {
   let rawData = req.body;
   let parsedContent = "";
@@ -591,7 +587,6 @@ io.on("connection", (socket) => {
         const snapshot = data.snapshot || null;
         const now = Date.now();
 
-        // 🧠 SYSTEM VISION AI ANALYSIS
         const ai = analyzeCameraFrameSnapshot(snapshot);
 
         let infractions = userInfractions.get(partnerHw) || [];
@@ -604,10 +599,6 @@ io.on("connection", (socket) => {
         }
 
         const reportCount = infractions.length;
-
-        // 🛡️ UMINGLE BAN LOGIC:
-        // NEVER BAN if AI confirms normal face (Troll report protected!)
-        // ONLY AUTO-BAN if AI confirms actual severe NSFW nudity
         const shouldAutoBan = ai.shouldAutoBan === true;
 
         const aiBadge = ai.isSafeUser 
@@ -638,18 +629,31 @@ io.on("connection", (socket) => {
     socket.emit("report-success");
   });
 
+  /* ================= 🛑 ANTI-SPAM UNBAN REQUEST ================= */
   socket.on("unban-request", (data) => {
     const phone = String(data.phone || "").trim().replace(/[^0-9]/g, "");
     const ref = String(data.ref || "").trim().replace(/[^0-9]/g, "");
     const reqHardware = String(data.hardwareId || hardwareId).trim();
+    const now = Date.now();
+
+    // 🔒 SERVER-SIDE SPAM SHIELD: Check 30-second cooldown
+    const lastSubmitTime = unbanRequestCooldowns.get(reqHardware) || 0;
+    if (now - lastSubmitTime < UNBAN_SUBMIT_COOLDOWN) {
+      const remainingSec = Math.ceil((UNBAN_SUBMIT_COOLDOWN - (now - lastSubmitTime)) / 1000);
+      return socket.emit("unban-response", { 
+        success: false, 
+        message: `⚠️ Anti-Spam: Please wait ${remainingSec} seconds before submitting again.` 
+      });
+    }
 
     if (!phone || phone.length < 10) {
       return socket.emit("unban-response", { success: false, message: "❌ Please enter a valid 11-digit GCash Mobile Number." });
     }
 
-    const now = Date.now();
-    let matchedIndex = -1;
+    // Set cooldown timestamp
+    unbanRequestCooldowns.set(reqHardware, now);
 
+    let matchedIndex = -1;
     for (let i = 0; i < availablePayments.length; i++) {
       const item = availablePayments[i];
       if ((now - item.time < PAYMENT_VALIDITY_WINDOW) && (isPhoneMatch(item.text, phone) || (ref && ref.length >= 6 && item.text.includes(ref)))) {
@@ -691,6 +695,7 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
   console.log(`🛡️ Umingle-Grade Smart Vision AI Moderation ACTIVE`);
+  console.log(`🛑 Anti-Spam 30s Cooldown Protection ENABLED`);
   console.log(`💰 Unban Clearance Fee: ₱20.00 ONLY`);
   console.log(`💾 Persistent Disk Storage: ${DB_FILE}`);
   console.log(`================================================`);
