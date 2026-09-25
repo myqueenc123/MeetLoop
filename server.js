@@ -282,6 +282,7 @@ function executeUnbanUser(hardwareId, phone, auto = false) {
   offlineClearedSet.add(hardwareId);
 
   syncToDisk();
+  // TANGING DITO LAMANG MAGPAPADALA NG UNBAN SIGNAL
   io.emit("real-admin-unban-signal", { hardwareId: hardwareId });
 
   if (auto) {
@@ -480,17 +481,6 @@ io.on("connection", (socket) => {
       snapshot: banInfo.snapshot 
     });
   }
-
-  socket.on("check-ban-status", (data) => {
-    const hwId = String(data?.hardwareId || hardwareId).trim();
-    const fp = String(data?.fingerprint || fingerprint).trim();
-    const b = checkSecurityBan(hwId, clientIp, fp);
-    if (!b) {
-      socket.emit("real-admin-unban-signal", { hardwareId: hwId });
-    } else {
-      socket.emit("ip-banned", { banUntil: b.banUntil, reason: b.reason, snapshot: b.snapshot });
-    }
-  });
 
   socket.on("skip", () => {
     const currentBan = checkSecurityBan(hardwareId, clientIp, fingerprint);
