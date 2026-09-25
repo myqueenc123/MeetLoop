@@ -1,6 +1,6 @@
 /**
  * MeetLoop - High-Performance WebRTC Backend Server
- * 100% Permanent File Database Storage + Anti-Bypass + AI Moderation
+ * 100% Permanent File Database Storage + Anti-Bypass + AI Moderation + Telegram Bot
  */
 
 const express = require("express");
@@ -110,6 +110,7 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+/* ================= 🤖 TELEGRAM BOT CONTROLLER ================= */
 function sendTelegramRaw(endpoint, payloadObj, callback) {
   if (!TELEGRAM_BOT_TOKEN) return;
   const payload = JSON.stringify(payloadObj);
@@ -300,6 +301,7 @@ function isPhoneMatch(gcashText, userPhone) {
   return gcashText.includes(cleanUser) || gcashText.includes(user10Digit);
 }
 
+/* ================= 💳 GCASH SMS WEBHOOK ================= */
 app.all("/webhook/gcash-sms", (req, res) => {
   let rawData = req.body;
   let parsedContent = "";
@@ -341,6 +343,7 @@ app.all("/webhook/gcash-sms", (req, res) => {
   res.status(200).json({ success: true, message: "Processed" });
 });
 
+/* ================= 📂 STATIC ASSETS SERVING ================= */
 app.use(express.static(path.join(__dirname, "public"), { etag: false, maxAge: 0 }));
 app.use(express.static(__dirname, { etag: false, maxAge: 0 }));
 
@@ -425,6 +428,7 @@ function banDeviceSecurity(hardwareId, clientIp, fingerprint, reason, snapshot =
   return record;
 }
 
+/* ================= 👥 WEBRTC MATCHING & SIGNALING ================= */
 let waitingQueue = [];
 const activePairs = new Map();
 
@@ -475,8 +479,6 @@ io.on("connection", (socket) => {
       reason: banInfo.reason, 
       snapshot: banInfo.snapshot 
     });
-  } else {
-    socket.emit("real-admin-unban-signal", { hardwareId: hardwareId });
   }
 
   socket.on("check-ban-status", (data) => {
