@@ -43,7 +43,7 @@ app.get("/ping", (req, res) => {
   res.status(200).send("MEETLOOP_24_7_ACTIVE_OK");
 });
 
-/* ================= 💾 PERMANENT FILE-BASED DATABASE SYSTEM ================= */
+/* ================= 💾 ATOMIC PERMANENT DATABASE ================= */
 const DATA_DIR = path.join(__dirname, "data");
 const DB_FILE = path.join(DATA_DIR, "meetloop_database.json");
 
@@ -65,13 +65,15 @@ function loadDatabase() {
       dbData = JSON.parse(raw);
     }
   } catch (err) {
-    console.error("⚠️ DB Read Error, using memory:", err.message);
+    console.error("⚠️ DB Read Error:", err.message);
   }
 }
 
 function saveDatabase() {
   try {
-    fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 2), "utf8");
+    const tempFile = `${DB_FILE}.tmp`;
+    fs.writeFileSync(tempFile, JSON.stringify(dbData, null, 2), "utf8");
+    fs.renameSync(tempFile, DB_FILE);
   } catch (err) {
     console.error("⚠️ DB Write Error:", err.message);
   }
@@ -87,7 +89,6 @@ const burnedReceipts = new Set(dbData.burnedReceipts || []);
 const bannedIPs = new Map();
 const userInfractions = new Map();
 let availablePayments = [];
-const attemptTracker = new Map();
 const offlineClearedSet = new Set();
 
 function syncToDisk() {
@@ -127,7 +128,7 @@ function sendTelegramRaw(endpoint, payloadObj, callback) {
     res.on("end", () => { if (callback) callback(null, d); });
   });
   req.on("error", (e) => {
-    console.error("❌ Telegram Error:", e.message);
+    console.error("❌ Telegram API Error:", e.message);
     if (callback) callback(e);
   });
   req.write(payload);
@@ -155,21 +156,74 @@ function sendTelegramWithButtons(chatId, text, reqId) {
   });
 }
 
-function sendReportAlertWithActions(chatId, text, targetHw) {
-  sendTelegramRaw("sendMessage", {
-    chat_id: chatId,
-    text: text,
-    parse_mode: "HTML",
-    disable_web_page_preview: true,
-    reply_markup: {
+function sendTelegramPhotoWithActions(chatId, base64Snapshot, captionText, targetHw) {
+  if (!base64Snapshot || typeof base64Snapshot !== "string" || !base64Snapshot.includes(",")) {
+    sendTelegramRaw("sendMessage", {
+      chat_id: chatId,
+      text: captionText,
+      parse_mode: "HTML",
+      disable_web_page_preview: true,
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: "🚨 1-CLICK BAN (7-DAYS)", callback_data: `adminban_${targetHw}` },
+            { text: "✅ DISMISS", callback_data: `dismiss_${targetHw}` }
+          ]
+        ]
+      }
+    });
+    return;
+  }
+
+  try {
+    const rawData = base64Snapshot.replace(/^data:image\/\w+;base64,/, "");
+    const buffer = Buffer.from(rawData, "base64");
+    const boundary = "----MeetLoopBoundary" + Math.random().toString(36).substring(2);
+
+    const replyMarkup = JSON.stringify({
       inline_keyboard: [
         [
           { text: "🚨 1-CLICK BAN (7-DAYS)", callback_data: `adminban_${targetHw}` },
-          { text: "✅ DISMISS REPORT", callback_data: `dismiss_${targetHw}` }
+          { text: "✅ DISMISS", callback_data: `dismiss_${targetHw}` }
         ]
       ]
-    }
-  });
+    });
+
+    let header = `--${boundary}\r\n`;
+    header += `Content-Disposition: form-data; name="chat_id"\r\n\r\n${chatId}\r\n`;
+    header += `--${boundary}\r\n`;
+    header += `Content-Disposition: form-data; name="caption"\r\n\r\n${captionText}\r\n`;
+    header += `--${boundary}\r\n`;
+    header += `Content-Disposition: form-data; name="parse_mode"\r\n\r\nHTML\r\n`;
+    header += `--${boundary}\r\n`;
+    header += `Content-Disposition: form-data; name="reply_markup"\r\n\r\n${replyMarkup}\r\n`;
+    header += `--${boundary}\r\n`;
+    header += `Content-Disposition: form-data; name="photo"; filename="evidence.jpg"\r\n`;
+    header += `Content-Type: image/jpeg\r\n\r\n`;
+
+    const footer = `\r\n--${boundary}--\r\n`;
+
+    const payloadLength = Buffer.byteLength(header) + buffer.length + Buffer.byteLength(footer);
+
+    const options = {
+      hostname: "api.telegram.org",
+      path: `/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`,
+      method: "POST",
+      headers: {
+        "Content-Type": `multipart/form-data; boundary=${boundary}`,
+        "Content-Length": payloadLength
+      }
+    };
+
+    const req = https.request(options);
+    req.on("error", (e) => console.error("Telegram Photo Error:", e.message));
+    req.write(header);
+    req.write(buffer);
+    req.write(footer);
+    req.end();
+  } catch (err) {
+    console.error("Snapshot dispatch error:", err.message);
+  }
 }
 
 function analyzeCameraFrameSnapshot(base64Data) {
@@ -223,7 +277,6 @@ function executeUnbanUser(hardwareId, phone, auto = false) {
   }
 
   persistentDeviceTickets.delete(hardwareId);
-  attemptTracker.delete(hardwareId);
   userInfractions.delete(hardwareId);
   offlineClearedSet.add(hardwareId);
 
@@ -234,7 +287,7 @@ function executeUnbanUser(hardwareId, phone, auto = false) {
     const successMsg = `⚡ <b>AUTO-UNBAN SUCCESSFUL!</b> 🎉\n\n` +
                        `📱 <b>Matched Mobile:</b> <code>${escapeHtml(phone)}</code>\n` +
                        `💳 <b>Hardware ID:</b> <code>${escapeHtml(hardwareId)}</code>\n` +
-                       `💰 <b>Status:</b> GCash Verified & Cleared! Clean Slate Activated.`;
+                       `💰 <b>Status:</b> Verified & Cleared!`;
     sendTelegramMessage(ADMIN_CHAT_ID, successMsg);
   }
 }
@@ -336,7 +389,7 @@ function pollTelegramUpdates() {
   }).on("error", () => { setTimeout(pollTelegramUpdates, 3000); });
 }
 
-/* ================= 🔒 PERSISTENT SNAPSHOT BAN ENGINE ================= */
+/* ================= 🔒 BAN ENGINE ================= */
 function checkSecurityBan(hardwareId, clientIp, fingerprint) {
   const now = Date.now();
 
@@ -344,14 +397,12 @@ function checkSecurityBan(hardwareId, clientIp, fingerprint) {
     return null;
   }
 
-  // 1. Hardware ID Check
   if (hardwareId && bannedDevices.has(hardwareId)) {
     const r = bannedDevices.get(hardwareId);
     if (now < r.banUntil) return r;
     executeUnbanUser(hardwareId, "", false);
   }
 
-  // 2. GPU Fingerprint Check
   if (fingerprint && bannedFingerprints.has(fingerprint)) {
     const r = bannedFingerprints.get(fingerprint);
     if (now < r.banUntil) return r;
@@ -417,7 +468,6 @@ io.on("connection", (socket) => {
 
   io.emit("online-count", Math.max(1, io.engine.clientsCount));
 
-  // 🔄 ALWAYS SYNC EVIDENCE SNAPSHOT ON RECONNECT/REFRESH
   const banInfo = checkSecurityBan(hardwareId, clientIp, fingerprint);
   if (banInfo) {
     socket.emit("ip-banned", { 
@@ -463,7 +513,6 @@ io.on("connection", (socket) => {
     }
   });
 
-  /* ================= 🧠 AI MODERATION & PERSISTENT SNAPSHOT ================= */
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -490,15 +539,14 @@ io.on("connection", (socket) => {
         const reportCount = infractions.length;
         const isSevereCategory = reason.includes("Nudity") || reason.includes("Underage") || reason.includes("Violence");
 
-        const alertText = `🚨 <b>USER REPORTED (System Evaluation)</b>\n\n` +
+        const alertText = `🚨 <b>USER REPORTED</b>\n\n` +
                           `⚠️ <b>Violation:</b> ${escapeHtml(reason)}\n` +
                           `🆔 <b>Target Device:</b> <code>${escapeHtml(partnerHw)}</code>\n` +
                           `🌐 <b>Target IP:</b> <code>${escapeHtml(partnerIp)}</code>\n` +
                           `📊 <b>Reports in 24h:</b> ${reportCount}\n` +
-                          `👁️ <b>Frame Skin Analysis:</b> ${analysis.confidence}% (${analysis.isSkinDominant ? "⚠️ High Skin Density" : "Normal"})\n\n` +
-                          `<i>Decision: ${reportCount >= 3 || (isSevereCategory && analysis.isSkinDominant) ? "🛑 AUTO-BAN EXECUTED" : "⏳ Pending Admin Review (No Instant Ban)"}</i>`;
+                          `👁️ <b>Skin Ratio:</b> ${analysis.confidence}% (${analysis.isSkinDominant ? "⚠️ High" : "Normal"})`;
 
-        sendReportAlertWithActions(ADMIN_CHAT_ID, alertText, partnerHw);
+        sendTelegramPhotoWithActions(ADMIN_CHAT_ID, snapshot, alertText, partnerHw);
 
         const shouldBan = (reportCount >= 3) || (reportCount >= 2 && analysis.isSkinDominant) || (isSevereCategory && analysis.isSkinDominant && reportCount >= 2);
 
