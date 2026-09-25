@@ -1,6 +1,6 @@
 /**
  * MeetLoop - High-Performance WebRTC Backend Server
- * 100% Persistent Telegram Buttons (Direct Encoded Actions)
+ * 100% Reliable Telegram 1-Click Buttons & Unban Alerts
  * Umingle-Grade AI Vision Moderation + Strict ₱20 GCash Protection
  */
 
@@ -25,7 +25,7 @@ const PORT = process.env.PORT || 3000;
 const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000;
 const PAYMENT_VALIDITY_WINDOW = 60 * 60 * 1000;
 const REPORT_EXPIRY_WINDOW = 24 * 60 * 60 * 1000;
-const UNBAN_SUBMIT_COOLDOWN = 30 * 1000;
+const UNBAN_SUBMIT_COOLDOWN = 5 * 1000; // 5 seconds anti-double click
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8648356765:AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || "5779976596";
@@ -130,10 +130,18 @@ function sendTelegramRaw(endpoint, payloadObj, callback) {
   const req = https.request(options, (res) => {
     let d = "";
     res.on("data", chunk => d += chunk);
-    res.on("end", () => { if (callback) callback(null, d); });
+    res.on("end", () => {
+      try {
+        const json = JSON.parse(d);
+        if (!json.ok) {
+          console.error(`❌ Telegram API Error [${endpoint}]:`, json.description);
+        }
+      } catch(e){}
+      if (callback) callback(null, d);
+    });
   });
   req.on("error", (e) => {
-    console.error("❌ Telegram Error:", e.message);
+    console.error("❌ Telegram Network Error:", e.message);
     if (callback) callback(e);
   });
   req.write(payload);
@@ -141,44 +149,47 @@ function sendTelegramRaw(endpoint, payloadObj, callback) {
 }
 
 function sendTelegramMessage(chatId, text) {
-  sendTelegramRaw("sendMessage", { chat_id: chatId, text: text, parse_mode: "HTML", disable_web_page_preview: true });
+  sendTelegramRaw("sendMessage", { chat_id: String(chatId).trim(), text: text, parse_mode: "HTML", disable_web_page_preview: true });
 }
 
 function sendTelegramWithButtons(chatId, text, hardwareId) {
-  // Direct Action Embed (100% Persistent across restarts, ~33 bytes)
+  const cleanId = String(hardwareId || "").trim();
   sendTelegramRaw("sendMessage", {
-    chat_id: chatId,
+    chat_id: String(chatId).trim(),
     text: text,
     parse_mode: "HTML",
     disable_web_page_preview: true,
     reply_markup: {
       inline_keyboard: [
         [
-          { text: "🟢 1-CLICK APPROVE", callback_data: `ap:${hardwareId}` },
-          { text: "🔴 REJECT", callback_data: `rj:${hardwareId}` }
+          { text: "🟢 1-CLICK APPROVE", callback_data: `ap:${cleanId}` },
+          { text: "🔴 REJECT", callback_data: `rj:${cleanId}` }
         ]
       ]
     }
+  }, (err, res) => {
+    if (!err) console.log(`📤 Telegram Unban Alert dispatched for ${cleanId}`);
   });
 }
 
 function sendTelegramPhotoWithActions(chatId, base64Snapshot, captionText, targetHw) {
+  const cleanId = String(targetHw || "").trim();
   if (base64Snapshot) {
-    snapshotCache.set(targetHw, base64Snapshot);
+    snapshotCache.set(cleanId, base64Snapshot);
   }
 
   const replyMarkup = JSON.stringify({
     inline_keyboard: [
       [
-        { text: "🚨 1-CLICK BAN (7-DAYS)", callback_data: `ab:${targetHw}` },
-        { text: "✅ DISMISS", callback_data: `ds:${targetHw}` }
+        { text: "🚨 1-CLICK BAN (7-DAYS)", callback_data: `ab:${cleanId}` },
+        { text: "✅ DISMISS", callback_data: `ds:${cleanId}` }
       ]
     ]
   });
 
   if (!base64Snapshot || typeof base64Snapshot !== "string" || !base64Snapshot.includes(",")) {
     sendTelegramRaw("sendMessage", {
-      chat_id: chatId,
+      chat_id: String(chatId).trim(),
       text: captionText,
       parse_mode: "HTML",
       disable_web_page_preview: true,
@@ -193,7 +204,7 @@ function sendTelegramPhotoWithActions(chatId, base64Snapshot, captionText, targe
     const boundary = "----MeetLoopBoundary" + Math.random().toString(36).substring(2);
 
     let header = `--${boundary}\r\n`;
-    header += `Content-Disposition: form-data; name="chat_id"\r\n\r\n${chatId}\r\n`;
+    header += `Content-Disposition: form-data; name="chat_id"\r\n\r\n${String(chatId).trim()}\r\n`;
     header += `--${boundary}\r\n`;
     header += `Content-Disposition: form-data; name="caption"\r\n\r\n${captionText}\r\n`;
     header += `--${boundary}\r\n`;
@@ -217,7 +228,16 @@ function sendTelegramPhotoWithActions(chatId, base64Snapshot, captionText, targe
       }
     };
 
-    const req = https.request(options);
+    const req = https.request(options, (res) => {
+      let d = "";
+      res.on("data", chunk => d += chunk);
+      res.on("end", () => {
+        try {
+          const json = JSON.parse(d);
+          if (!json.ok) console.error("❌ SendPhoto Error:", json.description);
+        } catch(e){}
+      });
+    });
     req.on("error", (e) => console.error("Telegram Photo Error:", e.message));
     req.write(header);
     req.write(buffer);
@@ -329,7 +349,6 @@ function executeUnbanUser(hardwareId, phone = "Manual", auto = false) {
 
   syncToDisk();
 
-  // Instant broadcast sa lahat ng active sockets
   io.emit("real-admin-unban-signal", { hardwareId: hardwareId });
 
   if (auto) {
@@ -412,7 +431,7 @@ let lastUpdateId = 0;
 
 function resetTelegramWebhook(cb) {
   sendTelegramRaw("deleteWebhook", { drop_pending_updates: false }, () => {
-    console.log("🤖 Telegram Webhook cleared. Polling ready.");
+    console.log("🤖 Telegram Webhook cleared. Polling engine online.");
     if (cb) cb();
   });
 }
@@ -450,7 +469,6 @@ function pollTelegramUpdates() {
               const msgId = cb.message?.message_id;
               const chatId = cb.message?.chat?.id || ADMIN_CHAT_ID;
 
-              // Parse Direct Action Format (e.g., "ab:dev_xxxx" or "ap:dev_xxxx")
               const parts = cbData.split(":");
               const action = parts[0];
               const hwId = parts.slice(1).join(":");
@@ -460,7 +478,6 @@ function pollTelegramUpdates() {
                 const snapshot = snapshotCache.get(hwId) || null;
                 const record = banDeviceSecurity(hwId, "0.0.0.0", "", "Admin 1-Click Ban", snapshot);
 
-                // Live Ejection sa lahat ng matching sockets
                 for (const [, s] of io.sockets.sockets.entries()) {
                   const socketHw = String(s.handshake.query.hardwareId || "").trim();
                   if (socketHw === hwId) {
@@ -732,20 +749,17 @@ io.on("connection", (socket) => {
     socket.emit("report-success");
   });
 
-  /* ================= 🛑 ANTI-SPAM UNBAN REQUEST ================= */
+  /* ================= 🛑 UNBAN REQUEST HANDLER ================= */
   socket.on("unban-request", (data) => {
     const phone = String(data.phone || "").trim().replace(/[^0-9]/g, "");
     const ref = String(data.ref || "").trim().replace(/[^0-9]/g, "");
     const reqHardware = String(data.hardwareId || hardwareId).trim();
     const now = Date.now();
 
+    // 5-second anti double-click protection
     const lastSubmitTime = unbanRequestCooldowns.get(reqHardware) || 0;
     if (now - lastSubmitTime < UNBAN_SUBMIT_COOLDOWN) {
-      const remainingSec = Math.ceil((UNBAN_SUBMIT_COOLDOWN - (now - lastSubmitTime)) / 1000);
-      return socket.emit("unban-response", { 
-        success: false, 
-        message: `⚠️ Anti-Spam: Please wait ${remainingSec} seconds before submitting again.` 
-      });
+      return socket.emit("unban-pending", { message: "⏳ Details already submitted. Checking payment..." });
     }
 
     if (!phone || phone.length < 10) {
@@ -774,7 +788,15 @@ io.on("connection", (socket) => {
     persistentDeviceTickets.set(reqHardware, { phone, ref, time: now });
     syncToDisk();
 
-    sendTelegramWithButtons(ADMIN_CHAT_ID, `🚨 <b>UNBAN REQUEST (₱20.00 FEE)</b>\n📱 Mobile: <code>${escapeHtml(phone)}</code>\n💳 Ref: <code>${escapeHtml(ref || "N/A")}</code>\n🆔 HW: <code>${escapeHtml(reqHardware)}</code>`, reqHardware);
+    // Palaging magpadala sa Telegram
+    sendTelegramWithButtons(
+      ADMIN_CHAT_ID, 
+      `🚨 <b>UNBAN REQUEST (₱20.00 FEE)</b>\n\n` +
+      `📱 <b>Mobile:</b> <code>${escapeHtml(phone)}</code>\n` +
+      `💳 <b>Ref:</b> <code>${escapeHtml(ref || "N/A")}</code>\n` +
+      `🆔 <b>HW:</b> <code>${escapeHtml(reqHardware)}</code>`, 
+      reqHardware
+    );
 
     socket.emit("unban-pending", { message: "⏳ Details submitted! Checking ₱20 payment..." });
   });
