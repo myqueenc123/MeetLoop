@@ -1,6 +1,6 @@
 /**
  * MeetLoop - High-Performance WebRTC Backend Server
- * Smart AI Camera Frame Analyzer + Multi-Tier Moderation (OmeTV-Grade)
+ * 100% Permanent File Database Storage + Anti-Bypass + AI Moderation
  */
 
 const express = require("express");
@@ -8,6 +8,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const path = require("path");
 const https = require("https");
+const fs = require("fs");
 
 const app = express();
 const server = http.createServer(app);
@@ -22,7 +23,7 @@ const io = new Server(server, {
 const PORT = process.env.PORT || 3000;
 const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000;
 const PAYMENT_VALIDITY_WINDOW = 60 * 60 * 1000;
-const REPORT_EXPIRY_WINDOW = 24 * 60 * 60 * 1000; // 24 oras na history
+const REPORT_EXPIRY_WINDOW = 24 * 60 * 60 * 1000;
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8648356765:AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || "5779976596";
@@ -34,25 +35,68 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json({ limit: "25mb" }));
-app.use(express.urlencoded({ extended: true, limit: "25mb" }));
-app.use(express.text({ type: "*/*", limit: "25mb" }));
+app.use(express.json({ limit: "30mb" }));
+app.use(express.urlencoded({ extended: true, limit: "30mb" }));
+app.use(express.text({ type: "*/*", limit: "30mb" }));
 
-// 🌟 24/7 HEALTH ROUTE
 app.get("/ping", (req, res) => {
   res.status(200).send("MEETLOOP_24_7_ACTIVE_OK");
 });
 
-/* ================= DATABASES & SECURITY ================= */
-const bannedDevices = new Map();           // HardwareID -> Record
-const bannedFingerprints = new Map();      // Fingerprint Hash -> Record
-const bannedIPs = new Map();               // Client IP -> Record
-const userInfractions = new Map();         // HardwareID -> [{ by: string, reason: string, time: number, isNSFW: boolean }]
-const persistentDeviceTickets = new Map(); // HardwareID -> { phone, ref, time }
+/* ================= 💾 PERMANENT FILE-BASED DATABASE SYSTEM ================= */
+const DATA_DIR = path.join(__dirname, "data");
+const DB_FILE = path.join(DATA_DIR, "meetloop_database.json");
+
+if (!fs.existsSync(DATA_DIR)) {
+  try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (e) {}
+}
+
+let dbData = {
+  bannedDevices: {},
+  bannedFingerprints: {},
+  persistentTickets: {},
+  burnedReceipts: []
+};
+
+function loadDatabase() {
+  try {
+    if (fs.existsSync(DB_FILE)) {
+      const raw = fs.readFileSync(DB_FILE, "utf8");
+      dbData = JSON.parse(raw);
+    }
+  } catch (err) {
+    console.error("⚠️ DB Read Error, using memory:", err.message);
+  }
+}
+
+function saveDatabase() {
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 2), "utf8");
+  } catch (err) {
+    console.error("⚠️ DB Write Error:", err.message);
+  }
+}
+
+loadDatabase();
+
+const bannedDevices = new Map(Object.entries(dbData.bannedDevices || {}));
+const bannedFingerprints = new Map(Object.entries(dbData.bannedFingerprints || {}));
+const persistentDeviceTickets = new Map(Object.entries(dbData.persistentTickets || {}));
+const burnedReceipts = new Set(dbData.burnedReceipts || []);
+
+const bannedIPs = new Map();
+const userInfractions = new Map();
 let availablePayments = [];
-const burnedReceipts = new Set();
 const attemptTracker = new Map();
 const offlineClearedSet = new Set();
+
+function syncToDisk() {
+  dbData.bannedDevices = Object.fromEntries(bannedDevices);
+  dbData.bannedFingerprints = Object.fromEntries(bannedFingerprints);
+  dbData.persistentTickets = Object.fromEntries(persistentDeviceTickets);
+  dbData.burnedReceipts = Array.from(burnedReceipts);
+  saveDatabase();
+}
 
 function getClientIp(socket) {
   const forwarded = socket.handshake.headers["x-forwarded-for"];
@@ -128,9 +172,8 @@ function sendReportAlertWithActions(chatId, text, targetHw) {
   });
 }
 
-// 🧠 OMETV CAMERA FRAME HEURISTIC ANALYZER (Checks Skin-Tone & Image Entropy)
 function analyzeCameraFrameSnapshot(base64Data) {
-  if (!base64Data || typeof base64Data !== "string" || base64Data.length < 500) {
+  if (!base64Data || typeof base64Data !== "string" || base64Data.length < 300) {
     return { hasValidFrame: false, isSkinDominant: false, confidence: 0 };
   }
 
@@ -145,10 +188,7 @@ function analyzeCameraFrameSnapshot(base64Data) {
     for (let i = 0; i < buffer.length; i += step) {
       const byte = buffer[i];
       sampleCount++;
-      // Warm skin-tone entropy region in compressed JPEG stream
-      if (byte >= 140 && byte <= 235) {
-        warmSkinBytes++;
-      }
+      if (byte >= 140 && byte <= 235) warmSkinBytes++;
     }
 
     const skinRatio = sampleCount > 0 ? (warmSkinBytes / sampleCount) : 0;
@@ -187,13 +227,14 @@ function executeUnbanUser(hardwareId, phone, auto = false) {
   userInfractions.delete(hardwareId);
   offlineClearedSet.add(hardwareId);
 
+  syncToDisk();
   io.emit("real-admin-unban-signal", { hardwareId: hardwareId });
 
   if (auto) {
-    const successMsg = `⚡ <b>OFFLINE AUTO-UNBAN SUCCESSFUL!</b> 🎉\n\n` +
+    const successMsg = `⚡ <b>AUTO-UNBAN SUCCESSFUL!</b> 🎉\n\n` +
                        `📱 <b>Matched Mobile:</b> <code>${escapeHtml(phone)}</code>\n` +
                        `💳 <b>Hardware ID:</b> <code>${escapeHtml(hardwareId)}</code>\n` +
-                       `💰 <b>Status:</b> GCash Cleared! Clean Slate Activated.`;
+                       `💰 <b>Status:</b> GCash Verified & Cleared! Clean Slate Activated.`;
     sendTelegramMessage(ADMIN_CHAT_ID, successMsg);
   }
 }
@@ -206,7 +247,6 @@ function isPhoneMatch(gcashText, userPhone) {
   return gcashText.includes(cleanUser) || gcashText.includes(user10Digit);
 }
 
-// GCASH WEBHOOK ENDPOINT
 app.all("/webhook/gcash-sms", (req, res) => {
   let rawData = req.body;
   let parsedContent = "";
@@ -275,6 +315,7 @@ function pollTelegramUpdates() {
               } else if (cbData.startsWith("reject_")) {
                 const hwId = cbData.replace("reject_", "");
                 persistentDeviceTickets.delete(hwId);
+                syncToDisk();
                 sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "❌ Rejected!", show_alert: false });
               } else if (cbData.startsWith("adminban_")) {
                 const hwId = cbData.replace("adminban_", "");
@@ -295,7 +336,7 @@ function pollTelegramUpdates() {
   }).on("error", () => { setTimeout(pollTelegramUpdates, 3000); });
 }
 
-/* ================= 🔒 HARDENED BAN ENGINE ================= */
+/* ================= 🔒 PERSISTENT SNAPSHOT BAN ENGINE ================= */
 function checkSecurityBan(hardwareId, clientIp, fingerprint) {
   const now = Date.now();
 
@@ -315,6 +356,7 @@ function checkSecurityBan(hardwareId, clientIp, fingerprint) {
     const r = bannedFingerprints.get(fingerprint);
     if (now < r.banUntil) return r;
     bannedFingerprints.delete(fingerprint);
+    syncToDisk();
   }
 
   return null;
@@ -328,10 +370,10 @@ function banDeviceSecurity(hardwareId, clientIp, fingerprint, reason, snapshot =
   if (hardwareId) bannedDevices.set(hardwareId, record);
   if (fingerprint) bannedFingerprints.set(fingerprint, record);
 
+  syncToDisk();
   return record;
 }
 
-/* ================= MATCHMAKING ENGINE ================= */
 let waitingQueue = [];
 const activePairs = new Map();
 
@@ -375,6 +417,7 @@ io.on("connection", (socket) => {
 
   io.emit("online-count", Math.max(1, io.engine.clientsCount));
 
+  // 🔄 ALWAYS SYNC EVIDENCE SNAPSHOT ON RECONNECT/REFRESH
   const banInfo = checkSecurityBan(hardwareId, clientIp, fingerprint);
   if (banInfo) {
     socket.emit("ip-banned", { 
@@ -420,7 +463,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  /* ================= 🧠 INTELLIGENT CAMERA & REPORT MODERATION ================= */
+  /* ================= 🧠 AI MODERATION & PERSISTENT SNAPSHOT ================= */
   socket.on("report-user", (data) => {
     const partnerId = activePairs.get(socket.id);
     if (partnerId) {
@@ -433,14 +476,11 @@ io.on("connection", (socket) => {
         const snapshot = data.snapshot || null;
         const now = Date.now();
 
-        // 1. Isagawa ang Camera Frame Analysis
         const analysis = analyzeCameraFrameSnapshot(snapshot);
 
-        // 2. I-record ang Report History
         let infractions = userInfractions.get(partnerHw) || [];
         infractions = infractions.filter(r => (now - r.time < REPORT_EXPIRY_WINDOW));
         
-        // Iwasan ang duplicate spammed report mula sa iisang tao
         const isDuplicate = infractions.some(r => r.by === hardwareId);
         if (!isDuplicate) {
           infractions.push({ by: hardwareId, reason, time: now, isNSFW: analysis.isSkinDominant });
@@ -450,7 +490,6 @@ io.on("connection", (socket) => {
         const reportCount = infractions.length;
         const isSevereCategory = reason.includes("Nudity") || reason.includes("Underage") || reason.includes("Violence");
 
-        // 3. I-notify ang Admin sa Telegram kasama ang buong analysis
         const alertText = `🚨 <b>USER REPORTED (System Evaluation)</b>\n\n` +
                           `⚠️ <b>Violation:</b> ${escapeHtml(reason)}\n` +
                           `🆔 <b>Target Device:</b> <code>${escapeHtml(partnerHw)}</code>\n` +
@@ -461,8 +500,6 @@ io.on("connection", (socket) => {
 
         sendReportAlertWithActions(ADMIN_CHAT_ID, alertText, partnerHw);
 
-        // 4. SMART BAN CONDITION:
-        // Hindi maba-ban sa 1 click lang maliban kung may matibay na AI skin match O 3 magkakaibang reports!
         const shouldBan = (reportCount >= 3) || (reportCount >= 2 && analysis.isSkinDominant) || (isSevereCategory && analysis.isSkinDominant && reportCount >= 2);
 
         if (shouldBan) {
@@ -507,6 +544,8 @@ io.on("connection", (socket) => {
     }
 
     persistentDeviceTickets.set(reqHardware, { phone, ref, time: now });
+    syncToDisk();
+
     sendTelegramWithButtons(ADMIN_CHAT_ID, `🚨 <b>UNBAN REQUEST</b>\n📱 Mobile: <code>${escapeHtml(phone)}</code>\n💳 Ref: <code>${escapeHtml(ref || "N/A")}</code>\n🆔 HW: <code>${escapeHtml(reqHardware)}</code>`, reqHardware);
 
     socket.emit("unban-pending", { message: "⏳ Details submitted! Checking payment..." });
@@ -522,13 +561,13 @@ io.on("connection", (socket) => {
 app.get("*", (req, res) => {
   const publicIndex = path.join(__dirname, "public", "index.html");
   const rootIndex = path.join(__dirname, "index.html");
-  res.sendFile(require("fs").existsSync(publicIndex) ? publicIndex : rootIndex);
+  res.sendFile(fs.existsSync(publicIndex) ? publicIndex : rootIndex);
 });
 
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`🧠 Smart Camera Heuristic Moderation: ACTIVE`);
+  console.log(`💾 Persistent Disk Storage: ${DB_FILE}`);
   console.log(`================================================`);
   pollTelegramUpdates();
 });
