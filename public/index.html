@@ -82,7 +82,7 @@ video{
   will-change:transform;
 }
 
-/* 🛡️ FULL-BLEED 100% STILL PHOTO OVERLAY */
+/* 🛡️ 100% FULL-BLEED FROZEN STILL PHOTO OVERLAY */
 #freezeImageOverlay{
   position:absolute;
   top:-25px;left:-25px;right:-25px;bottom:-25px;
@@ -749,19 +749,22 @@ function updateNumericDisplayId() {
 updateNumericDisplayId();
 
 let isCurrentlyBanned = false;
-let savedBanUntil = parseInt(localStorage.getItem("meetloop_ban_until") || "0", 10);
-let savedBanReason = localStorage.getItem("meetloop_ban_reason") || "Policy Violation";
-let savedBanSnapshot = localStorage.getItem("meetloop_ban_snapshot") || null;
+let savedBanUntil = parseInt(localStorage.getItem("meetloop_ban_until") || sessionStorage.getItem("meetloop_ban_until") || "0", 10);
+let savedBanReason = localStorage.getItem("meetloop_ban_reason") || sessionStorage.getItem("meetloop_ban_reason") || "Policy Violation";
+let savedBanSnapshot = localStorage.getItem("meetloop_ban_snapshot") || sessionStorage.getItem("meetloop_ban_snapshot") || null;
 
 if (savedBanUntil && Date.now() < savedBanUntil) {
   isCurrentlyBanned = true;
   setTimeout(() => {
     display7DayBanScreen(savedBanUntil, savedBanReason, savedBanSnapshot);
-  }, 100);
+  }, 50);
 } else {
   localStorage.removeItem("meetloop_ban_until");
   localStorage.removeItem("meetloop_ban_reason");
   localStorage.removeItem("meetloop_ban_snapshot");
+  sessionStorage.removeItem("meetloop_ban_until");
+  sessionStorage.removeItem("meetloop_ban_reason");
+  sessionStorage.removeItem("meetloop_ban_snapshot");
 }
 
 /* ================= 3. SOCKET CONNECTION ================= */
@@ -858,13 +861,13 @@ function displayOmeTVFrozenSnapshot() {
     isFreezeActive = true;
 
     const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = remoteVideo.videoWidth || 1280;
-    tempCanvas.height = remoteVideo.videoHeight || 720;
+    tempCanvas.width = 360;
+    tempCanvas.height = 270;
     const ctx = tempCanvas.getContext("2d");
-    ctx.drawImage(remoteVideo, 0, 0, tempCanvas.width, tempCanvas.height);
+    ctx.drawImage(remoteVideo, 0, 0, 360, 270);
 
     if (freezeImageOverlay) {
-      freezeImageOverlay.src = tempCanvas.toDataURL("image/jpeg", 0.9);
+      freezeImageOverlay.src = tempCanvas.toDataURL("image/jpeg", 0.85);
       freezeImageOverlay.style.opacity = "1";
       freezeImageOverlay.style.display = "block";
     }
@@ -910,14 +913,15 @@ function resetVideoLayers() {
   if (reportBtn) reportBtn.style.display = "none";
 }
 
-// 🌟 PERMANENT CLEAN UNBAN WITH FRESH ID RESET
 function handleSuccessfulUnban() {
   isCurrentlyBanned = false;
   localStorage.removeItem("meetloop_ban_until");
   localStorage.removeItem("meetloop_ban_reason");
   localStorage.removeItem("meetloop_ban_snapshot");
+  sessionStorage.removeItem("meetloop_ban_until");
+  sessionStorage.removeItem("meetloop_ban_reason");
+  sessionStorage.removeItem("meetloop_ban_snapshot");
 
-  // Fresh ID Reset
   myHardwareId = getPersistentDeviceId(true);
   updateNumericDisplayId();
 
@@ -992,6 +996,7 @@ if (socket) {
     triggerStartNext();
   });
 
+  // 📸 REALTIME BAN NOTIFICATION WITH PERSISTENT SNAPSHOT
   socket.on("ip-banned", (data) => {
     display7DayBanScreen(data.banUntil, data.reason, data.snapshot);
   });
@@ -1014,10 +1019,8 @@ if (socket) {
 
   socket.on("real-admin-unban-signal", (data) => {
     if (data && (!data.hardwareId || data.hardwareId === myHardwareId)) {
-      if (isCurrentlyBanned || localStorage.getItem("meetloop_ban_until")) {
-        handleSuccessfulUnban();
-        if (tabChannel) tabChannel.postMessage({ type: "UNBAN_EVENT" });
-      }
+      handleSuccessfulUnban();
+      if (tabChannel) tabChannel.postMessage({ type: "UNBAN_EVENT" });
     }
   });
 
@@ -1178,6 +1181,7 @@ function toggleMicrophone() {
 function updateVolume(val) {
   const v = Math.max(0, Math.min(1, parseFloat(val)));
   if (audioSlider) audioSlider.value = v;
+  localStorage.setItem("meetloop_volume", v.toString());
   if (remoteVideo) {
     remoteVideo.volume = v;
     remoteVideo.muted = (v === 0);
@@ -1230,8 +1234,10 @@ async function createPeer(initiator) {
         remoteVideo.srcObject.addTrack(e.track);
       }
 
+      const savedVol = parseFloat(localStorage.getItem("meetloop_volume") || "1.0");
       remoteVideo.muted = false;
-      remoteVideo.volume = parseFloat(audioSlider?.value || 1.0);
+      remoteVideo.volume = savedVol;
+      if (audioSlider) audioSlider.value = savedVol;
 
       if ("playoutDelayHint" in remoteVideo) {
         remoteVideo.playoutDelayHint = 0;
@@ -1288,7 +1294,6 @@ function closePeerConnection() {
   pendingCandidates = [];
 }
 
-// 🟢 START CHATTING PORTAL HANDLER
 async function startPortalChatting() {
   const portal = document.getElementById("welcomePortal");
   if (portal) portal.style.display = "none";
@@ -1344,7 +1349,7 @@ function stopSession() {
   if (stopBtn) stopBtn.disabled = true;
 }
 
-// 📸 PRIORITY: CAPTURES THE STRANGER'S CAMERA FEED AS VIOLATION EVIDENCE
+// 📸 SMART HIGH-QUALITY COMPRESSED SNAPSHOT CAPTURE (30KB)
 function captureStrangerSnapshot() {
   try {
     const canvas = document.createElement("canvas");
@@ -1354,24 +1359,32 @@ function captureStrangerSnapshot() {
 
     if (remoteVideo && (remoteVideo.videoWidth > 0 || remoteVideo.srcObject)) {
       ctx.drawImage(remoteVideo, 0, 0, 160, 160);
-      return canvas.toDataURL("image/jpeg", 0.7);
+      return canvas.toDataURL("image/jpeg", 0.65);
     }
   } catch(e){}
   return null;
 }
 
-// 📸 PERMANENT EVIDENCE DISPLAY (NEVER DISAPPEARS ON REFRESH)
+// 📸 100% AIRTIGHT EVIDENCE PICTURE DISPLAY ON REFRESH
 function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap = null) {
   isCurrentlyBanned = true;
   stopSession();
 
   const finalBanUntil = (!banUntil || isNaN(banUntil)) ? (Date.now() + 7 * 24 * 60 * 60 * 1000) : banUntil;
-  localStorage.setItem("meetloop_ban_until", finalBanUntil.toString());
-  localStorage.setItem("meetloop_ban_reason", reason);
+  
+  try {
+    localStorage.setItem("meetloop_ban_until", finalBanUntil.toString());
+    localStorage.setItem("meetloop_ban_reason", reason);
+    sessionStorage.setItem("meetloop_ban_until", finalBanUntil.toString());
+    sessionStorage.setItem("meetloop_ban_reason", reason);
+  } catch(e){}
 
-  const snapshotToRender = customSnap || localStorage.getItem("meetloop_ban_snapshot");
+  const snapshotToRender = customSnap || localStorage.getItem("meetloop_ban_snapshot") || sessionStorage.getItem("meetloop_ban_snapshot");
   if (customSnap) {
-    try { localStorage.setItem("meetloop_ban_snapshot", customSnap); } catch(e){}
+    try {
+      localStorage.setItem("meetloop_ban_snapshot", customSnap);
+      sessionStorage.setItem("meetloop_ban_snapshot", customSnap);
+    } catch(e){}
   }
 
   const elReason = document.getElementById("banReasonLabel");
@@ -1510,6 +1523,12 @@ document.getElementById("showLocalBtn")?.addEventListener("click", () => {
   localCamBox?.classList.remove("hidden-cam");
   document.getElementById("showLocalBtn")?.classList.remove("visible");
 });
+
+// Sync saved volume
+const savedVolume = localStorage.getItem("meetloop_volume");
+if (savedVolume !== null && audioSlider) {
+  audioSlider.value = savedVolume;
+}
 </script>
 </body>
 </html>
