@@ -338,8 +338,9 @@ video{
 .gcash-fee-tag{background:#0284c7;color:#fff;font-size:10px;font-weight:900;padding:2px 8px;border-radius:20px}
 .gcash-input-group{width:100%;display:flex;flex-direction:column;gap:5px}
 .gcash-input-field{width:100%;height:38px;padding:0 12px;background:#ffffff;border:2px solid #bfdbfe;border-radius:8px;color:#0f172a;font-size:11.5px;font-weight:700;outline:none}
-.gcash-verify-btn{width:100%;height:42px;border:0;border-radius:8px;background:#005ce6;color:#fff;font-size:12.5px;font-weight:900;cursor:pointer}
-.gcash-verify-btn:disabled{background:#475569 !important;cursor:not-allowed !important}
+.gcash-input-field:disabled{background:#f1f5f9;color:#94a3b8;cursor:not-allowed}
+.gcash-verify-btn{width:100%;height:42px;border:0;border-radius:8px;background:#005ce6;color:#fff;font-size:12.5px;font-weight:900;cursor:pointer;transition:all 0.2s}
+.gcash-verify-btn:disabled{background:#64748b !important;color:#cbd5e1 !important;cursor:not-allowed !important}
 
 .telegram-support-btn{
   width:100%;height:40px;border:1.5px solid #0284c7;border-radius:10px;background:#0f172a;color:#38bdf8;
@@ -462,7 +463,7 @@ video{
       </div>
     </div>
 
-    <!-- VIEW 1: METHOD OPTIONS (₱20 ONLY) -->
+    <!-- VIEW 1: METHOD OPTIONS -->
     <div id="selectMethodSection" class="method-choice-container">
       <div style="font-size:12px;font-weight:800;color:#334155">Select Resolution Method:</div>
 
@@ -497,7 +498,7 @@ video{
       </div>
     </div>
 
-    <!-- VIEW 2: GCASH FORM (₱20 ONLY) -->
+    <!-- VIEW 2: GCASH FORM (ANTI-SPAM PROTECTED) -->
     <div id="gcashPaySection">
       <div class="ban-disclaimer-box">
         <div class="ban-disclaimer-title">🚫 Official Ban Clearance Notice</div>
@@ -796,6 +797,10 @@ let isFreezeActive = false;
 let pendingCandidates = [];
 let lastCapturedStrangerSnapshot = null;
 
+// 🛑 ANTI-SPAM TIMER TRACKER
+let cooldownSeconds = 0;
+let cooldownInterval = null;
+
 const rtcConfig = {
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
@@ -908,6 +913,8 @@ function handleSuccessfulUnban() {
   myHardwareId = getPersistentDeviceId();
   updateNumericDisplayId();
 
+  if (cooldownInterval) clearInterval(cooldownInterval);
+
   const status = document.getElementById("gcashRefStatus");
   if (status) {
     status.style.color = "#16a34a";
@@ -988,7 +995,7 @@ if (socket) {
     const status = document.getElementById("gcashRefStatus");
     if (status) {
       status.style.color = "#0284c7";
-      status.innerHTML = `⏳ <b>Details Logged. Verifying ₱20 GCash payment...</b>`;
+      status.innerHTML = `⏳ <b>Details Submitted! Checking ₱20 GCash payment...</b>`;
     }
     const overlay = document.getElementById("banOverlay");
     if (overlay) overlay.style.display = "flex";
@@ -1345,9 +1352,11 @@ function openGcashPayView() {
   if (selectSec) selectSec.style.display = "none";
   if (gcashSec) gcashSec.style.display = "flex";
 
-  document.getElementById("gcashPhoneInput").value = "";
-  document.getElementById("gcashRefInput").value = "";
-  document.getElementById("gcashRefStatus").textContent = "";
+  if (cooldownSeconds <= 0) {
+    document.getElementById("gcashPhoneInput").value = "";
+    document.getElementById("gcashRefInput").value = "";
+    document.getElementById("gcashRefStatus").textContent = "";
+  }
 }
 
 function backToMethodSelection() {
@@ -1357,7 +1366,41 @@ function backToMethodSelection() {
   if (selectSec) selectSec.style.display = "flex";
 }
 
+/* ================= 🛑 ANTI-SPAM SUBMISSION CONTROLLER ================= */
+function startAntiSpamCooldown(seconds = 30) {
+  cooldownSeconds = seconds;
+  const btn = document.getElementById("gcashVerifyBtn");
+  const phoneInput = document.getElementById("gcashPhoneInput");
+  const refInput = document.getElementById("gcashRefInput");
+
+  if (btn) btn.disabled = true;
+  if (phoneInput) phoneInput.disabled = true;
+  if (refInput) refInput.disabled = true;
+
+  if (cooldownInterval) clearInterval(cooldownInterval);
+
+  cooldownInterval = setInterval(() => {
+    cooldownSeconds--;
+    if (btn) {
+      btn.textContent = `Please wait (${cooldownSeconds}s)...`;
+    }
+
+    if (cooldownSeconds <= 0) {
+      clearInterval(cooldownInterval);
+      cooldownInterval = null;
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "Submit for Verification";
+      }
+      if (phoneInput) phoneInput.disabled = false;
+      if (refInput) refInput.disabled = false;
+    }
+  }, 1000);
+}
+
 function submitGCashUnbanTicket() {
+  if (cooldownSeconds > 0) return;
+
   const phoneInput = document.getElementById("gcashPhoneInput");
   const refInput = document.getElementById("gcashRefInput");
   const status = document.getElementById("gcashRefStatus");
@@ -1373,6 +1416,9 @@ function submitGCashUnbanTicket() {
     return;
   }
 
+  // I-activate ang 30s Cooldown agad para bawal i-spam click
+  startAntiSpamCooldown(30);
+
   if (status) {
     status.style.color = "#0284c7";
     status.innerHTML = `⏳ <b>Submitting details for ₱20 verification...</b>`;
@@ -1380,6 +1426,11 @@ function submitGCashUnbanTicket() {
 
   if (socket && socket.connected) {
     socket.emit("unban-request", { hardwareId: myHardwareId, phone: phoneVal, ref: refVal });
+  } else {
+    if (status) {
+      status.style.color = "#dc2626";
+      status.textContent = "❌ Server disconnected. Please check internet connection.";
+    }
   }
 }
 
