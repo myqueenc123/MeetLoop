@@ -462,7 +462,7 @@ video{
       </div>
     </div>
 
-    <!-- VIEW 1: METHOD OPTIONS -->
+    <!-- VIEW 1: METHOD OPTIONS (₱20 ONLY) -->
     <div id="selectMethodSection" class="method-choice-container">
       <div style="font-size:12px;font-weight:800;color:#334155">Select Resolution Method:</div>
 
@@ -472,8 +472,8 @@ video{
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
           </div>
           <div>
-            <div class="method-title" style="color:#005ce6">Instant 7-Day Unban (₱10 Support)</div>
-            <div class="method-desc">Pay ₱10 GCash clearance fee & submit Mobile No.</div>
+            <div class="method-title" style="color:#005ce6">Instant 7-Day Unban (₱20 Support)</div>
+            <div class="method-desc">Pay ₱20 GCash clearance fee & submit Mobile No.</div>
           </div>
         </div>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
@@ -497,22 +497,22 @@ video{
       </div>
     </div>
 
-    <!-- VIEW 2: GCASH FORM (USING /gcash-qr.png) -->
+    <!-- VIEW 2: GCASH FORM (₱20 ONLY) -->
     <div id="gcashPaySection">
       <div class="ban-disclaimer-box">
         <div class="ban-disclaimer-title">🚫 Official Ban Clearance Notice</div>
         <div>
           Your access is restricted for <b>7 days</b> due to Community Guidelines violation.<br>
-          ⚡ <b>Want to return sooner?</b> Pay <b>₱10 voluntary support</b>.
+          ⚡ <b>Want to return sooner?</b> Pay <b>₱20 voluntary support</b>.
         </div>
       </div>
 
       <div class="gcash-qr-box">
-        <span class="gcash-fee-tag">Fee: ₱10.00 Support Payment</span>
+        <span class="gcash-fee-tag">Fee: ₱20.00 Support Payment</span>
         <div class="gcash-qr-frame">
           <img src="/gcash-qr.png" class="gcash-qr-img" alt="GCash QR">
         </div>
-        <div style="font-size:10px;color:#475569;font-weight:700">Scan QR via GCash, pay ₱10, & enter details below.</div>
+        <div style="font-size:10px;color:#475569;font-weight:700">Scan QR via GCash, pay exactly ₱20, & enter details below.</div>
       </div>
 
       <div class="gcash-input-group">
@@ -737,7 +737,6 @@ let savedBanUntil = parseInt(localStorage.getItem("meetloop_ban_until") || sessi
 let savedBanReason = localStorage.getItem("meetloop_ban_reason") || sessionStorage.getItem("meetloop_ban_reason") || "Policy Violation";
 let savedBanSnapshot = localStorage.getItem("meetloop_ban_snapshot") || sessionStorage.getItem("meetloop_ban_snapshot") || null;
 
-// HARD CHECK: Kung may active ban, huwag tanggalin kailanman sa client-side!
 if (savedBanUntil && Date.now() < savedBanUntil) {
   isCurrentlyBanned = true;
   setTimeout(() => {
@@ -905,7 +904,6 @@ function handleSuccessfulUnban() {
   sessionStorage.removeItem("meetloop_ban_reason");
   sessionStorage.removeItem("meetloop_ban_snapshot");
 
-  // Mag-generate ng fresh ID para malinis
   localStorage.removeItem("meetloop_device_id");
   myHardwareId = getPersistentDeviceId();
   updateNumericDisplayId();
@@ -913,7 +911,7 @@ function handleSuccessfulUnban() {
   const status = document.getElementById("gcashRefStatus");
   if (status) {
     status.style.color = "#16a34a";
-    status.textContent = "✅ Unban Successful! Welcome back!";
+    status.textContent = "✅ ₱20 Verified! Unban Successful! Welcome back!";
   }
   const overlay = document.getElementById("banOverlay");
   if (overlay) overlay.style.display = "none";
@@ -990,13 +988,12 @@ if (socket) {
     const status = document.getElementById("gcashRefStatus");
     if (status) {
       status.style.color = "#0284c7";
-      status.innerHTML = `⏳ <b>Details Logged. Verifying payment...</b>`;
+      status.innerHTML = `⏳ <b>Details Logged. Verifying ₱20 GCash payment...</b>`;
     }
     const overlay = document.getElementById("banOverlay");
     if (overlay) overlay.style.display = "flex";
   });
 
-  // TANGING DITO LANG MATATANGGAL ANG BAN SA BROWSER
   socket.on("real-admin-unban-signal", (data) => {
     if (data && (!data.hardwareId || data.hardwareId === myHardwareId)) {
       handleSuccessfulUnban();
@@ -1378,7 +1375,7 @@ function submitGCashUnbanTicket() {
 
   if (status) {
     status.style.color = "#0284c7";
-    status.innerHTML = `⏳ <b>Submitting details for verification...</b>`;
+    status.innerHTML = `⏳ <b>Submitting details for ₱20 verification...</b>`;
   }
 
   if (socket && socket.connected) {
