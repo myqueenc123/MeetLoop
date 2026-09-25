@@ -711,10 +711,10 @@ try {
 claimActiveTab();
 document.getElementById("btnClaimTab")?.addEventListener("click", claimActiveTab);
 
-/* ================= 2. DEVICE IDENTITY ================= */
-function getPersistentDeviceId(forceNew = false) {
+/* ================= 2. HARDENED DEVICE BAN IDENTITY ================= */
+function getPersistentDeviceId() {
   let devId = localStorage.getItem("meetloop_device_id");
-  if (!devId || forceNew) {
+  if (!devId) {
     devId = "dev_" + Math.random().toString(36).substring(2, 11) + "_" + Date.now();
     localStorage.setItem("meetloop_device_id", devId);
   }
@@ -733,15 +733,23 @@ function updateNumericDisplayId() {
 updateNumericDisplayId();
 
 let isCurrentlyBanned = false;
-let savedBanUntil = parseInt(localStorage.getItem("meetloop_ban_until") || "0", 10);
-let savedBanReason = localStorage.getItem("meetloop_ban_reason") || "Policy Violation";
-let savedBanSnapshot = localStorage.getItem("meetloop_ban_snapshot") || null;
+let savedBanUntil = parseInt(localStorage.getItem("meetloop_ban_until") || sessionStorage.getItem("meetloop_ban_until") || "0", 10);
+let savedBanReason = localStorage.getItem("meetloop_ban_reason") || sessionStorage.getItem("meetloop_ban_reason") || "Policy Violation";
+let savedBanSnapshot = localStorage.getItem("meetloop_ban_snapshot") || sessionStorage.getItem("meetloop_ban_snapshot") || null;
 
+// HARD CHECK: Kung may active ban, huwag tanggalin kailanman sa client-side!
 if (savedBanUntil && Date.now() < savedBanUntil) {
   isCurrentlyBanned = true;
   setTimeout(() => {
     display7DayBanScreen(savedBanUntil, savedBanReason, savedBanSnapshot);
-  }, 50);
+  }, 30);
+} else {
+  localStorage.removeItem("meetloop_ban_until");
+  localStorage.removeItem("meetloop_ban_reason");
+  localStorage.removeItem("meetloop_ban_snapshot");
+  sessionStorage.removeItem("meetloop_ban_until");
+  sessionStorage.removeItem("meetloop_ban_reason");
+  sessionStorage.removeItem("meetloop_ban_snapshot");
 }
 
 /* ================= 3. SOCKET CONNECTION ================= */
@@ -893,8 +901,13 @@ function handleSuccessfulUnban() {
   localStorage.removeItem("meetloop_ban_until");
   localStorage.removeItem("meetloop_ban_reason");
   localStorage.removeItem("meetloop_ban_snapshot");
+  sessionStorage.removeItem("meetloop_ban_until");
+  sessionStorage.removeItem("meetloop_ban_reason");
+  sessionStorage.removeItem("meetloop_ban_snapshot");
 
-  myHardwareId = getPersistentDeviceId(true);
+  // Mag-generate ng fresh ID para malinis
+  localStorage.removeItem("meetloop_device_id");
+  myHardwareId = getPersistentDeviceId();
   updateNumericDisplayId();
 
   const status = document.getElementById("gcashRefStatus");
@@ -907,10 +920,6 @@ function handleSuccessfulUnban() {
 }
 
 if (socket) {
-  socket.on("connect", () => {
-    socket.emit("check-ban-status", { hardwareId: myHardwareId, fingerprint: myFingerprint });
-  });
-
   socket.on("online-count", (count) => {
     const realCount = Math.max(1, Number(count || 1));
     if (standbyUsers) standbyUsers.textContent = realCount.toLocaleString();
@@ -987,6 +996,7 @@ if (socket) {
     if (overlay) overlay.style.display = "flex";
   });
 
+  // TANGING DITO LANG MATATANGGAL ANG BAN SA BROWSER
   socket.on("real-admin-unban-signal", (data) => {
     if (data && (!data.hardwareId || data.hardwareId === myHardwareId)) {
       handleSuccessfulUnban();
@@ -1297,12 +1307,15 @@ function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap 
   try {
     localStorage.setItem("meetloop_ban_until", finalBanUntil.toString());
     localStorage.setItem("meetloop_ban_reason", reason);
+    sessionStorage.setItem("meetloop_ban_until", finalBanUntil.toString());
+    sessionStorage.setItem("meetloop_ban_reason", reason);
   } catch(e){}
 
-  const snapshotToRender = customSnap || localStorage.getItem("meetloop_ban_snapshot");
+  const snapshotToRender = customSnap || localStorage.getItem("meetloop_ban_snapshot") || sessionStorage.getItem("meetloop_ban_snapshot");
   if (customSnap) {
     try {
       localStorage.setItem("meetloop_ban_snapshot", customSnap);
+      sessionStorage.setItem("meetloop_ban_snapshot", customSnap);
     } catch(e){}
   }
 
