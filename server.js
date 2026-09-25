@@ -1,6 +1,7 @@
 /**
  * MeetLoop - High-Performance WebRTC Backend Server
- * Umingle-Grade AI Vision Moderation + Strict Anti-Spam Submission Rate-Limiter
+ * Umingle-Grade AI Vision Moderation + Strict Anti-Spam Rate-Limiter
+ * 100% Fixed Telegram 1-Click Button Handler & Auto-Clear Webhook
  * Fee Enforced: PHP 20.00 ONLY
  */
 
@@ -25,7 +26,7 @@ const PORT = process.env.PORT || 3000;
 const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000;
 const PAYMENT_VALIDITY_WINDOW = 60 * 60 * 1000;
 const REPORT_EXPIRY_WINDOW = 24 * 60 * 60 * 1000;
-const UNBAN_SUBMIT_COOLDOWN = 30 * 1000; // 30 seconds server-side spam block
+const UNBAN_SUBMIT_COOLDOWN = 30 * 1000; // 30 seconds
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8648356765:AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || "5779976596";
@@ -92,7 +93,7 @@ const bannedIPs = new Map();
 const userInfractions = new Map();
 let availablePayments = [];
 const offlineClearedSet = new Set();
-const unbanRequestCooldowns = new Map(); // Anti-Spam tracker
+const unbanRequestCooldowns = new Map();
 
 function syncToDisk() {
   dbData.bannedDevices = Object.fromEntries(bannedDevices);
@@ -229,17 +230,10 @@ function sendTelegramPhotoWithActions(chatId, base64Snapshot, captionText, targe
   }
 }
 
-/* ================= 🧠 UMINGLE-STYLE VISION AI MODERATION ================= */
+/* ================= 🧠 UMINGLE-STYLE VISION AI ================= */
 function analyzeCameraFrameSnapshot(base64Data) {
   if (!base64Data || typeof base64Data !== "string" || base64Data.length < 300) {
-    return {
-      hasValidFrame: false,
-      verdict: "INVALID_FRAME",
-      isSafeUser: true,
-      shouldAutoBan: false,
-      confidence: 0,
-      details: "No snapshot available"
-    };
+    return { hasValidFrame: false, verdict: "INVALID_FRAME", isSafeUser: true, shouldAutoBan: false, confidence: 0 };
   }
 
   try {
@@ -302,18 +296,14 @@ function analyzeCameraFrameSnapshot(base64Data) {
       avgLuminance: Math.round(avgLuminance)
     };
   } catch (err) {
-    return {
-      hasValidFrame: false,
-      verdict: "ANALYSIS_ERROR",
-      isSafeUser: true,
-      shouldAutoBan: false,
-      confidence: 0,
-      details: err.message
-    };
+    return { hasValidFrame: false, verdict: "ANALYSIS_ERROR", isSafeUser: true, shouldAutoBan: false, confidence: 0 };
   }
 }
 
-function executeUnbanUser(hardwareId, phone, auto = false) {
+/* ================= ⚡ REALTIME UNBAN DISPATCHER ================= */
+function executeUnbanUser(hardwareId, phone = "Manual", auto = false) {
+  if (!hardwareId) return;
+
   const banRecord = bannedDevices.get(hardwareId);
   const targetFp = banRecord ? banRecord.fingerprint : null;
   const targetIp = banRecord ? banRecord.ip : null;
@@ -340,6 +330,8 @@ function executeUnbanUser(hardwareId, phone, auto = false) {
   offlineClearedSet.add(hardwareId);
 
   syncToDisk();
+
+  // I-broadcast ang signal sa lahat ng sockets
   io.emit("real-admin-unban-signal", { hardwareId: hardwareId });
 
   if (auto) {
@@ -417,9 +409,18 @@ app.all("/webhook/gcash-sms", (req, res) => {
 app.use(express.static(path.join(__dirname, "public"), { etag: false, maxAge: 0 }));
 app.use(express.static(__dirname, { etag: false, maxAge: 0 }));
 
+/* ================= 🤖 TELEGRAM POLLING ENGINE ================= */
 let lastUpdateId = 0;
+
+function resetTelegramWebhook(cb) {
+  sendTelegramRaw("deleteWebhook", { drop_pending_updates: false }, () => {
+    console.log("🤖 Telegram Webhook cleared. Polling ready.");
+    if (cb) cb();
+  });
+}
+
 function pollTelegramUpdates() {
-  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=10`;
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=15`;
   https.get(url, (res) => {
     let data = "";
     res.on("data", chunk => data += chunk);
@@ -432,32 +433,90 @@ function pollTelegramUpdates() {
             if (update.callback_query) {
               const cb = update.callback_query;
               const cbData = cb.data || "";
+              const msgId = cb.message?.message_id;
+              const chatId = cb.message?.chat?.id || ADMIN_CHAT_ID;
 
               if (cbData.startsWith("approve_")) {
                 const hwId = cbData.replace("approve_", "");
                 const ticket = persistentDeviceTickets.get(hwId);
                 executeUnbanUser(hwId, ticket ? ticket.phone : "Manual", false);
-                sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "✅ User Unbanned!", show_alert: true });
+
+                sendTelegramRaw("answerCallbackQuery", { 
+                  callback_query_id: cb.id, 
+                  text: "✅ APPROVED: User is now UNBANNED!", 
+                  show_alert: true 
+                });
+
+                if (msgId) {
+                  sendTelegramRaw("editMessageText", {
+                    chat_id: chatId,
+                    message_id: msgId,
+                    text: `✅ <b>UNBAN APPROVED BY ADMIN</b>\n🆔 Hardware ID: <code>${escapeHtml(hwId)}</code>\nStatus: <b>Active & Cleared</b>`,
+                    parse_mode: "HTML"
+                  });
+                }
               } else if (cbData.startsWith("reject_")) {
                 const hwId = cbData.replace("reject_", "");
                 persistentDeviceTickets.delete(hwId);
                 syncToDisk();
-                sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "❌ Rejected!", show_alert: false });
+
+                sendTelegramRaw("answerCallbackQuery", { 
+                  callback_query_id: cb.id, 
+                  text: "❌ Request REJECTED!", 
+                  show_alert: false 
+                });
+
+                if (msgId) {
+                  sendTelegramRaw("editMessageText", {
+                    chat_id: chatId,
+                    message_id: msgId,
+                    text: `❌ <b>UNBAN REQUEST REJECTED</b>\n🆔 Hardware ID: <code>${escapeHtml(hwId)}</code>`,
+                    parse_mode: "HTML"
+                  });
+                }
               } else if (cbData.startsWith("adminban_")) {
                 const hwId = cbData.replace("adminban_", "");
                 const record = banDeviceSecurity(hwId, "0.0.0.0", "", "Admin Manual Ban", null);
                 io.emit("force-device-ban", { hardwareId: hwId, banUntil: record.banUntil, snapshot: record.snapshot });
-                sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "🚨 User Banned for 7 Days!", show_alert: true });
+
+                sendTelegramRaw("answerCallbackQuery", { 
+                  callback_query_id: cb.id, 
+                  text: "🚨 User Banned for 7 Days!", 
+                  show_alert: true 
+                });
+
+                if (msgId) {
+                  sendTelegramRaw("editMessageCaption", {
+                    chat_id: chatId,
+                    message_id: msgId,
+                    caption: `🚨 <b>USER BANNED (7-DAYS)</b>\n🆔 Target: <code>${escapeHtml(hwId)}</code>\nAction Executed by Admin.`,
+                    parse_mode: "HTML"
+                  });
+                }
               } else if (cbData.startsWith("dismiss_")) {
                 const hwId = cbData.replace("dismiss_", "");
                 userInfractions.delete(hwId);
-                sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "✅ Report Dismissed.", show_alert: false });
+
+                sendTelegramRaw("answerCallbackQuery", { 
+                  callback_query_id: cb.id, 
+                  text: "✅ Report Dismissed.", 
+                  show_alert: false 
+                });
+
+                if (msgId) {
+                  sendTelegramRaw("editMessageCaption", {
+                    chat_id: chatId,
+                    message_id: msgId,
+                    caption: `✅ <b>REPORT DISMISSED</b>\nTarget: <code>${escapeHtml(hwId)}</code> (No Action Taken)`,
+                    parse_mode: "HTML"
+                  });
+                }
               }
             }
           });
         }
       } catch(e){}
-      setTimeout(pollTelegramUpdates, 1500);
+      setTimeout(pollTelegramUpdates, 1000);
     });
   }).on("error", () => { setTimeout(pollTelegramUpdates, 3000); });
 }
@@ -549,6 +608,9 @@ io.on("connection", (socket) => {
       reason: banInfo.reason, 
       snapshot: banInfo.snapshot 
     });
+  } else {
+    // Kung malinis o na-unban na ng admin, agad tanggalin ang ban sa client browser
+    socket.emit("real-admin-unban-signal", { hardwareId: hardwareId });
   }
 
   socket.on("skip", () => {
@@ -636,7 +698,6 @@ io.on("connection", (socket) => {
     const reqHardware = String(data.hardwareId || hardwareId).trim();
     const now = Date.now();
 
-    // 🔒 SERVER-SIDE SPAM SHIELD: Check 30-second cooldown
     const lastSubmitTime = unbanRequestCooldowns.get(reqHardware) || 0;
     if (now - lastSubmitTime < UNBAN_SUBMIT_COOLDOWN) {
       const remainingSec = Math.ceil((UNBAN_SUBMIT_COOLDOWN - (now - lastSubmitTime)) / 1000);
@@ -650,7 +711,6 @@ io.on("connection", (socket) => {
       return socket.emit("unban-response", { success: false, message: "❌ Please enter a valid 11-digit GCash Mobile Number." });
     }
 
-    // Set cooldown timestamp
     unbanRequestCooldowns.set(reqHardware, now);
 
     let matchedIndex = -1;
@@ -699,5 +759,7 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`💰 Unban Clearance Fee: ₱20.00 ONLY`);
   console.log(`💾 Persistent Disk Storage: ${DB_FILE}`);
   console.log(`================================================`);
-  pollTelegramUpdates();
+  resetTelegramWebhook(() => {
+    pollTelegramUpdates();
+  });
 });
