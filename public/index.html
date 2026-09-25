@@ -214,7 +214,7 @@ video{
 .chat-input{flex:1;min-width:0;height:38px;padding:0 12px;background:#070b14;border:1px solid var(--panel-border);border-radius:8px;color:#fff;outline:none;font-size:11px}
 .chat-send-btn{width:60px;height:38px;border:0;border-radius:8px;background:#2563eb;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
 
-/* 📱 COMPACT OMETV MOBILE PiP */
+/* 📱 MOBILE VIEW */
 @media (max-width:850px){
   body{height:100dvh;overflow-y:auto}
   header{height:46px;padding:0 10px}
@@ -263,7 +263,7 @@ video{
   }
 }
 
-/* 💻 PC / DESKTOP */
+/* 💻 DESKTOP VIEW */
 @media (min-width:851px){
   #hideLocalBtn, #showLocalBtn, #flipBtn{display:none !important}
 
@@ -295,7 +295,7 @@ video{
   .ban-expire-time{font-size:12px !important}
 }
 
-/* 🔒 FULL WHITE BAN MODAL CARD */
+/* 🔒 BAN OVERLAY */
 #banOverlay{
   position:fixed !important;inset:0 !important;z-index:2147483647 !important;
   background:rgba(0,0,0,0.98) !important;display:none;align-items:center;justify-content:center;
@@ -332,8 +332,6 @@ video{
 .method-desc{font-size:10.5px;color:#64748b}
 
 #gcashPaySection{display:none;flex-direction:column;gap:8px}
-.gcash-logo-banner{background:#005ce6;border-radius:10px;padding:6px 12px;display:flex;align-items:center;justify-content:center}
-.gcash-official-svg{height:24px;max-width:140px;display:block}
 .gcash-qr-box{background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:12px;padding:8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px}
 .gcash-qr-frame{background:#ffffff;padding:5px;border-radius:10px;border:1.5px solid #94a3b8;display:inline-block}
 .gcash-qr-img{width:120px;height:120px;display:block;border-radius:4px;object-fit:contain}
@@ -357,7 +355,7 @@ video{
 /* WELCOME PORTAL */
 #welcomePortal{
   position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px;
-  background:linear-gradient(rgba(10, 14, 23, 0.75), rgba(10, 14, 23, 0.85)), url('/meetloop-bg.png') center/cover no-repeat;
+  background:rgba(10, 14, 23, 0.88);
   backdrop-filter:blur(8px);
 }
 .portal-box{max-width:420px;width:100%;padding:28px 20px;text-align:center;background:rgba(17, 24, 39, 0.95);border-radius:24px;border:1.5px solid rgba(255,255,255,.12);box-shadow:0 25px 60px rgba(0,0,0,.9)}
@@ -393,7 +391,7 @@ video{
   <div class="tab-lock-card">
     <span style="font-size:42px;display:block;margin-bottom:12px">⚠️</span>
     <div style="font-size:18px;font-weight:900;color:#ef4444;margin-bottom:8px">Duplicate Tab Detected</div>
-    <div style="font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:18px">MeetLoop is only allowed in 1 tab session.</div>
+    <div style="font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:18px">MeetLoop is only allowed in 1 active tab.</div>
     <button type="button" class="btn-claim-tab" id="btnClaimTab">Use This Tab Instead</button>
   </div>
 </div>
@@ -440,28 +438,27 @@ video{
       <li><b>18+ Required:</b> Minors are strictly prohibited.</li>
       <li><b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.</li>
       <li><b>Human Face Only:</b> Look directly at the camera.</li>
-      <li><b>Instant 1s Safety Shield:</b> Safe OmeTV-style transition on every switch.</li>
+      <li><b>Safety Shield:</b> Safe transition on every stranger switch.</li>
     </ul>
 
     <button class="portal-btn" id="portalStartBtn" type="button" onclick="startPortalChatting()">START CHATTING</button>
   </div>
 </div>
 
-<!-- 7-DAY HARD LOCK BAN OVERLAY (PERFECT PROPORTION PC & MOBILE) -->
+<!-- 7-DAY HARD LOCK BAN OVERLAY -->
 <div id="banOverlay">
   <div class="ban-card">
     
-    <!-- BAN CARD HEADER (ALWAYS AT TOP) -->
     <div class="ban-top">
       <div class="ban-snap-frame">
         <img id="banSnapshotImg" alt="Evidence Snapshot">
         <div class="ban-snap-brand">MeetLoop</div>
-        <div class="ban-snap-tag">ENCOUNTER EVIDENCE</div>
+        <div class="ban-snap-tag">EVIDENCE LOGGED</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:3px">
         <div class="ban-title">7-Day Suspension</div>
         <div class="ban-reason">Reason: <span id="banReasonLabel">Policy Violation</span></div>
-        <div style="font-size:10px;color:#94a3b8;font-weight:600">Reported Encounter Snapshot Logged</div>
+        <div style="font-size:10px;color:#94a3b8;font-weight:600">Violation Snapshot Logged</div>
       </div>
     </div>
 
@@ -494,19 +491,19 @@ video{
           </div>
           <div>
             <div class="method-title">Wait 7-Day Suspension Period</div>
-            <div class="method-desc">Auto unbans when 7 days expire</div>
+            <div class="method-desc">Automatically unbans when period expires</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- VIEW 2: GCASH TOPUP FORM -->
+    <!-- VIEW 2: GCASH FORM -->
     <div id="gcashPaySection">
       <div class="ban-disclaimer-box">
         <div class="ban-disclaimer-title">🚫 Official Ban Clearance Notice</div>
         <div>
-          Your access has been restricted for <b>7 days</b> due to Community Guidelines violation.<br>
-          ⚡ <b>Want to return sooner?</b> Pay <b>₱10 voluntary support</b>. (Payment is optional).
+          Your access is restricted for <b>7 days</b> due to Community Guidelines violation.<br>
+          ⚡ <b>Want to return sooner?</b> Pay <b>₱10 voluntary support</b>.
         </div>
       </div>
 
@@ -520,7 +517,7 @@ video{
 
       <div class="gcash-input-group">
         <input type="tel" id="gcashPhoneInput" class="gcash-input-field" placeholder="GCash Mobile No. (e.g. 09123456789)" maxlength="13" inputmode="numeric">
-        <input type="tel" id="gcashRefInput" class="gcash-input-field" placeholder="13-Digit Ref No. (e.g. 2004123456789)" maxlength="16" inputmode="numeric">
+        <input type="tel" id="gcashRefInput" class="gcash-input-field" placeholder="13-Digit Ref No. (optional)" maxlength="16" inputmode="numeric">
         <button type="button" class="gcash-verify-btn" id="gcashVerifyBtn" onclick="submitGCashUnbanTicket()">Submit for Verification</button>
       </div>
 
@@ -528,7 +525,7 @@ video{
       <button type="button" class="btn-back-methods" onclick="backToMethodSelection()">← Back to Options</button>
     </div>
 
-    <!-- BAN EXPIRATION INFO (BOTTOM) -->
+    <!-- BAN EXPIRATION INFO -->
     <div class="ban-expire-box">
       <span class="ban-expire-label">7-Day Suspension Expiration:</span>
       <span class="ban-expire-time" id="banUntilFullText">--:-- --</span>
@@ -556,10 +553,10 @@ video{
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" autoplay playsinline></video>
 
-        <!-- 🛡️ STRANGER FULL-BLEED 100% FROZEN STILL PHOTO OVERLAY -->
+        <!-- 🛡️ STILL PHOTO OVERLAY -->
         <img id="freezeImageOverlay" alt="Frozen Still Frame">
 
-        <!-- 📺 CRT TV STATIC LAYER -->
+        <!-- 📺 CRT TV STATIC -->
         <div class="crt-screen-wrapper" id="crtWrapper">
           <canvas id="crtStaticCanvas"></canvas>
           <div class="crt-overlay-vignette"></div>
@@ -578,12 +575,12 @@ video{
           </div>
         </div>
 
-        <!-- CLEAN SPINNER ONLY -->
+        <!-- SEARCH LOADER -->
         <div class="search-loader" id="searchLoader">
           <div class="search-spinner"></div>
         </div>
 
-        <!-- AUDIO VOLUME CONTROLS -->
+        <!-- AUDIO VOLUME -->
         <div class="remote-audio-badge">
           <svg class="audio-speaker-btn" id="speakerIcon" onclick="toggleMuteSpeaker()" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
           <input type="range" class="audio-slider" id="audioSlider" min="0" max="1" step="0.05" value="1" oninput="updateVolume(this.value)">
@@ -591,7 +588,7 @@ video{
 
         <div class="cam-tag">Stranger</div>
         
-        <!-- 🚩 RED FLAG REPORT BUTTON -->
+        <!-- 🚩 REPORT BUTTON -->
         <button id="reportBtn" type="button" onclick="openReportModal()" title="Report User">
           <svg viewBox="0 0 24 24"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z"/></svg>
         </button>
@@ -599,7 +596,7 @@ video{
 
       <div class="cam-box" id="localCamBox">
         <video id="localVideo" class="mirrored" autoplay muted playsinline></video>
-        <div class="cam-tag">You</div>
+        <div class="cam-tag" id="localTag">You</div>
         <button id="hideLocalBtn" type="button">✕</button>
       </div>
 
@@ -624,12 +621,11 @@ video{
         <div class="chat-author">System</div>
         <div class="chat-bubble chat-rules-card">
           👋 <b>Welcome to MeetLoop!</b><br><br>
-          🔞 <b>18+ only</b> — You must be 18 or older.<br>
-          🚫 <b>No nudity, sexual content, hate speech, or harassment.</b><br>
-          📹 <b>Show yourself on camera</b> — no fake or pre-recorded video.<br>
-          💬 <b>Respect everyone</b> — MeetLoop is not a dating site.<br>
-          ⚠️ <b>Violations result in an immediate 7-day hardware suspension.</b><br><br>
-          Have fun, stay respectful, and enjoy chatting! 🌎
+          🔞 <b>18+ only</b> — Minors strictly prohibited.<br>
+          🚫 <b>No nudity, sexual content, hate speech, or spam.</b><br>
+          📹 <b>Keep your face on camera.</b><br>
+          ⚠️ <b>Violations result in an immediate 7-day ban.</b><br><br>
+          Have fun and stay respectful! 🌎
         </div>
       </div>
     </div>
@@ -654,7 +650,7 @@ function generateDeviceFingerprint() {
     ctx.fillStyle = "#f60";
     ctx.fillRect(125, 1, 62, 20);
     ctx.fillStyle = "#069";
-    ctx.fillText("MeetLoop_Sec_FP_v2", 2, 15);
+    ctx.fillText("MeetLoop_FP", 2, 15);
     
     let glRenderer = "";
     try {
@@ -679,7 +675,7 @@ function generateDeviceFingerprint() {
 
 const myFingerprint = generateDeviceFingerprint();
 
-/* ================= 1. STRICT 1-TAB CONTROLLER ================= */
+/* ================= 1. TAB CONTROLLER ================= */
 const myTabId = "tab_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
 let isMasterTab = true;
 let tabChannel = null;
@@ -687,7 +683,6 @@ let tabChannel = null;
 function claimActiveTab() {
   isMasterTab = true;
   localStorage.setItem("meetloop_active_tab", myTabId);
-  localStorage.setItem("meetloop_tab_ping", Date.now().toString());
   const overlay = document.getElementById("duplicateTabOverlay");
   if (overlay) overlay.style.display = "none";
   try {
@@ -706,9 +701,7 @@ try {
   tabChannel = new BroadcastChannel("meetloop_tab_lock");
   tabChannel.onmessage = (e) => {
     if (e.data && e.data.type === "CLAIM_MASTER") {
-      if (e.data.tabId !== myTabId) {
-        showDuplicateTabBlocker();
-      }
+      if (e.data.tabId !== myTabId) showDuplicateTabBlocker();
     } else if (e.data && e.data.type === "UNBAN_EVENT") {
       handleSuccessfulUnban();
     }
@@ -716,18 +709,9 @@ try {
 } catch(e){}
 
 claimActiveTab();
+document.getElementById("btnClaimTab")?.addEventListener("click", claimActiveTab);
 
-setInterval(() => {
-  if (isMasterTab) {
-    localStorage.setItem("meetloop_tab_ping", Date.now().toString());
-  }
-}, 1500);
-
-document.getElementById("btnClaimTab")?.addEventListener("click", () => {
-  claimActiveTab();
-});
-
-/* ================= 2. PERSISTENT DEVICE & HARDENED BAN ENGINE ================= */
+/* ================= 2. DEVICE IDENTITY ================= */
 function getPersistentDeviceId(forceNew = false) {
   let devId = localStorage.getItem("meetloop_device_id");
   if (!devId || forceNew) {
@@ -749,22 +733,15 @@ function updateNumericDisplayId() {
 updateNumericDisplayId();
 
 let isCurrentlyBanned = false;
-let savedBanUntil = parseInt(localStorage.getItem("meetloop_ban_until") || sessionStorage.getItem("meetloop_ban_until") || "0", 10);
-let savedBanReason = localStorage.getItem("meetloop_ban_reason") || sessionStorage.getItem("meetloop_ban_reason") || "Policy Violation";
-let savedBanSnapshot = localStorage.getItem("meetloop_ban_snapshot") || sessionStorage.getItem("meetloop_ban_snapshot") || null;
+let savedBanUntil = parseInt(localStorage.getItem("meetloop_ban_until") || "0", 10);
+let savedBanReason = localStorage.getItem("meetloop_ban_reason") || "Policy Violation";
+let savedBanSnapshot = localStorage.getItem("meetloop_ban_snapshot") || null;
 
 if (savedBanUntil && Date.now() < savedBanUntil) {
   isCurrentlyBanned = true;
   setTimeout(() => {
     display7DayBanScreen(savedBanUntil, savedBanReason, savedBanSnapshot);
   }, 50);
-} else {
-  localStorage.removeItem("meetloop_ban_until");
-  localStorage.removeItem("meetloop_ban_reason");
-  localStorage.removeItem("meetloop_ban_snapshot");
-  sessionStorage.removeItem("meetloop_ban_until");
-  sessionStorage.removeItem("meetloop_ban_reason");
-  sessionStorage.removeItem("meetloop_ban_snapshot");
 }
 
 /* ================= 3. SOCKET CONNECTION ================= */
@@ -810,8 +787,6 @@ let isMicActive = true;
 let freezeTimer = null;
 let isFreezeActive = false;
 let pendingCandidates = [];
-let submitAttempts = 0;
-let cooldownTimer = null;
 let lastCapturedStrangerSnapshot = null;
 
 const rtcConfig = {
@@ -852,7 +827,7 @@ function setHighQualityBitrate(sdp) {
   return sdp.replace(/a=mid:video\r\n/g, "a=mid:video\r\nb=AS:2500\r\n");
 }
 
-/* ================= 🌟 100% STILL PHOTO FREEZE & 1s OMETV BLUR ================= */
+/* ================= 🌟 FREEZE FRAME & SHIELD ================= */
 function displayOmeTVFrozenSnapshot() {
   if (isFreezeActive) return;
 
@@ -918,16 +893,10 @@ function handleSuccessfulUnban() {
   localStorage.removeItem("meetloop_ban_until");
   localStorage.removeItem("meetloop_ban_reason");
   localStorage.removeItem("meetloop_ban_snapshot");
-  sessionStorage.removeItem("meetloop_ban_until");
-  sessionStorage.removeItem("meetloop_ban_reason");
-  sessionStorage.removeItem("meetloop_ban_snapshot");
 
   myHardwareId = getPersistentDeviceId(true);
   updateNumericDisplayId();
 
-  if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
-  submitAttempts = 0;
-  
   const status = document.getElementById("gcashRefStatus");
   if (status) {
     status.style.color = "#16a34a";
@@ -967,7 +936,8 @@ if (socket) {
         if (!peerConnection) await createPeer(false);
         await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
         while (pendingCandidates.length > 0) {
-          await peerConnection.addIceCandidate(pendingCandidates.shift()).catch(()=>{});
+          const cand = pendingCandidates.shift();
+          await peerConnection.addIceCandidate(cand).catch(()=>{});
         }
         const ans = await peerConnection.createAnswer();
         ans.sdp = setHighQualityBitrate(ans.sdp);
@@ -976,7 +946,8 @@ if (socket) {
       } else if (data.type === "answer" && peerConnection) {
         await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
         while (pendingCandidates.length > 0) {
-          await peerConnection.addIceCandidate(pendingCandidates.shift()).catch(()=>{});
+          const cand = pendingCandidates.shift();
+          await peerConnection.addIceCandidate(cand).catch(()=>{});
         }
       } else if (data.type === "candidate") {
         const candidate = new RTCIceCandidate(data.candidate);
@@ -996,7 +967,6 @@ if (socket) {
     triggerStartNext();
   });
 
-  // 📸 REALTIME BAN NOTIFICATION WITH PERSISTENT SNAPSHOT
   socket.on("ip-banned", (data) => {
     display7DayBanScreen(data.banUntil, data.reason, data.snapshot);
   });
@@ -1007,11 +977,11 @@ if (socket) {
     }
   });
 
-  socket.on("unban-pending", (data) => {
+  socket.on("unban-pending", () => {
     const status = document.getElementById("gcashRefStatus");
     if (status) {
       status.style.color = "#0284c7";
-      status.innerHTML = `⏳ <b>Details Logged (${4 - submitAttempts} tries left)</b>`;
+      status.innerHTML = `⏳ <b>Details Logged. Verifying payment...</b>`;
     }
     const overlay = document.getElementById("banOverlay");
     if (overlay) overlay.style.display = "flex";
@@ -1037,7 +1007,7 @@ if (socket) {
   });
 }
 
-/* ================= 4. HD LOW-LATENCY MEDIA & MOBILE FLIP ================= */
+/* ================= 4. MEDIA & PEER CONNECTION ================= */
 async function startMedia() {
   if (isCurrentlyBanned) {
     const overlay = document.getElementById("banOverlay");
@@ -1086,7 +1056,7 @@ async function startMedia() {
       }
       return true;
     } catch (finalErr) {
-      alert("⚠️ Please allow Camera and Microphone permission in your browser!");
+      alert("⚠️ Camera and Microphone access are required to chat.");
       return false;
     }
   }
@@ -1125,15 +1095,7 @@ async function flipCamera() {
 
     if (peerConnection) {
       const sender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
-      if (sender) {
-        await sender.replaceTrack(newVideoTrack);
-        const params = sender.getParameters();
-        if (params.encodings && params.encodings[0]) {
-          params.encodings[0].maxBitrate = 2500000;
-          params.degradationPreference = "maintain-resolution";
-          sender.setParameters(params).catch(()=>{});
-        }
-      }
+      if (sender) await sender.replaceTrack(newVideoTrack);
     }
 
     if (localVideo) {
@@ -1142,18 +1104,7 @@ async function flipCamera() {
       await localVideo.play().catch(()=>{});
     }
   } catch (err) {
-    console.error("Mobile Flip error:", err);
-    try {
-      const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      const fallbackTrack = fallbackStream.getVideoTracks()[0];
-      localStream.addTrack(fallbackTrack);
-      currentFacingMode = "user";
-      if (localVideo) {
-        localVideo.className = "mirrored";
-        localVideo.srcObject = localStream;
-        await localVideo.play().catch(()=>{});
-      }
-    } catch(e){}
+    console.error("Flip error:", err);
   } finally {
     isFlipping = false;
     if (flipBtn) flipBtn.disabled = false;
@@ -1167,13 +1118,8 @@ function toggleMicrophone() {
     isMicActive = !isMicActive;
     audioTrack.enabled = isMicActive;
     if (micBtn) {
-      if (isMicActive) {
-        micBtn.textContent = "Mic On";
-        micBtn.classList.remove("muted");
-      } else {
-        micBtn.textContent = "Mic Off";
-        micBtn.classList.add("muted");
-      }
+      micBtn.textContent = isMicActive ? "Mic On" : "Mic Off";
+      micBtn.classList.toggle("muted", !isMicActive);
     }
   }
 }
@@ -1203,19 +1149,7 @@ async function createPeer(initiator) {
 
   if (localStream) {
     localStream.getTracks().forEach(track => {
-      const sender = peerConnection.addTrack(track, localStream);
-      if (track.kind === "video") {
-        setTimeout(() => {
-          try {
-            const params = sender.getParameters();
-            if (!params.encodings) params.encodings = [{}];
-            params.encodings[0].maxBitrate = 2500000;
-            params.encodings[0].maxFramerate = 30;
-            params.degradationPreference = "maintain-resolution";
-            sender.setParameters(params).catch(()=>{});
-          } catch(e){}
-        }, 100);
-      }
+      peerConnection.addTrack(track, localStream);
     });
   }
 
@@ -1237,24 +1171,14 @@ async function createPeer(initiator) {
       const savedVol = parseFloat(localStorage.getItem("meetloop_volume") || "1.0");
       remoteVideo.muted = false;
       remoteVideo.volume = savedVol;
-      if (audioSlider) audioSlider.value = savedVol;
-
-      if ("playoutDelayHint" in remoteVideo) {
-        remoteVideo.playoutDelayHint = 0;
-      }
-
-      remoteVideo.play().catch(() => {
-        remoteVideo.muted = true;
-        remoteVideo.play().then(() => {
-          setTimeout(() => { remoteVideo.muted = false; }, 150);
-        });
-      });
+      remoteVideo.play().catch(()=>{});
     }
   };
 
   peerConnection.onconnectionstatechange = () => {
     if (peerConnection?.connectionState === "connected") {
-      connected = true; searching = false;
+      connected = true; 
+      searching = false;
     } else if (peerConnection?.connectionState === "disconnected" || peerConnection?.connectionState === "failed") {
       triggerStartNext();
     }
@@ -1349,7 +1273,6 @@ function stopSession() {
   if (stopBtn) stopBtn.disabled = true;
 }
 
-// 📸 SMART HIGH-QUALITY COMPRESSED SNAPSHOT CAPTURE (30KB)
 function captureStrangerSnapshot() {
   try {
     const canvas = document.createElement("canvas");
@@ -1365,7 +1288,6 @@ function captureStrangerSnapshot() {
   return null;
 }
 
-// 📸 100% AIRTIGHT EVIDENCE PICTURE DISPLAY ON REFRESH
 function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap = null) {
   isCurrentlyBanned = true;
   stopSession();
@@ -1375,15 +1297,12 @@ function display7DayBanScreen(banUntil, reason = "Policy Violation", customSnap 
   try {
     localStorage.setItem("meetloop_ban_until", finalBanUntil.toString());
     localStorage.setItem("meetloop_ban_reason", reason);
-    sessionStorage.setItem("meetloop_ban_until", finalBanUntil.toString());
-    sessionStorage.setItem("meetloop_ban_reason", reason);
   } catch(e){}
 
-  const snapshotToRender = customSnap || localStorage.getItem("meetloop_ban_snapshot") || sessionStorage.getItem("meetloop_ban_snapshot");
+  const snapshotToRender = customSnap || localStorage.getItem("meetloop_ban_snapshot");
   if (customSnap) {
     try {
       localStorage.setItem("meetloop_ban_snapshot", customSnap);
-      sessionStorage.setItem("meetloop_ban_snapshot", customSnap);
     } catch(e){}
   }
 
@@ -1419,16 +1338,6 @@ function openGcashPayView() {
   document.getElementById("gcashPhoneInput").value = "";
   document.getElementById("gcashRefInput").value = "";
   document.getElementById("gcashRefStatus").textContent = "";
-  
-  if (!cooldownTimer) {
-    const btn = document.getElementById("gcashVerifyBtn");
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = "Submit for Verification";
-    }
-    document.getElementById("gcashPhoneInput").disabled = false;
-    document.getElementById("gcashRefInput").disabled = false;
-  }
 }
 
 function backToMethodSelection() {
@@ -1439,8 +1348,6 @@ function backToMethodSelection() {
 }
 
 function submitGCashUnbanTicket() {
-  if (cooldownTimer) return;
-
   const phoneInput = document.getElementById("gcashPhoneInput");
   const refInput = document.getElementById("gcashRefInput");
   const status = document.getElementById("gcashRefStatus");
@@ -1456,20 +1363,13 @@ function submitGCashUnbanTicket() {
     return;
   }
 
-  submitAttempts++;
-  const remaining = Math.max(0, 4 - submitAttempts);
   if (status) {
     status.style.color = "#0284c7";
-    status.innerHTML = `⏳ <b>Matching details... (${remaining} tries left)</b>`;
+    status.innerHTML = `⏳ <b>Submitting details for verification...</b>`;
   }
 
   if (socket && socket.connected) {
     socket.emit("unban-request", { hardwareId: myHardwareId, phone: phoneVal, ref: refVal });
-  } else {
-    if (status) {
-      status.style.color = "#dc2626";
-      status.textContent = "❌ Server connection lost. Please reload and try again.";
-    }
   }
 }
 
@@ -1499,7 +1399,17 @@ function addChatMessage(author, msg) {
   if (!chatStream) return;
   const div = document.createElement("div");
   div.className = "chat-msg";
-  div.innerHTML = `<div class="chat-author">${author}</div><div class="chat-bubble">${msg.replace(/[&<>'"]/g, "")}</div>`;
+
+  const authorEl = document.createElement("div");
+  authorEl.className = "chat-author";
+  authorEl.textContent = author;
+
+  const bubbleEl = document.createElement("div");
+  bubbleEl.className = "chat-bubble";
+  bubbleEl.textContent = msg;
+
+  div.appendChild(authorEl);
+  div.appendChild(bubbleEl);
   chatStream.appendChild(div);
   chatStream.scrollTop = chatStream.scrollHeight;
 }
@@ -1524,7 +1434,6 @@ document.getElementById("showLocalBtn")?.addEventListener("click", () => {
   document.getElementById("showLocalBtn")?.classList.remove("visible");
 });
 
-// Sync saved volume
 const savedVolume = localStorage.getItem("meetloop_volume");
 if (savedVolume !== null && audioSlider) {
   audioSlider.value = savedVolume;
