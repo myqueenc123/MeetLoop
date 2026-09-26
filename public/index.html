@@ -41,6 +41,10 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
   background:#111827;border:1.5px solid #ef4444;border-radius:20px;
   max-width:380px;width:100%;padding:26px 20px;box-shadow:0 25px 60px rgba(0,0,0,0.9);
 }
+.tab-icon-wrap{
+  width:48px;height:48px;border-radius:50%;background:rgba(239,68,68,0.15);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 12px;
+}
 .btn-claim-tab{
   width:100%;height:44px;border:0;border-radius:10px;background:#2563eb;
   color:#fff;font-size:13px;font-weight:800;cursor:pointer;margin-top:14px;
@@ -420,10 +424,11 @@ video{
 }
 
 .rule-icon{
-  width:28px;height:28px;border-radius:8px;background:rgba(15, 23, 42, 0.8);
-  display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;
-  border:1px solid rgba(255,255,255,0.06);
+  width:30px;height:30px;border-radius:8px;background:rgba(15, 23, 42, 0.85);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  border:1px solid rgba(255,255,255,0.08);color:#38bdf8;
 }
+.rule-icon svg{width:16px;height:16px;fill:currentColor}
 
 .portal-btn{
   width:100%;height:50px;border-radius:14px;border:0;
@@ -462,7 +467,7 @@ video{
   font-size:11px;color:#64748b;font-weight:600;letter-spacing:0.3px;
 }
 
-/* ================= 📑 MODAL DIALOGS FOR FOOTER (RULES / TERMS / PRIVACY) ================= */
+/* ================= 📑 MODAL DIALOGS FOR FOOTER ================= */
 .info-modal-backdrop{
   position:fixed;inset:0;z-index:1000000;background:rgba(0,0,0,0.85);
   display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px);
@@ -472,7 +477,7 @@ video{
   max-width:440px;width:100%;padding:22px 20px;box-shadow:0 25px 60px rgba(0,0,0,0.95);
   text-align:left;display:flex;flex-direction:column;gap:12px;
 }
-.info-modal-title{font-size:17px;font-weight:900;color:#38bdf8;display:flex;align-items:center;justify-content:space-between}
+.info-modal-title{font-size:16px;font-weight:900;color:#38bdf8;display:flex;align-items:center;justify-content:space-between}
 .info-modal-body{font-size:12px;line-height:1.6;color:#cbd5e1;max-height:55vh;overflow-y:auto;padding-right:4px}
 .info-modal-close-btn{
   width:100%;height:40px;border-radius:10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);
@@ -505,7 +510,9 @@ video{
 <!-- STRICT 1-TAB OVERLAY -->
 <div id="duplicateTabOverlay">
   <div class="tab-lock-card">
-    <span style="font-size:42px;display:block;margin-bottom:12px">⚠️</span>
+    <div class="tab-icon-wrap">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
     <div style="font-size:18px;font-weight:900;color:#ef4444;margin-bottom:8px">Duplicate Tab Detected</div>
     <div style="font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:18px">MeetLoop is only allowed in 1 active tab.</div>
     <button type="button" class="btn-claim-tab" id="btnClaimTab">Use This Tab Instead</button>
@@ -526,22 +533,25 @@ video{
   </div>
 </div>
 
-<!-- REPORT MODAL -->
+<!-- REPORT MODAL (NO EMOJIS, CLEAN SVGS & TEXT) -->
 <div id="reportModal">
   <div class="report-modal-card">
-    <div class="report-title">🚨 Report User</div>
+    <div class="report-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z"/></svg>
+      <span>Report User</span>
+    </div>
     <div class="report-desc">Select violation reason:</div>
     <select id="reportReasonSelect" class="report-select">
-      <option value="Nudity / Sexual Content">🔞 Nudity / Sexual Content</option>
-      <option value="Harassment / Bullying">🛑 Harassment / Bullying</option>
-      <option value="Hate Speech">🗣️ Hate Speech</option>
-      <option value="Threats / Violence">⚠️ Threats / Violence</option>
-      <option value="Spam / Advertising">📢 Spam / Advertising</option>
-      <option value="Scam / Fraud">💳 Scam / Fraud</option>
-      <option value="Underage User">🚸 Underage User</option>
-      <option value="Inappropriate Behavior">🚫 Inappropriate Behavior</option>
-      <option value="Impersonation">🎭 Impersonation</option>
-      <option value="Other">❓ Other</option>
+      <option value="Nudity / Sexual Content">Nudity / Sexual Content</option>
+      <option value="Harassment / Bullying">Harassment / Bullying</option>
+      <option value="Hate Speech">Hate Speech</option>
+      <option value="Threats / Violence">Threats / Violence</option>
+      <option value="Spam / Advertising">Spam / Advertising</option>
+      <option value="Scam / Fraud">Scam / Fraud</option>
+      <option value="Underage User">Underage User</option>
+      <option value="Inappropriate Behavior">Inappropriate Behavior</option>
+      <option value="Impersonation">Impersonation</option>
+      <option value="Other">Other Policy Violation</option>
     </select>
     <div class="report-actions">
       <button type="button" class="btn-cancel-report" onclick="closeReportModal()">Cancel</button>
@@ -550,7 +560,7 @@ video{
   </div>
 </div>
 
-<!-- 🌟 ULTRA-MODERN WELCOME PORTAL -->
+<!-- 🌟 ULTRA-MODERN WELCOME PORTAL (PROFESSIONAL VECTOR SVGS) -->
 <div id="welcomePortal">
   <div class="portal-wrapper">
     <div class="portal-box">
@@ -567,20 +577,35 @@ video{
       <div class="portal-subtitle">Random Video Chat</div>
 
       <div class="portal-rules-grid">
+        <!-- AGE RESTRICTION -->
         <div class="rule-chip">
-          <div class="rule-icon">🔞</div>
+          <div class="rule-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm4 0h-2v-6h2v6zm-2-8c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>
+          </div>
           <div><b>18+ Required:</b> Minors are strictly prohibited.</div>
         </div>
+
+        <!-- ZERO TOLERANCE -->
         <div class="rule-chip">
-          <div class="rule-icon">🚫</div>
+          <div class="rule-icon" style="color:#ef4444">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm6.31-3.1L7.1 5.69C8.45 4.63 10.15 4 12 4c4.42 0 8 3.58 8 8 0 1.85-.63 3.55-1.69 4.9z"/></svg>
+          </div>
           <div><b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.</div>
         </div>
+
+        <!-- FACE ON CAMERA -->
         <div class="rule-chip">
-          <div class="rule-icon">📹</div>
+          <div class="rule-icon">
+            <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+          </div>
           <div><b>Human Face Only:</b> Look directly at the camera.</div>
         </div>
+
+        <!-- SAFETY SHIELD -->
         <div class="rule-chip">
-          <div class="rule-icon">🛡️</div>
+          <div class="rule-icon" style="color:#22c55e">
+            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+          </div>
           <div><b>Safety Shield:</b> Safe transition on every stranger switch.</div>
         </div>
       </div>
@@ -657,10 +682,10 @@ video{
     <!-- VIEW 2: GCASH FORM -->
     <div id="gcashPaySection">
       <div class="ban-disclaimer-box">
-        <div class="ban-disclaimer-title">🚫 Official Ban Clearance Notice</div>
+        <div class="ban-disclaimer-title">Official Ban Clearance Notice</div>
         <div>
           Your access is restricted for <b>7 days</b> due to Community Guidelines violation.<br>
-          ⚡ <b>Want to return sooner?</b> Pay <b>₱20 voluntary support</b>.
+          Want to return sooner? Pay <b>₱20 voluntary support</b>.
         </div>
       </div>
 
@@ -777,12 +802,12 @@ video{
       <div class="chat-msg">
         <div class="chat-author">System</div>
         <div class="chat-bubble chat-rules-card">
-          👋 <b>Welcome to MeetLoop!</b><br><br>
-          🔞 <b>18+ only</b> — Minors strictly prohibited.<br>
-          🚫 <b>No nudity, sexual content, hate speech, or spam.</b><br>
-          📹 <b>Keep your face on camera.</b><br>
-          ⚠️ <b>Violations result in an immediate 7-day ban.</b><br><br>
-          Have fun and stay respectful! 🌎
+          <b>Welcome to MeetLoop!</b><br><br>
+          • <b>18+ only:</b> Minors strictly prohibited.<br>
+          • <b>No nudity, sexual content, or hate speech.</b><br>
+          • <b>Keep your face on camera.</b><br>
+          • <b>Violations result in an immediate 7-day ban.</b><br><br>
+          Have fun and stay respectful!
         </div>
       </div>
     </div>
@@ -1089,7 +1114,7 @@ function handleSuccessfulUnban() {
   const status = document.getElementById("gcashRefStatus");
   if (status) {
     status.style.color = "#16a34a";
-    status.textContent = "✅ Unban Successful! Welcome back!";
+    status.textContent = "Unban Successful! Welcome back!";
   }
   const overlay = document.getElementById("banOverlay");
   if (overlay) overlay.style.display = "none";
@@ -1170,7 +1195,7 @@ if (socket) {
     const status = document.getElementById("gcashRefStatus");
     if (status) {
       status.style.color = "#0284c7";
-      status.innerHTML = `⏳ <b>Details Submitted! Checking ₱20 GCash payment...</b>`;
+      status.innerHTML = `<b>Details Submitted! Checking ₱20 GCash payment...</b>`;
     }
     const overlay = document.getElementById("banOverlay");
     if (overlay) overlay.style.display = "flex";
@@ -1245,7 +1270,7 @@ async function startMedia() {
       }
       return true;
     } catch (finalErr) {
-      alert("⚠️ Camera and Microphone access are required to chat.");
+      alert("Camera and Microphone access are required to chat.");
       return false;
     }
   }
@@ -1586,7 +1611,7 @@ function submitGCashUnbanTicket() {
   if (!phoneVal || phoneVal.length < 10) {
     if (status) {
       status.style.color = "#dc2626";
-      status.textContent = "❌ Please enter a valid 11-digit GCash Mobile Number.";
+      status.textContent = "Please enter a valid 11-digit GCash Mobile Number.";
     }
     return;
   }
@@ -1595,7 +1620,7 @@ function submitGCashUnbanTicket() {
 
   if (status) {
     status.style.color = "#0284c7";
-    status.innerHTML = `⏳ <b>Submitting details for ₱20 verification...</b>`;
+    status.innerHTML = `<b>Submitting details for ₱20 verification...</b>`;
   }
 
   if (socket && socket.connected) {
@@ -1666,13 +1691,13 @@ document.getElementById("showLocalBtn")?.addEventListener("click", () => {
 /* ================= 📑 MODAL VIEWER FOR FOOTER ================= */
 const infoContents = {
   Blog: {
-    title: "📰 MeetLoop Official Blog",
+    title: "MeetLoop Official Blog",
     body: `<b>Welcome to the MeetLoop Updates & Community Blog!</b><br><br>
-           🚀 <b>Version 3.0 Live:</b> We've rolled out real-time Umingle-grade AI Vision moderation to keep video chats clean, enjoyable, and free of trolls.<br><br>
-           ⚡ <b>Ultra Low Latency:</b> Our WebRTC mesh network provides sub-50ms peer-to-peer connection for crystal-clear HD video and audio conversations across all mobile and desktop devices.`
+           <b>Version 3.0 Live:</b> We've rolled out real-time Umingle-grade AI Vision moderation to keep video chats clean, enjoyable, and free of trolls.<br><br>
+           <b>Ultra Low Latency:</b> Our WebRTC mesh network provides sub-50ms peer-to-peer connection for crystal-clear HD video and audio conversations across all mobile and desktop devices.`
   },
   Rules: {
-    title: "📋 Community Guidelines & Rules",
+    title: "Community Guidelines & Rules",
     body: `<b>MeetLoop Community Standards:</b><br><br>
            1. <b>18+ Required:</b> You must be at least 18 years old to use MeetLoop.<br>
            2. <b>Zero Tolerance for Nudity:</b> Any sexual content or inappropriate exposure results in an instant 7-day hardware ban.<br>
@@ -1680,13 +1705,13 @@ const infoContents = {
            4. <b>Respect Other Users:</b> Hate speech, harassment, bullying, and racial slurs are strictly banned.`
   },
   Terms: {
-    title: "⚖️ Terms of Service",
+    title: "Terms of Service",
     body: `<b>Terms of Service (meetloop-om0m.onrender.com):</b><br><br>
            By accessing or using MeetLoop, you agree to comply with our Terms of Service. MeetLoop is provided "as is" for random video communication.<br><br>
            We reserve the right to suspend or ban any user or device violating our safety rules. Unban fees (₱20.00) are voluntary administrative clearance contributions.`
   },
   Privacy: {
-    title: "🔒 Privacy Policy",
+    title: "Privacy Policy",
     body: `<b>Your Privacy is Protected:</b><br><br>
            MeetLoop operates on direct <b>Peer-to-Peer (P2P) WebRTC</b> streaming. Video and audio streams are directly transmitted between users and are <b>never recorded or stored on our servers</b>.<br><br>
            Temporary camera snapshots are only inspected in volatile memory when a user report is submitted to verify community safety.`
