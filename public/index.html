@@ -82,15 +82,16 @@ video{
   will-change:transform;
 }
 
-/* 🛡️ 100% FULL-BLEED FROZEN STILL PHOTO OVERLAY */
+/* 🛡️ 100% PERFECT FIT FROZEN STILL PHOTO OVERLAY (HINDI NA WIDE/BANAT) */
 #freezeImageOverlay{
   position:absolute;
-  top:-25px;left:-25px;right:-25px;bottom:-25px;
-  width:calc(100% + 50px);
-  height:calc(100% + 50px);
+  inset:0;
+  width:100%;
+  height:100%;
   object-fit:cover;
-  z-index:6;display:none;
-  filter:blur(10px) brightness(0.98);
+  z-index:6;
+  display:none;
+  filter:blur(8px) brightness(0.95);
   transition:opacity 0.35s ease-out;
   pointer-events:none;
   background:#000000;
@@ -554,7 +555,7 @@ video{
       <div class="cam-box" id="remoteBox">
         <video id="remoteVideo" autoplay playsinline></video>
 
-        <!-- 🛡️ STILL PHOTO OVERLAY -->
+        <!-- 🛡️ 100% PERFECT FIT FROZEN STILL PHOTO OVERLAY -->
         <img id="freezeImageOverlay" alt="Frozen Still Frame">
 
         <!-- 📺 CRT TV STATIC -->
@@ -831,7 +832,7 @@ function setHighQualityBitrate(sdp) {
   return sdp.replace(/a=mid:video\r\n/g, "a=mid:video\r\nb=AS:2500\r\n");
 }
 
-/* ================= 🌟 FREEZE FRAME & SHIELD ================= */
+/* ================= 🌟 100% SAKTONG SUKAT (ZERO WIDE DISTORTION) ================= */
 function displayOmeTVFrozenSnapshot() {
   if (isFreezeActive) return;
 
@@ -839,11 +840,15 @@ function displayOmeTVFrozenSnapshot() {
     if (isFreezeActive || !remoteVideo || remoteVideo.videoWidth === 0) return;
     isFreezeActive = true;
 
+    // Gamitin ang totoong sukat ng camera ng kausap (hindi naka-wide!)
+    const vWidth = remoteVideo.videoWidth || 640;
+    const vHeight = remoteVideo.videoHeight || 480;
+
     const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = 360;
-    tempCanvas.height = 270;
+    tempCanvas.width = vWidth;
+    tempCanvas.height = vHeight;
     const ctx = tempCanvas.getContext("2d");
-    ctx.drawImage(remoteVideo, 0, 0, 360, 270);
+    ctx.drawImage(remoteVideo, 0, 0, vWidth, vHeight);
 
     if (freezeImageOverlay) {
       freezeImageOverlay.src = tempCanvas.toDataURL("image/jpeg", 0.85);
@@ -855,7 +860,6 @@ function displayOmeTVFrozenSnapshot() {
     if (standbyCenter) standbyCenter.style.display = "none";
     if (searchLoader) searchLoader.style.display = "none";
     
-    // Palaging i-enable at ipakita ang report button
     if (reportBtn) {
       reportBtn.style.display = "flex";
       reportBtn.disabled = false;
