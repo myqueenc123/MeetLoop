@@ -1,8 +1,8 @@
 /**
  * MeetLoop - High-Performance WebRTC Backend Server
- * DUAL-BOT ARCHITECTURE (Fully Isolated):
- *  1. MeetLoopPayBot / Admin Bot -> Puro GCash, Reports, at 1-Click Ban/Approve
- *  2. MeetLoop Support Bot -> Puro Customer Chat at Support Tickets LANG
+ * DUAL-BOT ARCHITECTURE:
+ *  1. MeetLoopPayBot -> Admin Controls, AI Reports, 1-Click Ban/Approve
+ *  2. MeetLoop Support Bot -> Smart AI Customer Agent + Photo/Receipt Forwarder
  */
 
 const express = require("express");
@@ -31,11 +31,8 @@ const UNBAN_SUBMIT_COOLDOWN = 5 * 1000;
 /* ================= 🤖 SECURE DUAL-BOT TOKENS ================= */
 const _dec = (b64) => Buffer.from(b64, "base64").toString("utf8");
 
-// 🔴 BOT 1: MeetLoopPayBot (Admin Controls, GCash & Bans)
 const ADMIN_BOT_TOKEN = process.env.ADMIN_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || _dec("ODY0ODM1Njc2NTpBQUdnakVZOVc4VF9yV1VFazFEZ3hIUzQ4b05MT2hnMGQycw==");
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || _dec("NTc3OTk3NjU5Ng==");
-
-// 🔵 BOT 2: MeetLoop Support Bot (Customer Inquiries Only)
 const SUPPORT_BOT_TOKEN = process.env.SUPPORT_BOT_TOKEN || _dec("ODgzMzczNzQwNjpBQUVBSDhrbkxzcldxdThESVY0NFRjVmVqTFo5VGhnQy1HTQ==");
 
 let autoDetectedSupportBotUsername = "MeetLoop_bot";
@@ -130,7 +127,7 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-/* ================= 🔴 BOT 1: MEETLOOP PAY BOT (ADMIN CONTROLS) ================= */
+/* ================= 🔴 BOT 1: ADMIN CONTROL SENDER ================= */
 function sendTelegramAdminRaw(endpoint, payloadObj, callback) {
   if (!ADMIN_BOT_TOKEN) return;
   const payload = JSON.stringify(payloadObj);
@@ -260,21 +257,39 @@ function sendTelegramPhotoWithActions(chatId, base64Snapshot, captionText, targe
   }
 }
 
-/* ================= 🔵 BOT 2: MEETLOOP SUPPORT BOT (CUSTOMER ONLY) ================= */
-function sendTelegramSupportMessage(chatId, text) {
+/* ================= 🔵 BOT 2: SUPPORT SENDER & PHOTO FORWARDER ================= */
+function sendTelegramSupportMessage(chatId, text, replyMarkupObj = null) {
   if (!SUPPORT_BOT_TOKEN) return;
-  const payload = JSON.stringify({ chat_id: String(chatId).trim(), text: text, parse_mode: "HTML", disable_web_page_preview: true });
+  const payloadObj = { chat_id: String(chatId).trim(), text: text, parse_mode: "HTML", disable_web_page_preview: true };
+  if (replyMarkupObj) payloadObj.reply_markup = replyMarkupObj;
+
+  const payload = JSON.stringify(payloadObj);
   const options = {
     hostname: "api.telegram.org",
     path: `/bot${SUPPORT_BOT_TOKEN}/sendMessage`,
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Content-Length": Buffer.byteLength(payload)
-    }
+    headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(payload) }
   };
   const req = https.request(options);
   req.on("error", (e) => console.error("❌ Support Bot Error:", e.message));
+  req.write(payload);
+  req.end();
+}
+
+function sendTelegramSupportPhoto(chatId, fileId, captionText, replyMarkupObj = null) {
+  if (!SUPPORT_BOT_TOKEN) return;
+  const payloadObj = { chat_id: String(chatId).trim(), photo: fileId, caption: captionText, parse_mode: "HTML" };
+  if (replyMarkupObj) payloadObj.reply_markup = replyMarkupObj;
+
+  const payload = JSON.stringify(payloadObj);
+  const options = {
+    hostname: "api.telegram.org",
+    path: `/bot${SUPPORT_BOT_TOKEN}/sendPhoto`,
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(payload) }
+  };
+  const req = https.request(options);
+  req.on("error", (e) => console.error("❌ Support Photo Forward Error:", e.message));
   req.write(payload);
   req.end();
 }
@@ -301,6 +316,42 @@ function detectSupportBotUsername() {
   });
   req.on("error", () => {});
   req.end();
+}
+
+/* ================= 🧠 AI CONVERSATIONAL ASSISTANT ================= */
+function generateSmartAIResponse(userText) {
+  const t = userText.toLowerCase();
+
+  if (t.includes("unban") || t.includes("banned") || t.includes("na-ban") || t.includes("lift") || t.includes("paunban")) {
+    return `🤖 <b>MeetLoop AI Assistant:</b>\n\n` +
+           `Para ma-unban ang iyong account agad:\n` +
+           `1️⃣ Magbayad ng <b>₱20.00 GCash Clearance Fee</b> gamit ang QR code sa pulang ban screen.\n` +
+           `2️⃣ I-submit ang iyong 11-digit mobile number sa website.\n` +
+           `3️⃣ O i-send dito ang screenshot ng iyong resibo kasama ang iyong <b>Device Ban ID</b> para ma-review ni Admin!`;
+  }
+
+  if (t.includes("gcash") || t.includes("bayad") || t.includes("magkano") || t.includes("price") || t.includes("fee") || t.includes("pay")) {
+    return `💳 <b>MeetLoop AI Assistant:</b>\n\n` +
+           `Ang voluntary clearance fee ay eksaktong <b>₱20.00 ONLY</b>.\n` +
+           `I-scan ang official InstaPay/GCash QR Code sa website at ilagay ang iyong number para sa instant auto-unban.`;
+  }
+
+  if (t.includes("ban id") || t.includes("device id") || t.includes("saan makikita")) {
+    return `🔍 <b>MeetLoop AI Assistant:</b>\n\n` +
+           `Makikita mo ang iyong <b>Device Ban ID (e.g. 899807956)</b> sa pinaka-ibaba ng pulang ban card sa website.`;
+  }
+
+  if (t.includes("hello") || t.includes("hi") || t.includes("kamusta") || t.includes("start") || t.includes("hey")) {
+    return `👋 <b>Kumusta! Ako ang MeetLoop AI Support Assistant.</b>\n\n` +
+           `Paano kita matutulungan ngayon?\n` +
+           `• Magtanong tungkol sa <b>Unban</b>\n` +
+           `• Mag-send ng <b>GCash Proof / Screenshot</b>\n` +
+           `• Mag-submit ng <b>Apela sa Ban</b>`;
+  }
+
+  return `🤖 <b>MeetLoop AI Assistant:</b>\n\n` +
+         `Natanggap ko ang iyong mensahe. Ipinasa ko na ito sa aming **Human Admin Team** para masuri agad ang iyong account.\n\n` +
+         `<i>Tip: Kung nagbayad ka sa GCash, pakisend dito ang screenshot ng resibo kasama ang iyong Ban ID!</i>`;
 }
 
 /* ================= 🧠 UMINGLE-STYLE VISION AI ================= */
@@ -500,10 +551,7 @@ function pollAdminBotUpdates() {
     hostname: "api.telegram.org",
     path: `/bot${ADMIN_BOT_TOKEN}/getUpdates`,
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Content-Length": Buffer.byteLength(payload)
-    }
+    headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(payload) }
   };
 
   const req = https.request(options, (res) => {
@@ -612,7 +660,7 @@ function pollAdminBotUpdates() {
   req.end();
 }
 
-/* ================= 🤖 BOT 2 POLLING: MEETLOOP SUPPORT BOT (ISOLATED) ================= */
+/* ================= 🤖 BOT 2 POLLING: SMART AI SUPPORT + PHOTO FORWARDER ================= */
 let supportLastUpdateId = 0;
 
 function pollSupportBotUpdates() {
@@ -628,10 +676,7 @@ function pollSupportBotUpdates() {
     hostname: "api.telegram.org",
     path: `/bot${SUPPORT_BOT_TOKEN}/getUpdates`,
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Content-Length": Buffer.byteLength(payload)
-    }
+    headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(payload) }
   };
 
   const req = https.request(options, (res) => {
@@ -647,23 +692,37 @@ function pollSupportBotUpdates() {
             if (update.message) {
               const msg = update.message;
               const senderChatId = msg.chat?.id;
-              const text = msg.text || "";
+              const text = msg.text || msg.caption || "";
               const senderName = `${msg.from?.first_name || ""} ${msg.from?.last_name || ""}`.trim();
               const username = msg.from?.username ? `@${msg.from.username}` : "No Username";
 
-              if (text === "/start") {
+              // 📸 1. KUNG NAG-SEND NG SCREENSHOT / LITRATO ANG USER:
+              if (msg.photo && Array.isArray(msg.photo) && msg.photo.length > 0) {
+                const highestResPhoto = msg.photo[msg.photo.length - 1];
+                const fileId = highestResPhoto.file_id;
+
+                // Auto-reply ng AI sa user
                 sendTelegramSupportMessage(senderChatId, 
-                  `👋 <b>Welcome to MeetLoop Live Customer Support!</b>\n\n` +
-                  `Kung nais mag-apela sa ban o mag-submit ng GCash proof:\n` +
-                  `1. I-send dito ang iyong <b>Device Ban ID</b>\n` +
-                  `2. I-send ang iyong <b>GCash Ref No. o Screenshot ng bayad</b>\n\n` +
-                  `<i>Matatanggap agad ito ng Admin team para ma-unban ka.</i>`
+                  `📸 <b>Salamat! Natanggap ko ang iyong screenshot ng resibo.</b>\n\n` +
+                  `Ipinasa ko na ito agad kay Admin para ma-verify at ma-clear ang iyong unban request!`
                 );
-              } else {
-                // Sagot ng Support Bot sa user
-                sendTelegramSupportMessage(senderChatId, `✅ <b>Nai-forward na ang mensahe mo kay Admin.</b> Pakihintay ang unban clearance.`);
-                
-                // Mismong SUPPORT BOT ang magme-message sa Admin (HINDI ang PayBot!)
+
+                // I-FORWARD ANG LITRATO DIRECTLY KAY ADMIN!
+                const captionForAdmin = `🧾 <b>BAGONG GCASH RECEIPT / SCREENSHOT</b>\n\n` +
+                                        `👤 <b>Mula kay:</b> ${escapeHtml(senderName)} (${escapeHtml(username)})\n` +
+                                        `🆔 <b>User Telegram ID:</b> <code>${senderChatId}</code>\n` +
+                                        `💬 <b>Caption:</b> <i>${escapeHtml(text || "No caption")}</i>`;
+
+                sendTelegramSupportPhoto(ADMIN_CHAT_ID, fileId, captionForAdmin);
+              } 
+              
+              // 💬 2. KUNG REGULAR TEXT MESSAGE ANG IPINADALA:
+              else if (text) {
+                // Auto AI Response papunta sa user
+                const aiResponse = generateSmartAIResponse(text);
+                sendTelegramSupportMessage(senderChatId, aiResponse);
+
+                // I-forward ang text message kay Admin
                 sendTelegramSupportMessage(ADMIN_CHAT_ID, 
                   `📩 <b>CUSTOMER SUPPORT TICKET</b>\n\n` +
                   `👤 <b>Sender:</b> ${escapeHtml(senderName)} (${escapeHtml(username)})\n` +
@@ -930,7 +989,8 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
   console.log(`🔴 Bot 1: MeetLoopPayBot (Admin Controls) -> ONLINE`);
-  console.log(`🔵 Bot 2: MeetLoop Support Bot (Customer Care) -> ONLINE`);
+  console.log(`🔵 Bot 2: MeetLoop Support Bot (AI Assistant) -> ONLINE`);
+  console.log(`📸 Realtime Photo & Receipt Forwarder: ENABLED`);
   console.log(`💰 Unban Clearance Fee: ₱20.00 ONLY`);
   console.log(`💾 Persistent Disk Storage: ${DB_FILE}`);
   console.log(`================================================`);
