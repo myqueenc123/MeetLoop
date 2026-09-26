@@ -74,13 +74,13 @@ header{
 .cam-box{
   position:relative;flex:1;min-width:0;min-height:0;background:#000000;
   border-radius:14px;overflow:hidden;border:1px solid var(--panel-border);
+  transform:translateZ(0);
 }
 
-/* HD LIVE VIDEO */
+/* HARDWARE ACCELERATED HD VIDEO */
 video{
   width:100%;height:100%;object-fit:cover;background:#000000;display:block;
   image-rendering:-webkit-optimize-contrast;
-  image-rendering:crisp-edges;
   transform:translate3d(0,0,0);
   backface-visibility:hidden;
   will-change:transform;
@@ -96,22 +96,22 @@ video{
   z-index:6;
   display:none;
   filter:blur(8px) brightness(0.95);
-  transition:opacity 0.35s ease-out;
+  transition:opacity 0.25s ease-out;
   pointer-events:none;
   background:#000000;
+  transform:translateZ(0);
 }
 
-/* 📺 CRT TV STATIC SCREEN */
+/* 📺 CRT TV STATIC SCREEN (OPTIMIZED 0% CPU ON CALL) */
 .crt-screen-wrapper{
   position:absolute;inset:0;z-index:3;overflow:hidden;background:#050811;pointer-events:none;
 }
 #crtStaticCanvas{
-  position:absolute;inset:0;width:100%;height:100%;opacity:0.22;display:block;
+  position:absolute;inset:0;width:100%;height:100%;opacity:0.2;display:block;
 }
 .crt-overlay-vignette{
   position:absolute;inset:0;
-  background:radial-gradient(circle, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.85) 100%),
-             repeating-linear-gradient(0deg, rgba(0,0,0,0.12), rgba(0,0,0,0.12) 1.5px, transparent 1.5px, transparent 3px);
+  background:radial-gradient(circle, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.85) 100%);
   pointer-events:none;
 }
 
@@ -143,8 +143,8 @@ video{
   user-select:none;pointer-events:none;
 }
 .search-spinner{
-  width:52px;height:52px;border:4px solid rgba(255,255,255,.15);
-  border-top-color:#38bdf8;border-radius:50%;animation:spin .75s linear infinite;
+  width:50px;height:50px;border:3.5px solid rgba(255,255,255,.15);
+  border-top-color:#38bdf8;border-radius:50%;animation:spin .65s linear infinite;
   filter:drop-shadow(0 0 15px rgba(56,189,248,0.85));
 }
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -158,8 +158,8 @@ video{
 .audio-slider{width:70px;height:5px;-webkit-appearance:none;background:#334155;border-radius:999px;outline:none;cursor:pointer}
 .audio-slider::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:#38bdf8;cursor:pointer}
 
-#localVideo.mirrored{transform:scaleX(-1)}
-#localVideo.unmirrored{transform:scaleX(1)}
+#localVideo.mirrored{transform:scaleX(-1) translateZ(0)}
+#localVideo.unmirrored{transform:scaleX(1) translateZ(0)}
 
 .cam-tag{
   position:absolute;top:10px;left:10px;z-index:10;
@@ -176,21 +176,12 @@ video{
   cursor:pointer;padding:0;
   box-shadow:0 4px 12px rgba(0,0,0,0.6);
   backdrop-filter:blur(6px);
-  transition:all 0.15s ease;
+  transition:transform 0.15s ease;
   user-select:none;
 }
-#reportBtn svg{
-  width:18px;height:18px;fill:#ef4444;flex-shrink:0;
-  filter:drop-shadow(0 0 5px rgba(239,68,68,0.6));
-}
-#reportBtn:hover{
-  background:rgba(239,68,68,0.2);
-  border-color:rgba(239,68,68,0.5);
-  transform:scale(1.08);
-}
-#reportBtn:active{
-  transform:scale(0.92);
-}
+#reportBtn svg{width:18px;height:18px;fill:#ef4444;filter:drop-shadow(0 0 5px rgba(239,68,68,0.6))}
+#reportBtn:hover{transform:scale(1.08)}
+#reportBtn:active{transform:scale(0.92)}
 
 .controls-panel{display:flex;gap:8px;height:48px;flex-shrink:0}
 .ctrl-btn{
@@ -380,11 +371,11 @@ video{
   border:1px solid rgba(255, 255, 255, 0.12);
   box-shadow:0 30px 80px rgba(0,0,0,0.85), inset 0 1px 1px rgba(255,255,255,0.15);
   backdrop-filter:blur(16px);
-  animation:portalEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation:portalEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes portalEntrance{
-  from{opacity:0;transform:scale(0.92) translateY(15px)}
+  from{opacity:0;transform:scale(0.94) translateY(12px)}
   to{opacity:1;transform:scale(1) translateY(0)}
 }
 
@@ -467,14 +458,14 @@ video{
   font-size:11px;color:#64748b;font-weight:600;letter-spacing:0.3px;
 }
 
-/* ================= 🚀 FULLSCREEN TRANSITION LOADER ================= */
+/* ================= 🚀 ZERO-LAG TRANSITION LOADER ================= */
 #portalLoadingOverlay{
   position:fixed;inset:0;z-index:999998;
   display:none;flex-direction:column;align-items:center;justify-content:center;
   background:radial-gradient(circle at center, rgba(15, 23, 42, 0.88) 0%, rgba(10, 14, 23, 0.98) 100%), url('/meetloop-bg.png') center/cover no-repeat fixed;
   backdrop-filter:blur(16px);
   -webkit-backdrop-filter:blur(16px);
-  transition:opacity 0.4s ease-out;
+  transition:opacity 0.3s ease-out;
   padding:20px;text-align:center;
 }
 
@@ -483,7 +474,7 @@ video{
   border-radius:24px;padding:34px 28px;max-width:380px;width:100%;
   box-shadow:0 25px 70px rgba(0,0,0,0.9);
   display:flex;flex-direction:column;align-items:center;gap:16px;
-  animation:portalEntrance 0.5s ease-out forwards;
+  animation:portalEntrance 0.4s ease-out forwards;
 }
 
 .dual-spinner-wrap{
@@ -491,11 +482,11 @@ video{
 }
 .spinner-ring-outer{
   position:absolute;inset:0;border:3px solid transparent;border-top-color:#38bdf8;border-right-color:#38bdf8;
-  border-radius:50%;animation:spin 1s linear infinite;filter:drop-shadow(0 0 10px rgba(56,189,248,0.8));
+  border-radius:50%;animation:spin 0.85s linear infinite;filter:drop-shadow(0 0 10px rgba(56,189,248,0.8));
 }
 .spinner-ring-inner{
   position:absolute;inset:8px;border:3px solid transparent;border-bottom-color:#a855f7;border-left-color:#a855f7;
-  border-radius:50%;animation:spin 0.75s linear infinite reverse;filter:drop-shadow(0 0 10px rgba(168,85,247,0.8));
+  border-radius:50%;animation:spin 0.65s linear infinite reverse;filter:drop-shadow(0 0 10px rgba(168,85,247,0.8));
 }
 
 .loader-title{
@@ -510,7 +501,7 @@ video{
 }
 .loader-bar-fill{
   height:100%;width:15%;background:linear-gradient(90deg, #38bdf8, #a855f7);border-radius:999px;
-  transition:width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow:0 0 12px rgba(56,189,248,0.8);
 }
 
@@ -566,7 +557,7 @@ video{
   </div>
 </div>
 
-<!-- 🚀 FULLSCREEN TRANSITION LOADER (AFTER START CHATTING) -->
+<!-- 🚀 FULLSCREEN TRANSITION LOADER -->
 <div id="portalLoadingOverlay">
   <div class="loader-card">
     <div class="dual-spinner-wrap">
@@ -587,7 +578,7 @@ video{
   </div>
 </div>
 
-<!-- 📑 GENERAL INFO MODAL (BLOG / RULES / TERMS / PRIVACY) -->
+<!-- 📑 GENERAL INFO MODAL -->
 <div id="infoModalBackdrop" class="info-modal-backdrop">
   <div class="info-modal-box">
     <div class="info-modal-title">
@@ -678,7 +669,7 @@ video{
     </div>
   </div>
 
-  <!-- ✨ MODERN PORTAL FOOTER (© 2026 meetloop-om0m.onrender.com) -->
+  <!-- ✨ MODERN PORTAL FOOTER -->
   <div class="portal-footer">
     <div class="portal-footer-links">
       <span class="portal-footer-link" onclick="openInfoModal('Blog')">Blog</span>
@@ -724,7 +715,6 @@ video{
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
 
-      <!-- DYNAMIC AUTO-LINKED SUPPORT BOT -->
       <a href="https://t.me/MeetLoop_bot" target="_blank" class="telegram-support-btn" id="telegramSupportLink">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.99-1.74 6.66-2.89 8-3.46 3.82-1.6 4.62-1.88 5.14-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.21-.03.36z"/></svg>
         <span id="telegramSupportLabel">Message Telegram Support</span>
@@ -802,7 +792,7 @@ video{
         <!-- 🛡️ 100% PERFECT FIT FROZEN STILL PHOTO OVERLAY -->
         <img id="freezeImageOverlay" alt="Frozen Still Frame">
 
-        <!-- 📺 CRT TV STATIC -->
+        <!-- 📺 CRT TV STATIC (0% CPU ACCELERATED) -->
         <div class="crt-screen-wrapper" id="crtWrapper">
           <canvas id="crtStaticCanvas"></canvas>
           <div class="crt-overlay-vignette"></div>
@@ -1052,6 +1042,7 @@ let lastCapturedStrangerSnapshot = null;
 
 let cooldownSeconds = 0;
 let cooldownInterval = null;
+let staticNoiseActive = true;
 
 const rtcConfig = {
   iceServers: [
@@ -1064,34 +1055,41 @@ const rtcConfig = {
   sdpSemantics: "unified-plan"
 };
 
+/* ================= 🚀 ZERO-LAG CPU OPTIMIZED TV STATIC ================= */
 function runTVStatic() {
   if (!crtStaticCanvas) return;
   const ctx = crtStaticCanvas.getContext("2d");
-  const w = (crtStaticCanvas.width = 240);
-  const h = (crtStaticCanvas.height = 180);
+  const w = (crtStaticCanvas.width = 160);
+  const h = (crtStaticCanvas.height = 120);
   const imgData = ctx.createImageData(w, h);
   const buffer = new Uint32Array(imgData.data.buffer);
   const len = buffer.length;
 
-  function noise() {
-    if (crtWrapper && crtWrapper.style.display !== "none") {
-      for (let i = 0; i < len; i++) {
-        const gray = (Math.random() * 255) | 0;
-        buffer[i] = (255 << 24) | (gray << 16) | (gray << 8) | gray;
+  let lastFrameTime = 0;
+  const targetFPS = 24;
+
+  function noise(now) {
+    if (staticNoiseActive && crtWrapper && crtWrapper.style.display !== "none") {
+      if (now - lastFrameTime >= (1000 / targetFPS)) {
+        lastFrameTime = now;
+        for (let i = 0; i < len; i++) {
+          const gray = (Math.random() * 255) | 0;
+          buffer[i] = (255 << 24) | (gray << 16) | (gray << 8) | gray;
+        }
+        ctx.putImageData(imgData, 0, 0);
       }
-      ctx.putImageData(imgData, 0, 0);
     }
     requestAnimationFrame(noise);
   }
-  noise();
+  requestAnimationFrame(noise);
 }
 runTVStatic();
 
 function setHighQualityBitrate(sdp) {
-  return sdp.replace(/a=mid:video\r\n/g, "a=mid:video\r\nb=AS:2500\r\n");
+  return sdp.replace(/a=mid:video\r\n/g, "a=mid:video\r\nb=AS:1800\r\n");
 }
 
-/* ================= 🌟 100% SAKTONG SUKAT ================= */
+/* ================= 🌟 100% SAKTONG SUKAT & ZERO-LAG FREEZE ================= */
 function displayOmeTVFrozenSnapshot() {
   if (isFreezeActive) return;
 
@@ -1114,6 +1112,7 @@ function displayOmeTVFrozenSnapshot() {
       freezeImageOverlay.style.display = "block";
     }
 
+    staticNoiseActive = false;
     if (crtWrapper) crtWrapper.style.display = "none";
     if (standbyCenter) standbyCenter.style.display = "none";
     if (searchLoader) searchLoader.style.display = "none";
@@ -1131,15 +1130,15 @@ function displayOmeTVFrozenSnapshot() {
           freezeImageOverlay.style.display = "none";
           freezeImageOverlay.src = "";
           isFreezeActive = false;
-        }, 350);
+        }, 250);
       }
-    }, 1000);
+    }, 900);
   };
 
   if ("requestVideoFrameCallback" in HTMLVideoElement.prototype) {
     remoteVideo.requestVideoFrameCallback(capturePhoto);
   } else {
-    setTimeout(capturePhoto, 120);
+    setTimeout(capturePhoto, 100);
   }
 }
 
@@ -1196,6 +1195,7 @@ if (socket) {
 
   socket.on("waiting", () => {
     searching = true;
+    staticNoiseActive = true;
     resetVideoLayers();
     if (crtWrapper) crtWrapper.style.display = "block";
     if (standbyCenter) standbyCenter.style.display = "none";
@@ -1285,7 +1285,7 @@ if (socket) {
   });
 }
 
-/* ================= 4. MEDIA & PEER CONNECTION ================= */
+/* ================= 4. ULTRA-FAST MEDIA & LOW-LATENCY WEBRTC ================= */
 async function startMedia() {
   if (isCurrentlyBanned) {
     const overlay = document.getElementById("banOverlay");
@@ -1446,6 +1446,10 @@ async function createPeer(initiator) {
         remoteVideo.srcObject.addTrack(e.track);
       }
 
+      if ("playoutDelayHint" in remoteVideo) {
+        remoteVideo.playoutDelayHint = 0;
+      }
+
       const savedVol = parseFloat(localStorage.getItem("meetloop_volume") || "1.0");
       remoteVideo.muted = false;
       remoteVideo.volume = savedVol;
@@ -1507,12 +1511,12 @@ async function startPortalChatting() {
   if (loader) loader.style.display = "flex";
 
   if (statusEl) statusEl.textContent = "Requesting Camera & Microphone Access...";
-  if (progressBar) progressBar.style.width = "35%";
+  if (progressBar) progressBar.style.width = "40%";
 
   const mediaOk = await startMedia();
 
-  if (statusEl) statusEl.textContent = "Connecting to Secure WebRTC Mesh Relay...";
-  if (progressBar) progressBar.style.width = "75%";
+  if (statusEl) statusEl.textContent = "Connecting to Low-Latency Mesh Relay...";
+  if (progressBar) progressBar.style.width = "80%";
 
   setTimeout(() => {
     if (statusEl) statusEl.textContent = "System Ready!";
@@ -1524,11 +1528,11 @@ async function startPortalChatting() {
         setTimeout(() => {
           loader.style.display = "none";
           loader.style.opacity = "1";
-        }, 400);
+        }, 300);
       }
       stopSession();
-    }, 450);
-  }, 800);
+    }, 350);
+  }, 600);
 }
 
 async function triggerStartNext() {
@@ -1543,6 +1547,7 @@ async function triggerStartNext() {
 
   if (mainActionBtn) mainActionBtn.disabled = true;
   resetVideoLayers();
+  staticNoiseActive = true;
   if (crtWrapper) crtWrapper.style.display = "block";
   if (standbyCenter) standbyCenter.style.display = "none";
   if (searchLoader) searchLoader.style.display = "flex";
@@ -1565,6 +1570,7 @@ function stopSession() {
   connected = false;
 
   resetVideoLayers();
+  staticNoiseActive = true;
   if (crtWrapper) crtWrapper.style.display = "block";
   if (standbyCenter) standbyCenter.style.display = "flex";
   if (searchLoader) searchLoader.style.display = "none";
