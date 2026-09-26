@@ -29,13 +29,12 @@ const REPORT_EXPIRY_WINDOW = 24 * 60 * 60 * 1000;
 const UNBAN_SUBMIT_COOLDOWN = 5 * 1000;
 
 /* ================= 🤖 DUAL-BOT CONFIGURATION ================= */
-// 🔴 BOT 1 (ADMIN CONTROL): Para sa bans, reports, at unban approvals
-const ADMIN_BOT_TOKEN = process.env.ADMIN_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || "8648356765:AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
+// 🔴 BOT 1 (ADMIN CONTROL): Reports, 1-Click Ban, Unban Approvals
+const ADMIN_BOT_TOKEN = process.env.ADMIN_BOT_TOKEN || "8648356765:AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || "5779976596";
 
-// 🔵 BOT 2 (SUPPORT BOT): Para sa customer inquiries & ticket submissions
-// (Kung wala ka pang 2nd token, gagamitin muna nito ang default bot token)
-const SUPPORT_BOT_TOKEN = process.env.SUPPORT_BOT_TOKEN || ADMIN_BOT_TOKEN;
+// 🔵 BOT 2 (CUSTOMER SUPPORT BOT): User chat appeals & support tickets
+const SUPPORT_BOT_TOKEN = process.env.SUPPORT_BOT_TOKEN || "8833737406:AAEAH8knLsrWqu8DIVY4TcVejLZ9ThgC-GM";
 
 app.use((req, res, next) => {
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
@@ -121,7 +120,7 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-/* ================= 🤖 BOT 1: ADMIN CONTROL SENDER ================= */
+/* ================= 🤖 BOT 1: ADMIN SENDER ================= */
 function sendTelegramAdminRaw(endpoint, payloadObj, callback) {
   if (!ADMIN_BOT_TOKEN) return;
   const payload = JSON.stringify(payloadObj);
@@ -573,8 +572,6 @@ function pollAdminBotUpdates() {
 let supportLastUpdateId = 0;
 
 function pollSupportBotUpdates() {
-  if (SUPPORT_BOT_TOKEN === ADMIN_BOT_TOKEN) return; // Skip if using single bot
-
   const payload = JSON.stringify({
     offset: supportLastUpdateId + 1,
     timeout: 15,
@@ -876,8 +873,8 @@ app.get("*", (req, res) => {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`🤖 Bot 1 (Admin Controls): ONLINE`);
-  console.log(`👥 Bot 2 (Customer Support): ONLINE`);
+  console.log(`🔴 Bot 1 (Admin Controls): ONLINE`);
+  console.log(`🔵 Bot 2 (Customer Support): ONLINE`);
   console.log(`💰 Unban Clearance Fee: ₱20.00 ONLY`);
   console.log(`💾 Persistent Disk Storage: ${DB_FILE}`);
   console.log(`================================================`);
