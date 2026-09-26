@@ -355,16 +355,129 @@ video{
 .ban-expire-time{font-size:11.5px;font-weight:800;color:#0f172a}
 .ban-id-chip{font-size:9.5px;color:#64748b;font-family:monospace}
 
-/* WELCOME PORTAL */
+/* ================= 🌟 ULTRA-MODERN GLASSMORPHISM WELCOME PORTAL ================= */
 #welcomePortal{
-  position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px;
-  background:linear-gradient(rgba(10, 14, 23, 0.72), rgba(10, 14, 23, 0.85)), url('/meetloop-bg.png') center/cover no-repeat fixed;
-  backdrop-filter:blur(8px);
+  position:fixed;inset:0;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  padding:20px 16px 14px;
+  background:radial-gradient(circle at center, rgba(15, 23, 42, 0.72) 0%, rgba(10, 14, 23, 0.92) 100%), url('/meetloop-bg.png') center/cover no-repeat fixed;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  overflow-y:auto;
 }
-.portal-box{max-width:420px;width:100%;padding:28px 20px;text-align:center;background:rgba(17, 24, 39, 0.95);border-radius:24px;border:1.5px solid rgba(255,255,255,.12);box-shadow:0 25px 60px rgba(0,0,0,.9)}
-.portal-logo-svg{width:75px;height:75px;margin:0 auto 12px;display:block}
-.portal-btn{width:100%;height:48px;border-radius:12px;border:0;background:linear-gradient(135deg,#0284c7,#2563eb);color:#fff;font-size:14px;font-weight:800;cursor:pointer;margin-top:12px}
-.portal-rules{text-align:left;font-size:12px;color:#cbd5e1;line-height:1.6;margin:16px 0;background:#1f293d;padding:14px;border-radius:12px}
+
+.portal-wrapper{
+  flex:1;display:flex;align-items:center;justify-content:center;width:100%;max-width:440px;margin:auto;
+}
+
+.portal-box{
+  width:100%;padding:32px 24px 28px;text-align:center;
+  background:rgba(17, 24, 39, 0.82);
+  border-radius:28px;
+  border:1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:0 30px 80px rgba(0,0,0,0.85), inset 0 1px 1px rgba(255,255,255,0.15);
+  backdrop-filter:blur(16px);
+  animation:portalEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes portalEntrance{
+  from{opacity:0;transform:scale(0.92) translateY(15px)}
+  to{opacity:1;transform:scale(1) translateY(0)}
+}
+
+.portal-logo-svg{
+  width:82px;height:82px;margin:0 auto 10px;display:block;
+  filter:drop-shadow(0 0 20px rgba(56,189,248,0.55));
+  animation:floatLogo 3s ease-in-out infinite alternate;
+}
+
+.portal-title{
+  font-size:26px;font-weight:900;letter-spacing:-0.5px;color:#ffffff;
+  background:linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+
+.portal-subtitle{
+  font-size:12px;color:#94a3b8;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;margin-top:2px;
+}
+
+.portal-rules-grid{
+  display:flex;flex-direction:column;gap:8px;margin:18px 0 20px;text-align:left;
+}
+
+.rule-chip{
+  background:rgba(30, 41, 59, 0.7);
+  border:1px solid rgba(255, 255, 255, 0.08);
+  border-radius:12px;padding:9px 12px;
+  display:flex;align-items:center;gap:10px;
+  font-size:12px;color:#e2e8f0;line-height:1.4;
+  transition:all 0.2s ease;
+}
+
+.rule-chip:hover{
+  background:rgba(30, 41, 59, 0.95);
+  border-color:rgba(56, 189, 248, 0.3);
+  transform:translateX(2px);
+}
+
+.rule-icon{
+  width:28px;height:28px;border-radius:8px;background:rgba(15, 23, 42, 0.8);
+  display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;
+  border:1px solid rgba(255,255,255,0.06);
+}
+
+.portal-btn{
+  width:100%;height:50px;border-radius:14px;border:0;
+  background:linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+  color:#ffffff;font-size:14px;font-weight:900;letter-spacing:0.5px;
+  cursor:pointer;position:relative;overflow:hidden;
+  box-shadow:0 8px 25px rgba(37, 99, 235, 0.45);
+  transition:all 0.2s ease;
+}
+
+.portal-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 30px rgba(56, 189, 248, 0.6);
+}
+.portal-btn:active{transform:scale(0.97)}
+
+/* ✨ PORTAL MODERN FOOTER */
+.portal-footer{
+  width:100%;max-width:520px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);
+  user-select:none;
+}
+
+.portal-footer-links{
+  display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;
+}
+
+.portal-footer-link{
+  color:#94a3b8;font-size:12px;font-weight:700;text-decoration:none;
+  cursor:pointer;transition:color 0.2s ease;
+}
+.portal-footer-link:hover{color:#38bdf8;text-decoration:underline}
+
+.portal-footer-copy{
+  font-size:11px;color:#64748b;font-weight:600;letter-spacing:0.3px;
+}
+
+/* ================= 📑 MODAL DIALOGS FOR FOOTER (RULES / TERMS / PRIVACY) ================= */
+.info-modal-backdrop{
+  position:fixed;inset:0;z-index:1000000;background:rgba(0,0,0,0.85);
+  display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px);
+}
+.info-modal-box{
+  background:#111827;border:1.5px solid rgba(255,255,255,0.15);border-radius:20px;
+  max-width:440px;width:100%;padding:22px 20px;box-shadow:0 25px 60px rgba(0,0,0,0.95);
+  text-align:left;display:flex;flex-direction:column;gap:12px;
+}
+.info-modal-title{font-size:17px;font-weight:900;color:#38bdf8;display:flex;align-items:center;justify-content:space-between}
+.info-modal-body{font-size:12px;line-height:1.6;color:#cbd5e1;max-height:55vh;overflow-y:auto;padding-right:4px}
+.info-modal-close-btn{
+  width:100%;height:40px;border-radius:10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);
+  color:#fff;font-weight:800;font-size:12px;cursor:pointer;margin-top:6px;
+}
 
 /* REPORT MODAL */
 #reportModal{
@@ -399,6 +512,20 @@ video{
   </div>
 </div>
 
+<!-- 📑 GENERAL INFO MODAL (BLOG / RULES / TERMS / PRIVACY) -->
+<div id="infoModalBackdrop" class="info-modal-backdrop">
+  <div class="info-modal-box">
+    <div class="info-modal-title">
+      <span id="infoModalTitleText">Rules & Guidelines</span>
+      <span style="cursor:pointer;color:#94a3b8;font-size:18px" onclick="closeInfoModal()">✕</span>
+    </div>
+    <div class="info-modal-body" id="infoModalBodyText">
+      Loading...
+    </div>
+    <button type="button" class="info-modal-close-btn" onclick="closeInfoModal()">Close</button>
+  </div>
+</div>
+
 <!-- REPORT MODAL -->
 <div id="reportModal">
   <div class="report-modal-card">
@@ -423,28 +550,54 @@ video{
   </div>
 </div>
 
-<!-- WELCOME PORTAL -->
+<!-- 🌟 ULTRA-MODERN WELCOME PORTAL -->
 <div id="welcomePortal">
-  <div class="portal-box">
-    <svg class="portal-logo-svg" viewBox="0 0 100 100">
-      <defs>
-        <linearGradient id="pG1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#2563eb"/></linearGradient>
-        <linearGradient id="pG2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#ec4899"/></linearGradient>
-      </defs>
-      <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 Z" fill="url(#pG1)"/>
-      <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 Z" fill="url(#pG2)"/>
-    </svg>
-    <h1 style="font-size:24px;font-weight:900;color:#fff">MeetLoop</h1>
-    <p style="font-size:12px;color:var(--text-muted);font-weight:700;margin-top:2px">Random Video Chat</p>
+  <div class="portal-wrapper">
+    <div class="portal-box">
+      <svg class="portal-logo-svg" viewBox="0 0 100 100">
+        <defs>
+          <linearGradient id="pG1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#2563eb"/></linearGradient>
+          <linearGradient id="pG2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#ec4899"/></linearGradient>
+        </defs>
+        <path d="M38 22 C24 22 14 32 14 46 C14 53.5 17 60 22 65 L18 78 L32 73.5 C34.5 74.5 37 75 40 75 Z" fill="url(#pG1)"/>
+        <path d="M62 25 C50 25 40 34.5 40 46.5 C40 51.5 42 56 45 59.5 C48 55 53 52 59 52 Z" fill="url(#pG2)"/>
+      </svg>
+      
+      <div class="portal-title">MeetLoop</div>
+      <div class="portal-subtitle">Random Video Chat</div>
 
-    <ul class="portal-rules">
-      <li><b>18+ Required:</b> Minors are strictly prohibited.</li>
-      <li><b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.</li>
-      <li><b>Human Face Only:</b> Look directly at the camera.</li>
-      <li><b>Safety Shield:</b> Safe transition on every stranger switch.</li>
-    </ul>
+      <div class="portal-rules-grid">
+        <div class="rule-chip">
+          <div class="rule-icon">🔞</div>
+          <div><b>18+ Required:</b> Minors are strictly prohibited.</div>
+        </div>
+        <div class="rule-chip">
+          <div class="rule-icon">🚫</div>
+          <div><b>Zero Tolerance:</b> Nudity, obscene behavior, and spam are banned.</div>
+        </div>
+        <div class="rule-chip">
+          <div class="rule-icon">📹</div>
+          <div><b>Human Face Only:</b> Look directly at the camera.</div>
+        </div>
+        <div class="rule-chip">
+          <div class="rule-icon">🛡️</div>
+          <div><b>Safety Shield:</b> Safe transition on every stranger switch.</div>
+        </div>
+      </div>
 
-    <button class="portal-btn" id="portalStartBtn" type="button" onclick="startPortalChatting()">START CHATTING</button>
+      <button class="portal-btn" id="portalStartBtn" type="button" onclick="startPortalChatting()">START CHATTING</button>
+    </div>
+  </div>
+
+  <!-- ✨ MODERN PORTAL FOOTER (© 2026 meetloop-om0m.onrender.com) -->
+  <div class="portal-footer">
+    <div class="portal-footer-links">
+      <span class="portal-footer-link" onclick="openInfoModal('Blog')">Blog</span>
+      <span class="portal-footer-link" onclick="openInfoModal('Rules')">Rules</span>
+      <span class="portal-footer-link" onclick="openInfoModal('Terms')">Terms</span>
+      <span class="portal-footer-link" onclick="openInfoModal('Privacy')">Privacy</span>
+    </div>
+    <div class="portal-footer-copy">© 2026 meetloop-om0m.onrender.com • All Rights Reserved</div>
   </div>
 </div>
 
@@ -767,7 +920,6 @@ function updateSupportBotLink(botUsername) {
   if (label) label.textContent = `Message Telegram Support (@${botUsername})`;
 }
 
-// Auto Fetch Config from Backend
 fetch("/api/config")
   .then(r => r.json())
   .then(cfg => {
@@ -1510,6 +1662,47 @@ document.getElementById("showLocalBtn")?.addEventListener("click", () => {
   localCamBox?.classList.remove("hidden-cam");
   document.getElementById("showLocalBtn")?.classList.remove("visible");
 });
+
+/* ================= 📑 MODAL VIEWER FOR FOOTER ================= */
+const infoContents = {
+  Blog: {
+    title: "📰 MeetLoop Official Blog",
+    body: `<b>Welcome to the MeetLoop Updates & Community Blog!</b><br><br>
+           🚀 <b>Version 3.0 Live:</b> We've rolled out real-time Umingle-grade AI Vision moderation to keep video chats clean, enjoyable, and free of trolls.<br><br>
+           ⚡ <b>Ultra Low Latency:</b> Our WebRTC mesh network provides sub-50ms peer-to-peer connection for crystal-clear HD video and audio conversations across all mobile and desktop devices.`
+  },
+  Rules: {
+    title: "📋 Community Guidelines & Rules",
+    body: `<b>MeetLoop Community Standards:</b><br><br>
+           1. <b>18+ Required:</b> You must be at least 18 years old to use MeetLoop.<br>
+           2. <b>Zero Tolerance for Nudity:</b> Any sexual content or inappropriate exposure results in an instant 7-day hardware ban.<br>
+           3. <b>Keep Your Face on Camera:</b> Looking away, covering the camera, or streaming static video is prohibited.<br>
+           4. <b>Respect Other Users:</b> Hate speech, harassment, bullying, and racial slurs are strictly banned.`
+  },
+  Terms: {
+    title: "⚖️ Terms of Service",
+    body: `<b>Terms of Service (meetloop-om0m.onrender.com):</b><br><br>
+           By accessing or using MeetLoop, you agree to comply with our Terms of Service. MeetLoop is provided "as is" for random video communication.<br><br>
+           We reserve the right to suspend or ban any user or device violating our safety rules. Unban fees (₱20.00) are voluntary administrative clearance contributions.`
+  },
+  Privacy: {
+    title: "🔒 Privacy Policy",
+    body: `<b>Your Privacy is Protected:</b><br><br>
+           MeetLoop operates on direct <b>Peer-to-Peer (P2P) WebRTC</b> streaming. Video and audio streams are directly transmitted between users and are <b>never recorded or stored on our servers</b>.<br><br>
+           Temporary camera snapshots are only inspected in volatile memory when a user report is submitted to verify community safety.`
+  }
+};
+
+function openInfoModal(type) {
+  const data = infoContents[type] || infoContents.Rules;
+  document.getElementById("infoModalTitleText").innerHTML = data.title;
+  document.getElementById("infoModalBodyText").innerHTML = data.body;
+  document.getElementById("infoModalBackdrop").style.display = "flex";
+}
+
+function closeInfoModal() {
+  document.getElementById("infoModalBackdrop").style.display = "none";
+}
 
 const savedVolume = localStorage.getItem("meetloop_volume");
 if (savedVolume !== null && audioSlider) {
