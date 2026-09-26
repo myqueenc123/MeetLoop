@@ -1,8 +1,6 @@
 /**
  * MeetLoop - High-Performance WebRTC Backend Server
- * DUAL-BOT ARCHITECTURE:
- *  1. Admin Control Bot (Reports, 1-Click Ban, 1-Click Approve, GCash Alerts)
- *  2. Customer Support Bot (Public Tickets, User Chats, Receipt Submissions)
+ * DUAL-BOT ARCHITECTURE with Automatic Bot Username Detection
  */
 
 const express = require("express");
@@ -28,13 +26,14 @@ const PAYMENT_VALIDITY_WINDOW = 60 * 60 * 1000;
 const REPORT_EXPIRY_WINDOW = 24 * 60 * 60 * 1000;
 const UNBAN_SUBMIT_COOLDOWN = 5 * 1000;
 
-/* ================= 🤖 SECURE BOT TOKENS ================= */
-// Obfuscated to bypass GitHub public scanner
+/* ================= 🤖 SECURE DUAL-BOT TOKENS ================= */
 const _dec = (b64) => Buffer.from(b64, "base64").toString("utf8");
 
 const ADMIN_BOT_TOKEN = process.env.ADMIN_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || _dec("ODY0ODM1Njc2NTpBQUdnakVZOVc4VF9yV1VFazFEZ3hIUzQ4b05MT2hnMGQycw==");
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || _dec("NTc3OTk3NjU5Ng==");
 const SUPPORT_BOT_TOKEN = process.env.SUPPORT_BOT_TOKEN || _dec("ODgzMzczNzQwNjpBQUVBSDhrbkxzcldxdThESVY0NFRjVmVqTFo5VGhnQy1HTQ==");
+
+let autoDetectedSupportBotUsername = "MeetLoop_bot";
 
 app.use((req, res, next) => {
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
@@ -49,6 +48,10 @@ app.use(express.text({ type: "*/*", limit: "30mb" }));
 
 app.get("/ping", (req, res) => {
   res.status(200).send("MEETLOOP_24_7_ACTIVE_OK");
+});
+
+app.get("/api/config", (req, res) => {
+  res.json({ supportBot: autoDetectedSupportBotUsername });
 });
 
 /* ================= 💾 ATOMIC PERMANENT DATABASE ================= */
@@ -120,7 +123,7 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-/* ================= 🤖 BOT 1: ADMIN SENDER ================= */
+/* ================= 🤖 BOT 1: ADMIN CONTROLS ================= */
 function sendTelegramAdminRaw(endpoint, payloadObj, callback) {
   if (!ADMIN_BOT_TOKEN) return;
   const payload = JSON.stringify(payloadObj);
@@ -139,7 +142,7 @@ function sendTelegramAdminRaw(endpoint, payloadObj, callback) {
     res.on("end", () => {
       try {
         const json = JSON.parse(d);
-        if (!json.ok) console.error(`❌ Admin Bot API Error [${endpoint}]:`, json.description);
+        if (!json.ok) console.error(`❌ Admin Bot Error [${endpoint}]:`, json.description);
       } catch(e){}
       if (callback) callback(null, d);
     });
@@ -266,6 +269,31 @@ function sendTelegramSupportMessage(chatId, text) {
   const req = https.request(options);
   req.on("error", (e) => console.error("❌ Support Bot Error:", e.message));
   req.write(payload);
+  req.end();
+}
+
+/* ================= 🔍 AUTO-DETECT BOT 2 USERNAME ================= */
+function detectSupportBotUsername() {
+  const options = {
+    hostname: "api.telegram.org",
+    path: `/bot${SUPPORT_BOT_TOKEN}/getMe`,
+    method: "GET"
+  };
+  const req = https.request(options, (res) => {
+    let d = "";
+    res.on("data", chunk => d += chunk);
+    res.on("end", () => {
+      try {
+        const json = JSON.parse(d);
+        if (json.ok && json.result && json.result.username) {
+          autoDetectedSupportBotUsername = json.result.username;
+          console.log(`🔵 Live Support Bot Username: @${autoDetectedSupportBotUsername}`);
+          io.emit("bot-config", { supportBot: autoDetectedSupportBotUsername });
+        }
+      } catch(e){}
+    });
+  });
+  req.on("error", () => {});
   req.end();
 }
 
@@ -718,6 +746,7 @@ io.on("connection", (socket) => {
   const clientIp = getClientIp(socket);
 
   io.emit("online-count", Math.max(1, io.engine.clientsCount));
+  socket.emit("bot-config", { supportBot: autoDetectedSupportBotUsername });
 
   const banInfo = checkSecurityBan(hardwareId, clientIp, fingerprint);
   if (banInfo) {
@@ -879,6 +908,7 @@ server.listen(PORT, "0.0.0.0", () => {
   console.log(`💰 Unban Clearance Fee: ₱20.00 ONLY`);
   console.log(`💾 Persistent Disk Storage: ${DB_FILE}`);
   console.log(`================================================`);
+  detectSupportBotUsername();
   pollAdminBotUpdates();
   pollSupportBotUpdates();
 });
