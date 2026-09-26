@@ -1,7 +1,8 @@
 /**
  * MeetLoop - High-Performance WebRTC Backend Server
- * Complete Live Telegram Support Ticket Router + Umingle Vision AI Moderation
- * Fee Enforced: PHP 20.00 ONLY
+ * DUAL-BOT ARCHITECTURE:
+ *  1. Admin Control Bot (Reports, 1-Click Ban, 1-Click Approve, GCash Alerts)
+ *  2. Customer Support Bot (Public Tickets, User Chats, Receipt Submissions)
  */
 
 const express = require("express");
@@ -27,8 +28,14 @@ const PAYMENT_VALIDITY_WINDOW = 60 * 60 * 1000;
 const REPORT_EXPIRY_WINDOW = 24 * 60 * 60 * 1000;
 const UNBAN_SUBMIT_COOLDOWN = 5 * 1000;
 
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8648356765:AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
+/* ================= 🤖 DUAL-BOT CONFIGURATION ================= */
+// 🔴 BOT 1 (ADMIN CONTROL): Para sa bans, reports, at unban approvals
+const ADMIN_BOT_TOKEN = process.env.ADMIN_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || "8648356765:AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || "5779976596";
+
+// 🔵 BOT 2 (SUPPORT BOT): Para sa customer inquiries & ticket submissions
+// (Kung wala ka pang 2nd token, gagamitin muna nito ang default bot token)
+const SUPPORT_BOT_TOKEN = process.env.SUPPORT_BOT_TOKEN || ADMIN_BOT_TOKEN;
 
 app.use((req, res, next) => {
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
@@ -114,13 +121,13 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-/* ================= 🤖 TELEGRAM BOT CONTROLLER ================= */
-function sendTelegramRaw(endpoint, payloadObj, callback) {
-  if (!TELEGRAM_BOT_TOKEN) return;
+/* ================= 🤖 BOT 1: ADMIN CONTROL SENDER ================= */
+function sendTelegramAdminRaw(endpoint, payloadObj, callback) {
+  if (!ADMIN_BOT_TOKEN) return;
   const payload = JSON.stringify(payloadObj);
   const options = {
     hostname: "api.telegram.org",
-    path: `/bot${TELEGRAM_BOT_TOKEN}/${endpoint}`,
+    path: `/bot${ADMIN_BOT_TOKEN}/${endpoint}`,
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -133,28 +140,26 @@ function sendTelegramRaw(endpoint, payloadObj, callback) {
     res.on("end", () => {
       try {
         const json = JSON.parse(d);
-        if (!json.ok) {
-          console.error(`❌ Telegram API Error [${endpoint}]:`, json.description);
-        }
+        if (!json.ok) console.error(`❌ Admin Bot API Error [${endpoint}]:`, json.description);
       } catch(e){}
       if (callback) callback(null, d);
     });
   });
   req.on("error", (e) => {
-    console.error("❌ Telegram Network Error:", e.message);
+    console.error("❌ Admin Bot Network Error:", e.message);
     if (callback) callback(e);
   });
   req.write(payload);
   req.end();
 }
 
-function sendTelegramMessage(chatId, text) {
-  sendTelegramRaw("sendMessage", { chat_id: String(chatId).trim(), text: text, parse_mode: "HTML", disable_web_page_preview: true });
+function sendTelegramAdminMessage(chatId, text) {
+  sendTelegramAdminRaw("sendMessage", { chat_id: String(chatId).trim(), text: text, parse_mode: "HTML", disable_web_page_preview: true });
 }
 
 function sendTelegramWithButtons(chatId, text, hardwareId) {
   const cleanId = String(hardwareId || "").trim();
-  sendTelegramRaw("sendMessage", {
+  sendTelegramAdminRaw("sendMessage", {
     chat_id: String(chatId).trim(),
     text: text,
     parse_mode: "HTML",
@@ -186,7 +191,7 @@ function sendTelegramPhotoWithActions(chatId, base64Snapshot, captionText, targe
   });
 
   if (!base64Snapshot || typeof base64Snapshot !== "string" || !base64Snapshot.includes(",")) {
-    sendTelegramRaw("sendMessage", {
+    sendTelegramAdminRaw("sendMessage", {
       chat_id: String(chatId).trim(),
       text: captionText,
       parse_mode: "HTML",
@@ -218,7 +223,7 @@ function sendTelegramPhotoWithActions(chatId, base64Snapshot, captionText, targe
 
     const options = {
       hostname: "api.telegram.org",
-      path: `/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`,
+      path: `/bot${ADMIN_BOT_TOKEN}/sendPhoto`,
       method: "POST",
       headers: {
         "Content-Type": `multipart/form-data; boundary=${boundary}`,
@@ -236,7 +241,7 @@ function sendTelegramPhotoWithActions(chatId, base64Snapshot, captionText, targe
         } catch(e){}
       });
     });
-    req.on("error", (e) => console.error("Telegram Photo Error:", e.message));
+    req.on("error", (e) => console.error("Admin Photo Error:", e.message));
     req.write(header);
     req.write(buffer);
     req.write(footer);
@@ -244,6 +249,25 @@ function sendTelegramPhotoWithActions(chatId, base64Snapshot, captionText, targe
   } catch (err) {
     console.error("Snapshot dispatch error:", err.message);
   }
+}
+
+/* ================= 🤖 BOT 2: PUBLIC SUPPORT SENDER ================= */
+function sendTelegramSupportMessage(chatId, text) {
+  if (!SUPPORT_BOT_TOKEN) return;
+  const payload = JSON.stringify({ chat_id: String(chatId).trim(), text: text, parse_mode: "HTML", disable_web_page_preview: true });
+  const options = {
+    hostname: "api.telegram.org",
+    path: `/bot${SUPPORT_BOT_TOKEN}/sendMessage`,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": Buffer.byteLength(payload)
+    }
+  };
+  const req = https.request(options);
+  req.on("error", (e) => console.error("❌ Support Bot Error:", e.message));
+  req.write(payload);
+  req.end();
 }
 
 /* ================= 🧠 UMINGLE-STYLE VISION AI ================= */
@@ -354,7 +378,7 @@ function executeUnbanUser(hardwareId, phone = "Manual", auto = false) {
                        `📱 <b>Mobile:</b> <code>${escapeHtml(phone)}</code>\n` +
                        `💳 <b>Hardware ID:</b> <code>${escapeHtml(hardwareId)}</code>\n` +
                        `💰 <b>Amount:</b> ₱20.00 Verified & Cleared!`;
-    sendTelegramMessage(ADMIN_CHAT_ID, successMsg);
+    sendTelegramAdminMessage(ADMIN_CHAT_ID, successMsg);
   }
 }
 
@@ -411,10 +435,10 @@ app.all("/webhook/gcash-sms", (req, res) => {
     }
 
     if (!autoUnbanned) {
-      sendTelegramMessage(ADMIN_CHAT_ID, `💰 <b>GCASH RECEIVED (₱20.00 VERIFIED)</b>\n<code>${escapeHtml(fullPayloadString)}</code>`);
+      sendTelegramAdminMessage(ADMIN_CHAT_ID, `💰 <b>GCASH RECEIVED (₱20.00 VERIFIED)</b>\n<code>${escapeHtml(fullPayloadString)}</code>`);
     }
   } else {
-    sendTelegramMessage(ADMIN_CHAT_ID, `⚠️ <b>INVALID GCASH AMOUNT (Not ₱20)</b>\n<code>${escapeHtml(fullPayloadString)}</code>\n<i>Auto-unban blocked. Only exact ₱20.00 is allowed.</i>`);
+    sendTelegramAdminMessage(ADMIN_CHAT_ID, `⚠️ <b>INVALID GCASH AMOUNT (Not ₱20)</b>\n<code>${escapeHtml(fullPayloadString)}</code>\n<i>Auto-unban blocked. Only exact ₱20.00 is allowed.</i>`);
   }
 
   res.status(200).json({ success: true, message: "Processed" });
@@ -424,26 +448,19 @@ app.all("/webhook/gcash-sms", (req, res) => {
 app.use(express.static(path.join(__dirname, "public"), { etag: false, maxAge: 0 }));
 app.use(express.static(__dirname, { etag: false, maxAge: 0 }));
 
-/* ================= 🤖 TELEGRAM POLLING & SUPPORT BOT ================= */
-let lastUpdateId = 0;
+/* ================= 🤖 TELEGRAM POLLING (BOT 1: ADMIN CONTROLS) ================= */
+let adminLastUpdateId = 0;
 
-function resetTelegramWebhook(cb) {
-  sendTelegramRaw("deleteWebhook", { drop_pending_updates: false }, () => {
-    console.log("🤖 Telegram Webhook reset complete. Support Bot ready.");
-    if (cb) cb();
-  });
-}
-
-function pollTelegramUpdates() {
+function pollAdminBotUpdates() {
   const payload = JSON.stringify({
-    offset: lastUpdateId + 1,
+    offset: adminLastUpdateId + 1,
     timeout: 15,
-    allowed_updates: ["callback_query", "message"]
+    allowed_updates: ["callback_query"]
   });
 
   const options = {
     hostname: "api.telegram.org",
-    path: `/bot${TELEGRAM_BOT_TOKEN}/getUpdates`,
+    path: `/bot${ADMIN_BOT_TOKEN}/getUpdates`,
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -459,9 +476,8 @@ function pollTelegramUpdates() {
         const json = JSON.parse(data);
         if (json.ok && Array.isArray(json.result)) {
           json.result.forEach((update) => {
-            lastUpdateId = update.update_id;
+            adminLastUpdateId = update.update_id;
             
-            // 1. HANDLE BUTTON CLICKS (Callbacks)
             if (update.callback_query) {
               const cb = update.callback_query;
               const cbData = String(cb.data || "");
@@ -486,10 +502,10 @@ function pollTelegramUpdates() {
                 }
                 io.emit("force-device-ban", { hardwareId: hwId, banUntil: record.banUntil, snapshot: record.snapshot });
 
-                sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "🚨 User BANNED for 7 Days!", show_alert: true });
+                sendTelegramAdminRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "🚨 User BANNED for 7 Days!", show_alert: true });
 
                 if (msgId) {
-                  sendTelegramRaw("editMessageCaption", {
+                  sendTelegramAdminRaw("editMessageCaption", {
                     chat_id: chatId,
                     message_id: msgId,
                     caption: `🚨 <b>USER BANNED (7 DAYS ACTIVE)</b>\n🆔 Target ID: <code>${escapeHtml(hwId)}</code>\nAction Executed by Admin.`,
@@ -500,10 +516,10 @@ function pollTelegramUpdates() {
                 userInfractions.delete(hwId);
                 snapshotCache.delete(hwId);
 
-                sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "✅ Report Dismissed.", show_alert: false });
+                sendTelegramAdminRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "✅ Report Dismissed.", show_alert: false });
 
                 if (msgId) {
-                  sendTelegramRaw("editMessageCaption", {
+                  sendTelegramAdminRaw("editMessageCaption", {
                     chat_id: chatId,
                     message_id: msgId,
                     caption: `✅ <b>REPORT DISMISSED</b>\nTarget: <code>${escapeHtml(hwId)}</code> (No Action Taken)`,
@@ -514,10 +530,10 @@ function pollTelegramUpdates() {
                 const ticket = persistentDeviceTickets.get(hwId);
                 executeUnbanUser(hwId, ticket ? ticket.phone : "Manual", false);
 
-                sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "✅ APPROVED: User is UNBANNED!", show_alert: true });
+                sendTelegramAdminRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "✅ APPROVED: User is UNBANNED!", show_alert: true });
 
                 if (msgId) {
-                  sendTelegramRaw("editMessageText", {
+                  sendTelegramAdminRaw("editMessageText", {
                     chat_id: chatId,
                     message_id: msgId,
                     text: `✅ <b>UNBAN APPROVED BY ADMIN</b>\n🆔 Hardware ID: <code>${escapeHtml(hwId)}</code>\nStatus: <b>Clean Slate / Active</b>`,
@@ -528,10 +544,10 @@ function pollTelegramUpdates() {
                 persistentDeviceTickets.delete(hwId);
                 syncToDisk();
 
-                sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "❌ Request REJECTED.", show_alert: false });
+                sendTelegramAdminRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "❌ Request REJECTED.", show_alert: false });
 
                 if (msgId) {
-                  sendTelegramRaw("editMessageText", {
+                  sendTelegramAdminRaw("editMessageText", {
                     chat_id: chatId,
                     message_id: msgId,
                     text: `❌ <b>UNBAN REQUEST REJECTED</b>\n🆔 Hardware ID: <code>${escapeHtml(hwId)}</code>`,
@@ -539,54 +555,88 @@ function pollTelegramUpdates() {
                   });
                 }
               }
-            } 
+            }
+          });
+        }
+      } catch(e){}
+      setTimeout(pollAdminBotUpdates, 1000);
+    });
+  });
+
+  req.on("error", () => { setTimeout(pollAdminBotUpdates, 3000); });
+  req.setTimeout(18000, () => { req.destroy(); });
+  req.write(payload);
+  req.end();
+}
+
+/* ================= 🤖 TELEGRAM POLLING (BOT 2: CUSTOMER SUPPORT) ================= */
+let supportLastUpdateId = 0;
+
+function pollSupportBotUpdates() {
+  if (SUPPORT_BOT_TOKEN === ADMIN_BOT_TOKEN) return; // Skip if using single bot
+
+  const payload = JSON.stringify({
+    offset: supportLastUpdateId + 1,
+    timeout: 15,
+    allowed_updates: ["message"]
+  });
+
+  const options = {
+    hostname: "api.telegram.org",
+    path: `/bot${SUPPORT_BOT_TOKEN}/getUpdates`,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": Buffer.byteLength(payload)
+    }
+  };
+
+  const req = https.request(options, (res) => {
+    let data = "";
+    res.on("data", chunk => data += chunk);
+    res.on("end", () => {
+      try {
+        const json = JSON.parse(data);
+        if (json.ok && Array.isArray(json.result)) {
+          json.result.forEach((update) => {
+            supportLastUpdateId = update.update_id;
             
-            // 2. HANDLE DIRECT CHATS / SUPPORT MESSAGES FROM USERS
-            else if (update.message) {
+            if (update.message) {
               const msg = update.message;
               const senderChatId = msg.chat?.id;
               const text = msg.text || "";
               const senderName = `${msg.from?.first_name || ""} ${msg.from?.last_name || ""}`.trim();
               const username = msg.from?.username ? `@${msg.from.username}` : "No Username";
 
-              if (String(senderChatId) !== String(ADMIN_CHAT_ID)) {
-                if (text === "/start") {
-                  // Auto Welcome Message
-                  sendTelegramMessage(senderChatId, 
-                    `👋 <b>Welcome to MeetLoop Live Support!</b>\n\n` +
-                    `Kung ikaw ay na-ban at nais mag-apela o mag-send ng GCash payment receipt, mangyaring i-send dito ang iyong:\n` +
-                    `1. <b>Device Ban ID (makikita sa pulang ban screen)</b>\n` +
-                    `2. <b>GCash Ref No. o Screenshot ng bayad</b>\n\n` +
-                    `<i>Matatanggap agad ito ng Admin team para ma-verify ang unban mo.</i>`
-                  );
-                } else {
-                  // Forward User's Message to Admin
-                  sendTelegramMessage(senderChatId, `✅ <b>Nai-forward na ang mensahe mo kay Admin.</b> Pakihintay ang pagsusuri.`);
-                  
-                  sendTelegramMessage(ADMIN_CHAT_ID, 
-                    `📩 <b>BAGONG SUPPORT MESSAGE</b>\n\n` +
-                    `👤 <b>Mula kay:</b> ${escapeHtml(senderName)} (${escapeHtml(username)})\n` +
-                    `🆔 <b>Telegram User ID:</b> <code>${senderChatId}</code>\n` +
-                    `💬 <b>Mensahe:</b>\n<i>${escapeHtml(text)}</i>`
-                  );
-                }
+              if (text === "/start") {
+                sendTelegramSupportMessage(senderChatId, 
+                  `👋 <b>Welcome to MeetLoop Live Customer Support!</b>\n\n` +
+                  `Kung nais mag-apela sa ban o mag-submit ng GCash proof:\n` +
+                  `1. I-send dito ang iyong <b>Device Ban ID</b>\n` +
+                  `2. I-send ang iyong <b>GCash Ref No. o Screenshot ng bayad</b>\n\n` +
+                  `<i>Matatanggap agad ito ng Admin team para ma-unban ka.</i>`
+                );
+              } else {
+                sendTelegramSupportMessage(senderChatId, `✅ <b>Nai-forward na ang mensahe mo kay Admin.</b> Pakihintay ang unban clearance.`);
+                
+                // I-forward sa Admin Alert Channel
+                sendTelegramAdminMessage(ADMIN_CHAT_ID, 
+                  `📩 <b>CUSTOMER SUPPORT TICKET</b>\n\n` +
+                  `👤 <b>Sender:</b> ${escapeHtml(senderName)} (${escapeHtml(username)})\n` +
+                  `🆔 <b>User Telegram ID:</b> <code>${senderChatId}</code>\n` +
+                  `💬 <b>Mensahe:</b>\n<i>${escapeHtml(text)}</i>`
+                );
               }
             }
           });
         }
       } catch(e){}
-      setTimeout(pollTelegramUpdates, 1000);
+      setTimeout(pollSupportBotUpdates, 1000);
     });
   });
 
-  req.on("error", () => {
-    setTimeout(pollTelegramUpdates, 3000);
-  });
-
-  req.setTimeout(18000, () => {
-    req.destroy();
-  });
-
+  req.on("error", () => { setTimeout(pollSupportBotUpdates, 3000); });
+  req.setTimeout(18000, () => { req.destroy(); });
   req.write(payload);
   req.end();
 }
@@ -826,12 +876,11 @@ app.get("*", (req, res) => {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`🤖 Telegram Live Support Bot ACTIVE`);
-  console.log(`🛡️ Umingle-Grade Smart Vision AI Moderation ACTIVE`);
+  console.log(`🤖 Bot 1 (Admin Controls): ONLINE`);
+  console.log(`👥 Bot 2 (Customer Support): ONLINE`);
   console.log(`💰 Unban Clearance Fee: ₱20.00 ONLY`);
   console.log(`💾 Persistent Disk Storage: ${DB_FILE}`);
   console.log(`================================================`);
-  resetTelegramWebhook(() => {
-    pollTelegramUpdates();
-  });
+  pollAdminBotUpdates();
+  pollSupportBotUpdates();
 });
