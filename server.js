@@ -1,6 +1,8 @@
 /**
  * MeetLoop - High-Performance WebRTC Backend Server
- * DUAL-BOT ARCHITECTURE with Automatic Bot Username Detection
+ * DUAL-BOT ARCHITECTURE (Fully Isolated):
+ *  1. MeetLoopPayBot / Admin Bot -> Puro GCash, Reports, at 1-Click Ban/Approve
+ *  2. MeetLoop Support Bot -> Puro Customer Chat at Support Tickets LANG
  */
 
 const express = require("express");
@@ -29,8 +31,11 @@ const UNBAN_SUBMIT_COOLDOWN = 5 * 1000;
 /* ================= 🤖 SECURE DUAL-BOT TOKENS ================= */
 const _dec = (b64) => Buffer.from(b64, "base64").toString("utf8");
 
+// 🔴 BOT 1: MeetLoopPayBot (Admin Controls, GCash & Bans)
 const ADMIN_BOT_TOKEN = process.env.ADMIN_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || _dec("ODY0ODM1Njc2NTpBQUdnakVZOVc4VF9yV1VFazFEZ3hIUzQ4b05MT2hnMGQycw==");
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || _dec("NTc3OTk3NjU5Ng==");
+
+// 🔵 BOT 2: MeetLoop Support Bot (Customer Inquiries Only)
 const SUPPORT_BOT_TOKEN = process.env.SUPPORT_BOT_TOKEN || _dec("ODgzMzczNzQwNjpBQUVBSDhrbkxzcldxdThESVY0NFRjVmVqTFo5VGhnQy1HTQ==");
 
 let autoDetectedSupportBotUsername = "MeetLoop_bot";
@@ -65,6 +70,7 @@ if (!fs.existsSync(DATA_DIR)) {
 let dbData = {
   bannedDevices: {},
   bannedFingerprints: {},
+  bannedIPs: {},
   persistentTickets: {},
   burnedReceipts: []
 };
@@ -94,10 +100,10 @@ loadDatabase();
 
 const bannedDevices = new Map(Object.entries(dbData.bannedDevices || {}));
 const bannedFingerprints = new Map(Object.entries(dbData.bannedFingerprints || {}));
+const bannedIPs = new Map(Object.entries(dbData.bannedIPs || {}));
 const persistentDeviceTickets = new Map(Object.entries(dbData.persistentTickets || {}));
 const burnedReceipts = new Set(dbData.burnedReceipts || []);
 
-const bannedIPs = new Map();
 const userInfractions = new Map();
 let availablePayments = [];
 const offlineClearedSet = new Set();
@@ -107,6 +113,7 @@ const snapshotCache = new Map();
 function syncToDisk() {
   dbData.bannedDevices = Object.fromEntries(bannedDevices);
   dbData.bannedFingerprints = Object.fromEntries(bannedFingerprints);
+  dbData.bannedIPs = Object.fromEntries(bannedIPs);
   dbData.persistentTickets = Object.fromEntries(persistentDeviceTickets);
   dbData.burnedReceipts = Array.from(burnedReceipts);
   saveDatabase();
@@ -115,7 +122,7 @@ function syncToDisk() {
 function getClientIp(socket) {
   const forwarded = socket.handshake.headers["x-forwarded-for"];
   if (forwarded) return forwarded.split(",")[0].trim();
-  return socket.handshake.address || "0.0.0.0";
+  return socket.handshake.address || socket.conn?.remoteAddress || "0.0.0.0";
 }
 
 function escapeHtml(str) {
@@ -123,7 +130,7 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-/* ================= 🤖 BOT 1: ADMIN CONTROLS ================= */
+/* ================= 🔴 BOT 1: MEETLOOP PAY BOT (ADMIN CONTROLS) ================= */
 function sendTelegramAdminRaw(endpoint, payloadObj, callback) {
   if (!ADMIN_BOT_TOKEN) return;
   const payload = JSON.stringify(payloadObj);
@@ -253,7 +260,7 @@ function sendTelegramPhotoWithActions(chatId, base64Snapshot, captionText, targe
   }
 }
 
-/* ================= 🤖 BOT 2: PUBLIC SUPPORT SENDER ================= */
+/* ================= 🔵 BOT 2: MEETLOOP SUPPORT BOT (CUSTOMER ONLY) ================= */
 function sendTelegramSupportMessage(chatId, text) {
   if (!SUPPORT_BOT_TOKEN) return;
   const payload = JSON.stringify({ chat_id: String(chatId).trim(), text: text, parse_mode: "HTML", disable_web_page_preview: true });
@@ -272,7 +279,6 @@ function sendTelegramSupportMessage(chatId, text) {
   req.end();
 }
 
-/* ================= 🔍 AUTO-DETECT BOT 2 USERNAME ================= */
 function detectSupportBotUsername() {
   const options = {
     hostname: "api.telegram.org",
@@ -287,7 +293,7 @@ function detectSupportBotUsername() {
         const json = JSON.parse(d);
         if (json.ok && json.result && json.result.username) {
           autoDetectedSupportBotUsername = json.result.username;
-          console.log(`🔵 Live Support Bot Username: @${autoDetectedSupportBotUsername}`);
+          console.log(`🔵 Live Support Bot: @${autoDetectedSupportBotUsername}`);
           io.emit("bot-config", { supportBot: autoDetectedSupportBotUsername });
         }
       } catch(e){}
@@ -371,13 +377,18 @@ function analyzeCameraFrameSnapshot(base64Data) {
 function executeUnbanUser(hardwareId, phone = "Manual", auto = false) {
   if (!hardwareId) return;
 
+  let targetIp = null;
+  let targetFp = null;
+
   const banRecord = bannedDevices.get(hardwareId);
-  const targetFp = banRecord ? banRecord.fingerprint : null;
-  const targetIp = banRecord ? banRecord.ip : null;
+  if (banRecord) {
+    targetIp = banRecord.ip;
+    targetFp = banRecord.fingerprint;
+  }
 
   bannedDevices.delete(hardwareId);
   if (targetFp) bannedFingerprints.delete(targetFp);
-  if (targetIp) bannedIPs.delete(targetIp);
+  if (targetIp && targetIp !== "0.0.0.0") bannedIPs.delete(targetIp);
 
   for (const [fp, rec] of bannedFingerprints.entries()) {
     if (rec.hardwareId === hardwareId || (targetFp && fp === targetFp)) {
@@ -386,7 +397,7 @@ function executeUnbanUser(hardwareId, phone = "Manual", auto = false) {
   }
 
   for (const [ip, rec] of bannedIPs.entries()) {
-    if (rec.hardwareId === hardwareId) {
+    if (rec.hardwareId === hardwareId || (targetIp && ip === targetIp)) {
       bannedIPs.delete(ip);
     }
   }
@@ -398,7 +409,7 @@ function executeUnbanUser(hardwareId, phone = "Manual", auto = false) {
 
   syncToDisk();
 
-  io.emit("real-admin-unban-signal", { hardwareId: hardwareId });
+  io.emit("real-admin-unban-signal", { hardwareId: hardwareId, ip: targetIp, fingerprint: targetFp });
 
   if (auto) {
     const successMsg = `⚡ <b>AUTO-UNBAN SUCCESSFUL (₱20.00 PAID)!</b> 🎉\n\n` +
@@ -475,7 +486,7 @@ app.all("/webhook/gcash-sms", (req, res) => {
 app.use(express.static(path.join(__dirname, "public"), { etag: false, maxAge: 0 }));
 app.use(express.static(__dirname, { etag: false, maxAge: 0 }));
 
-/* ================= 🤖 TELEGRAM POLLING (BOT 1: ADMIN CONTROLS) ================= */
+/* ================= 🤖 BOT 1 POLLING: MEETLOOP PAY BOT (ADMIN) ================= */
 let adminLastUpdateId = 0;
 
 function pollAdminBotUpdates() {
@@ -517,11 +528,16 @@ function pollAdminBotUpdates() {
 
               if (action === "ab") {
                 const snapshot = snapshotCache.get(hwId) || null;
-                const record = banDeviceSecurity(hwId, "0.0.0.0", "", "Admin 1-Click Ban", snapshot);
+                const socketTarget = io.sockets.sockets.get(hwId);
+                const clientIp = socketTarget ? getClientIp(socketTarget) : "0.0.0.0";
+                const fingerprint = String(socketTarget?.handshake?.query?.fingerprint || "");
+
+                const record = banDeviceSecurity(hwId, clientIp, fingerprint, "Admin 1-Click Ban", snapshot);
 
                 for (const [, s] of io.sockets.sockets.entries()) {
                   const socketHw = String(s.handshake.query.hardwareId || "").trim();
-                  if (socketHw === hwId) {
+                  const sIp = getClientIp(s);
+                  if (socketHw === hwId || (clientIp !== "0.0.0.0" && sIp === clientIp)) {
                     s.emit("force-device-ban", { hardwareId: hwId, banUntil: record.banUntil, snapshot: record.snapshot });
                     s.emit("ip-banned", { banUntil: record.banUntil, reason: record.reason, snapshot: record.snapshot });
                     cleanupUserSession(s.id);
@@ -596,11 +612,11 @@ function pollAdminBotUpdates() {
   req.end();
 }
 
-/* ================= 🤖 TELEGRAM POLLING (BOT 2: CUSTOMER SUPPORT) ================= */
+/* ================= 🤖 BOT 2 POLLING: MEETLOOP SUPPORT BOT (ISOLATED) ================= */
 let supportLastUpdateId = 0;
 
 function pollSupportBotUpdates() {
-  if (SUPPORT_BOT_TOKEN === ADMIN_BOT_TOKEN) return;
+  if (!SUPPORT_BOT_TOKEN || SUPPORT_BOT_TOKEN === ADMIN_BOT_TOKEN) return;
 
   const payload = JSON.stringify({
     offset: supportLastUpdateId + 1,
@@ -644,9 +660,11 @@ function pollSupportBotUpdates() {
                   `<i>Matatanggap agad ito ng Admin team para ma-unban ka.</i>`
                 );
               } else {
+                // Sagot ng Support Bot sa user
                 sendTelegramSupportMessage(senderChatId, `✅ <b>Nai-forward na ang mensahe mo kay Admin.</b> Pakihintay ang unban clearance.`);
                 
-                sendTelegramAdminMessage(ADMIN_CHAT_ID, 
+                // Mismong SUPPORT BOT ang magme-message sa Admin (HINDI ang PayBot!)
+                sendTelegramSupportMessage(ADMIN_CHAT_ID, 
                   `📩 <b>CUSTOMER SUPPORT TICKET</b>\n\n` +
                   `👤 <b>Sender:</b> ${escapeHtml(senderName)} (${escapeHtml(username)})\n` +
                   `🆔 <b>User Telegram ID:</b> <code>${senderChatId}</code>\n` +
@@ -667,7 +685,7 @@ function pollSupportBotUpdates() {
   req.end();
 }
 
-/* ================= 🔒 BAN ENGINE ================= */
+/* ================= 🔒 3-LAYER HARDENED BAN ENGINE ================= */
 function checkSecurityBan(hardwareId, clientIp, fingerprint) {
   const now = Date.now();
 
@@ -688,6 +706,13 @@ function checkSecurityBan(hardwareId, clientIp, fingerprint) {
     syncToDisk();
   }
 
+  if (clientIp && clientIp !== "0.0.0.0" && clientIp !== "127.0.0.1" && bannedIPs.has(clientIp)) {
+    const r = bannedIPs.get(clientIp);
+    if (now < r.banUntil) return r;
+    bannedIPs.delete(clientIp);
+    syncToDisk();
+  }
+
   return null;
 }
 
@@ -698,6 +723,7 @@ function banDeviceSecurity(hardwareId, clientIp, fingerprint, reason, snapshot =
   offlineClearedSet.delete(hardwareId);
   if (hardwareId) bannedDevices.set(hardwareId, record);
   if (fingerprint) bannedFingerprints.set(fingerprint, record);
+  if (clientIp && clientIp !== "0.0.0.0" && clientIp !== "127.0.0.1") bannedIPs.set(clientIp, record);
 
   syncToDisk();
   return record;
@@ -903,8 +929,8 @@ app.get("*", (req, res) => {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`🔴 Bot 1 (Admin Controls): ONLINE`);
-  console.log(`🔵 Bot 2 (Customer Support): ONLINE`);
+  console.log(`🔴 Bot 1: MeetLoopPayBot (Admin Controls) -> ONLINE`);
+  console.log(`🔵 Bot 2: MeetLoop Support Bot (Customer Care) -> ONLINE`);
   console.log(`💰 Unban Clearance Fee: ₱20.00 ONLY`);
   console.log(`💾 Persistent Disk Storage: ${DB_FILE}`);
   console.log(`================================================`);
