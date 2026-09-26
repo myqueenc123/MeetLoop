@@ -1,7 +1,7 @@
 /**
  * MeetLoop - High-Performance WebRTC Backend Server
- * 100% Reliable Telegram 1-Click Buttons & Unban Alerts
- * Umingle-Grade AI Vision Moderation + Strict ₱20 GCash Protection
+ * Complete Live Telegram Support Ticket Router + Umingle Vision AI Moderation
+ * Fee Enforced: PHP 20.00 ONLY
  */
 
 const express = require("express");
@@ -25,7 +25,7 @@ const PORT = process.env.PORT || 3000;
 const BAN_DURATION_7DAYS = 7 * 24 * 60 * 60 * 1000;
 const PAYMENT_VALIDITY_WINDOW = 60 * 60 * 1000;
 const REPORT_EXPIRY_WINDOW = 24 * 60 * 60 * 1000;
-const UNBAN_SUBMIT_COOLDOWN = 5 * 1000; // 5 seconds anti-double click
+const UNBAN_SUBMIT_COOLDOWN = 5 * 1000;
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8648356765:AAGgnEY9W8T_rWUEk1DgxHS48oNLOhg0d2s";
 const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || "5779976596";
@@ -167,8 +167,6 @@ function sendTelegramWithButtons(chatId, text, hardwareId) {
         ]
       ]
     }
-  }, (err, res) => {
-    if (!err) console.log(`📤 Telegram Unban Alert dispatched for ${cleanId}`);
   });
 }
 
@@ -426,12 +424,12 @@ app.all("/webhook/gcash-sms", (req, res) => {
 app.use(express.static(path.join(__dirname, "public"), { etag: false, maxAge: 0 }));
 app.use(express.static(__dirname, { etag: false, maxAge: 0 }));
 
-/* ================= 🤖 TELEGRAM POLLING ENGINE ================= */
+/* ================= 🤖 TELEGRAM POLLING & SUPPORT BOT ================= */
 let lastUpdateId = 0;
 
 function resetTelegramWebhook(cb) {
   sendTelegramRaw("deleteWebhook", { drop_pending_updates: false }, () => {
-    console.log("🤖 Telegram Webhook cleared. Polling engine online.");
+    console.log("🤖 Telegram Webhook reset complete. Support Bot ready.");
     if (cb) cb();
   });
 }
@@ -463,6 +461,7 @@ function pollTelegramUpdates() {
           json.result.forEach((update) => {
             lastUpdateId = update.update_id;
             
+            // 1. HANDLE BUTTON CLICKS (Callbacks)
             if (update.callback_query) {
               const cb = update.callback_query;
               const cbData = String(cb.data || "");
@@ -474,7 +473,6 @@ function pollTelegramUpdates() {
               const hwId = parts.slice(1).join(":");
 
               if (action === "ab") {
-                // 🚨 1-CLICK BAN (7-DAYS)
                 const snapshot = snapshotCache.get(hwId) || null;
                 const record = banDeviceSecurity(hwId, "0.0.0.0", "", "Admin 1-Click Ban", snapshot);
 
@@ -488,11 +486,7 @@ function pollTelegramUpdates() {
                 }
                 io.emit("force-device-ban", { hardwareId: hwId, banUntil: record.banUntil, snapshot: record.snapshot });
 
-                sendTelegramRaw("answerCallbackQuery", { 
-                  callback_query_id: cb.id, 
-                  text: "🚨 User BANNED for 7 Days!", 
-                  show_alert: true 
-                });
+                sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "🚨 User BANNED for 7 Days!", show_alert: true });
 
                 if (msgId) {
                   sendTelegramRaw("editMessageCaption", {
@@ -503,15 +497,10 @@ function pollTelegramUpdates() {
                   });
                 }
               } else if (action === "ds") {
-                // ✅ DISMISS REPORT
                 userInfractions.delete(hwId);
                 snapshotCache.delete(hwId);
 
-                sendTelegramRaw("answerCallbackQuery", { 
-                  callback_query_id: cb.id, 
-                  text: "✅ Report Dismissed.", 
-                  show_alert: false 
-                });
+                sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "✅ Report Dismissed.", show_alert: false });
 
                 if (msgId) {
                   sendTelegramRaw("editMessageCaption", {
@@ -522,15 +511,10 @@ function pollTelegramUpdates() {
                   });
                 }
               } else if (action === "ap") {
-                // 🟢 1-CLICK APPROVE UNBAN
                 const ticket = persistentDeviceTickets.get(hwId);
                 executeUnbanUser(hwId, ticket ? ticket.phone : "Manual", false);
 
-                sendTelegramRaw("answerCallbackQuery", { 
-                  callback_query_id: cb.id, 
-                  text: "✅ APPROVED: User is UNBANNED!", 
-                  show_alert: true 
-                });
+                sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "✅ APPROVED: User is UNBANNED!", show_alert: true });
 
                 if (msgId) {
                   sendTelegramRaw("editMessageText", {
@@ -541,15 +525,10 @@ function pollTelegramUpdates() {
                   });
                 }
               } else if (action === "rj") {
-                // 🔴 REJECT UNBAN
                 persistentDeviceTickets.delete(hwId);
                 syncToDisk();
 
-                sendTelegramRaw("answerCallbackQuery", { 
-                  callback_query_id: cb.id, 
-                  text: "❌ Request REJECTED.", 
-                  show_alert: false 
-                });
+                sendTelegramRaw("answerCallbackQuery", { callback_query_id: cb.id, text: "❌ Request REJECTED.", show_alert: false });
 
                 if (msgId) {
                   sendTelegramRaw("editMessageText", {
@@ -558,6 +537,38 @@ function pollTelegramUpdates() {
                     text: `❌ <b>UNBAN REQUEST REJECTED</b>\n🆔 Hardware ID: <code>${escapeHtml(hwId)}</code>`,
                     parse_mode: "HTML"
                   });
+                }
+              }
+            } 
+            
+            // 2. HANDLE DIRECT CHATS / SUPPORT MESSAGES FROM USERS
+            else if (update.message) {
+              const msg = update.message;
+              const senderChatId = msg.chat?.id;
+              const text = msg.text || "";
+              const senderName = `${msg.from?.first_name || ""} ${msg.from?.last_name || ""}`.trim();
+              const username = msg.from?.username ? `@${msg.from.username}` : "No Username";
+
+              if (String(senderChatId) !== String(ADMIN_CHAT_ID)) {
+                if (text === "/start") {
+                  // Auto Welcome Message
+                  sendTelegramMessage(senderChatId, 
+                    `👋 <b>Welcome to MeetLoop Live Support!</b>\n\n` +
+                    `Kung ikaw ay na-ban at nais mag-apela o mag-send ng GCash payment receipt, mangyaring i-send dito ang iyong:\n` +
+                    `1. <b>Device Ban ID (makikita sa pulang ban screen)</b>\n` +
+                    `2. <b>GCash Ref No. o Screenshot ng bayad</b>\n\n` +
+                    `<i>Matatanggap agad ito ng Admin team para ma-verify ang unban mo.</i>`
+                  );
+                } else {
+                  // Forward User's Message to Admin
+                  sendTelegramMessage(senderChatId, `✅ <b>Nai-forward na ang mensahe mo kay Admin.</b> Pakihintay ang pagsusuri.`);
+                  
+                  sendTelegramMessage(ADMIN_CHAT_ID, 
+                    `📩 <b>BAGONG SUPPORT MESSAGE</b>\n\n` +
+                    `👤 <b>Mula kay:</b> ${escapeHtml(senderName)} (${escapeHtml(username)})\n` +
+                    `🆔 <b>Telegram User ID:</b> <code>${senderChatId}</code>\n` +
+                    `💬 <b>Mensahe:</b>\n<i>${escapeHtml(text)}</i>`
+                  );
                 }
               }
             }
@@ -756,7 +767,6 @@ io.on("connection", (socket) => {
     const reqHardware = String(data.hardwareId || hardwareId).trim();
     const now = Date.now();
 
-    // 5-second anti double-click protection
     const lastSubmitTime = unbanRequestCooldowns.get(reqHardware) || 0;
     if (now - lastSubmitTime < UNBAN_SUBMIT_COOLDOWN) {
       return socket.emit("unban-pending", { message: "⏳ Details already submitted. Checking payment..." });
@@ -788,7 +798,6 @@ io.on("connection", (socket) => {
     persistentDeviceTickets.set(reqHardware, { phone, ref, time: now });
     syncToDisk();
 
-    // Palaging magpadala sa Telegram
     sendTelegramWithButtons(
       ADMIN_CHAT_ID, 
       `🚨 <b>UNBAN REQUEST (₱20.00 FEE)</b>\n\n` +
@@ -817,7 +826,7 @@ app.get("*", (req, res) => {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
-  console.log(`🤖 Telegram Direct Action Engine: READY`);
+  console.log(`🤖 Telegram Live Support Bot ACTIVE`);
   console.log(`🛡️ Umingle-Grade Smart Vision AI Moderation ACTIVE`);
   console.log(`💰 Unban Clearance Fee: ₱20.00 ONLY`);
   console.log(`💾 Persistent Disk Storage: ${DB_FILE}`);
