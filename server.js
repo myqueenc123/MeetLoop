@@ -1,8 +1,7 @@
 /**
  * MeetLoop - High-Performance WebRTC Backend Server
- * DUAL-BOT ARCHITECTURE:
- *  1. MeetLoopPayBot -> Admin Controls, AI Reports, 1-Click Ban/Approve
- *  2. MeetLoop Support Bot -> Smart AI Customer Agent + Photo/Receipt Forwarder
+ * Zero-Lag Fast WebSocket Dispatch + 3-Layer Anti-Incognito Ban
+ * DUAL-BOT Architecture + Umingle Vision AI Moderation
  */
 
 const express = require("express");
@@ -15,11 +14,13 @@ const fs = require("fs");
 const app = express();
 const server = http.createServer(app);
 
+// ⚡ HIGH-PERFORMANCE SOCKET.IO ENGINE (ZERO LAG)
 const io = new Server(server, {
   cors: { origin: "*", methods: ["GET", "POST"] },
   transports: ["websocket", "polling"],
-  pingTimeout: 30000,
-  pingInterval: 10000
+  perMessageDeflate: false,
+  pingTimeout: 20000,
+  pingInterval: 8000
 });
 
 const PORT = process.env.PORT || 3000;
@@ -83,6 +84,7 @@ function loadDatabase() {
   }
 }
 
+let diskSaveTimer = null;
 function saveDatabase() {
   try {
     const tempFile = `${DB_FILE}.tmp`;
@@ -113,7 +115,9 @@ function syncToDisk() {
   dbData.bannedIPs = Object.fromEntries(bannedIPs);
   dbData.persistentTickets = Object.fromEntries(persistentDeviceTickets);
   dbData.burnedReceipts = Array.from(burnedReceipts);
-  saveDatabase();
+  
+  if (diskSaveTimer) clearTimeout(diskSaveTimer);
+  diskSaveTimer = setTimeout(saveDatabase, 300);
 }
 
 function getClientIp(socket) {
@@ -127,7 +131,7 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-/* ================= 🔴 BOT 1: ADMIN CONTROL SENDER ================= */
+/* ================= 🔴 BOT 1: MEETLOOP PAY BOT (ADMIN CONTROLS) ================= */
 function sendTelegramAdminRaw(endpoint, payloadObj, callback) {
   if (!ADMIN_BOT_TOKEN) return;
   const payload = JSON.stringify(payloadObj);
@@ -135,10 +139,7 @@ function sendTelegramAdminRaw(endpoint, payloadObj, callback) {
     hostname: "api.telegram.org",
     path: `/bot${ADMIN_BOT_TOKEN}/${endpoint}`,
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Content-Length": Buffer.byteLength(payload)
-    }
+    headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(payload) }
   };
   const req = https.request(options, (res) => {
     let d = "";
@@ -231,10 +232,7 @@ function sendTelegramPhotoWithActions(chatId, base64Snapshot, captionText, targe
       hostname: "api.telegram.org",
       path: `/bot${ADMIN_BOT_TOKEN}/sendPhoto`,
       method: "POST",
-      headers: {
-        "Content-Type": `multipart/form-data; boundary=${boundary}`,
-        "Content-Length": payloadLength
-      }
+      headers: { "Content-Type": `multipart/form-data; boundary=${boundary}`, "Content-Length": payloadLength }
     };
 
     const req = https.request(options, (res) => {
@@ -257,13 +255,10 @@ function sendTelegramPhotoWithActions(chatId, base64Snapshot, captionText, targe
   }
 }
 
-/* ================= 🔵 BOT 2: SUPPORT SENDER & PHOTO FORWARDER ================= */
-function sendTelegramSupportMessage(chatId, text, replyMarkupObj = null) {
+/* ================= 🔵 BOT 2: MEETLOOP SUPPORT BOT ================= */
+function sendTelegramSupportMessage(chatId, text) {
   if (!SUPPORT_BOT_TOKEN) return;
-  const payloadObj = { chat_id: String(chatId).trim(), text: text, parse_mode: "HTML", disable_web_page_preview: true };
-  if (replyMarkupObj) payloadObj.reply_markup = replyMarkupObj;
-
-  const payload = JSON.stringify(payloadObj);
+  const payload = JSON.stringify({ chat_id: String(chatId).trim(), text: text, parse_mode: "HTML", disable_web_page_preview: true });
   const options = {
     hostname: "api.telegram.org",
     path: `/bot${SUPPORT_BOT_TOKEN}/sendMessage`,
@@ -276,12 +271,9 @@ function sendTelegramSupportMessage(chatId, text, replyMarkupObj = null) {
   req.end();
 }
 
-function sendTelegramSupportPhoto(chatId, fileId, captionText, replyMarkupObj = null) {
+function sendTelegramSupportPhoto(chatId, fileId, captionText) {
   if (!SUPPORT_BOT_TOKEN) return;
-  const payloadObj = { chat_id: String(chatId).trim(), photo: fileId, caption: captionText, parse_mode: "HTML" };
-  if (replyMarkupObj) payloadObj.reply_markup = replyMarkupObj;
-
-  const payload = JSON.stringify(payloadObj);
+  const payload = JSON.stringify({ chat_id: String(chatId).trim(), photo: fileId, caption: captionText, parse_mode: "HTML" });
   const options = {
     hostname: "api.telegram.org",
     path: `/bot${SUPPORT_BOT_TOKEN}/sendPhoto`,
@@ -325,15 +317,15 @@ function generateSmartAIResponse(userText) {
   if (t.includes("unban") || t.includes("banned") || t.includes("na-ban") || t.includes("lift") || t.includes("paunban")) {
     return `🤖 <b>MeetLoop AI Assistant:</b>\n\n` +
            `Para ma-unban ang iyong account agad:\n` +
-           `1️⃣ Magbayad ng <b>₱20.00 GCash Clearance Fee</b> gamit ang QR code sa pulang ban screen.\n` +
+           `1️⃣ Magbayad ng <b>₱20.00 GCash Clearance Fee</b> gamit ang QR code sa ban screen.\n` +
            `2️⃣ I-submit ang iyong 11-digit mobile number sa website.\n` +
-           `3️⃣ O i-send dito ang screenshot ng iyong resibo kasama ang iyong <b>Device Ban ID</b> para ma-review ni Admin!`;
+           `3️⃣ O i-send dito ang screenshot ng resibo kasama ang iyong <b>Device Ban ID</b> para ma-review ni Admin!`;
   }
 
-  if (t.includes("gcash") || t.includes("bayad") || t.includes("magkano") || t.includes("price") || t.includes("fee") || t.includes("pay")) {
+  if (t.includes("gcash") || t.includes("bayad") || t.includes("magkano") || t.includes("fee") || t.includes("pay")) {
     return `💳 <b>MeetLoop AI Assistant:</b>\n\n` +
            `Ang voluntary clearance fee ay eksaktong <b>₱20.00 ONLY</b>.\n` +
-           `I-scan ang official InstaPay/GCash QR Code sa website at ilagay ang iyong number para sa instant auto-unban.`;
+           `I-scan ang official QR Code sa website at ilagay ang iyong number para sa instant unban verification.`;
   }
 
   if (t.includes("ban id") || t.includes("device id") || t.includes("saan makikita")) {
@@ -660,7 +652,7 @@ function pollAdminBotUpdates() {
   req.end();
 }
 
-/* ================= 🤖 BOT 2 POLLING: SMART AI SUPPORT + PHOTO FORWARDER ================= */
+/* ================= 🤖 BOT 2 POLLING: MEETLOOP SUPPORT BOT ================= */
 let supportLastUpdateId = 0;
 
 function pollSupportBotUpdates() {
@@ -696,18 +688,16 @@ function pollSupportBotUpdates() {
               const senderName = `${msg.from?.first_name || ""} ${msg.from?.last_name || ""}`.trim();
               const username = msg.from?.username ? `@${msg.from.username}` : "No Username";
 
-              // 📸 1. KUNG NAG-SEND NG SCREENSHOT / LITRATO ANG USER:
+              // 📸 1. PHOTO / RECEIPT FORWARDING
               if (msg.photo && Array.isArray(msg.photo) && msg.photo.length > 0) {
                 const highestResPhoto = msg.photo[msg.photo.length - 1];
                 const fileId = highestResPhoto.file_id;
 
-                // Auto-reply ng AI sa user
                 sendTelegramSupportMessage(senderChatId, 
                   `📸 <b>Salamat! Natanggap ko ang iyong screenshot ng resibo.</b>\n\n` +
                   `Ipinasa ko na ito agad kay Admin para ma-verify at ma-clear ang iyong unban request!`
                 );
 
-                // I-FORWARD ANG LITRATO DIRECTLY KAY ADMIN!
                 const captionForAdmin = `🧾 <b>BAGONG GCASH RECEIPT / SCREENSHOT</b>\n\n` +
                                         `👤 <b>Mula kay:</b> ${escapeHtml(senderName)} (${escapeHtml(username)})\n` +
                                         `🆔 <b>User Telegram ID:</b> <code>${senderChatId}</code>\n` +
@@ -716,13 +706,11 @@ function pollSupportBotUpdates() {
                 sendTelegramSupportPhoto(ADMIN_CHAT_ID, fileId, captionForAdmin);
               } 
               
-              // 💬 2. KUNG REGULAR TEXT MESSAGE ANG IPINADALA:
+              // 💬 2. CONVERSATIONAL AI CHAT
               else if (text) {
-                // Auto AI Response papunta sa user
                 const aiResponse = generateSmartAIResponse(text);
                 sendTelegramSupportMessage(senderChatId, aiResponse);
 
-                // I-forward ang text message kay Admin
                 sendTelegramSupportMessage(ADMIN_CHAT_ID, 
                   `📩 <b>CUSTOMER SUPPORT TICKET</b>\n\n` +
                   `👤 <b>Sender:</b> ${escapeHtml(senderName)} (${escapeHtml(username)})\n` +
@@ -895,8 +883,8 @@ io.on("connection", (socket) => {
         const shouldAutoBan = ai.shouldAutoBan === true;
 
         const aiBadge = ai.isSafeUser 
-          ? "🟢 <b>SAFE / INNOCENT (Auto-Ban Blocked)</b>" 
-          : (shouldAutoBan ? "🛑 <b>VIOLATION CONFIRMED (Auto-Banned)</b>" : "⚠️ <b>SUSPICIOUS (Needs Admin Review)</b>");
+          ? "SAFE / INNOCENT (Auto-Ban Blocked)" 
+          : (shouldAutoBan ? "VIOLATION CONFIRMED (Auto-Banned)" : "SUSPICIOUS (Needs Admin Review)");
 
         const alertText = `🚨 <b>USER REPORT INSPECTED</b>\n\n` +
                           `⚖️ <b>AI Verdict:</b> ${aiBadge}\n` +
@@ -905,7 +893,7 @@ io.on("connection", (socket) => {
                           `🆔 <b>Target Device:</b> <code>${escapeHtml(partnerHw)}</code>\n` +
                           `🌐 <b>Target IP:</b> <code>${escapeHtml(partnerIp)}</code>\n` +
                           `📊 <b>Reports (24h):</b> ${reportCount}\n\n` +
-                          `<i>Decision: ${shouldAutoBan ? "🛑 Banned for 7 Days by AI." : (ai.isSafeUser ? "✅ Inosente. Hindi binan." : "⏳ Pindutin ang button sa ibaba para mag-desisyon.")}</i>`;
+                          `<i>Decision: ${shouldAutoBan ? "Banned for 7 Days by AI." : (ai.isSafeUser ? "Inosente. Hindi binan." : "Pindutin ang button sa ibaba para mag-desisyon.")}</i>`;
 
         sendTelegramPhotoWithActions(ADMIN_CHAT_ID, snapshot, alertText, partnerHw);
 
@@ -931,11 +919,11 @@ io.on("connection", (socket) => {
 
     const lastSubmitTime = unbanRequestCooldowns.get(reqHardware) || 0;
     if (now - lastSubmitTime < UNBAN_SUBMIT_COOLDOWN) {
-      return socket.emit("unban-pending", { message: "⏳ Details already submitted. Checking payment..." });
+      return socket.emit("unban-pending", { message: "Details already submitted. Checking payment..." });
     }
 
     if (!phone || phone.length < 10) {
-      return socket.emit("unban-response", { success: false, message: "❌ Please enter a valid 11-digit GCash Mobile Number." });
+      return socket.emit("unban-response", { success: false, message: "Please enter a valid 11-digit GCash Mobile Number." });
     }
 
     unbanRequestCooldowns.set(reqHardware, now);
@@ -969,7 +957,7 @@ io.on("connection", (socket) => {
       reqHardware
     );
 
-    socket.emit("unban-pending", { message: "⏳ Details submitted! Checking ₱20 payment..." });
+    socket.emit("unban-pending", { message: "Details submitted! Checking ₱20 payment..." });
   });
 
   socket.on("stop-search", () => { cleanupUserSession(socket.id); });
@@ -988,6 +976,7 @@ app.get("*", (req, res) => {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`================================================`);
   console.log(`🚀 MeetLoop Server LIVE on port ${PORT}`);
+  console.log(`⚡ Zero-Lag WebRTC Mesh Engine: ACTIVE`);
   console.log(`🔴 Bot 1: MeetLoopPayBot (Admin Controls) -> ONLINE`);
   console.log(`🔵 Bot 2: MeetLoop Support Bot (AI Assistant) -> ONLINE`);
   console.log(`📸 Realtime Photo & Receipt Forwarder: ENABLED`);
