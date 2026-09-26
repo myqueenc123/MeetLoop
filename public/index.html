@@ -82,7 +82,7 @@ video{
   will-change:transform;
 }
 
-/* 🛡️ 100% PERFECT FIT FROZEN STILL PHOTO OVERLAY (HINDI NA WIDE/BANAT) */
+/* 🛡️ 100% PERFECT FIT FROZEN STILL PHOTO OVERLAY */
 #freezeImageOverlay{
   position:absolute;
   inset:0;
@@ -343,6 +343,7 @@ video{
 .gcash-verify-btn{width:100%;height:42px;border:0;border-radius:8px;background:#005ce6;color:#fff;font-size:12.5px;font-weight:900;cursor:pointer;transition:all 0.2s}
 .gcash-verify-btn:disabled{background:#64748b !important;color:#cbd5e1 !important;cursor:not-allowed !important}
 
+/* DYNAMIC SUPPORT BOT BUTTON */
 .telegram-support-btn{
   width:100%;height:40px;border:1.5px solid #0284c7;border-radius:10px;background:#0f172a;color:#38bdf8;
   font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;
@@ -481,9 +482,10 @@ video{
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
 
-      <a href="https://t.me/MeetLoop_bot" target="_blank" class="telegram-support-btn">
+      <!-- DYNAMIC AUTO-LINKED SUPPORT BOT -->
+      <a href="https://t.me/MeetLoop_bot" target="_blank" class="telegram-support-btn" id="telegramSupportLink">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.88.03-.24.37-.49 1.02-.75 3.99-1.74 6.66-2.89 8-3.46 3.82-1.6 4.62-1.88 5.14-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.21-.03.36z"/></svg>
-        <span>Message Telegram Support (@MeetLoop_bot)</span>
+        <span id="telegramSupportLabel">Message Telegram Support</span>
       </a>
 
       <div class="method-card" style="cursor:default">
@@ -746,7 +748,7 @@ if (savedBanUntil && Date.now() < savedBanUntil) {
   }, 30);
 }
 
-/* ================= 3. SOCKET CONNECTION ================= */
+/* ================= 3. SOCKET CONNECTION & AUTO BOT CONFIG ================= */
 let socket = null;
 try {
   if (typeof io !== "undefined") {
@@ -756,6 +758,22 @@ try {
     });
   }
 } catch(e){}
+
+function updateSupportBotLink(botUsername) {
+  if (!botUsername) return;
+  const link = document.getElementById("telegramSupportLink");
+  const label = document.getElementById("telegramSupportLabel");
+  if (link) link.href = `https://t.me/${botUsername}`;
+  if (label) label.textContent = `Message Telegram Support (@${botUsername})`;
+}
+
+// Auto Fetch Config from Backend
+fetch("/api/config")
+  .then(r => r.json())
+  .then(cfg => {
+    if (cfg && cfg.supportBot) updateSupportBotLink(cfg.supportBot);
+  })
+  .catch(()=>{});
 
 const crtWrapper = document.getElementById("crtWrapper");
 const crtStaticCanvas = document.getElementById("crtStaticCanvas");
@@ -832,7 +850,7 @@ function setHighQualityBitrate(sdp) {
   return sdp.replace(/a=mid:video\r\n/g, "a=mid:video\r\nb=AS:2500\r\n");
 }
 
-/* ================= 🌟 100% SAKTONG SUKAT (ZERO WIDE DISTORTION) ================= */
+/* ================= 🌟 100% SAKTONG SUKAT ================= */
 function displayOmeTVFrozenSnapshot() {
   if (isFreezeActive) return;
 
@@ -840,7 +858,6 @@ function displayOmeTVFrozenSnapshot() {
     if (isFreezeActive || !remoteVideo || remoteVideo.videoWidth === 0) return;
     isFreezeActive = true;
 
-    // Gamitin ang totoong sukat ng camera ng kausap (hindi naka-wide!)
     const vWidth = remoteVideo.videoWidth || 640;
     const vHeight = remoteVideo.videoHeight || 480;
 
@@ -927,6 +944,10 @@ function handleSuccessfulUnban() {
 }
 
 if (socket) {
+  socket.on("bot-config", (data) => {
+    if (data && data.supportBot) updateSupportBotLink(data.supportBot);
+  });
+
   socket.on("online-count", (count) => {
     const realCount = Math.max(1, Number(count || 1));
     if (standbyUsers) standbyUsers.textContent = realCount.toLocaleString();
